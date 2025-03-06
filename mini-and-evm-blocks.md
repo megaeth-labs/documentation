@@ -1,3 +1,7 @@
+---
+title: Mini Blocks and EVM Blocks
+---
+
 # Mini Blocks and EVM Blocks
 
 MegaETH has two types of blocks: mini blocks and EVM blocks. EVM blocks are identical to their counterparts in other EVM chains, ensuring compatibility with existing tools and applications. Mini blocks are specific to MegaETH and anchor an ecosystem of applications, tools, and infrastructure propose-built for minimum end-to-end latency.
@@ -13,11 +17,13 @@ Besides the resource overhead, the standard EVM block header is designed for cha
 ## What Are Mini Blocks
 
 Mini blocks share a lot of similarities with EVM blocks. Like EVM blocks,
+
 - Mini blocks are ordered lists of transactions executed and preconfirmed by the sequencer.
 - Mini blocks contain every transaction that has been processed by the system. That is, every transaction appears in one mini block and one EVM block. 
 - Mini blocks are totally ordered by their block height, starting with 0 at the genesis.
 - Preconfirmation of mini blocks by the sequencer has the same level of guarantees as EVM blocks.
 
 On the other hand, there are some key differences
+
 - Mini blocks contain a different set of metadata fields compared to EVM blocks.
-- To access information related to transactions that have been included in a mini block but not an EVM block, it is necessary to use the Realtime API—MegaETH’s extension to the standard Ethereum JSON-RPC API.
+- To access information related to transactions that have been included in a mini block but not an EVM block, it is necessary to use the [Realtime API](/realtime-api.html)—MegaETH’s extension to the standard Ethereum JSON-RPC API.

@@ -1,3 +1,7 @@
+---
+title: Realtime API
+---
+
 # Realtime API
 
 MegaETH executes transactions as soon as they arrive at the sequencer. The sequencer emits _preconfirmations_ and _execution results_ of the transactions within 10 milliseconds of their arrival at the sequencer.
@@ -11,6 +15,7 @@ This document specifies the Realtime API. Note that the Realtime API is an evolv
 ## Overview of the Changes
 
 The Realtime API introduces three types of changes to the vanilla Ethereum JSON-RPC API:
+
 1. Most methods that query chain and account states return values as of the most recent mini block, when invoked with `pending` or `latest` as the block tag.
 2. Most methods that query transaction data are able to “see” a transaction and return results as soon as the transaction of interest is packaged into a mini block.
 3. `eth_subscribe`, when invoked over WebSocket, streams transaction logs, state changes, and block content as soon as the corresponding mini block is produced.
