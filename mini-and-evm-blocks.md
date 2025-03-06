@@ -8,7 +8,7 @@ Handling blocks at 10 millisecond intervals requires a significant amount of res
 
 The key issue with standard EVM blocks is that their headers take up quite some space—more than 500 bytes per block. In comparison, at 10,000 transactions per second, each block is expected to contain 100 transactions, so the block header adds 5 bytes of overhead per transaction. The overhead is even higher at lower throughput.
 
-Besides the resource overhead, the standard EVM block header is designed for chains whose block times are seconds or higher as well as light clients who use block headers as the sole root of trust. For example, timestamps have one second resolution, and the multiple Merkle roots optimize for succinctness of Merkle proofs rather than compactness of the headers. We believe that interactions with a chain in realtime—at tens of milliseconds of latency—will take on a different paradigm, and it is an opportunity to redesign the block header for compactness. 
+Besides the resource overhead, the standard EVM block header is designed for chains whose block times are seconds or higher as well as light clients who use block headers as the sole root of trust. For example, timestamps have one second resolution, and the multiple Merkle roots optimize for succinctness of Merkle proofs rather than compactness of the headers. We believe that interactions with a chain in realtime—at tens of milliseconds of latency—will take on a different paradigm, and it is the opportunity to redesign the block for compactness and low latency. 
 
 ## What Are Mini Blocks
 
