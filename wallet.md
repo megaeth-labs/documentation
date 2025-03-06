@@ -1,4 +1,4 @@
-# Set Up and Connect a Wallet 
+# Connecting to MegaETH
 # Testnet Notice
 
 MegaETH is currently in **testnet**, which means the following for wallets:
@@ -10,7 +10,6 @@ MegaETH is currently in **testnet**, which means the following for wallets:
 - Testnet tokens have no real-world value and cannot be bridged to mainnet.
 
 **To learn more about the implications of being on testnet and our rollout roadmap, see [Network Phases](https://hackmd.io/zTV7ghoXRqWLLT8W5UN9BQ#Network-Phases).**
-
 
 # What is a Wallet?
 
@@ -100,18 +99,4 @@ If you’re using a different EVM-compatible wallet, follow a similar process to
 **What’s a secret phrase?**
 
 **How can you be sure that no one can reverse engineer my privkey from my pubkey?**
-
-
-<div style="display: flex; justify-content: space-between; margin-top: 40px;">
-  <a href="https://hackmd.io/1so5MP3ZRJiVKuXHg4aaVQ#Network-Overview" 
-     style="padding: 20px 40px; font-size: 16px; font-weight: bold; border: 1px solid #ddd; text-decoration: none; border-radius: 10px; display: inline-block; text-align: left; width: 350px; color: black;">
-    <span style="font-size: 14px; color: #6c757d;">Previous</span><br>
-    <span style="font-size: 18px; color: #5c3cff;">« Network Overview</span>
-  </a>
-  <a href="https://hackmd.io/ZMe52In5SfqIwfoNHpsl5g#Aquire-Tokens" 
-     style="padding: 20px 40px; font-size: 16px; font-weight: bold; border: 1px solid #ddd; text-decoration: none; border-radius: 10px; display: inline-block; text-align: right; width: 350px; color: black;">
-    <span style="font-size: 14px; color: #6c757d;">Next</span><br>
-    <span style="font-size: 18px; color: #5c3cff;">Aquire Tokens  »</span>
-  </a>
-</div>
 
