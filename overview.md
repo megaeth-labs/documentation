@@ -2,9 +2,10 @@
 
 ##  Testnet Notice
 
-MegaETH is currently in **testnet**, which means:
-- **RPC Endpoints Are Rate Limited And May Change** → Always check this page for the latest URLs.
-- **Network Maintenance May Occur** → RPCs may go offline during upgrades. Contracts and states may be reset in rare cases. Refer to [Latest Updates](/updates) for announcements and updates.
+MegaETH is currently in **Testnet**, which means:
+- **Onboarding Developers and Infrastructure Providers** → The initial phase of the Testnet focuses on onboarding developers and infrastructure providers. They are deploying on the Testnet and checking their integration. This phase will last a few days. In the meantime, the public faucet is disabled. 
+- **RPC Endpoints Are Rate Limited And May Change** → Always check this page for the latest URLs and status.
+- **Network Maintenance May Occur** → RPCs may go offline during upgrades. Contracts and states may be rolled back in rare cases.
 - **Testnet Is Not Incentivized** → Testnet tokens and transactions have no real monetary value. *Everything happening on the chain is solely for experimental purposes.*
 
 ## Fact Sheet
@@ -25,8 +26,7 @@ MegaETH is currently in **testnet**, which means:
 
 ## Next Steps
 
-- **[FAQ](/faq)** → Check out a list of the most commonly asked questions.
-- **[Realtime API](/realtime-api)** → MegaETH is compatible with Ethereum JSON-RPC API. To fully exploit the 10ms block time and build realtime experiences, it is necessary to use the realtime WebSocket RPCs we added to the standard JSON-RPC API.
-- **[Mini Blocks and EVM Blocks](/mini-and-evm-blocks)** → Learn about the differences between the two types of blocks in MegaETH: mini blocks and EVM blocks.
-- **Faucet** → Currently, developers and infrastructure providers are deploying their applications on the Testnet. A public faucet will be available on March 10.
-- **[Connect to the RPC](/wallet)** → Learn how to interact with MegaETH by connecting your wallet or developer tooling to the RPC. 
+- **[FAQ](/faq)** → Go through a list of the most commonly asked questions.
+- **[Architecture](/architecture)** → Get an overview of MegaETH’s architecture 
+- **[Realtime API](/realtime-api)** → MegaETH is compatible with Ethereum JSON-RPC API. To fully exploit the 10ms block time and build realtime experiences, it is necessary to use MegaETH’s Realtime API.
+- **[Mini Blocks and EVM Blocks](/mini-and-evm-blocks)** → Learn about the similarities and differences between the two types of blocks in MegaETH: mini blocks and EVM blocks.
