@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="date" content=''>
+        <title>MegaETH Testnet Docs - Realtime API</title>
+        <link rel="stylesheet" type="text/css" href="neat.css">
+        <link rel="stylesheet" type="text/css" href="custom.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <header>
+            <a href="https://megaeth.com" target="_blank">MEGAETH</a>&nbsp;&nbsp;
+            <a href="/index.html">OVERVIEW</a>&nbsp;&nbsp;
+            <a href="/architecture.html">ARCHITECTURE</a>&nbsp;&nbsp;
+            <a href="/mini-and-evm-blocks.html">MINI BLOCKS</a>&nbsp;&nbsp;
+            <a href="/realtime-api.html">REALTIME API</a>
+        </header>
+        <h1 id="realtime-api">Realtime API</h1>
+        <p>MegaETH executes transactions as soon as they arrive at the
+        sequencer. The sequencer emits <em>preconfirmations</em> and
+        <em>execution results</em> of the transactions within 10
+        milliseconds of their arrival at the sequencer.</p>
+        <p>Such information is exposed through MegaETH’s <em>Realtime
+        API</em>, an extension to Ethereum JSON-RPC API optimized for
+        low-latency access. This API queries against the most recent
+        <em>mini block</em>. In other words, receipts and state changes
+        associated with a transaction is reflected in this API as soon
+        as the transaction is packaged into a mini block, which usually
+        happens within 10 milliseconds of its arrival at the sequencer.
+        In comparison, the vanilla Ethereum JSON-RPC API queries against
+        the most recent <em>EVM block</em>, which leads to much longer
+        delay before execution results are reflected.</p>
+        <p>It is important to point out that mini blocks in MegaETH are
+        preconfirmed by the sequencer just like EVM blocks are. The
+        sequencer makes as much effort not to roll back mini blocks as
+        it does EVM blocks. As a result, results returned by the
+        Realtime API still fall under the preconfirmation guarantee by
+        the sequencer.</p>
+        <p>This document specifies the Realtime API. Note that the
+        Realtime API is an evolving standard. Additional functionalities
+        will be added to the API based on feedbacks. This document will
+        be kept up to date.</p>
+        <h2 id="overview-of-the-changes">Overview of the Changes</h2>
+        <p>The Realtime API introduces three types of changes to the
+        vanilla Ethereum JSON-RPC API:</p>
+        <ol type="1">
+        <li>Most methods that query chain and account states return
+        values as of the most recent mini block, when invoked with
+        <code>pending</code> or <code>latest</code> as the block
+        tag.</li>
+        <li>Most methods that query transaction data are able to “see” a
+        transaction and return results as soon as the transaction of
+        interest is packaged into a mini block.</li>
+        <li><code>eth_subscribe</code>, when invoked over WebSocket,
+        streams transaction logs, state changes, and block content as
+        soon as the corresponding mini block is produced.</li>
+        </ol>
+        <h2 id="querying-account-and-chain-states">Querying Account and
+        Chain States</h2>
+        <p>The following API methods that query account and chain
+        states, when invoked with <code>pending</code> or
+        <code>latest</code> as the block tag, return results up to the
+        most recent mini block.</p>
+        <table>
+        <thead>
+        <tr>
+        <th>Method</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <td>eth_getBalance</td>
+        </tr>
+        <tr>
+        <td>eth_getStorageAt</td>
+        </tr>
+        <tr>
+        <td>eth_getTransactionCount</td>
+        </tr>
+        <tr>
+        <td>eth_getCode</td>
+        </tr>
+        <tr>
+        <td>eth_call</td>
+        </tr>
+        <tr>
+        <td>eth_callMany</td>
+        </tr>
+        <tr>
+        <td>eth_createAccessList</td>
+        </tr>
+        <tr>
+        <td>eth_estimateGas</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="example">Example</h3>
+        <p>At 5pm, the height of the most recent mini block is 10000,
+        and the height of the most recent EVM block is 100. At this
+        point, Alice’s account has a balance of 10 Ether.</p>
+        <p>At 100 milliseconds past 5pm, the height of the most recent
+        mini block is 10010, and the height of the most recent EVM block
+        is still 100. Now, Alice sends a transaction that transfers 1
+        Ether to Bob. This transaction will decrease her account balance
+        by 1 Ether.</p>
+        <p>At 110 milliseconds past 5pm, the transaction is picked up
+        and executed by the sequencer, and packaged into the mini block
+        at height 10011. Now, Bob invokes <code>eth_getBalance</code> on
+        Alice’s account with <code>latest</code> as the block tag; he
+        get a response of 9 Ether, because the transaction has been
+        packaged into a mini block and is thus reflected in the Realtime
+        API. However, Charlie, who makes the same query with
+        <code>100</code> as the block tag, still sees 10 Ether, because
+        the transaction has not been packaged into an EVM block, which
+        will not happen until 1 second past 5pm.</p>
+        <h2 id="querying-transactions">Querying Transactions</h2>
+        <p>The following API methods that query transaction data are
+        able to locate a transaction in the database and return results
+        as soon as the transaction is packaged into a mini block. No
+        special parameters are needed when invoking the methods.</p>
+        <table>
+        <thead>
+        <tr>
+        <th>Method</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <td>eth_getTransactionByHash</td>
+        </tr>
+        <tr>
+        <td>eth_getTransactionReceipt</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="example-1">Example</h3>
+        <p>Continuing the previous example, Alice invokes
+        <code>eth_getTransactionReceipt</code> on her transaction at 110
+        milliseconds past 5pm. The API responds with the correct
+        receipt, even though no EVM block has been produced since she
+        sent her transaction. This is because her transaction is already
+        packaged into the mini block at height 10011 and the Realtime
+        API can thus see the transaction.</p>
+        <h2 id="eth_subscribe-over-websocket"><code>eth_subscribe</code>
+        over WebSocket</h2>
+        <p>When invoked over WebSocket, <code>eth_subscribe</code>
+        streams data as soon as the corresponding mini block is
+        produced. This is the mechanism to get transaction
+        preconfirmation and execution results with the minimum amount of
+        latency. As a reminder, please call <code>eth_unsubscribe</code>
+        when a subscription is no longer needed.</p>
+        <h3 id="logs">Logs</h3>
+        <p>When both <code>startBlock</code> and <code>endBlock</code>
+        are set to <code>pending</code>, the API returns logs as soon as
+        transactions are packaged into mini blocks. The following query
+        is an example.</p>
+        <pre><code>{
+    &quot;jsonrpc&quot;: &quot;2.0&quot;,
+    &quot;method&quot;: &quot;eth_subscribe&quot;,
+    &quot;params&quot;: [
+        &quot;logs&quot;,
+        {
+            &quot;fromBlock&quot;: &quot;pending&quot;,
+            &quot;toBlock&quot;: &quot;pending&quot;
+        }
+    ],
+    &quot;id&quot;: 83
+}</code></pre>
+        <p>It is also possible to filter the logs by contract addresses
+        and topics. Here is an example.</p>
+        <pre><code>{
+    &quot;jsonrpc&quot;: &quot;2.0&quot;,
+    &quot;method&quot;: &quot;eth_subscribe&quot;,
+    &quot;params&quot;: [
+        &quot;logs&quot;,
+        {
+            &quot;address&quot;: &quot;0x8320fe7702b96808f7bbc0d4a888ed1468216cfd&quot;,
+            &quot;topics&quot;: [&quot;0xd78a0cb8bb633d06981248b816e7bd33c2a35a6089241d099fa519e361cab902&quot;],
+            &quot;fromBlock&quot;: &quot;pending&quot;,
+            &quot;toBlock&quot;: &quot;pending&quot;
+        }
+    ],
+    &quot;id&quot;: 83
+}</code></pre>
+        <h3 id="state-changes">State Changes</h3>
+        <p><code>stateChange</code> is a new type of subscription that
+        streams state changes of an account as soon as the transactions
+        making the changes are packaged into mini blocks. It takes a
+        list of account addresses to monitor as a parameter. Here is an
+        example.</p>
+        <pre><code>{
+    &quot;jsonrpc&quot;: &quot;2.0&quot;,
+    &quot;method&quot;: &quot;eth_subscribe&quot;,
+    &quot;params&quot;: [
+        &quot;stateChange&quot;,
+        [&quot;0x2ef038991d64c72646d4f06ba78d93f4f1654e3f&quot;]
+    ],
+    &quot;id&quot;: 83
+}</code></pre>
+        <p>Here is an example of the response. It shows the latest
+        account balance, nonce, and values of storage slots that are
+        changed.</p>
+        <pre><code>{
+    &quot;address&quot;: &quot;0x2ef038991d64c72646d4f06ba78d93f4f1654e3f&quot;,
+    &quot;nonce&quot;: 1,
+    &quot;balance&quot;: &quot;0x16345785d8a0000&quot;,
+    &quot;storage&quot;: {
+    &quot;0xb6318d15e99499c465cc5e3d630975bf37b5641a8beb2614b018219310f4ea12&quot;: &quot;0x68836e425f5&quot;,
+    &quot;0xbf0f571b7368c19b53ab5ef0ff767ed8e0aef55a462778a6119b7871b017ce8f&quot;: &quot;0x71094412456b0&quot;
+    }
+}</code></pre>
+        <h3 id="mini-blocks">Mini Blocks</h3>
+        <p><code>fragment</code> is a new type of subscription that
+        streams mini blocks as they are produced. Here is an
+        example.</p>
+        <pre><code>{
+    &quot;jsonrpc&quot;: &quot;2.0&quot;,
+    &quot;method&quot;: &quot;eth_subscribe&quot;,
+    &quot;params&quot;: [
+        &quot;fragment&quot;
+    ],
+    &quot;id&quot;: 83
+}</code></pre>
+        <p>The returned mini blocks contain the following fields</p>
+        <table>
+        <colgroup>
+        <col style="width: 50%" />
+        <col style="width: 50%" />
+        </colgroup>
+        <thead>
+        <tr>
+        <th>Field Name</th>
+        <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <td>timestamp</td>
+        <td>The UNIX timestamp in milliseconds when the mini block is
+        created. This field is set by the sequencer and is not
+        verifiable.</td>
+        </tr>
+        <tr>
+        <td>gas_used</td>
+        <td>The amount of gas consumed by the mini block.</td>
+        </tr>
+        <tr>
+        <td>transactions</td>
+        <td>Transactions in the mini block.</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <footer>
+            <div>
+                <p className="opacity-70">© 2025 MegaETH. All rights reserved.</p>
+            </div>
+        </footer>
+    </body>
+</html>

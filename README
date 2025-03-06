@@ -1,0 +1,9 @@
+MegaETH Documentation
+
+1. Install pandoc
+2. Run make
+3. Commit and push to Github, making sure that files under public/ are also
+   committed
+
+Cloudflare Pages build settings: do nothing and copy paste stuff from public/
+to production.
