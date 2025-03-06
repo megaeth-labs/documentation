@@ -21,7 +21,7 @@ MegaETH is currently in **Testnet**, which means:
 | **Network ID** | 6342 |
 | **Native Token (Symbol)** | MegaETH Testnet Ether (ETH)|
 | **Native Token Decimals** | 18 |
-| **RPC HTTP URL**     | [https://carrot.megaeth.com/rpc](https://carrot.megaeth.com/rpc) |
+| **RPC HTTP URL**     | https://carrot.megaeth.com/rpc |
 | **RPC WebSocket URL** | wss://carrot.megaeth.com/ws |
 | **Block Explorer** | Performance Dashboard: [https://uptime.megaeth.com](https://uptime.megaeth.com) <br/> Community Explorer: [https://megaexplorer.xyz](https://megaexplorer.xyz) <!-- <br/> OKX Explorer: https://www.okx.com/web3/explorer/megaeth-testnet --> |
 | **Experimental EIPs Supported** | EIP-7702 |
