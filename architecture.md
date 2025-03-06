@@ -15,7 +15,7 @@ The complete MegaETH system will consist of the following logical components:
 The current phase of the MegaETH Testnet contains the following components:
 - One sequencer
 - Multiple replica nodes maintained by MegaETH to serve RPC requests
-- EigenDA as the DA service
+- EigenDA devnet as the DA service
 - An Ethereum devnet as the L1
 
 Upcoming phases of the Testnet will introduce

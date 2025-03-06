@@ -36,7 +36,7 @@ At 5pm, the height of the most recent mini block is 10000, and the height of the
 
 At 100 milliseconds past 5pm, the height of the most recent mini block is 10010, and the height of the most recent EVM block is still 100. Now, Alice sends a transaction that transfers 1 Ether to Bob. This transaction will decrease her account balance by 1 Ether.
 
-At 110 milliseconds past 5pm, the transaction is picked up and executed by the sequencer, and packaged into the mini block at height 10011. Now, Bob invokes `eth_getBalance` on Alice’s account with `latest` as the block tag; he get a response of 9 Ether, because the transaction has been packaged into a mini block and is thus reflected in the Realtime API. However, Charlie, who makes the same query without using `pending` or `latest` as the block tag, still sees 10 Ether, because the transaction has not been packaged into an EVM block, which will not happen until 1 second past 5pm.
+At 110 milliseconds past 5pm, the transaction is picked up and executed by the sequencer, and packaged into the mini block at height 10011. Now, Bob invokes `eth_getBalance` on Alice’s account with `latest` as the block tag; he get a response of 9 Ether, because the transaction has been packaged into a mini block and is thus reflected in the Realtime API. However, Charlie, who makes the same query with `100` as the block tag, still sees 10 Ether, because the transaction has not been packaged into an EVM block, which will not happen until 1 second past 5pm.
 
 ## Querying Transactions
 
