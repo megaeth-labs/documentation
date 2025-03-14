@@ -2,7 +2,7 @@
 title: Overview
 ---
 
-# MegaETH Testnet Overview
+# MegaETH Testnet Documentation 
 
 ##  Testnet Notice
 
@@ -16,16 +16,17 @@ MegaETH is currently in **Testnet**, which means:
 ## Fact Sheet
 | Parameter | Value | 
 | --------         | --------    | 
-| **Network Name**     | MegaETH Testnet     | 
+| **Network Name**     | MEGA Testnet     | 
 | **Chain ID**       | 6342        |
 | **Network ID** | 6342 |
-| **Native Token (Symbol)** | MegaETH Testnet Ether (ETH)|
+| **Native Token (Symbol)** | MEGA Testnet Ether (ETH)|
 | **Native Token Decimals** | 18 |
 | **RPC HTTP URL**     | https://carrot.megaeth.com/rpc |
 | **RPC WebSocket URL** | wss://carrot.megaeth.com/ws |
 | **Block Explorer** | Performance Dashboard: [https://uptime.megaeth.com](https://uptime.megaeth.com) <br/> Community Explorer: [https://megaexplorer.xyz](https://megaexplorer.xyz) <!-- <br/> OKX Explorer: https://www.okx.com/web3/explorer/megaeth-testnet --> |
 | **Experimental EIPs Supported** | EIP-7702 |
-| **EIP-1559 Base Fee Price** | 0.0025 Gwei |
+| **EIP-1559 Base Fee Price Target** | 0.0025 Gwei |
+| **EIP-1559 Base Fee Price Floor** | 0.001 Gwei |
 | **EIP-1559 Max Block Size** | 2 Giga gas |
 | **EIP-1559 Target Block Size** | 50% (1 Giga gas) |
 | **Block Time** | 10ms for mini blocks<br/>1s for EVM blocks |
