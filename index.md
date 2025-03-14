@@ -23,12 +23,9 @@ MegaETH is currently in **Testnet**, which means:
 | **Native Token Decimals** | 18 |
 | **RPC HTTP URL**     | https://carrot.megaeth.com/rpc |
 | **RPC WebSocket URL** | wss://carrot.megaeth.com/ws |
-| **Block Explorer** | Performance Dashboard: [https://uptime.megaeth.com](https://uptime.megaeth.com) <br/> Community Explorer: [https://megaexplorer.xyz](https://megaexplorer.xyz) <!-- <br/> OKX Explorer: https://www.okx.com/web3/explorer/megaeth-testnet --> |
+| **Block Explorer** | Performance dashboard: [https://uptime.megaeth.com](https://uptime.megaeth.com) <br/> Community explorer: [https://megaexplorer.xyz](https://megaexplorer.xyz) <!-- <br/> OKX Explorer: https://www.okx.com/web3/explorer/megaeth-testnet --> |
 | **Experimental EIPs Supported** | EIP-7702 |
-| **EIP-1559 Base Fee Price Target** | 0.0025 Gwei |
-| **EIP-1559 Base Fee Price Floor** | 0.001 Gwei |
-| **EIP-1559 Max Block Size** | 2 Giga gas |
-| **EIP-1559 Target Block Size** | 50% (1 Giga gas) |
+| **EIP-1559 Parameters** | Base fee price target: 0.0025 Gwei<br/>Base fee price floor: 0.001 Gwei<br/>Max block size: 2 Giga gas<br/>Target block size: 50% (1 Giga gas) |
 | **Block Time** | 10ms for mini blocks<br/>1s for EVM blocks |
 
 ## Next Steps
