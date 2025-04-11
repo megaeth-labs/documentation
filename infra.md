@@ -1,3 +1,56 @@
-# Third-Party Infrastructure
+---
+title: Developer Tooling and Infrastructure
+---
 
-Redstone
+# Tooling and Infrastructure
+
+##  Testnet Notice
+
+Many tooling and infrastructure are still being finalized:
+
+- If there is a specific tool or service you would like to see support MegaETH, let us know [here](https://2g6w10ag996.typeform.com/to/KPD7TTCC).
+- If you are a tool or service which already supports MegaETH and would like to be included on this page, please reach out. 
+
+## Account Abstraction
+
+| Provider       | Get Started                                                                                           | Supported Services | Status           |
+|----------------|--------------------------------------------------------------------------------------------------------|-------|------------------|
+| [Dynamic](https://www.dynamic.xyz)        | [Docs](https://docs.dynamic.xyz/guides/integrations/megaEth)                      |  [Embedded Wallets via TSS-MPC](https://www.dynamic.xyz/features/wallet-infrastructure) Authentication: [Email, Social, Phone](https://demo.dynamic.xyz/)   |  Supported   |
+| [Privy](https://www.privy.io)             | [Docs](https://docs.privy.io/basics/react/advanced/configuring-evm-networks#configuring-evm-networks)                                                    | [Embedded Wallets, Wallet Connectors](https://docs.privy.io/wallets/overview/index) Authentication: [Passkey, Social, Email, SMS](https://docs.privy.io/authentication/overview)    |  Supported   |
+| [ZeroDev](https://zerodev.app)            | [Docs](https://docs.zerodev.app/)                                                 | [Embedded Smart Accounts](https://docs.zerodev.app/sdk/core-api/create-account), [Gas Sponsorship](https://docs.zerodev.app/sdk/core-api/pay-gas-with-erc20s#deploy-your-own-erc20-paymaster), [Session Keys](https://docs.zerodev.app/sdk/advanced/session-keys) (Transaction Automation),  [Chain abstraction](https://docs.zerodev.app/sdk/advanced/chain-abstraction)  |  Supported   |
+| [Pimlico](https://www.pimlico.io)         | [Docs](https://docs.pimlico.io/)                                                  |[Bundler](https://docs.pimlico.io/infra/bundler), [Paymaster](https://docs.pimlico.io/infra/paymaster)    |  Supported   |
+| [OKX Wallet](https://)                    | [Docs](https://www.okx.com/xlayer/docs/developer/tools/account-abstraction-overview) | Embedded Wallets     |  Supported   |
+| [Gelato Relay](https://www.gelato.network) | [Docs](https://www.notion.so/gelato-network/Gelato-Relay-1bc69e877ab680bf8c64cd8e30dae802)                           | [Gas Sponsorship](https://docs.gelato.network/web3-services/relay)     |  Supported   |
+
+## Analytics and Block Explorers  
+
+| Tool                                               | Notes                              | Status         |
+|----------------------------------------------------|------------------------------------|----------------|
+| [OKX Explorer](https://www.okx.com/web3/explorer/megaeth-testnet) |                                  | Supported      |
+| [Mega Explorer](https://www.megaexplorer.xyz)      | Community maintained explorer      | Supported      |
+| [Uptime](https://uptime.megaeth.com)               | Native performance dashboard       | Supported      |
+| [Parsec](https://parsec.fi)                  |                                | In Progress    |
+| [Dora](https://www.ondora.xyz)                           |                              | In Progress    |
+| [Blockscout](https://www.blockscout.com)             |                                | In Progress    |
+
+## Oracles  
+| Provider   | Get Started                                                                 | Contract Addresses                                | Supported Feeds                | Status           |
+|------------|------------------------------------------------------------------------------|--------------------------------------------------|-------------------------------|------------------|
+| [Redstone](https://www.redstone.finance/)   | [Docs](https://docs.redstone.finance/docs/introduction)                     | 0xbEb886F1A51803d7e9FD4514a91E89b81F4fdE58        |[ Push Model (on-chain Feeds)  ](https://app.redstone.finance/app/feeds/?networks=6342&page=1&sortBy=popularity&sortDesc=false&perPage=32)                         |  Supported   |
+| [Chainlink](https://chain.link)  | [Docs](https://docs.chain.link/)                                            | 0xfBFff08fE4169853F7B1b5Ac67eC10dc8806801d                                              | [Data Streams](https://docs.chain.link/data-streams/crypto-streams?page=1) |  Supported   |
+| [Gelato](https://www.gelato.network)     | [Docs](https://docs.gelato.network/web3-services/vrf)                       | -                                              | [Verifiable Random Function](https://www.notion.so/gelato-network/Gelato-VRF-1cb69e877ab681ad8867ca621802022b)    |  Supported   |
+
+## Indexers  
+| Indexer     | Get Started                                               | Status          |
+|-------------|------------------------------------------------------------|------------------|
+| [Goldsky](https://goldsky.com)     | [Docs](https://docs.goldsky.com/)                          | Supported  |
+| [The Indexing Co.](https://www.indexing.co/) | [Docs](https://docs.indexing.co/networks/megaeth_testnet#megaeth-testnet)                           | Supported |
+| [Thirdweb](https://thirdweb.com)    | [Docs](https://portal.thirdweb.com)                         | In Progress |
+| [Mobula](https://mobula.io)         | [Docs](https://docs.mobula.io/)                             | In Progress |
+| [The Graph](https://thegraph.com)   | [Docs](https://thegraph.com/docs/en/)                       | In Progress |
+
+## RPC  
+Nodes of MegaETH are highly specialized, so RPC infrastructure requires careful design and operation. As a result, we are currently self-hosting all RPC endpoints and do not support external RPC providers at this time. We are working closely and experimenting with a number of providers and will update here as soon as one is ready.
+
+
+
