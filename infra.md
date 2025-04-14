@@ -21,6 +21,7 @@ Many tooling and infrastructure are still being finalized:
 | [Pimlico](https://www.pimlico.io)         | [Docs](https://docs.pimlico.io/)                                                  |[Bundler](https://docs.pimlico.io/infra/bundler), [Paymaster](https://docs.pimlico.io/infra/paymaster)    |  Supported   |
 | [OKX Wallet](https://)                    | [Docs](https://www.okx.com/xlayer/docs/developer/tools/account-abstraction-overview) | Embedded Wallets     |  Supported   |
 | [Gelato Relay](https://www.gelato.network) | [Docs](https://www.notion.so/gelato-network/Gelato-Relay-1bc69e877ab680bf8c64cd8e30dae802)                           | [Gas Sponsorship](https://docs.gelato.network/web3-services/relay)     |  Supported   |
+[ThirdWeb](Thirdweb)|[Docs](https://portal.thirdweb.com/)|[ Embedded Wallets, Wallet Connectors](https://playground.thirdweb.com/connect/sign-in/button) Authentication: [Passkey, Social, Email, SMS](https://portal.thirdweb.com/connect/wallet/sign-in-methods/configure), [Custom Auth ++ Embedded Smart Accounts](https://portal.thirdweb.com/connect/in-app-wallet/custom-auth/overview), [Gas Sponsorship](https://portal.thirdweb.com/connect/account-abstraction/sponsorship-rules), Session Keys (Transaction Automation), [Bundler](http://portal.thirdweb.com/connect/account-abstraction/infrastructure), [Paymaster](http://portal.thirdweb.com/connect/account-abstraction/infrastructure)|Supported
 
 ## Analytics and Block Explorers  
 
@@ -30,8 +31,7 @@ Many tooling and infrastructure are still being finalized:
 | [Mega Explorer](https://www.megaexplorer.xyz)      | Community maintained explorer      | Supported      |
 | [Uptime](https://uptime.megaeth.com)               | Native performance dashboard       | Supported      |
 | [Parsec](https://parsec.fi)                  |                                | In Progress    |
-| [Dora](https://www.ondora.xyz)                           |                              | In Progress    |
-| [Blockscout](https://www.blockscout.com)             |                                | In Progress    |
+
 
 ## Oracles  
 | Provider   | Get Started                                                                 | Contract Addresses                                | Supported Feeds                | Status           |
@@ -45,9 +45,11 @@ Many tooling and infrastructure are still being finalized:
 |-------------|------------------------------------------------------------|------------------|
 | [Goldsky](https://goldsky.com)     | [Docs](https://docs.goldsky.com/)                          | Supported  |
 | [The Indexing Co.](https://www.indexing.co/) | [Docs](https://docs.indexing.co/networks/megaeth_testnet#megaeth-testnet)                           | Supported |
-| [Thirdweb](https://thirdweb.com)    | [Docs](https://portal.thirdweb.com)                         | In Progress |
+| [The Graph](https://thegraph.com)   | [Docs](https://thegraph.com/docs/en/)                       | Supported |
+| [Thirdweb](https://thirdweb.com)    | [Docs](https://portal.thirdweb.com)                         | Supported |
+| [Envio](https://envio.dev/)         | [Docs](https://docs.envio.dev/docs/HyperIndex/contract-import)                             | Supported |
 | [Mobula](https://mobula.io)         | [Docs](https://docs.mobula.io/)                             | In Progress |
-| [The Graph](https://thegraph.com)   | [Docs](https://thegraph.com/docs/en/)                       | In Progress |
+
 
 ## RPC  
 Nodes of MegaETH are highly specialized, so RPC infrastructure requires careful design and operation. As a result, we are currently self-hosting all RPC endpoints and do not support external RPC providers at this time. We are working closely and experimenting with a number of providers and will update here as soon as one is ready.
