@@ -1,5 +1,5 @@
 ---
-title: Developer Tooling and Infrastructure
+title: Tooling and Infrastructure
 ---
 
 # Tooling and Infrastructure

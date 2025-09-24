@@ -1,5 +1,5 @@
 ---
-title: Mini Blocks and EVM Blocks
+title: Mini Blocks
 ---
 
 # Mini Blocks and EVM Blocks
