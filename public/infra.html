@@ -3,7 +3,8 @@
     <head>
         <meta charset="utf-8">
         <meta name="date" content=''>
-        <title>MegaETH Testnet Docs - </title>
+        <title>MegaETH Testnet Docs - Developer Tooling and
+Infrastructure</title>
         <link rel="stylesheet" type="text/css" href="neat.css">
         <link rel="stylesheet" type="text/css" href="custom.css">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,9 +17,261 @@
             <a href="/mini-and-evm-blocks.html">MINI BLOCKS</a>&nbsp;&nbsp;
             <a href="/realtime-api.html">REALTIME API</a>
         </header>
-        <h1 id="third-party-infrastructure">Third-Party
+        <h1 id="tooling-and-infrastructure">Tooling and
         Infrastructure</h1>
-        <p>Redstone</p>
+        <h2 id="testnet-notice">Testnet Notice</h2>
+        <p>Many tooling and infrastructure are still being
+        finalized:</p>
+        <ul>
+        <li>If there is a specific tool or service you would like to see
+        support MegaETH, let us know <a
+        href="https://2g6w10ag996.typeform.com/to/KPD7TTCC">here</a>.</li>
+        <li>If you are a tool or service which already supports MegaETH
+        and would like to be included on this page, please reach
+        out.</li>
+        </ul>
+        <h2 id="account-abstraction">Account Abstraction</h2>
+        <table>
+        <colgroup>
+        <col style="width: 11%" />
+        <col style="width: 71%" />
+        <col style="width: 4%" />
+        <col style="width: 12%" />
+        </colgroup>
+        <thead>
+        <tr>
+        <th>Provider</th>
+        <th>Get Started</th>
+        <th>Supported Services</th>
+        <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <td><a href="https://www.dynamic.xyz">Dynamic</a></td>
+        <td><a
+        href="https://docs.dynamic.xyz/guides/integrations/megaEth">Docs</a></td>
+        <td><a
+        href="https://www.dynamic.xyz/features/wallet-infrastructure">Embedded
+        Wallets via TSS-MPC</a> Authentication: <a
+        href="https://demo.dynamic.xyz/">Email, Social, Phone</a></td>
+        <td>Supported</td>
+        </tr>
+        <tr>
+        <td><a href="https://www.privy.io">Privy</a></td>
+        <td><a
+        href="https://docs.privy.io/basics/react/advanced/configuring-evm-networks#configuring-evm-networks">Docs</a></td>
+        <td><a
+        href="https://docs.privy.io/wallets/overview/index">Embedded
+        Wallets, Wallet Connectors</a> Authentication: <a
+        href="https://docs.privy.io/authentication/overview">Passkey,
+        Social, Email, SMS</a></td>
+        <td>Supported</td>
+        </tr>
+        <tr>
+        <td><a href="https://zerodev.app">ZeroDev</a></td>
+        <td><a href="https://docs.zerodev.app/">Docs</a></td>
+        <td><a
+        href="https://docs.zerodev.app/sdk/core-api/create-account">Embedded
+        Smart Accounts</a>, <a
+        href="https://docs.zerodev.app/sdk/core-api/pay-gas-with-erc20s#deploy-your-own-erc20-paymaster">Gas
+        Sponsorship</a>, <a
+        href="https://docs.zerodev.app/sdk/advanced/session-keys">Session
+        Keys</a> (Transaction Automation), <a
+        href="https://docs.zerodev.app/sdk/advanced/chain-abstraction">Chain
+        abstraction</a></td>
+        <td>Supported</td>
+        </tr>
+        <tr>
+        <td><a href="https://www.pimlico.io">Pimlico</a></td>
+        <td><a href="https://docs.pimlico.io/">Docs</a></td>
+        <td><a href="https://docs.pimlico.io/infra/bundler">Bundler</a>,
+        <a
+        href="https://docs.pimlico.io/infra/paymaster">Paymaster</a></td>
+        <td>Supported</td>
+        </tr>
+        <tr>
+        <td><a href="https://">OKX Wallet</a></td>
+        <td><a
+        href="https://www.okx.com/xlayer/docs/developer/tools/account-abstraction-overview">Docs</a></td>
+        <td>Embedded Wallets</td>
+        <td>Supported</td>
+        </tr>
+        <tr>
+        <td><a href="https://www.gelato.network">Gelato Relay</a></td>
+        <td><a
+        href="https://www.notion.so/gelato-network/Gelato-Relay-1bc69e877ab680bf8c64cd8e30dae802">Docs</a></td>
+        <td><a
+        href="https://docs.gelato.network/web3-services/relay">Gas
+        Sponsorship</a></td>
+        <td>Supported</td>
+        </tr>
+        <tr>
+        <td><a href="Thirdweb">ThirdWeb</a></td>
+        <td><a href="https://portal.thirdweb.com/">Docs</a></td>
+        <td><a
+        href="https://playground.thirdweb.com/connect/sign-in/button">Embedded
+        Wallets, Wallet Connectors</a> Authentication: <a
+        href="https://portal.thirdweb.com/connect/wallet/sign-in-methods/configure">Passkey,
+        Social, Email, SMS</a>, <a
+        href="https://portal.thirdweb.com/connect/in-app-wallet/custom-auth/overview">Custom
+        Auth ++ Embedded Smart Accounts</a>, <a
+        href="https://portal.thirdweb.com/connect/account-abstraction/sponsorship-rules">Gas
+        Sponsorship</a>, Session Keys (Transaction Automation), <a
+        href="http://portal.thirdweb.com/connect/account-abstraction/infrastructure">Bundler</a>,
+        <a
+        href="http://portal.thirdweb.com/connect/account-abstraction/infrastructure">Paymaster</a></td>
+        <td>Supported</td>
+        </tr>
+        </tbody>
+        </table>
+        <h2 id="analytics-and-block-explorers">Analytics and Block
+        Explorers</h2>
+        <table>
+        <colgroup>
+        <col style="width: 50%" />
+        <col style="width: 34%" />
+        <col style="width: 15%" />
+        </colgroup>
+        <thead>
+        <tr>
+        <th>Tool</th>
+        <th>Notes</th>
+        <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <td><a
+        href="https://www.okx.com/web3/explorer/megaeth-testnet">OKX
+        Explorer</a></td>
+        <td></td>
+        <td>Supported</td>
+        </tr>
+        <tr>
+        <td><a href="https://www.megaexplorer.xyz">Mega
+        Explorer</a></td>
+        <td>Community maintained explorer</td>
+        <td>Supported</td>
+        </tr>
+        <tr>
+        <td><a href="https://uptime.megaeth.com">Uptime</a></td>
+        <td>Native performance dashboard</td>
+        <td>Supported</td>
+        </tr>
+        <tr>
+        <td><a href="https://parsec.fi">Parsec</a></td>
+        <td></td>
+        <td>In Progress</td>
+        </tr>
+        </tbody>
+        </table>
+        <h2 id="oracles">Oracles</h2>
+        <table style="width:100%;">
+        <colgroup>
+        <col style="width: 6%" />
+        <col style="width: 41%" />
+        <col style="width: 26%" />
+        <col style="width: 16%" />
+        <col style="width: 9%" />
+        </colgroup>
+        <thead>
+        <tr>
+        <th>Provider</th>
+        <th>Get Started</th>
+        <th>Contract Addresses</th>
+        <th>Supported Feeds</th>
+        <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <td><a href="https://www.redstone.finance/">Redstone</a></td>
+        <td><a
+        href="https://docs.redstone.finance/docs/introduction">Docs</a></td>
+        <td>0xbEb886F1A51803d7e9FD4514a91E89b81F4fdE58</td>
+        <td><a
+        href="https://app.redstone.finance/app/feeds/?networks=6342&amp;page=1&amp;sortBy=popularity&amp;sortDesc=false&amp;perPage=32">Push
+        Model (on-chain Feeds)</a></td>
+        <td>Supported</td>
+        </tr>
+        <tr>
+        <td><a href="https://chain.link">Chainlink</a></td>
+        <td><a href="https://docs.chain.link/">Docs</a></td>
+        <td>0xfBFff08fE4169853F7B1b5Ac67eC10dc8806801d</td>
+        <td><a
+        href="https://docs.chain.link/data-streams/crypto-streams?page=1">Data
+        Streams</a></td>
+        <td>Supported</td>
+        </tr>
+        <tr>
+        <td><a href="https://www.gelato.network">Gelato</a></td>
+        <td><a
+        href="https://docs.gelato.network/web3-services/vrf">Docs</a></td>
+        <td>-</td>
+        <td><a
+        href="https://www.notion.so/gelato-network/Gelato-VRF-1cb69e877ab681ad8867ca621802022b">Verifiable
+        Random Function</a></td>
+        <td>Supported</td>
+        </tr>
+        </tbody>
+        </table>
+        <h2 id="indexers">Indexers</h2>
+        <table>
+        <colgroup>
+        <col style="width: 14%" />
+        <col style="width: 65%" />
+        <col style="width: 19%" />
+        </colgroup>
+        <thead>
+        <tr>
+        <th>Indexer</th>
+        <th>Get Started</th>
+        <th>Status</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <td><a href="https://goldsky.com">Goldsky</a></td>
+        <td><a href="https://docs.goldsky.com/">Docs</a></td>
+        <td>Supported</td>
+        </tr>
+        <tr>
+        <td><a href="https://www.indexing.co/">The Indexing Co.</a></td>
+        <td><a
+        href="https://docs.indexing.co/networks/megaeth_testnet#megaeth-testnet">Docs</a></td>
+        <td>Supported</td>
+        </tr>
+        <tr>
+        <td><a href="https://thegraph.com">The Graph</a></td>
+        <td><a href="https://thegraph.com/docs/en/">Docs</a></td>
+        <td>Supported</td>
+        </tr>
+        <tr>
+        <td><a href="https://thirdweb.com">Thirdweb</a></td>
+        <td><a href="https://portal.thirdweb.com">Docs</a></td>
+        <td>Supported</td>
+        </tr>
+        <tr>
+        <td><a href="https://envio.dev/">Envio</a></td>
+        <td><a
+        href="https://docs.envio.dev/docs/HyperIndex/contract-import">Docs</a></td>
+        <td>Supported</td>
+        </tr>
+        <tr>
+        <td><a href="https://mobula.io">Mobula</a></td>
+        <td><a href="https://docs.mobula.io/">Docs</a></td>
+        <td>In Progress</td>
+        </tr>
+        </tbody>
+        </table>
+        <h2 id="rpc">RPC</h2>
+        <p>Nodes of MegaETH are highly specialized, so RPC
+        infrastructure requires careful design and operation. As a
+        result, we are currently self-hosting all RPC endpoints and do
+        not support external RPC providers at this time. We are working
+        closely and experimenting with a number of providers and will
+        update here as soon as one is ready.</p>
         <hr />
         <footer>
             <div>
