@@ -25,18 +25,18 @@
         API</em>, an extension to Ethereum JSON-RPC API optimized for
         low-latency access. This API queries against the most recent
         <em>mini block</em>. In other words, receipts and state changes
-        associated with a transaction is reflected in this API as soon
+        associated with a transaction are reflected in this API as soon
         as the transaction is packaged into a mini block, which usually
         happens within 10 milliseconds of its arrival at the sequencer.
         In comparison, the vanilla Ethereum JSON-RPC API queries against
         the most recent <em>EVM block</em>, which leads to much longer
         delay before execution results are reflected.</p>
-        <p>It is important to point out that mini blocks in MegaETH are
+        <p>It is important to note that mini blocks in MegaETH are
         preconfirmed by the sequencer just like EVM blocks are. The
         sequencer makes as much effort not to roll back mini blocks as
-        it does EVM blocks. As a result, results returned by the
-        Realtime API still fall under the preconfirmation guarantee by
-        the sequencer.</p>
+        it does EVM blocks. Thus, results returned by the Realtime API
+        still fall under the preconfirmation guarantee by the
+        sequencer.</p>
         <p>This document specifies the Realtime API. Note that the
         Realtime API is an evolving standard. Additional functionalities
         will be added to the API based on feedbacks. This document will
@@ -55,6 +55,12 @@
         <li><code>eth_subscribe</code>, when invoked over WebSocket,
         streams transaction logs, state changes, and block content as
         soon as the corresponding mini block is produced.</li>
+        <li><code>realtime_sendRawTransaction</code> submits a
+        transaction and returns the receipt in a single call — without
+        requiring polling.</li>
+        <li><code>eth_getLogsWithCursor</code> supports paginated log
+        queries using a cursor, allowing applications to retrieve large
+        datasets incrementally and reliably.</li>
         </ol>
         <h2 id="querying-account-and-chain-states">Querying Account and
         Chain States</h2>
@@ -183,6 +189,8 @@
     ],
     &quot;id&quot;: 83
 }</code></pre>
+        <p>The schema of each log entry is the same as in
+        <code>eth_getLogs</code>.</p>
         <h3 id="state-changes">State Changes</h3>
         <p><code>stateChange</code> is a new type of subscription that
         streams state changes of an account as soon as the transactions
@@ -200,7 +208,18 @@
 }</code></pre>
         <p>Here is an example of the response. It shows the latest
         account balance, nonce, and values of storage slots that are
-        changed.</p>
+        changed. The schema is as the following.</p>
+        <pre><code>{
+    &quot;address&quot;: Address, // The address of the account that is changed.
+    &quot;nonce&quot;: number, // The latest nonce of the account.
+    &quot;balance&quot;: U256, // The latest balance of the account.
+    &quot;storage&quot;: { // Updated storage slots and new values of the account.
+       U256: U256,
+       ... 
+    }
+}
+</code></pre>
+        <p>Here is an example.</p>
         <pre><code>{
     &quot;address&quot;: &quot;0x2ef038991d64c72646d4f06ba78d93f4f1654e3f&quot;,
     &quot;nonce&quot;: 1,
@@ -211,46 +230,194 @@
     }
 }</code></pre>
         <h3 id="mini-blocks">Mini Blocks</h3>
-        <p><code>fragment</code> is a new type of subscription that
+        <p><code>miniBlocks</code> is a new type of subscription that
         streams mini blocks as they are produced. Here is an
         example.</p>
         <pre><code>{
     &quot;jsonrpc&quot;: &quot;2.0&quot;,
     &quot;method&quot;: &quot;eth_subscribe&quot;,
     &quot;params&quot;: [
-        &quot;fragment&quot;
+        &quot;miniBlocks&quot;
     ],
     &quot;id&quot;: 83
 }</code></pre>
-        <p>The returned mini blocks contain the following fields</p>
-        <table>
-        <colgroup>
-        <col style="width: 50%" />
-        <col style="width: 50%" />
-        </colgroup>
-        <thead>
-        <tr>
-        <th>Field Name</th>
-        <th>Description</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr>
-        <td>timestamp</td>
-        <td>The UNIX timestamp in milliseconds when the mini block is
-        created. This field is set by the sequencer and is not
-        verifiable.</td>
-        </tr>
-        <tr>
-        <td>gas_used</td>
-        <td>The amount of gas consumed by the mini block.</td>
-        </tr>
-        <tr>
-        <td>transactions</td>
-        <td>Transactions in the mini block.</td>
-        </tr>
-        </tbody>
-        </table>
+        <p>The returned mini blocks use the following schema.</p>
+        <pre><code>{
+     &quot;payload_id&quot;: HexString, // EngineAPI payload ID of the EVM block that this mini-block belongs to
+     &quot;block_number&quot;: number, // The block number of that EVM block that this mini-block belongs to
+     &quot;index&quot;: number, // Index of this mini-block in the EVM block.
+     &quot;tx_offset&quot;: number, // The number of transactions in all previous mini-blocks of the same EVM block.
+     &quot;log_offset&quot;: number, // The number of logs in all previous mini-blocks of the same EVM block.
+     &quot;gas_offset&quot;: number, // The gas used in all previous mini-blocks of the same EVM block.
+     &quot;timestamp&quot;: number, // The timestamp when this mini-block is created. Unix timestamp in milliseconds.
+     &quot;gas_used&quot;: number, // Gas used inside this mini-block
+     &quot;transactions&quot;: [ ... ], // Transactions included in this mini-block. The schema of each transaction is the same as `eth_getTransactionByHash`.
+     &quot;receipts&quot;: [ ... ] // Receipts of the transactions in this mini-block. The schema of each receipt is the same as `eth_getTransactionReceipt`.
+}</code></pre>
+        <h2
+        id="sending-and-confirming-transactions-in-one-round-trip">Sending
+        and Confirming Transactions in One Round Trip</h2>
+        <h3 id="overview">Overview</h3>
+        <p><code>realtime_sendRawTransaction</code> simplifies realtime
+        dApp development by returning the transaction receipt directly,
+        without requiring polling
+        <code>eth_getTransactionReceipt</code>. It accepts the same
+        parameters as <code>eth_sendRawTransaction</code> but waits for
+        the transaction to be executed and returns its receipt as the
+        response. This method times out after 10 seconds, in which case
+        it returns a <code>realtime transaction expired</code> error,
+        indicating that the user should revert to querying
+        <code>eth_getTransactionReceipt</code>.</p>
+        <h3 id="example-2">Example</h3>
+        <p><code>realtime_sendRawTransaction</code> is a drop-in
+        replacement of <code>eth_sendRawTransaction</code>.</p>
+        <pre><code>{
+  &quot;jsonrpc&quot;: &quot;2.0&quot;,
+  &quot;method&quot;: &quot;realtime_sendRawTransaction&quot;,
+  &quot;params&quot;: [
+    &quot;0x&lt;hex-encoded-signed-tx&gt;&quot;
+  ],
+  &quot;id&quot;: 1
+}</code></pre>
+        <p>If the submitted transaction is executed within 10 seconds,
+        it returns the receipt of the executed transaction.</p>
+        <pre><code>{
+  &quot;jsonrpc&quot;: &quot;2.0&quot;,
+  &quot;id&quot;: 1,
+  &quot;result&quot;: {
+    &quot;blockHash&quot;: &quot;0x0000000000000000000000000000000000000000000000000000000000000000&quot;,
+    &quot;blockNumber&quot;: &quot;0x10&quot;,
+    &quot;contractAddress&quot;: null,
+    &quot;cumulativeGasUsed&quot;: &quot;0x11dde&quot;,
+    &quot;effectiveGasPrice&quot;: &quot;0x23ebdf&quot;,
+    &quot;from&quot;: &quot;0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266&quot;,
+    &quot;gasUsed&quot;: &quot;0x5208&quot;,
+    &quot;logs&quot;: [],
+    &quot;logsBloom&quot;: &quot;0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000&quot;,
+    &quot;status&quot;: &quot;0x1&quot;,
+    &quot;to&quot;: &quot;0xa7b8c275b3dde39e69a5c0ffd9f34f974364941a&quot;,
+    &quot;transactionHash&quot;: &quot;0xf98a6b5de84ee59666d0ff3d8c361f308c3a22fc0bb94466810777d60a3ed7a7&quot;,
+    &quot;transactionIndex&quot;: &quot;0x1&quot;,
+    &quot;type&quot;: &quot;0x0&quot;
+  }
+}</code></pre>
+        <p>If the transaction is not executed within 10 seconds, e.g.,
+        because of congestion at the sequencer, it returns an error.</p>
+        <pre><code>{
+  &quot;jsonrpc&quot;: &quot;2.0&quot;,
+  &quot;id&quot;: 1,
+  &quot;error&quot;: {
+    &quot;code&quot;: -32000,
+    &quot;message&quot;: &quot;realtime transaction expired&quot;
+  }
+}</code></pre>
+        <h2 id="paginated-log-queries-with-cursors">Paginated Log
+        Queries with Cursors</h2>
+        <h3 id="overview-1">Overview</h3>
+        <p><code>eth_getLogsWithCursor</code> is an enhanced version of
+        <code>eth_getLogs</code> that adds support for pagination via a
+        cursor. This allows applications to query large sets of logs
+        while gracefully handing execution or memory limits on the RPC
+        server. When a query exceeds server-side resource caps, the
+        server returns a partial result and a cursor that marks where it
+        left off. The client can then continue the query from that
+        point.</p>
+        <p>This method accepts the same parameters as
+        <code>eth_getLogs</code>, with an additional optional
+        <code>cursor</code>, which is an opaque string. If the query is
+        too large and hits the server-side caps, it returns a partial
+        list of logs and a <code>cursor</code> pointing to the next log
+        to fetch. Clients can resume the query using the provided
+        <code>cursor</code>. Absence of a <code>cursor</code> in the
+        request indicates that the server should start the query at
+        <code>fromBlock</code> as usual. Absence of a returned
+        <code>cursor</code> indicates the query is complete. The cursor
+        is derived from <code>(blockNumber + logIndex)</code> of the
+        last log in the current batch, but users should treat it as an
+        opaque string.</p>
+        <h3 id="example-3">Example</h3>
+        <p>To send an initial request, start with a standard
+        <code>eth_getLogs</code>-style query. Set <code>fromBlock</code>
+        and <code>toBlock</code> (or <code>blockHash</code>) and do
+        <em>not</em> include a cursor.</p>
+        <pre><code>{
+  &quot;jsonrpc&quot;: &quot;2.0&quot;,
+  &quot;method&quot;: &quot;eth_getLogsWithCursor&quot;,
+  &quot;params&quot;: [
+    {
+      &quot;fromBlock&quot;: &quot;0x100&quot;,
+      &quot;toBlock&quot;: &quot;0x200&quot;,
+      &quot;address&quot;: &quot;0x1234567890abcdef1234567890abcdef12345678&quot;,
+      &quot;topics&quot;: [&quot;0xddf252ad...&quot;]
+    }
+  ],
+  &quot;id&quot;: 1
+}</code></pre>
+        <p>If the server reaches its processing limit (e.g. max logs or
+        execution time), it will return the logs retrieved so far and
+        include a <code>cursor</code> indicating the last log
+        processed.</p>
+        <pre><code>{
+  &quot;jsonrpc&quot;: &quot;2.0&quot;,
+  &quot;id&quot;: 1,
+  &quot;result&quot;: {
+    &quot;logs&quot;: [
+      {
+        &quot;address&quot;: &quot;0x1234567890abcdef1234567890abcdef12345678&quot;,
+        &quot;blockNumber&quot;: &quot;0x101&quot;,
+        &quot;logIndex&quot;: &quot;0x0&quot;,
+        &quot;topics&quot;: [&quot;0xddf252ad...&quot;],
+        &quot;data&quot;: &quot;0x...&quot;,
+        &quot;transactionHash&quot;: &quot;0x...&quot;,
+        &quot;transactionIndex&quot;: &quot;0x0&quot;,
+        &quot;blockHash&quot;: &quot;0x...&quot;,
+        &quot;removed&quot;: false
+      }
+    ],
+    &quot;cursor&quot;: &quot;0x0000010100000000&quot;  
+  }
+}</code></pre>
+        <p>The client should submit a second request with the same
+        filter (e.g. address, topics, block range) and the
+        <code>cursor</code> from the previous response (mandatory). The
+        server will resume the query from where it left off.</p>
+        <pre><code>{
+  &quot;jsonrpc&quot;: &quot;2.0&quot;,
+  &quot;method&quot;: &quot;eth_getLogsWithCursor&quot;,
+  &quot;params&quot;: [
+    {
+      &quot;fromBlock&quot;: &quot;0x100&quot;,
+      &quot;toBlock&quot;: &quot;0x200&quot;,
+      &quot;address&quot;: &quot;0x1234567890abcdef1234567890abcdef12345678&quot;,
+      &quot;topics&quot;: [&quot;0xddf252ad...&quot;],
+      &quot;cursor&quot;: &quot;0x0000010100000000&quot;
+    }
+  ],
+  &quot;id&quot;: 2
+}</code></pre>
+        <p>When the server returns a response <em>without</em> a
+        <code>cursor</code>, it means that all matching logs have been
+        retrieved and no further requests are needed</p>
+        <pre><code>{
+  &quot;jsonrpc&quot;: &quot;2.0&quot;,
+  &quot;id&quot;: 2,
+  &quot;result&quot;: {
+    &quot;logs&quot;: [
+      {
+        &quot;address&quot;: &quot;0x1234567890abcdef1234567890abcdef12345678&quot;,
+        &quot;blockNumber&quot;: &quot;0x102&quot;,
+        &quot;logIndex&quot;: &quot;0x3&quot;,
+        &quot;topics&quot;: [&quot;0xddf252ad...&quot;],
+        &quot;data&quot;: &quot;0x...&quot;,
+        &quot;transactionHash&quot;: &quot;0x...&quot;,
+        &quot;transactionIndex&quot;: &quot;0x2&quot;,
+        &quot;blockHash&quot;: &quot;0x...&quot;,
+        &quot;removed&quot;: false
+      }
+    ]
+    // No cursor field — query is complete
+  }
+}</code></pre>
         <hr />
         <footer>
             <div>

@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="date" content=''>
+        <title>MegaETH Testnet Docs - RPC Errors</title>
+        <link rel="stylesheet" type="text/css" href="neat.css">
+        <link rel="stylesheet" type="text/css" href="custom.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <header>
+            <a href="https://megaeth.com" target="_blank">MEGAETH</a>&nbsp;&nbsp;
+            <a href="/index.html">HOME</a>&nbsp;&nbsp;
+            <a href="/architecture.html">ARCHITECTURE</a>&nbsp;&nbsp;
+            <a href="/mini-and-evm-blocks.html">MINI BLOCKS</a>&nbsp;&nbsp;
+            <a href="/realtime-api.html">REALTIME API</a>
+        </header>
+        <p>This section lists common error messages that RPC users might
+        face.</p>
+        <table style="width:100%;">
+        <colgroup>
+        <col style="width: 23%" />
+        <col style="width: 22%" />
+        <col style="width: 20%" />
+        <col style="width: 17%" />
+        <col style="width: 15%" />
+        </colgroup>
+        <thead>
+        <tr>
+        <th>HTTP Error Code</th>
+        <th>RPC Error Code</th>
+        <th>Error Message</th>
+        <th>Explanation</th>
+        <th>Mitigation</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <td></td>
+        <td></td>
+        <td>server is busy</td>
+        <td>The backend RPC server handling the request is congested and
+        cannot serve the request.</td>
+        <td>Pause for a while and retry. Notify MegaETH if the error
+        persists.</td>
+        </tr>
+        <tr>
+        <td></td>
+        <td>-32000</td>
+        <td>permanent error forwarding request context deadline
+        exceeded</td>
+        <td>The API proxy cannot connect to the backend RPC server.</td>
+        <td>Pause for a while and retry. Notify MegaETH if the error
+        persists.</td>
+        </tr>
+        <tr>
+        <td>429</td>
+        <td>-32022</td>
+        <td>over compute unit limit</td>
+        <td>The user is incurring too much computation on the backend
+        RPC server.</td>
+        <td>Pause for a while and retry. Reduce the number of requests
+        sent per second. Computation cost varies by RPC methods.</td>
+        </tr>
+        <tr>
+        <td>429</td>
+        <td>-32022</td>
+        <td>over network traffic limit</td>
+        <td>The user is incurring too much network traffic.</td>
+        <td>Pause for a while and retry. Reduce the number of requests
+        sent per second. Network traffic varies by RPC methods.</td>
+        </tr>
+        <tr>
+        <td>429</td>
+        <td>-32016</td>
+        <td>over rate limit</td>
+        <td>The user has exceeded its rate limit.</td>
+        <td>Pause for a while and retry. Reduce the number of requests
+        sent per second.</td>
+        </tr>
+        <tr>
+        <td>500</td>
+        <td>-32000</td>
+        <td>internal error</td>
+        <td>An error has occurred at the backend RPC server handling the
+        request.</td>
+        <td>Log the raw RPC request that triggered the error and submit
+        it to MegaETH.</td>
+        </tr>
+        </tbody>
+        </table>
+        <hr />
+        <footer>
+            <div>
+                <p className="opacity-70">© 2025 MegaETH. All rights reserved.</p>
+            </div>
+        </footer>
+    </body>
+</html>

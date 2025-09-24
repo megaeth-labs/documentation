@@ -1,0 +1,792 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="date" content=''>
+        <title>MegaETH Testnet Docs - FAQ</title>
+        <link rel="stylesheet" type="text/css" href="neat.css">
+        <link rel="stylesheet" type="text/css" href="custom.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <header>
+            <a href="https://megaeth.com" target="_blank">MEGAETH</a>&nbsp;&nbsp;
+            <a href="/index.html">HOME</a>&nbsp;&nbsp;
+            <a href="/architecture.html">ARCHITECTURE</a>&nbsp;&nbsp;
+            <a href="/mini-and-evm-blocks.html">MINI BLOCKS</a>&nbsp;&nbsp;
+            <a href="/realtime-api.html">REALTIME API</a>
+        </header>
+        <h1 id="frequently-asked-questions">Frequently Asked
+        Questions</h1>
+        <h2 id="chain-behavior-evm-compatibility">Chain Behavior &amp;
+        EVM Compatibility</h2>
+        <h3 id="which-eips-are-supported-or-enforced-on-megaeth">Which
+        EIPs are supported or enforced on MegaETH?</h3>
+        <table>
+        <colgroup>
+        <col style="width: 11%" />
+        <col style="width: 58%" />
+        <col style="width: 22%" />
+        <col style="width: 6%" />
+        </colgroup>
+        <thead>
+        <tr>
+        <th>EIP</th>
+        <th>Title</th>
+        <th>Enforced / Supported</th>
+        <th>Notes</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <td><strong>EIP-55</strong></td>
+        <td>Mixed-case checksum address encoding</td>
+        <td>Not enforced</td>
+        <td>Addresses may appear in lowercase, especially in logs and
+        WebSocket responses.</td>
+        </tr>
+        <tr>
+        <td><strong>EIP-170</strong></td>
+        <td>Contract code size limit</td>
+        <td>Not enforced</td>
+        <td>MegaETH raises the contract size limit to
+        <strong>512KB</strong> to support larger deployments.</td>
+        </tr>
+        <tr>
+        <td><strong>EIP-1559</strong></td>
+        <td>Fee market change for ETH 1.0 chain</td>
+        <td>Supported</td>
+        <td>MegaETH uses a dynamically adjusting base fee model with a
+        different set of parameters.</td>
+        </tr>
+        <tr>
+        <td><strong>EIP-7702</strong></td>
+        <td>Account abstraction via temporary smart contract
+        accounts</td>
+        <td>Supported</td>
+        <td>EOAs can be delegated to smart contracts and behave like
+        smart contract wallets. See compatible tools <a
+        href="https://docs.megaeth.com/infra">here</a>.</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3 id="what-versions-of-solidity-does-megaeth-support">What
+        versions of Solidity does MegaETH support?</h3>
+        <p>As long as the output bytecode targets the Prague EVM or an
+        older one, it will run on MegaETH. This means you can use any
+        Solidity version that supports Prague or earlier as the
+        compilation target.</p>
+        <h3 id="does-megaeth-support-transient-storage-store">Does
+        MegaETH support transient storage (<code>STORE</code>)?</h3>
+        <p>Yes, MegaETH supports <code>TSTORE</code> as part of its
+        compatibility with the Cancun upgrade.</p>
+        <h3
+        id="should-i-expect-race-conditions-to-affect-simulations">Should
+        I expect race conditions to affect simulations?</h3>
+        <p>Some applications simulate transactions before submitting
+        them to the blockchain for actual execution. Race conditions
+        occur if the chain state changes after a transaction is
+        simulated and before it is executed on-chain, e.g., because of a
+        conflicting transaction sent in parallel. This may lead to
+        disagreeing results between simulation and on-chain execution.
+        Hence, we strongly suggest you write proper error handling for
+        this scenario, and only regard on-chain execution results as
+        authoritative.</p>
+        <h3
+        id="are-there-any-edge-cases-i-should-be-aware-of-that-may-cause-an-l2-pre-confirmation-to-be-reverted-because-of-an-l1-reorganization">Are
+        there any edge cases I should be aware of that may cause an L2
+        pre-confirmation to be reverted because of an L1
+        reorganization?</h3>
+        <p>Given that each MegaETH block anchors to an L1 block, an L1
+        reorganization (“reorg”) can invalidate the anchor and roll back
+        any corresponding MegaETH blocks. The likelihood depends on how
+        aggressively the sequencer chooses anchors, but should be
+        overall very low. (Ethereum almost never experiences finality
+        violation.)</p>
+        <p>Nevertheless, we suggest you write error handling for
+        rollbacks of preconfirmed blocks.</p>
+        <h3 id="what-is-the-contract-size-limit">What is the contract
+        size limit?</h3>
+        <p>512KB, rather than Ethereum’s 24KB.</p>
+        <h2 id="transaction-lifecycle-txpool">Transaction Lifecycle
+        &amp; Txpool</h2>
+        <h3 id="what-is-the-gas-limit-of-eth_call-eth_estimategas">What
+        is the gas limit of <code>eth_call</code> /
+        <code>eth_EstimateGas</code>?</h3>
+        <p>10,000,000 (increased on 28/03/2025 from 5,000,000).</p>
+        <p>Note that this gas limit is <em>different</em> from the limit
+        for on-chain transactions, which is 1,000,000,000. It applies
+        only to RPC calls.</p>
+        <h3
+        id="what-is-the-maximum-number-of-transactions-i-can-have-in-the-txpool">What
+        is the maximum number of transactions I can have in the
+        txpool?</h3>
+        <p><strong>Each account can have up to 500 pending transactions
+        in the pool.</strong> If you exceed this limit, new transactions
+        will be rejected with a <code>txpool is full</code> error. To
+        free up space in the queue, try replacing existing pending
+        transactions. To avoid leaving transactions stuck in the pool,
+        pay attention to send transactions with nonces that increase one
+        by one, as required by the EVM.</p>
+        <h3
+        id="what-is-the-maximum-number-of-transactions-i-can-send-per-second-per-account">What
+        is the maximum number of transactions I can send per second per
+        account?</h3>
+        <p>Although MegaETH does not exercise a per account transaction
+        rate limit, there are two main constraints:</p>
+        <ol type="1">
+        <li><strong>Block gas limit.</strong> Each EVM block has a
+        maximum gas limit of 2 Giga (2,000,000,000) gas. Given that the
+        minimum gas cost per transaction is 21,000 gas, the theoretical
+        maximum number of transactions per block is 2,000,000,000 /
+        21,000 = 95,238.</li>
+        <li><strong>Execution throughput.</strong> The practical limit
+        is also dependent on the number of transactions the EVM can
+        process per second. For native ETH transfers, this number is
+        estimated to be around 100,000 transactions per second under
+        ideal conditions.</li>
+        </ol>
+        <h3
+        id="how-do-i-check-how-many-transactions-are-in-the-txpool">How
+        do I check how many transactions are in the txpool?</h3>
+        <p>There is currently no way to check the contents of the
+        txpool.</p>
+        <h3
+        id="is-the-txpool-cleared-when-i-reconnect-or-restart-my-sender">Is
+        the txpool cleared when I reconnect or restart my sender?</h3>
+        <p>No. The txpool is persistent and is not cleared when you
+        reconnect to the RPC or restart your sender. If you are
+        observing nonce-related issues after reconnecting, it is likely
+        because your sender is re-initializing the nonce from the latest
+        executed block (<code>latest</code>) instead of tracking the
+        <code>pending</code> state.</p>
+        <p>To avoid creating gaps or collisions in nonces, use
+        <code>eth_getTransactionCount(..., "pending")</code> or manage
+        nonce state locally when sending multiple transactions
+        concurrently.</p>
+        <h3
+        id="my-transactions-are-stuck-in-the-txpool.-how-can-i-clear-the-blockage">My
+        transactions are stuck in the txpool. How can I clear the
+        blockage?</h3>
+        <p>This usually happens when there is a gap in your nonce
+        sequence. For example, if your last executed transaction had
+        nonce <em>x</em>, but the txpool contains transactions starting
+        at <em>x+2</em>, those transactions will remain stuck until a
+        transaction with nonce <em>x+1</em> is submitted and
+        executed.</p>
+        <p>Previously, the txpool would reject this corrective
+        <em>x+1</em> transaction if the per-account limit (500
+        transactions) had already been reached. This would block the
+        sender permanently. After a recent update, transactions with the
+        next sequential nonce (<em>x+1</em>) are always admissible, even
+        when the account has hit the txpool cap. To recover:</p>
+        <ol type="1">
+        <li>Identify the last executed nonce <em>x</em>.</li>
+        <li>Send a transaction with nonce <em>x+1</em>.</li>
+        <li>Wait for it to be executed and included in a block.</li>
+        <li>Repeat the process if necessary.</li>
+        </ol>
+        <p>This unblocks the stuck transactions and allows your sender
+        logic to resume.</p>
+        <h3
+        id="my-wallet-transfers-keep-getting-stuck-and-dont-go-through.-what-should-i-do">My
+        wallet transfers keep getting stuck and don’t go through. What
+        should I do?</h3>
+        <p>This is usually caused by a pending transaction with nonce
+        conflict or underpriced gas. Try replacing the stuck transaction
+        with a higher gas price.</p>
+        <h2 id="miniblocks-realtime-api">Miniblocks &amp; Realtime
+        API</h2>
+        <h3
+        id="does-block.timestamp-return-the-timestamp-of-the-evm-block-or-the-miniblock">Does
+        <code>block.timestamp</code> return the timestamp of the EVM
+        block or the miniblock?</h3>
+        <p>It returns the timestamp of the EVM block.</p>
+        <h3 id="can-smart-contracts-access-miniblock-metadata">Can smart
+        contracts access miniblock metadata?</h3>
+        <p>Not currently. Mini blocks are intentionally compact and do
+        not include the same metadata fields as EVM blocks, so there is
+        currently no way to access their metadata.</p>
+        <h3 id="do-miniblocks-have-the-same-guarantees-as-evm-blocks">Do
+        miniblocks have the same guarantees as EVM blocks?</h3>
+        <p>Yes. Preconfirmation of miniblocks by the sequencer have the
+        same level of guarantees as that of EVM blocks.</p>
+        <h3
+        id="does-the-performance-dashboard-uptime.megaeth.com-display-the-block-height-in-miniblocks-or-evm-blocks">Does
+        the performance dashboard (uptime.megaeth.com) display the block
+        height in miniblocks or EVM blocks?</h3>
+        <p>Miniblocks.</p>
+        <h3
+        id="why-am-i-seeing-null-blockhash-in-a-realtime-transaction-receipt-particularly-when-i-do-get-a-valid-blocknumber">Why
+        am I seeing <code>null</code> <code>blockHash</code> in a
+        realtime transaction receipt, particularly when I do get a valid
+        <code>blockNumber</code>?</h3>
+        <p>In the realtime RPC, if a transaction receipt has a
+        <code>null</code> <code>blockHash</code> but a valid
+        <code>blockNumber</code>, it means the transaction was included
+        in a miniblock and is preconfirmed by the sequencer, but not yet
+        part of an EVM block.</p>
+        <p>The presence or absence of <code>blockHash</code> does not
+        affect the level of finality, as the sequencer guarantees
+        inclusion from the moment it is included in a miniblock.</p>
+        <p>Full finality still depends on the transaction being
+        submitted and finalized on the L1.</p>
+        <h3 id="why-does-eth_subscribe-return-an-internal-error">Why
+        does <code>eth_subscribe</code> return an internal error?</h3>
+        <p><code>eth_subscribe</code> must be called over a WebSocket
+        (<code>ws</code>) connection. You will receive the error when
+        trying it over HTTP because HTTP transport does not support
+        persistent, bidirectional communication required for
+        subscriptions.</p>
+        <h2 id="rpc-and-websocket-behavior">RPC and Websocket
+        behavior</h2>
+        <h3
+        id="which-http-rpc-methods-are-unavailable-or-rate-limited">Which
+        HTTP RPC methods are unavailable or rate-limited?</h3>
+        <table>
+        <colgroup>
+        <col style="width: 53%" />
+        <col style="width: 36%" />
+        <col style="width: 10%" />
+        </colgroup>
+        <thead>
+        <tr>
+        <th>Method</th>
+        <th>Availability</th>
+        <th>Rate Limit (reqs/s)</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+        <td><code>debug_getRawBlock</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>debug_getRawHeader</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>debug_getRawReceipts</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>debug_getRawTransaction</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>debug_replyBlock</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>debug_traceBlock</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>debug_traceBlockByHash</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>debug_traceBlockByNumber</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>debug_traceCall</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>debug_traceCallMany</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>debug_traceTransaction</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>eth_accounts</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_blockNumber</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_call</code></td>
+        <td></td>
+        <td>15</td>
+        </tr>
+        <tr>
+        <td><code>eth_chainId</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_createAccessList</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_estimateGas</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_feeHistory</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_gasPrice</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_getBalance</code></td>
+        <td></td>
+        <td>15</td>
+        </tr>
+        <tr>
+        <td><code>eth_getBlockByHash</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_getBlockByNumber</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_getBlockReceipts</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>eth_getBlockTransactionCountByHash</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_getBlockTransactionCountByNumber</code></td>
+        <td></td>
+        <td>15</td>
+        </tr>
+        <tr>
+        <td><code>eth_getCode</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_getFilterChanges</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_getFilterLogs</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_getLogs</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_getLogsWithCursor</code></td>
+        <td></td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>eth_getStorageAt</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_getTransactionByBlockHashAndIndex</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_getTransactionByBlockNumberAndIndex</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_getTransactionByHash</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_getTransactionCount</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_getTransactionReceipt</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_getUncleByBlockHashAndIndex</code></td>
+        <td></td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>eth_getUncleByBlockNumberAndIndex</code></td>
+        <td></td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>eth_getUncleCountByBlockHash</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_getUncleCountByBlockNumber</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_maxPriorityFeePerGas</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_mining</code></td>
+        <td></td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>eth_newBlockFilter</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_newFilter</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_newPendingTransactionFilter</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_protocolVersion</code></td>
+        <td></td>
+        <td>30</td>
+        </tr>
+        <tr>
+        <td><code>eth_sendRawTransaction</code></td>
+        <td></td>
+        <td>30</td>
+        </tr>
+        <tr>
+        <td><code>eth_sendTransaction</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>eth_sign</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>eth_signTransaction</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>eth_signTypedData</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>eth_subscribe</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_syncing</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_uninstallFilter</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>eth_unsubscribe</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        <tr>
+        <td><code>net_listening</code></td>
+        <td></td>
+        <td>30</td>
+        </tr>
+        <tr>
+        <td><code>net_peerCount</code></td>
+        <td></td>
+        <td>30</td>
+        </tr>
+        <tr>
+        <td><code>net_version</code></td>
+        <td></td>
+        <td>30</td>
+        </tr>
+        <tr>
+        <td><code>realtime_sendRawTransaction</code></td>
+        <td></td>
+        <td>30</td>
+        </tr>
+        <tr>
+        <td><code>trace_block</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>trace_call</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>trace_callMany</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>trace_get</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>trace_rawTransaction</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>trace_replayBlockTransactions</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>trace_replayTransaction</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>trace_transaction</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>txpool_content</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>txpool_contentFrom</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>txpool_inspect</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>txpool_status</code></td>
+        <td>Temporarily unavailable</td>
+        <td>-</td>
+        </tr>
+        <tr>
+        <td><code>web3_clientVersion</code></td>
+        <td></td>
+        <td>5</td>
+        </tr>
+        </tbody>
+        </table>
+        <h3
+        id="which-websocket-methods-are-unavailable-or-rate-limited">Which
+        WebSocket methods are unavailable or rate-limited?</h3>
+        <p>Currently all WebSocket methods other than
+        <code>eth_chainId</code> (rate-limited at 5 reqs/s) are
+        unavailable. We hope to lift these restrictions soon and will
+        make a notice as soon as we do.</p>
+        <h3 id="can-i-setup-my-own-rpc-node">Can I setup my own RPC
+        node?</h3>
+        <p>Not yet. Currently, all RPC endpoints are operated by the
+        MegaETH team and support for externally hosted or self-run nodes
+        is not available. We hope to change this in the very near
+        future, so keep an eye out on the infra page for updates.</p>
+        <h3 id="where-are-the-rpc-endpoints-located">Where are the RPC
+        endpoints located?</h3>
+        <p>Miami, FL</p>
+        <h3
+        id="im-having-trouble-accessing-the-rpc-without-a-vpn.-is-this-related-to-ssl-support">I’m
+        having trouble accessing the RPC without a VPN. Is this related
+        to SSL support?</h3>
+        <p>The issue is unlikely to be SSL-related unless your router is
+        blocking TLS handshakes using deprecated protocol versions,
+        which we have seen in exactly one case. We only disable outdated
+        ciphers and protocol versions, so modern routers and firewalls
+        should have no problem establishing a connection.</p>
+        <h2 id="developer-tooling-support">Developer Tooling &amp;
+        Support</h2>
+        <h3
+        id="where-can-i-find-standard-token-contract-addresses">Where
+        can I find standard token contract addresses?</h3>
+        <p>On the community run <a
+        href="https://megaeth-1.gitbook.io/untitled">wiki</a>.</p>
+        <h3 id="how-do-i-wrap-the-native-gas-token">How do I wrap the
+        native (gas) token?</h3>
+        <p>To wrap the native token (ETH), you can use the canonical
+        WETH contract deployed at:
+        <code>0x4eB2Bd7beE16F38B1F4a0A5796Fffd028b6040e9</code></p>
+        <p>This contract uses the standard WETH interface, with the
+        <code>deposit()</code> function wrapping native ETH into WETH.
+        Simply send ETH to the contract, and you’ll receive an
+        equivalent amount of WETH. While the deposit function appears to
+        take no parameters, it accepts a <code>msg.value</code>
+        parameter implicitly, and the explorer may not fully display its
+        signature.</p>
+        <h3
+        id="how-can-i-get-my-contract-verified-on-the-megaexplorer">How
+        can I get my contract verified on the MegaExplorer?</h3>
+        <p>Please open a pull request with the contract address and ABI
+        at: <a
+        href="https://github.com/princesinha19/megaeth-abis/tree/main">https://github.com/princesinha19/megaeth-abis/tree/main</a>.
+        It should then automatically be reflected on the <a
+        href="https://www.megaexplorer.xyz">MegaExplorer</a>.</p>
+        <p><em>Please note that both this repo, and the MegaExplorer are
+        community created and managed.</em></p>
+        <h2 id="errors">Errors</h2>
+        <h3
+        id="why-am-i-seeing-null-blockhash-when-calling-gettransactionreceipt">Why
+        am I seeing <code>null</code> <code>blockHash</code> when
+        calling <code>getTransactionReceipt</code>?</h3>
+        <p>To avoid adding latency, MegaETH does not force global
+        synchronization across all RPC servers. As a result, it is
+        possible that the RPC server handling your request has not yet
+        received the transaction receipt from the sequencer, even if the
+        transaction has already been processed.</p>
+        <h3
+        id="why-am-i-getting-a-403-error-saying-enable-javascript-and-cookies-to-continue-when-using-foundry">Why
+        am I getting a <code>403</code> error saying “Enable JavaScript
+        and cookies to continue” when using Foundry?</h3>
+        <p>This error typically comes from Cloudflare’s protection
+        layers. Consider retrying with a low-risk IP address.</p>
+        <h3
+        id="why-am-i-getting-a-405-error-when-clicking-on-the-rpc-endpoint-link">Why
+        am I getting a <code>405</code> error when clicking on the RPC
+        endpoint link?</h3>
+        <p>RPC endpoints are not meant to be opened directly in the
+        browser. They only accept <code>POST</code> requests with
+        properly formatted JSON-RPC payloads, and will return a
+        <code>405 Method Not Allowed</code> error if accessed via a
+        browser, which typically sends a <code>GET</code> request. To
+        use the RPC, connect through a wallet, dApp or developer
+        tool.</p>
+        <h3
+        id="why-am-i-getting-a-tls-handshake-failure-when-using-alloy.rs">Why
+        am I getting a TLS handshake failure when using Alloy.rs?</h3>
+        <p>This error typically occurs because Alloy’s WebSocket
+        transport forces the use of <code>rustls</code> for TLS. To fix
+        this, make sure you do the following:</p>
+        <ol type="1">
+        <li><p>Install <code>reqwest</code> with the
+        <code>rustls-tls</code> feature in your
+        <code>Cargo.toml</code>:</p>
+        <pre><code>reqwest = { version = &quot;...&quot;, features = [&quot;rustls-tls&quot;] }</code></pre></li>
+        <li><p>Use a custom transport to build your HTTP provider:</p>
+        <pre><code>let client = reqwest::Client::builder()
+.use_rustls_tls()
+.build()
+.unwrap();
+
+let http_client = Http::with_client(client, Url::parse(&amp;self.http_url).unwrap());
+let is_local = http_client.guess_local();
+let http_client = ClientBuilder::default().transport(http_client, is_local);
+let http_provider = ProviderBuilder::new().on_client(http_client);</code></pre></li>
+        <li><p>Install the default TLS provider early in your
+        <code>main.rs</code>:</p>
+        <pre><code>let _ = rustls::crypto::ring::default_provider().install_default();</code></pre></li>
+        </ol>
+        <h3
+        id="what-does-rabbit-hole-is-full.-please-try-again-later-mean">What
+        does “rabbit hole is full. Please try again later” mean?</h3>
+        <p>It means you are hitting a rate limit.</p>
+        <h3 id="what-does-rpc-method-is-not-whitelisted-mean">What does
+        “rpc method is not whitelisted” mean?</h3>
+        <p>It means you are calling a method which is currently
+        restricted. If this is a blocker, please reach out to the team
+        to come up with a solution.</p>
+        <h3 id="why-do-i-get-a-502-bad-gateway-error">Why do I get a
+        <code>502 Bad Gateway</code> error?</h3>
+        <p>A <code>502</code> usually indicates a temporary upstream
+        issue or stale DNS resolution. The latter case is especially
+        common in long-running processes (e.g. bots, indexers or
+        backends) that reuse DNS lookups for too long. Restarting your
+        process typically resolves it. If the issue persists, reach out
+        to the team.</p>
+        <h2 id="testnet-eth">Testnet ETH</h2>
+        <h3
+        id="how-can-i-get-testnet-eth-to-interact-with-the-chain">How
+        can I get testnet ETH to interact with the chain?</h3>
+        <p>You can use the <a
+        href="https://testnet.megaeth.com">official faucet</a> to
+        request testnet ETH.</p>
+        <p>If you are on the Fluffle whitelist, registered via Discord,
+        active in telegram or have interacted with us on Twitter, you
+        may already be prefunded and can start using the chain right
+        away.</p>
+        <h3 id="is-the-faucet-capped">Is the faucet capped?</h3>
+        <p>Yes. The faucet provides a maximum of 0.005 testnet ETH per
+        user every 24 hours.</p>
+        <h3
+        id="can-i-use-different-wallets-to-get-more-eth-from-the-faucet">Can
+        I use different wallets to get more ETH from the faucet?</h3>
+        <p>No. Requests are tracked by IP address, meaning that
+        switching wallets will not bypass the request limit.</p>
+        <h3
+        id="the-testnet-eth-from-the-faucet-is-not-enough-for-me-to-deploy-and-test-my-protocol.-how-can-i-get-more">The
+        testnet ETH from the faucet is not enough for me to deploy and
+        test my protocol. How can I get more?</h3>
+        <p>Please reach out to the team!</p>
+        <h3 id="can-i-set-up-my-own-faucet-in-my-dapp">Can I set up my
+        own faucet in my dApp?</h3>
+        <p>No, we ask dApp’s not to set up their own faucets, and
+        instead direct users to the official MegaETH faucet.</p>
+        <h3 id="why-is-testnet-eth-distribution-controlled">Why is
+        testnet ETH distribution controlled?</h3>
+        <p>We have not put these limits in place to create artificial
+        scarcity or out of concern of inflation. They exist purely as a
+        last line of defense against abuse and to maintain network
+        stability.</p>
+        <h3 id="will-the-faucet-stay-open-after-mainnet">Will the faucet
+        stay open after mainnet?</h3>
+        <p>Yes, it will remain operational after mainnet launch but will
+        continue to distribute tokens only for the testnet.</p>
+        <p>It will not be possible to bridge testnet ETH onto
+        mainnet.</p>
+        <hr />
+        <footer>
+            <div>
+                <p className="opacity-70">© 2025 MegaETH. All rights reserved.</p>
+            </div>
+        </footer>
+    </body>
+</html>
