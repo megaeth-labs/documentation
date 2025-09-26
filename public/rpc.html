@@ -55,6 +55,8 @@
   </header>
 
   <main class="site-content">
+    <h2 id="docs__rpc__1-method.md__available-methods">Available
+    Methods</h2>
     <table>
     <colgroup>
     <col style="width: 48%" />
@@ -428,6 +430,79 @@
     <td><code>web3_clientVersion</code></td>
     <td>5</td>
     <td></td>
+    </tr>
+    </tbody>
+    </table>
+    <h2 id="docs__rpc__2-error-codes.md__error-codes">Error Codes</h2>
+    <table style="width:100%;">
+    <colgroup>
+    <col style="width: 23%" />
+    <col style="width: 22%" />
+    <col style="width: 20%" />
+    <col style="width: 17%" />
+    <col style="width: 15%" />
+    </colgroup>
+    <thead>
+    <tr>
+    <th>HTTP Error Code</th>
+    <th>RPC Error Code</th>
+    <th>Error Message</th>
+    <th>Explanation</th>
+    <th>Mitigation</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td></td>
+    <td></td>
+    <td>server is busy</td>
+    <td>The backend RPC server handling the request is congested and
+    cannot serve the request.</td>
+    <td>Pause for a while and retry. Notify MegaETH if the error
+    persists.</td>
+    </tr>
+    <tr>
+    <td></td>
+    <td>-32000</td>
+    <td>permanent error forwarding request context deadline
+    exceeded</td>
+    <td>The API proxy cannot connect to the backend RPC server.</td>
+    <td>Pause for a while and retry. Notify MegaETH if the error
+    persists.</td>
+    </tr>
+    <tr>
+    <td>429</td>
+    <td>-32022</td>
+    <td>over compute unit limit</td>
+    <td>The user is incurring too much computation on the backend RPC
+    server.</td>
+    <td>Pause for a while and retry. Reduce the number of requests sent
+    per second. Computation cost varies by RPC methods.</td>
+    </tr>
+    <tr>
+    <td>429</td>
+    <td>-32022</td>
+    <td>over network traffic limit</td>
+    <td>The user is incurring too much network traffic.</td>
+    <td>Pause for a while and retry. Reduce the number of requests sent
+    per second. Network traffic varies by RPC methods.</td>
+    </tr>
+    <tr>
+    <td>429</td>
+    <td>-32016</td>
+    <td>over rate limit</td>
+    <td>The user has exceeded its rate limit.</td>
+    <td>Pause for a while and retry. Reduce the number of requests sent
+    per second.</td>
+    </tr>
+    <tr>
+    <td>500</td>
+    <td>-32000</td>
+    <td>internal error</td>
+    <td>An error has occurred at the backend RPC server handling the
+    request.</td>
+    <td>Log the raw RPC request that triggered the error and submit it
+    to MegaETH.</td>
     </tr>
     </tbody>
     </table>

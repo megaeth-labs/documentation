@@ -2,6 +2,8 @@
 title: Public RPC
 ---
 
+# Available Methods
+
 | Method                                     | Rate Limit (reqs/s) | Additional Restrictions |
 |--------------------------------------------|---------------------|-------------------------|
 | `debug_getRawBlock`                        | Unavailable  | |

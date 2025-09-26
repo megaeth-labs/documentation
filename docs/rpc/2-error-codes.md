@@ -1,8 +1,4 @@
----
-title: RPC Errors
----
-
-This section lists common error messages that RPC users might face.
+# Error Codes
 
 | HTTP Error Code | RPC Error Code | Error Message | Explanation | Mitigation |
 | --------------- | -------------- | ------------- | ----------- | ---------- |
