@@ -2,7 +2,7 @@
 title: FAQ
 ---
 
-# Chain Behavior & EVM Compatibility
+# Chain Behavior & EVM Compatibility 
 
 ## Which EIPs are supported or enforced on MegaETH?
 
@@ -158,83 +158,6 @@ receive the error when trying it over HTTP because HTTP transport does not
 support persistent, bidirectional communication required for subscriptions. 
 
 # RPC and Websocket behavior 
-
-## Which HTTP RPC methods are unavailable or rate-limited?
-
-| Method                                     | Availability                 | Rate Limit (reqs/s) |
-|--------------------------------------------|------------------------------|---------|
-| `debug_getRawBlock`                        | Temporarily unavailable      | -       |
-| `debug_getRawHeader`                       | Temporarily unavailable      |  -      |
-| `debug_getRawReceipts`                     | Temporarily unavailable      |   -     |
-| `debug_getRawTransaction`                  | Temporarily unavailable      |    -    |
-| `debug_replyBlock`                         | Temporarily unavailable      |     -   |
-| `debug_traceBlock`                         | Temporarily unavailable      |      -  |
-| `debug_traceBlockByHash`                   | Temporarily unavailable      |       - |
-| `debug_traceBlockByNumber`                 | Temporarily unavailable      | -       |
-| `debug_traceCall`                          | Temporarily unavailable      |  -      |
-| `debug_traceCallMany`                      | Temporarily unavailable      |   -     |
-| `debug_traceTransaction`                   | Temporarily unavailable      |    -    |
-| `eth_accounts`                             |                              |5        |
-| `eth_blockNumber`                          |                              |5        |
-| `eth_call`                                 |                              |15       |
-| `eth_chainId`                              |                              |5        |
-| `eth_createAccessList`                     |                              |5        |
-| `eth_estimateGas`                          |                              |5        |
-| `eth_feeHistory`                           |                              |5        |
-| `eth_gasPrice`                             |                              |5        |
-| `eth_getBalance`                           |                              |15       |
-| `eth_getBlockByHash`                       |                              |5        |
-| `eth_getBlockByNumber`                     |                              |5        |
-| `eth_getBlockReceipts`                     | Temporarily unavailable      |-        |
-| `eth_getBlockTransactionCountByHash`       |                              |5        |
-| `eth_getBlockTransactionCountByNumber`     |                              |15       |
-| `eth_getCode`                              |                              |5        |
-| `eth_getFilterChanges`                     |                              |5        |
-| `eth_getFilterLogs`                        |                              |5        |
-| `eth_getLogs`                              |                              |5        |
-| `eth_getLogsWithCursor`                    |                              |-        |
-| `eth_getStorageAt`                         |                              |5        |
-| `eth_getTransactionByBlockHashAndIndex`    |                              |5        |
-| `eth_getTransactionByBlockNumberAndIndex`  |                              |5        |
-| `eth_getTransactionByHash`                 |                              |5        |
-| `eth_getTransactionCount`                  |                              |5        |
-| `eth_getTransactionReceipt`                |                              |5        |
-| `eth_getUncleByBlockHashAndIndex`          |                              |-        |
-| `eth_getUncleByBlockNumberAndIndex`        |                              | -       |
-| `eth_getUncleCountByBlockHash`             |                              |5        |
-| `eth_getUncleCountByBlockNumber`           |                              |5        |
-| `eth_maxPriorityFeePerGas`                 |                              |5        |
-| `eth_mining`                               |                              |-        |
-| `eth_newBlockFilter`                       |                              |5        |
-| `eth_newFilter`                            |                              |5        |
-| `eth_newPendingTransactionFilter`          |                              |5        |
-| `eth_protocolVersion`                      |                              |30       |
-| `eth_sendRawTransaction`                   |                              |30       |
-| `eth_sendTransaction`                      | Temporarily unavailable      |  -      |
-| `eth_sign`                                 | Temporarily unavailable      |   -     |
-| `eth_signTransaction`                      | Temporarily unavailable      |    -    |
-| `eth_signTypedData`                        | Temporarily unavailable      |     -   |
-| `eth_subscribe`                            |                              |5        |
-| `eth_syncing`                              |                              |5        |
-| `eth_uninstallFilter`                      |                              |5        |
-| `eth_unsubscribe`                          |                              |5        |
-| `net_listening`                            |                              |30       |
-| `net_peerCount`                            |                              |30       |
-| `net_version`                              |                              |30       |
-| `realtime_sendRawTransaction`              |                              |30       |
-| `trace_block`                              | Temporarily unavailable      |-        |
-| `trace_call`                               | Temporarily unavailable      | -       |
-| `trace_callMany`                           | Temporarily unavailable      |  -      |
-| `trace_get`                                | Temporarily unavailable      |   -     |
-| `trace_rawTransaction`                     | Temporarily unavailable      |    -    |
-| `trace_replayBlockTransactions`            | Temporarily unavailable      |     -   |
-| `trace_replayTransaction`                  | Temporarily unavailable      |      -  |
-| `trace_transaction`                        | Temporarily unavailable      |       - |
-| `txpool_content`                           | Temporarily unavailable      |        -|
-| `txpool_contentFrom`                       | Temporarily unavailable      |-        |
-| `txpool_inspect`                           | Temporarily unavailable      | -       |
-| `txpool_status`                            | Temporarily unavailable      |  -      |
-| `web3_clientVersion`                       |                              |5        |
 
 ## Which WebSocket methods are unavailable or rate-limited?
 
