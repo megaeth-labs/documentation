@@ -1,9 +1,12 @@
 MegaETH Documentation
 
-1. Install pandoc
-2. Run make
-3. Commit and push to Github, making sure that files under public/ are also
-   committed
+Documentation is written in the Pandoc-flavored Markdown format. A minimal
+website template (one HTML file and one CSS file) and a makefile automate the
+process of converting the loose text into a website.
 
-Cloudflare Pages build settings: do nothing and copy paste stuff from public/
-to production.
+To build the website, make sure Pandoc and Make are installed. Then, run
+"make". Files for the website will appear in public/. There is a Cloudflare
+Pages automation configured for this repository on Github
+(megaeth-labs/documentation) that hosts the content of public/ at
+docs.megaeth.com. For that reason, always run "make" before committing and
+never git-ignore any file in public/.
