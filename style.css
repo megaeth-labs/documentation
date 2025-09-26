@@ -105,3 +105,24 @@ th {
     width: 100%;
     height: auto;
 }
+
+/* === Code blocks === */
+pre, code {
+  background-color: #cbc5c5;  /* NEW: light background */
+  color: #000000;             /* NEW: black text for readability */
+  font-family: monospace;
+  padding: 0.5em;
+  border-radius: 4px;
+}
+
+pre {
+  overflow-x: auto;
+  white-space: pre-wrap;      /* NEW: wrap long lines */
+  word-wrap: break-word;      /* NEW: break long words if needed */
+  margin: 1em 0;
+}
+
+code {
+  padding: 0.1em 0.3em;       /* NEW: subtle padding for inline code spans */
+  background-color: #cbc5c5;  /* NEW: light background */
+}
