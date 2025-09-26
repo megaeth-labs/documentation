@@ -1,116 +1,116 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MegaETH Docs – Architecture</title>
-  <link rel="stylesheet" type="text/css" href="style.css">
-  </head>
-<body>
-  <header class="site-header">
-    <div class="nav-bar">
-    <nav class="main-nav">
-      <ul>
-        <li><a href="/index.html">Overview</a></li>
-        <li><a href="/architecture.html">Architecture</a></li>
-        <li><a href="/miniblocks.html">Mini Blocks</a></li>
-        <li><a href="/rpc.html">RPC</a></li>
-        <li><a href="/realtime-api.html">Realtime API</a></li>
-        <li><a href="/infra.html">Infra</a></li>
-        <li><a href="/faq.html">FAQ</a></li>
-      </ul>
-    </nav>
-    </div>
-    <div class="site-logo">
-        <a href="https://www.megaeth.com">
-        <svg width="876" height="110" viewBox="0 0 876 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <g clip-path="url(#clip0_3001_7242)">
-            <path d="M851.78 25.7251H851.728L847.605 13.6316H842.154V30.9606C843.092 30.4655 844.157 30.0442 845.317 29.7071V18.8882L845.37 17.4977L850.199 28.917C850.821 28.8643 851 28.8432 851.643 28.8432C852.287 28.8432 852.455 28.8748 853.077 28.917L857.907 17.3713L857.959 18.7618V29.7071C859.109 30.0442 860.173 30.4655 861.122 30.9606V13.6316H855.671L851.77 25.7251H851.78Z" fill="currentColor"></path>
-            <path d="M847.268 37.5551C848.438 37.5551 849.387 36.6071 849.387 35.4377C849.387 34.2683 848.438 33.3203 847.268 33.3203C846.097 33.3203 845.148 34.2683 845.148 35.4377C845.148 36.6071 846.097 37.5551 847.268 37.5551Z" fill="currentColor"></path>
-            <path d="M856.02 37.5551C857.19 37.5551 858.139 36.6071 858.139 35.4377C858.139 34.2683 857.19 33.3203 856.02 33.3203C854.849 33.3203 853.901 34.2683 853.901 35.4377C853.901 36.6071 854.849 37.5551 856.02 37.5551Z" fill="currentColor"></path>
-            <path d="M851.644 0C838.21 0 827.287 10.9136 827.287 24.3344C827.287 37.7553 838.21 48.6689 851.644 48.6689C865.077 48.6689 876 37.7553 876 24.3344C876 10.9136 865.077 0 851.644 0ZM851.644 45.4243C840.003 45.4243 830.534 35.9644 830.534 24.3344C830.534 12.7045 840.003 3.24459 851.644 3.24459C863.284 3.24459 872.753 12.7045 872.753 24.3344C872.753 35.9644 863.284 45.4243 851.644 45.4243Z" fill="currentColor"></path>
-            <path d="M117.904 26.9576V109.874H72.8172V82.2103L58.8885 98.7808L45.0758 82.3262V109.874H0V26.9576H45.0864V27.0734L58.8991 43.5281L72.8278 27.0102V26.947H117.914L117.904 26.9576Z" fill="currentColor"></path>
-            <path d="M172.121 43.5281V60.1619H231.073V76.7325H172.121V93.3031H231.073V109.874H127.035V26.9575H231.073V43.5281H172.121Z" fill="currentColor"></path>
-            <path d="M342.734 27.0732V43.6438H292.397C290.004 43.6859 287.979 44.5076 286.324 46.1299C284.626 47.7417 283.783 49.6905 283.783 51.9659C283.783 52.0397 283.761 63.5327 283.73 86.4344C283.804 88.5518 284.573 90.2267 286.039 91.4593C287.462 92.6497 289.35 93.2712 291.701 93.3028H297.659V60.2776H342.745V110H248.133C245.55 110 243.336 109.115 241.49 107.345C239.645 105.617 238.717 103.5 238.717 100.993V36.0907C238.717 33.5835 239.645 31.4766 241.49 29.7384C243.336 27.9687 245.55 27.0838 248.133 27.0838H342.745L342.734 27.0732Z" fill="currentColor"></path>
-            <path d="M420.528 93.3031H399.725L396.256 109.874H351.17L368.504 26.9575H451.728L469.063 109.874H423.976L420.507 93.3031H420.528ZM417.06 76.7325L410.122 43.5281L403.184 76.7325H417.06Z" fill="currentColor"></path>
-            <path d="M522.595 43.5281V60.1619H581.547V76.7325H522.595V93.3031H581.547V109.874H477.509V26.9575H581.547V43.5281H522.595Z" fill="currentColor"></path>
-            <path d="M693.441 43.5281H663.96V109.874H618.884V43.5281H589.403V26.9575H693.441V43.5281Z" fill="currentColor"></path>
-            <path d="M819.441 26.9575V109.874H774.366V76.7325H746.624V109.874H701.538V26.9575H746.624V60.1619H774.366V26.9575H819.441Z" fill="currentColor"></path>
-            </g>
-            <defs>
-            <clipPath id="clip0_3001_7242">
-            <rect width="876" height="110" fill="currentColor"></rect>
-            </clipPath>
-            </defs>
-        </svg>
-        </a>
-    </div>
-    <div class="page-title">
-        <h1>Architecture</h1>
-    
-    
-    
-    </div>
-  </header>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>MegaETH Docs – Architecture</title>
+        <link rel="stylesheet" type="text/css" href="style.css">
+            </head>
+    <body>
+        <header class="site-header">
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="/index.html">Overview</a></li>
+                    <li><a href="/architecture.html">Architecture</a></li>
+                    <li><a href="/miniblocks.html">Mini Blocks</a></li>
+                    <li><a href="/rpc.html">RPC</a></li>
+                    <li><a href="/realtime-api.html">Realtime API</a></li>
+                    <li><a href="/infra.html">Infra</a></li>
+                    <li><a href="/faq.html">FAQ</a></li>
+                </ul>
+            </nav>
+            <div class="site-logo">
+                <a href="https://www.megaeth.com">
+                    <svg width="876" height="110" viewBox="0 0 876 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#clip0_3001_7242)">
+                        <path d="M851.78 25.7251H851.728L847.605 13.6316H842.154V30.9606C843.092 30.4655 844.157 30.0442 845.317 29.7071V18.8882L845.37 17.4977L850.199 28.917C850.821 28.8643 851 28.8432 851.643 28.8432C852.287 28.8432 852.455 28.8748 853.077 28.917L857.907 17.3713L857.959 18.7618V29.7071C859.109 30.0442 860.173 30.4655 861.122 30.9606V13.6316H855.671L851.77 25.7251H851.78Z" fill="currentColor"></path>
+                        <path d="M847.268 37.5551C848.438 37.5551 849.387 36.6071 849.387 35.4377C849.387 34.2683 848.438 33.3203 847.268 33.3203C846.097 33.3203 845.148 34.2683 845.148 35.4377C845.148 36.6071 846.097 37.5551 847.268 37.5551Z" fill="currentColor"></path>
+                        <path d="M856.02 37.5551C857.19 37.5551 858.139 36.6071 858.139 35.4377C858.139 34.2683 857.19 33.3203 856.02 33.3203C854.849 33.3203 853.901 34.2683 853.901 35.4377C853.901 36.6071 854.849 37.5551 856.02 37.5551Z" fill="currentColor"></path>
+                        <path d="M851.644 0C838.21 0 827.287 10.9136 827.287 24.3344C827.287 37.7553 838.21 48.6689 851.644 48.6689C865.077 48.6689 876 37.7553 876 24.3344C876 10.9136 865.077 0 851.644 0ZM851.644 45.4243C840.003 45.4243 830.534 35.9644 830.534 24.3344C830.534 12.7045 840.003 3.24459 851.644 3.24459C863.284 3.24459 872.753 12.7045 872.753 24.3344C872.753 35.9644 863.284 45.4243 851.644 45.4243Z" fill="currentColor"></path>
+                        <path d="M117.904 26.9576V109.874H72.8172V82.2103L58.8885 98.7808L45.0758 82.3262V109.874H0V26.9576H45.0864V27.0734L58.8991 43.5281L72.8278 27.0102V26.947H117.914L117.904 26.9576Z" fill="currentColor"></path>
+                        <path d="M172.121 43.5281V60.1619H231.073V76.7325H172.121V93.3031H231.073V109.874H127.035V26.9575H231.073V43.5281H172.121Z" fill="currentColor"></path>
+                        <path d="M342.734 27.0732V43.6438H292.397C290.004 43.6859 287.979 44.5076 286.324 46.1299C284.626 47.7417 283.783 49.6905 283.783 51.9659C283.783 52.0397 283.761 63.5327 283.73 86.4344C283.804 88.5518 284.573 90.2267 286.039 91.4593C287.462 92.6497 289.35 93.2712 291.701 93.3028H297.659V60.2776H342.745V110H248.133C245.55 110 243.336 109.115 241.49 107.345C239.645 105.617 238.717 103.5 238.717 100.993V36.0907C238.717 33.5835 239.645 31.4766 241.49 29.7384C243.336 27.9687 245.55 27.0838 248.133 27.0838H342.745L342.734 27.0732Z" fill="currentColor"></path>
+                        <path d="M420.528 93.3031H399.725L396.256 109.874H351.17L368.504 26.9575H451.728L469.063 109.874H423.976L420.507 93.3031H420.528ZM417.06 76.7325L410.122 43.5281L403.184 76.7325H417.06Z" fill="currentColor"></path>
+                        <path d="M522.595 43.5281V60.1619H581.547V76.7325H522.595V93.3031H581.547V109.874H477.509V26.9575H581.547V43.5281H522.595Z" fill="currentColor"></path>
+                        <path d="M693.441 43.5281H663.96V109.874H618.884V43.5281H589.403V26.9575H693.441V43.5281Z" fill="currentColor"></path>
+                        <path d="M819.441 26.9575V109.874H774.366V76.7325H746.624V109.874H701.538V26.9575H746.624V60.1619H774.366V26.9575H819.441Z" fill="currentColor"></path>
+                        </g>
+                        <defs>
+                        <clipPath id="clip0_3001_7242">
+                        <rect width="876" height="110" fill="currentColor"></rect>
+                        </clipPath>
+                        </defs>
+                    </svg>
+                </a>
+            </div>
+            <div class="page-title">
+                <h1>Architecture</h1>
+                
+                
+                
+                            </div>
+        </header>
 
-  <main class="site-content">
-    <p>The complete MegaETH system will consist of the following logical
-    components:</p>
-    <p><strong>Sequencers.</strong> Users’ transactions (write requests)
-    coming into the system end up with them. They execute users’
-    transactions, assemble executed transactions into blocks, and
-    disseminate execution results such as transaction receipts and state
-    changes. They also submit the blocks to the L1 for finality.</p>
-    <p><strong>Read replicas.</strong> They maintain replicas of the
-    chain’s state and (recent) history to service read requests. They
-    may also choose to screen write requests by validating them against
-    local replicas of the chain’s state. Depending on how a replica
-    maintains the state and the history, there are two types of
-    nodes.</p>
-    <ul>
-    <li><em>Replica nodes.</em> They receive new blocks and execution
-    results and apply them to local replicas of the chain’s state and
-    history without validation.</li>
-    <li><em>Full nodes.</em> They receive new blocks, locally re-execute
-    the blocks, and update local replicas of the chain’s state and
-    history.</li>
-    </ul>
-    <p><strong>Provers.</strong> They receive new blocks, locally
-    re-execute the blocks, and generate proofs for the blocks. These
-    proofs might be fault proofs or validity proofs, depending on how
-    the chain is operated.</p>
-    <p><strong>Data availability (DA) service.</strong> When a sequencer
-    produces a block, it must submit to the DA service any associated
-    data that the rest of the network depends on to process the block;
-    the DA service will return a receipt certifying that the data is
-    received and make the data publicly available for a finite period of
-    time. Without the receipt, the sequencer cannot submit the block to
-    the L1. The DA service ensures that replica nodes and full nodes can
-    keep up with the chain’s state, and prover nodes can produce proofs
-    for any block that is submitted to the L1, even if the sequencer
-    maliciously withholds data.</p>
-    <p>The current phase of the MegaETH Testnet contains the following
-    components:</p>
-    <ul>
-    <li>One sequencer</li>
-    <li>Multiple replica nodes maintained by MegaETH to serve RPC
-    requests</li>
-    <li>EigenDA devnet as the DA service</li>
-    <li>An Ethereum devnet as the L1</li>
-    </ul>
-    <p>Upcoming phases of the Testnet will introduce</p>
-    <ul>
-    <li>Multiple sequencers for failover and rotation</li>
-    <li>Permissionless full nodes</li>
-    <li>Permissionless replica nodes</li>
-    <li>Permissionless prover nodes running in optimistic (fault proof)
-    mode</li>
-    <li>Ethereum Testnet as the L1</li>
-    </ul>
-  </main>
+        <main class="site-content">
+            <p>The complete MegaETH system will consist of the following
+            logical components:</p>
+            <p><strong>Sequencers.</strong> Users’ transactions (write
+            requests) coming into the system end up with them. They
+            execute users’ transactions, assemble executed transactions
+            into blocks, and disseminate execution results such as
+            transaction receipts and state changes. They also submit the
+            blocks to the L1 for finality.</p>
+            <p><strong>Read replicas.</strong> They maintain replicas of
+            the chain’s state and (recent) history to service read
+            requests. They may also choose to screen write requests by
+            validating them against local replicas of the chain’s state.
+            Depending on how a replica maintains the state and the
+            history, there are two types of nodes.</p>
+            <ul>
+            <li><em>Replica nodes.</em> They receive new blocks and
+            execution results and apply them to local replicas of the
+            chain’s state and history without validation.</li>
+            <li><em>Full nodes.</em> They receive new blocks, locally
+            re-execute the blocks, and update local replicas of the
+            chain’s state and history.</li>
+            </ul>
+            <p><strong>Provers.</strong> They receive new blocks,
+            locally re-execute the blocks, and generate proofs for the
+            blocks. These proofs might be fault proofs or validity
+            proofs, depending on how the chain is operated.</p>
+            <p><strong>Data availability (DA) service.</strong> When a
+            sequencer produces a block, it must submit to the DA service
+            any associated data that the rest of the network depends on
+            to process the block; the DA service will return a receipt
+            certifying that the data is received and make the data
+            publicly available for a finite period of time. Without the
+            receipt, the sequencer cannot submit the block to the L1.
+            The DA service ensures that replica nodes and full nodes can
+            keep up with the chain’s state, and prover nodes can produce
+            proofs for any block that is submitted to the L1, even if
+            the sequencer maliciously withholds data.</p>
+            <p>The current phase of the MegaETH Testnet contains the
+            following components:</p>
+            <ul>
+            <li>One sequencer</li>
+            <li>Multiple replica nodes maintained by MegaETH to serve
+            RPC requests</li>
+            <li>EigenDA devnet as the DA service</li>
+            <li>An Ethereum devnet as the L1</li>
+            </ul>
+            <p>Upcoming phases of the Testnet will introduce</p>
+            <ul>
+            <li>Multiple sequencers for failover and rotation</li>
+            <li>Permissionless full nodes</li>
+            <li>Permissionless replica nodes</li>
+            <li>Permissionless prover nodes running in optimistic (fault
+            proof) mode</li>
+            <li>Ethereum Testnet as the L1</li>
+            </ul>
+        </main>
 
-  <footer class="site-footer">
-    <p>© 2025 MegaETH. All rights reserved.</p>
-      </footer>
-</body>
+        <footer class="site-footer">
+            <p>© 2025 MegaETH. All rights reserved.</p>
+                    </footer>
+    </body>
 </html>

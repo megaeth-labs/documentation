@@ -10,11 +10,11 @@ website: $(OUTPUTS) public/style.css
 
 public/%.html: docs/%.md template/template.html
 	mkdir -p public
-	pandoc --standalone --shift-heading-level-by=1 --template template/template.html "$<" > $@
+	pandoc --toc --standalone --shift-heading-level-by=1 --template template/template.html "$<" > $@
 
 public/%.html: docs/%/ $(wildcard docs/%/*.md) template/template.html
 	mkdir -p public
-	pandoc --standalone --shift-heading-level-by=1 --template template/template.html --file-scope docs/$*/*.md > $@
+	pandoc --toc --standalone --shift-heading-level-by=1 --template template/template.html --file-scope docs/$*/*.md > $@
 
 public/style.css: template/style.css
 	mkdir -p public
