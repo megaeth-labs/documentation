@@ -2,8 +2,6 @@
 title: Public RPC
 ---
 
-MegaETH provides a publicly available free RPC service
-
 | Method                                     | Rate Limit (reqs/s) | Additional Restrictions |
 |--------------------------------------------|---------------------|-------------------------|
 | `debug_getRawBlock`                        | Unavailable  | |
