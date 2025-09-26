@@ -25,6 +25,9 @@ table {
     border-collapse: collapse;
     width: 100%;
     margin: 1em 0;
+    max-width: 100%;        /* don’t overflow container */
+  display: block;         /* allow scroll */
+  overflow-x: auto;
 }
 th, td {
     border: 1px solid #cbc5c5;
@@ -75,6 +78,7 @@ th {
     padding: 2em;
     max-width: 800px;
     margin: 0 auto;
+  overflow-x: auto;   /* allow horizontal scroll if needed */
 }
 
 .site-footer {
