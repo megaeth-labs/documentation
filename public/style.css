@@ -1,0 +1,107 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    line-height: 1.6;
+    color: #111827;
+    background-color: #dfd9d9;
+}
+
+a {
+    color: #2563eb;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid #cbc5c5;
+    margin: 2em 0;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+}
+th, td {
+    border: 1px solid #cbc5c5;
+    padding: 0.5em 1em;
+    text-align: left;
+}
+th {
+    background-color: #cbc5c5;
+}
+
+.site-header {
+    background-color: #cbc5c5;
+    position: relative;
+    padding: 1em;
+    border-bottom: 1px solid #cbc5c5;
+}
+
+.main-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.main-nav li {
+    margin-right: 1em;
+}
+
+.main-nav a {
+    text-decoration: none;
+    color: #000;
+}
+.main-nav a:hover {
+    color: #2563eb;
+}
+
+.site-content {
+    padding: 2em;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.site-footer {
+    text-align: center;
+    padding: 1em;
+    border-top: 1px solid #cbc5c5;
+    margin-top: 2em;
+    font-size: 0.9em;
+    color: #000;
+}
+
+.site-logo {
+    position: absolute;
+    top: 1em;
+    right: 1em;
+    width: 180px;
+    height: auto;
+}
+
+.page-title {
+    max-width: 800px;   /* match main text width */
+    margin: 2em auto 1em auto;
+    text-align: left;
+    padding: 0 1em;     /* same horizontal padding as .content */
+}
+.page-title h1 {
+    font-size: 2em;
+    margin-bottom: 0.2em;
+}
+.page-title h2 {
+    font-size: 1.2em;
+    color: #111827;
+    margin-top: 0;
+}
+
+.site-logo svg {
+    width: 100%;
+    height: auto;
+}

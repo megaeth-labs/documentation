@@ -1,15 +1,15 @@
 INPUTS := $(wildcard *.md)
 OUTPUTS := $(patsubst %.md,public/%.html,$(INPUTS))
 
-website: $(OUTPUTS) public/neat.css
+website: $(OUTPUTS) public/style.css
 
 public/%.html: %.md template.html
 	mkdir -p public
 	pandoc --standalone --shift-heading-level-by=1 --template template.html "$<" > $@ 
 
-public/neat.css: neat.css
+public/style.css: style.css
 	mkdir -p public
-	cp neat.css public/neat.css
+	cp style.css public/style.css
 
 .PHONY: clean
 clean:
