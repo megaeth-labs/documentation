@@ -50,6 +50,11 @@ th {
     flex-wrap: wrap;
 }
 
+.site-logo a {
+  color: inherit;          /* keep it same as surrounding text */
+  text-decoration: none;   /* remove underline */
+}
+
 .main-nav li {
     margin-right: 1em;
 }
