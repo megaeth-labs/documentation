@@ -27,8 +27,8 @@ MegaETH is currently in **Testnet**, which means:
 
 # Next Steps
 
-- **[Architecture](/architecture)** → Get an overview of MegaETH’s architecture.
-- **[Realtime API](/realtime-api)** → MegaETH is compatible with Ethereum JSON-RPC API. To fully exploit the 10ms block time and build realtime experiences, it is necessary to use MegaETH’s Realtime API.
-- **[Mini Blocks and EVM Blocks](/mini-blocks)** → Learn about the similarities and differences between the two types of blocks in MegaETH: mini blocks and EVM blocks.
-- **[FAQ](/faq)** → Check out a list of frequently asked questions.
+- **[Architecture](/architecture.html)** → Get an overview of MegaETH’s architecture.
+- **[Realtime API](/realtime-api.html)** → MegaETH is compatible with Ethereum JSON-RPC API. To fully exploit the 10ms block time and build realtime experiences, it is necessary to use MegaETH’s Realtime API.
+- **[Mini Blocks and EVM Blocks](/miniblocks.html)** → Learn about the similarities and differences between the two types of blocks in MegaETH: mini blocks and EVM blocks.
+- **[FAQ](/faq.html)** → Check out a list of frequently asked questions.
 
