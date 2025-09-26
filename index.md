@@ -2,8 +2,6 @@
 title: Overview
 ---
 
-# MegaETH Testnet Documentation
-
 ## Testnet Notice
 
 MegaETH is currently in **Testnet**, which means:

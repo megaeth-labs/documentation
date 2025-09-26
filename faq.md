@@ -2,8 +2,6 @@
 title: FAQ
 ---
 
-# Frequently Asked Questions 
-
 ## Chain Behavior & EVM Compatibility
 
 ### Which EIPs are supported or enforced on MegaETH?

@@ -2,8 +2,6 @@
 title: Tooling and Infrastructure
 ---
 
-# Tooling and Infrastructure
-
 ## Testnet Notice
 
 Many tooling and infrastructure are still being finalized:

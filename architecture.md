@@ -2,8 +2,6 @@
 title: Architecture
 ---
 
-# Architecture Overview
-
 The complete MegaETH system will consist of the following logical components:
 
 **Sequencers.** Users’ transactions (write requests) coming into the system end

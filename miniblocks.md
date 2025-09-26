@@ -2,8 +2,6 @@
 title: Mini Blocks
 ---
 
-# Mini Blocks and EVM Blocks
-
 MegaETH has two types of blocks: mini blocks and EVM blocks. EVM blocks are identical to their counterparts in other EVM chains, ensuring compatibility with existing tools and applications. Mini blocks are specific to MegaETH and anchor an ecosystem of applications, tools, and infrastructure propose-built for minimum end-to-end latency.
 
 ## Why Mini Blocks
