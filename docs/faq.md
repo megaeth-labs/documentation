@@ -1,5 +1,6 @@
 ---
 title: FAQ
+owners: sami, alex
 ---
 
 # Chain Behavior & EVM Compatibility 

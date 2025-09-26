@@ -1,3 +1,7 @@
+---
+owners: krabat
+---
+
 # Error Codes
 
 | HTTP Error Code | RPC Error Code | Error Message | Explanation | Mitigation |

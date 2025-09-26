@@ -1,5 +1,6 @@
 ---
 title: Public RPC
+owners: krabat
 ---
 
 # Available Methods
