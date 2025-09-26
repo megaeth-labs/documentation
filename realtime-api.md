@@ -10,7 +10,7 @@ It is important to note that mini blocks in MegaETH are preconfirmed by the sequ
 
 This document specifies the Realtime API. Note that the Realtime API is an evolving standard. Additional functionalities will be added to the API based on feedbacks. This document will be kept up to date.
 
-## Overview of the Changes
+# Overview of the Changes
 
 The Realtime API introduces three types of changes to the vanilla Ethereum JSON-RPC API:
 
@@ -20,7 +20,7 @@ The Realtime API introduces three types of changes to the vanilla Ethereum JSON-
 4. `realtime_sendRawTransaction` submits a transaction and returns the receipt in a single call — without requiring polling.
 5. `eth_getLogsWithCursor` supports paginated log queries using a cursor, allowing applications to retrieve large datasets incrementally and reliably.
 
-## Querying Account and Chain States
+# Querying Account and Chain States
 
 The following API methods that query account and chain states, when invoked with `pending` or `latest` as the block tag, return results up to the most recent mini block.
 
@@ -35,7 +35,7 @@ The following API methods that query account and chain states, when invoked with
 | eth_createAccessList    |
 | eth_estimateGas         |
 
-### Example
+## Example
 
 At 5pm, the height of the most recent mini block is 10000, and the height of the most recent EVM block is 100. At this point, Alice’s account has a balance of 10 Ether.
 
@@ -43,7 +43,7 @@ At 100 milliseconds past 5pm, the height of the most recent mini block is 10010,
 
 At 110 milliseconds past 5pm, the transaction is picked up and executed by the sequencer, and packaged into the mini block at height 10011. Now, Bob invokes `eth_getBalance` on Alice’s account with `latest` as the block tag; he get a response of 9 Ether, because the transaction has been packaged into a mini block and is thus reflected in the Realtime API. However, Charlie, who makes the same query with `100` as the block tag, still sees 10 Ether, because the transaction has not been packaged into an EVM block, which will not happen until 1 second past 5pm.
 
-## Querying Transactions
+# Querying Transactions
 
 The following API methods that query transaction data are able to locate a transaction in the database and return results as soon as the transaction is packaged into a mini block. No special parameters are needed when invoking the methods.
 
@@ -52,15 +52,15 @@ The following API methods that query transaction data are able to locate a trans
 | eth_getTransactionByHash  |
 | eth_getTransactionReceipt |
 
-### Example
+## Example
 
 Continuing the previous example, Alice invokes `eth_getTransactionReceipt` on her transaction at 110 milliseconds past 5pm. The API responds with the correct receipt, even though no EVM block has been produced since she sent her transaction. This is because her transaction is already packaged into the mini block at height 10011 and the Realtime API can thus see the transaction.
 
-## `eth_subscribe` over WebSocket
+# `eth_subscribe` over WebSocket
 
 When invoked over WebSocket, `eth_subscribe` streams data as soon as the corresponding mini block is produced. This is the mechanism to get transaction preconfirmation and execution results with the minimum amount of latency. As a reminder, please call `eth_unsubscribe` when a subscription is no longer needed.
 
-### Logs
+## Logs
 
 When both `startBlock` and `endBlock` are set to `pending`, the API returns logs as soon as transactions are packaged into mini blocks. The following query is an example.
 
@@ -100,7 +100,7 @@ It is also possible to filter the logs by contract addresses and topics. Here is
 
 The schema of each log entry is the same as in `eth_getLogs`.
 
-### State Changes
+## State Changes
 
 `stateChange` is a new type of subscription that streams state changes of an account as soon as the transactions making the changes are packaged into mini blocks. It takes a list of account addresses to monitor as a parameter. Here is an example.
 
@@ -145,7 +145,7 @@ Here is an example.
 }
 ```
 
-### Mini Blocks
+## Mini Blocks
 
 `miniBlocks` is a new type of subscription that streams mini blocks as they are produced. Here is an example.
 
@@ -177,9 +177,9 @@ The returned mini blocks use the following schema.
 }
 ```
 
-## Sending and Confirming Transactions in One Round Trip
+# Sending and Confirming Transactions in One Round Trip
 
-### Overview
+## Overview
 
 `realtime_sendRawTransaction` simplifies realtime dApp development by returning
 the transaction receipt directly, without requiring polling
@@ -190,7 +190,7 @@ which case it returns a `realtime transaction expired` error, indicating that
 the user should revert to querying `eth_getTransactionReceipt`.
 
 
-### Example
+## Example
 
 `realtime_sendRawTransaction` is a drop-in replacement of `eth_sendRawTransaction`.
 
@@ -245,9 +245,9 @@ the sequencer, it returns an error.
 }
 ```
 
-## Paginated Log Queries with Cursors
+# Paginated Log Queries with Cursors
 
-### Overview
+## Overview
 
 `eth_getLogsWithCursor` is an enhanced version of `eth_getLogs` that adds
 support for pagination via a cursor. This allows applications to query large
@@ -266,7 +266,7 @@ server should start the query at `fromBlock` as usual. Absence of a returned
 `(blockNumber + logIndex)` of the last log in the current batch, but users
 should treat it as an opaque string.
 
-### Example
+## Example
 
 To send an initial request, start with a standard `eth_getLogs`-style query.
 Set `fromBlock` and `toBlock` (or `blockHash`) and do *not* include a cursor.

@@ -2,7 +2,7 @@
 title: Overview
 ---
 
-## Testnet Notice
+# Testnet Notice
 
 MegaETH is currently in **Testnet**, which means:
 
@@ -11,7 +11,7 @@ MegaETH is currently in **Testnet**, which means:
 - **Network Maintenance May Occur** → RPCs may go offline during upgrades. Contracts and states may be rolled back in rare cases.
 - **Testnet Is Not Incentivized** → Testnet tokens and transactions have no real monetary value. _Everything happening on the chain is solely for experimental purposes._
 
-## Fact Sheet
+# Fact Sheet
 
 | Parameter | Value |
 | --------- | ----- |
@@ -25,7 +25,7 @@ MegaETH is currently in **Testnet**, which means:
 | **EIP-1559 Parameters** | Base fee price target: 0.0025 Gwei<br/>Base fee price floor: 0.001 Gwei<br/>Max block size: 2 Giga gas<br/>Target block size: 50% (1 Giga gas) |
 | **Block Time** | 10ms for mini blocks<br/>1s for EVM blocks |
 
-## Next Steps
+# Next Steps
 
 - **[Architecture](/architecture)** → Get an overview of MegaETH’s architecture.
 - **[Realtime API](/realtime-api)** → MegaETH is compatible with Ethereum JSON-RPC API. To fully exploit the 10ms block time and build realtime experiences, it is necessary to use MegaETH’s Realtime API.

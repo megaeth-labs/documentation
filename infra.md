@@ -2,14 +2,14 @@
 title: Tooling and Infrastructure
 ---
 
-## Testnet Notice
+# Testnet Notice
 
 Many tooling and infrastructure are still being finalized:
 
 - If there is a specific tool or service you would like to see support MegaETH, let us know [here](https://2g6w10ag996.typeform.com/to/KPD7TTCC).
 - If you are a tool or service which already supports MegaETH and would like to be included on this page, please reach out.
 
-## Account Abstraction
+# Account Abstraction
 
 | Provider                                                 | Get Started                                                                                           | Supported Services                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Status    |
 | -------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
@@ -22,7 +22,7 @@ Many tooling and infrastructure are still being finalized:
 | [ThirdWeb](Thirdweb)                                     | [Docs](https://portal.thirdweb.com/)                                                                  | [ Embedded Wallets, Wallet Connectors](https://playground.thirdweb.com/connect/sign-in/button) Authentication: [Passkey, Social, Email, SMS](https://portal.thirdweb.com/connect/wallet/sign-in-methods/configure), [Custom Auth ++ Embedded Smart Accounts](https://portal.thirdweb.com/connect/in-app-wallet/custom-auth/overview), [Gas Sponsorship](https://portal.thirdweb.com/connect/account-abstraction/sponsorship-rules), Session Keys (Transaction Automation), [Bundler](http://portal.thirdweb.com/connect/account-abstraction/infrastructure), [Paymaster](http://portal.thirdweb.com/connect/account-abstraction/infrastructure) | Supported |
 | [MetaMask Delegation Toolkit](https://metamask.io/en-GB) | [Docs](https://docs.metamask.io/delegation-toolkit/)                                                  | [Embedded Smart Accounts](https://docs.metamask.io/delegation-toolkit/concepts/smart-accounts/#smart-account-implementation-types)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Supported |
 
-## Analytics and Block Explorers
+# Analytics and Block Explorers
 
 | Tool                                                              | Notes                         | Status      |
 | ----------------------------------------------------------------- | ----------------------------- | ----------- |
@@ -31,7 +31,7 @@ Many tooling and infrastructure are still being finalized:
 | [Uptime](https://uptime.megaeth.com)                              | Native performance dashboard  | Supported   |
 | [Parsec](https://parsec.fi)                                       |                               | In Progress |
 
-## Oracles
+# Oracles
 
 | Provider                                  | Get Started                                             | Contract Addresses                         | Supported Feeds                                                                                                                           | Status    |
 | ----------------------------------------- | ------------------------------------------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | --------- |
@@ -40,7 +40,7 @@ Many tooling and infrastructure are still being finalized:
 | [Gelato](https://www.gelato.network)      | [Docs](https://docs.gelato.network/web3-services/vrf)   | -                                          | [Verifiable Random Function](https://www.notion.so/gelato-network/Gelato-VRF-1cb69e877ab681ad8867ca621802022b)                            | Supported |
 | [Pyth](https://www.pyth.network/)         | [Docs](https://docs.pyth.network/price-feeds)           | 0x2880aB155794e7179c9eE2e38200202908C17B43 | [Price Feeds](https://docs.pyth.network/price-feeds/contract-addresses/evm)                                                               | Supported |
 
-## Indexers
+# Indexers
 
 | Indexer                                      | Get Started                                                               | Status    |
 | -------------------------------------------- | ------------------------------------------------------------------------- | --------- |
@@ -51,6 +51,6 @@ Many tooling and infrastructure are still being finalized:
 | [Envio](https://envio.dev/)                  | [Docs](https://docs.envio.dev/docs/HyperIndex/contract-import)            | Supported |
 | [Mobula](https://mobula.io)                  | [Docs](https://docs.mobula.io/)                                           | Supported |
 
-## RPC
+# RPC
 
 Nodes of MegaETH are highly specialized, so RPC infrastructure requires careful design and operation. As a result, we are currently self-hosting all RPC endpoints and do not support external RPC providers at this time. We are working closely and experimenting with a number of providers and will update here as soon as one is ready.

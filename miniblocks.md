@@ -4,7 +4,7 @@ title: Mini Blocks
 
 MegaETH has two types of blocks: mini blocks and EVM blocks. EVM blocks are identical to their counterparts in other EVM chains, ensuring compatibility with existing tools and applications. Mini blocks are specific to MegaETH and anchor an ecosystem of applications, tools, and infrastructure propose-built for minimum end-to-end latency.
 
-## Why Mini Blocks
+# Why Mini Blocks
 
 Handling blocks at 10 millisecond intervals requires a significant amount of resources. While software optimizations and powerful hardware give the sequencer ample headroom to produce 100 blocks per second, pushing the data to the other nodes, especially light clients with limited connectivity, quickly becomes a bottleneck.
 
@@ -12,7 +12,7 @@ The key issue with standard EVM blocks is that their headers take up quite some 
 
 Besides the resource overhead, the standard EVM block header is designed for chains whose block times are seconds or higher as well as light clients who use block headers as the sole root of trust. For example, timestamps have one second resolution, and the multiple Merkle roots optimize for succinctness of Merkle proofs rather than compactness of the headers. We believe that interactions with a chain in realtime—at tens of milliseconds of latency—will take on a different paradigm, and it is the right opportunity to redesign the block for compactness and low latency.
 
-## What Are Mini Blocks
+# What Are Mini Blocks
 
 Mini blocks share a lot of similarities with EVM blocks. Like EVM blocks,
 

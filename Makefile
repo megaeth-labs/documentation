@@ -5,7 +5,7 @@ website: $(OUTPUTS) public/neat.css
 
 public/%.html: %.md template.html
 	mkdir -p public
-	pandoc --standalone --template template.html "$<" > $@ 
+	pandoc --standalone --shift-heading-level-by=1 --template template.html "$<" > $@ 
 
 public/neat.css: neat.css
 	mkdir -p public
