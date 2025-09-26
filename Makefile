@@ -1,15 +1,15 @@
-INPUTS := $(wildcard *.md)
-OUTPUTS := $(patsubst %.md,public/%.html,$(INPUTS))
+INPUTS := $(wildcard docs/*.md)
+OUTPUTS := $(patsubst docs/%.md,public/%.html,$(INPUTS))
 
 website: $(OUTPUTS) public/style.css
 
-public/%.html: %.md template.html
+public/%.html: docs/%.md template/template.html
 	mkdir -p public
-	pandoc --standalone --shift-heading-level-by=1 --template template.html "$<" > $@ 
+	pandoc --standalone --shift-heading-level-by=1 --template template/template.html "$<" > $@ 
 
-public/style.css: style.css
+public/style.css: template/style.css
 	mkdir -p public
-	cp style.css public/style.css
+	cp template/style.css public/style.css
 
 .PHONY: clean
 clean:
