@@ -1,141 +1,142 @@
+/* === Base === */
 body {
-    margin: 0;
-    padding: 0;
-    font-family: sans-serif;
-    line-height: 1.6;
-    color: #111827;
-    background-color: #dfd9d9;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+  line-height: 1.6;
+  color: #111827;              /* primary text */
+  background-color: #dfd9d9;   /* page background */
 }
 
 a {
-    color: #2563eb;
-    text-decoration: none;
+  color: #2563eb;              /* accent blue */
+  text-decoration: none;
 }
 a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
 hr {
-    border: none;
-    border-top: 1px solid #cbc5c5;
-    margin: 2em 0;
+  border: none;
+  border-top: 1px solid #cbc5c5;
+  margin: 2em 0;
 }
 
+/* === Tables === */
 table {
-    border-collapse: collapse;
-    width: 100%;
-    margin: 1em 0;
-    max-width: 100%;        /* don’t overflow container */
-  display: block;         /* allow scroll */
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+  max-width: 100%;
+  display: block;              /* scroll if too wide */
   overflow-x: auto;
 }
 th, td {
-    border: 1px solid #cbc5c5;
-    padding: 0.5em 1em;
-    text-align: left;
+  border: 1px solid #cbc5c5;
+  padding: 0.5em 1em;
+  text-align: left;
 }
 th {
-    background-color: #cbc5c5;
+  background-color: #cbc5c5;   /* header cells */
 }
 
+/* === Header === */
 .site-header {
-    background-color: #cbc5c5;
-    position: relative;
-    padding: 1em;
-    border-bottom: 1px solid #cbc5c5;
+  background-color: #cbc5c5;
+  position: relative;
+  padding: 1em;
+  border-bottom: 1px solid #cbc5c5;
+  color: #000;                 /* darker text */
 }
 
 .main-nav {
-    padding-right: 200px;
+  padding-right: 200px;        /* reserve space for logo */
 }
-
 .main-nav ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
 }
-
-.site-logo a {
-  color: inherit;          /* keep it same as surrounding text */
-  text-decoration: none;   /* remove underline */
-}
-
 .main-nav li {
-    margin-right: 1em;
+  margin-right: 1em;
 }
-
 .main-nav a {
-    text-decoration: none;
-    color: #000;
+  text-decoration: none;
+  color: #000;                 /* darker text */
 }
 .main-nav a:hover {
-    color: #2563eb;
-}
-
-.site-content {
-    padding: 2em;
-    max-width: 800px;
-    margin: 0 auto;
-  overflow-x: auto;   /* allow horizontal scroll if needed */
-}
-
-.site-footer {
-    text-align: center;
-    padding: 1em;
-    border-top: 1px solid #cbc5c5;
-    margin-top: 2em;
-    font-size: 0.9em;
-    color: #000;
+  color: #2563eb;              /* accent on hover */
 }
 
 .site-logo {
-    position: absolute;
-    top: 1em;
-    right: 1em;
-    width: 180px;
-    height: auto;
+  position: absolute;
+  top: 1em;
+  right: 1em;
+  width: 180px;
+  height: auto;
+}
+.site-logo a {
+  color: inherit;
+  text-decoration: none;
+}
+.site-logo svg {
+  width: 100%;
+  height: auto;
 }
 
+/* === Title === */
 .page-title {
-    max-width: 800px;   /* match main text width */
-    margin: 2em auto 1em auto;
-    text-align: left;
-    padding: 0 1em;     /* same horizontal padding as .content */
+  max-width: 800px;
+  margin: 2em auto 1em auto;
+  text-align: left;
+  padding: 0 1em;
 }
 .page-title h1 {
-    font-size: 2em;
-    margin-bottom: 0.2em;
+  font-size: 2em;
+  margin-bottom: 0.2em;
 }
 .page-title h2 {
-    font-size: 1.2em;
-    color: #111827;
-    margin-top: 0;
+  font-size: 1.2em;
+  margin-top: 0;
+  color: #111827;              /* matches body text */
 }
 
-.site-logo svg {
-    width: 100%;
-    height: auto;
+/* === Content === */
+.site-content {
+  padding: 2em;
+  max-width: 800px;
+  margin: 0 auto;
+  overflow-x: auto;            /* prevent overflow */
 }
 
-/* === Code blocks === */
+/* === Footer === */
+.site-footer {
+  text-align: center;
+  padding: 1em;
+  border-top: 1px solid #cbc5c5;
+  margin-top: 2em;
+  font-size: 0.9em;
+  color: #000;                 /* darker text */
+}
+
+/* === Code === */
 pre, code {
-  background-color: #cbc5c5;  /* NEW: light background */
-  color: #000000;             /* NEW: black text for readability */
+  background-color: #cbc5c5;   /* secondary background */
+  color: #111827;              /* readable text */
   font-family: monospace;
-  padding: 0.5em;
   border-radius: 4px;
 }
 
 pre {
-  overflow-x: auto;
-  white-space: pre-wrap;      /* NEW: wrap long lines */
-  word-wrap: break-word;      /* NEW: break long words if needed */
+  padding: 0.5em;
   margin: 1em 0;
+  overflow-x: auto;
+  white-space: pre-wrap;       /* wrap long lines */
+  word-wrap: break-word;
 }
 
 code {
-  padding: 0.1em 0.3em;       /* NEW: subtle padding for inline code spans */
-  background-color: #cbc5c5;  /* NEW: light background */
+  padding: 0.1em 0.3em;        /* inline code spacing */
 }
