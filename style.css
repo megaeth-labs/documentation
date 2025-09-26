@@ -42,6 +42,10 @@ th {
     border-bottom: 1px solid #cbc5c5;
 }
 
+.nav-bar {
+    padding-right: 200px;
+}
+
 .main-nav ul {
     list-style: none;
     margin: 0;
