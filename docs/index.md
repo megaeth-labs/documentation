@@ -14,7 +14,7 @@ MegaETH is currently in **Testnet**, which means:
 # Fact Sheet
 
 | Parameter | Value |
-| --------- | ----- |
+| --------- | ------------------------------- |
 | **Network Name** | MegaETH Testnet |
 | **Chain ID** | 6342 |
 | **Network ID** | 6342 |

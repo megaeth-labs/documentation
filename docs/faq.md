@@ -8,7 +8,7 @@ owners: sami, alex
 ## Which EIPs are supported or enforced on MegaETH?
 
 | EIP        | Title                                                      | Enforced / Supported | Notes |
-|------------|------------------------------------------------------------|-----------------------|-------|
+|------------|-------------------------|----------------|-----------------------------------------------|
 | **EIP-55**   | Mixed-case checksum address encoding                      |  Not enforced        | Addresses may appear in lowercase, especially in logs and WebSocket responses. |
 | **EIP-170**  | Contract code size limit                                  |  Not enforced        | MegaETH raises the contract size limit to **512KB** to support larger deployments. |
 | **EIP-1559** | Fee market change for ETH 1.0 chain                       |  Supported           | MegaETH uses a dynamically adjusting base fee model with a different set of parameters. |
