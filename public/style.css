@@ -4,12 +4,12 @@ body {
   padding: 0;
   font-family: sans-serif;
   line-height: 1.6;
-  color: #111827;              /* primary text */
-  background-color: #dfd9d9;   /* page background */
+  color: #19191A;              /* primary text */
+  background-color: #ECE8E8;   /* page background */
 }
 
 a {
-  color: #2563eb;              /* accent blue */
+  color: #2A3E91;              /* accent blue */
   text-decoration: none;
 }
 a:hover {
@@ -18,7 +18,7 @@ a:hover {
 
 hr {
   border: none;
-  border-top: 1px solid #cbc5c5;
+  border-top: 1px solid #DFD9D9;
   margin: 2em 0;
 }
 
@@ -32,20 +32,20 @@ table {
   overflow-x: auto;
 }
 th, td {
-  border: 1px solid #cbc5c5;
+  border: 1px solid #DFD9D9;
   padding: 0.5em 1em;
   text-align: left;
 }
 th {
-  background-color: #cbc5c5;   /* header cells */
+  background-color: #DFD9D9;   /* header cells */
 }
 
 /* === Header === */
 .site-header {
-  background-color: #cbc5c5;
+  background-color: #DFD9D9;
   position: relative;
   padding: 1em;
-  border-bottom: 1px solid #cbc5c5;
+  border-bottom: 1px solid #DFD9D9;
   color: #000;                 /* darker text */
 }
 
@@ -67,7 +67,7 @@ th {
   color: #000;                 /* darker text */
 }
 .main-nav a:hover {
-  color: #2563eb;              /* accent on hover */
+  color: #2A3E91;              /* accent on hover */
 }
 
 .site-logo {
@@ -100,7 +100,6 @@ th {
 .page-title h2 {
   font-size: 1.2em;
   margin-top: 0;
-  color: #111827;              /* matches body text */
 }
 
 /* === Content === */
@@ -115,7 +114,7 @@ th {
 .site-footer {
   text-align: center;
   padding: 1em;
-  border-top: 1px solid #cbc5c5;
+  border-top: 1px solid #DFD9D9;
   margin-top: 2em;
   font-size: 0.9em;
   color: #000;                 /* darker text */
@@ -123,8 +122,8 @@ th {
 
 /* === Code === */
 pre, code {
-  background-color: #cbc5c5;   /* secondary background */
-  color: #111827;              /* readable text */
+  background-color: #DFD9D9;   /* secondary background */
+  color: #19191A;              /* readable text */
   font-family: monospace;
   border-radius: 4px;
 }
