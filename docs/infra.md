@@ -1,5 +1,5 @@
 ---
-title: Tooling and Infrastructure
+title: Tooling
 owners: sami
 ---
 

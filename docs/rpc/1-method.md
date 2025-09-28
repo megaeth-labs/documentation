@@ -1,5 +1,5 @@
 ---
-title: Public RPC
+title: RPC
 owners: krabat
 ---
 

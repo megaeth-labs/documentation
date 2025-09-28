@@ -1,1 +1,1 @@
-<li><a href="/rpc.html">Public RPC</a></li>
+<li><a href="/rpc.html">RPC</a></li>
