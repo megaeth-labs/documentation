@@ -9,7 +9,7 @@ body {
 }
 
 a {
-  color: #2A3E91;              /* accent blue */
+  color: #289DCC;              /* accent blue */
   text-decoration: none;
 }
 a:hover {
@@ -67,7 +67,7 @@ th {
   color: #000;                 /* darker text */
 }
 .main-nav a:hover {
-  color: #2A3E91;              /* accent on hover */
+  color: #289DCC;              /* accent on hover */
 }
 
 .site-logo {
