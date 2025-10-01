@@ -5,8 +5,8 @@ owners: krabat
 
 # Available Methods
 
-| Method                                     | Rate Limit (reqs/s) | Additional Restrictions |
-|--------------------------------------------|---------------------|-------------------------|
+| Method                                     | Availability | Additional Restrictions |
+|--------------------------------------------|--------------|-------------------------|
 | `debug_getRawBlock`                        | Unavailable  | |
 | `debug_getRawHeader`                       | Unavailable  | |
 | `debug_getRawReceipts`                     | Unavailable  | |
@@ -18,54 +18,54 @@ owners: krabat
 | `debug_traceCall`                          | Unavailable  | |
 | `debug_traceCallMany`                      | Unavailable  | |
 | `debug_traceTransaction`                   | Unavailable  | |
-| `eth_accounts`                             | 5        | |
-| `eth_blockNumber`                          | 5        | | 
-| `eth_call`                                 | 15       | Gas is limited to 10,000,000. |
-| `eth_chainId`                              | 5        | |
-| `eth_createAccessList`                     | 5        | |
-| `eth_estimateGas`                          | 5        | Gas is limited to 10,000,000. |
-| `eth_feeHistory`                           | 5        | |
-| `eth_gasPrice`                             | 5        | |
-| `eth_getBalance`                           | 15       | |
-| `eth_getBlockByHash`                       | 5        | | 
-| `eth_getBlockByNumber`                     | 5        | |
+| `eth_accounts`                             | Available    | |
+| `eth_blockNumber`                          | Available    | | 
+| `eth_call`                                 | Available    | Gas is limited to 10,000,000. |
+| `eth_chainId`                              | Available    | |
+| `eth_createAccessList`                     | Available    | Gas is limited to 10,000,000. |
+| `eth_estimateGas`                          | Available    | Gas is limited to 10,000,000. |
+| `eth_feeHistory`                           | Available    | Block range is limited to 10,000. |
+| `eth_gasPrice`                             | Available    | |
+| `eth_getBalance`                           | Available    | |
+| `eth_getBlockByHash`                       | Available    | Full block is disabled. | 
+| `eth_getBlockByNumber`                     | Available    | Full block is disabled. |
 | `eth_getBlockReceipts`                     | Unavailable  | |
-| `eth_getBlockTransactionCountByHash`       | 5        | |
-| `eth_getBlockTransactionCountByNumber`     | 15       | |
-| `eth_getCode`                              | 5        | |
-| `eth_getFilterChanges`                     | 5        | |
-| `eth_getFilterLogs`                        | 5        | |
-| `eth_getLogs`                              | 5        | |
-| `eth_getLogsWithCursor`                    | Unavailable  | |
-| `eth_getStorageAt`                         | 5        | |
-| `eth_getTransactionByBlockHashAndIndex`    | 5        | |
-| `eth_getTransactionByBlockNumberAndIndex`  | 5        | |
-| `eth_getTransactionByHash`                 | 5        | |
-| `eth_getTransactionCount`                  | 5        | |
-| `eth_getTransactionReceipt`                | 5        | |
-| `eth_getUncleByBlockHashAndIndex`          | Unavailable  | |
-| `eth_getUncleByBlockNumberAndIndex`        | Unavailable  | |
-| `eth_getUncleCountByBlockHash`             | 5        | |
-| `eth_getUncleCountByBlockNumber`           | 5        | |
-| `eth_maxPriorityFeePerGas`                 | 5        | |
-| `eth_mining`                               | Unavailable  | |
-| `eth_newBlockFilter`                       | 5        | |
-| `eth_newFilter`                            | 5        | |
-| `eth_newPendingTransactionFilter`          | 5        | |
-| `eth_protocolVersion`                      | 30       | |
-| `eth_sendRawTransaction`                   | 30       | |
+| `eth_getBlockTransactionCountByHash`       | Available    | |
+| `eth_getBlockTransactionCountByNumber`     | Available    | |
+| `eth_getCode`                              | Available    | |
+| `eth_getFilterChanges`                     | Available    | |
+| `eth_getFilterLogs`                        | Available    | |
+| `eth_getLogs`                              | Available    | |
+| `eth_getLogsWithCursor`                    | Available    | |
+| `eth_getStorageAt`                         | Available    | |
+| `eth_getTransactionByBlockHashAndIndex`    | Available    | |
+| `eth_getTransactionByBlockNumberAndIndex`  | Available    | |
+| `eth_getTransactionByHash`                 | Available    | |
+| `eth_getTransactionCount`                  | Available    | |
+| `eth_getTransactionReceipt`                | Available    | |
+| `eth_getUncleByBlockHashAndIndex`          | Available    | |
+| `eth_getUncleByBlockNumberAndIndex`        | Available    | |
+| `eth_getUncleCountByBlockHash`             | Available    | |
+| `eth_getUncleCountByBlockNumber`           | Available    | |
+| `eth_maxPriorityFeePerGas`                 | Available    | |
+| `eth_mining`                               | Available    | |
+| `eth_newBlockFilter`                       | Available    | |
+| `eth_newFilter`                            | Available    | |
+| `eth_newPendingTransactionFilter`          | Available    | |
+| `eth_protocolVersion`                      | Available    | |
+| `eth_sendRawTransaction`                   | Available    | |
 | `eth_sendTransaction`                      | Unavailable  | |
 | `eth_sign`                                 | Unavailable  | |
 | `eth_signTransaction`                      | Unavailable  | |
 | `eth_signTypedData`                        | Unavailable  | |
-| `eth_subscribe`                            | 5        | Only available over WebSocket. |
-| `eth_syncing`                              | 5        | |
-| `eth_uninstallFilter`                      | 5        | |
-| `eth_unsubscribe`                          | 5        | |
-| `net_listening`                            | 30       | |
-| `net_peerCount`                            | 30       | |
-| `net_version`                              | 30       | |
-| `realtime_sendRawTransaction`              | 30       | |
+| `eth_subscribe`                            | Unavailable  | |
+| `eth_syncing`                              | Available    | |
+| `eth_uninstallFilter`                      | Available    | |
+| `eth_unsubscribe`                          | Available    | |
+| `net_listening`                            | Available    | |
+| `net_peerCount`                            | Available    | |
+| `net_version`                              | Available    | |
+| `realtime_sendRawTransaction`              | Available    | |
 | `trace_block`                              | Unavailable  | |
 | `trace_call`                               | Unavailable  | |
 | `trace_callMany`                           | Unavailable  | |
@@ -78,5 +78,13 @@ owners: krabat
 | `txpool_contentFrom`                       | Unavailable  | |
 | `txpool_inspect`                           | Unavailable  | |
 | `txpool_status`                            | Unavailable  | |
-| `web3_clientVersion`                       | 5        | |
+| `web3_clientVersion`                       | Available    | |
 
+# Rate Limiting
+
+All available methods are subject to rate limiting based on two criteria:
+
+- **Compute Unit (CU) Limiting**: Limits the computational cost of requests based on the complexity of the requests.
+- **Network Bandwidth Limiting**: Limits the network traffic based on response sizes.
+
+User limits are dynamically updated in response to individual behavior.
