@@ -84,7 +84,7 @@ owners: krabat
 
 All available methods are subject to rate limiting based on two criteria:
 
-- **Compute Unit (CU) Limiting**: Limits the computational cost of requests based on the complexity of the requests.
+- **Compute Unit (CU) Limiting**: Limits the computational cost of requests based on their complexity.
 - **Network Bandwidth Limiting**: Limits the network traffic based on response sizes.
 
 User limits are dynamically updated in response to individual behavior.
