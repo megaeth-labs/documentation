@@ -65,18 +65,11 @@ Many tooling and infrastructure are still being finalized:
 
 # RPC Providers
 
-## Self-Hosted
-
-| Provider        | Get Started                                     |  Endpoint                                | Testnet (Carrot) | Mainnet  |
-| ----------------| ----------------------------------------------- | ------------------------------------------- | ---------------- | -------- |
-| **MegaETH RPC** | [Docs](https://docs.megaeth.com/rpc)            | `https://carrot.megaeth.com/rpc`                | Supported        | Planned  |
-| **MegaETH WSS** | [Docs](https://docs.megaeth.com/realtime-api)   | `wss://carrot.megaeth.com/wss`                  | In Progress      | Planned  |
-
-## Third-Party
-
-| Provider              | Get Started                                                                                 | Endpoint                                | Testnet (Carrot) | Mainnet      |
-| --------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------- | ---------------- | ------------ |
-| **Alchemy RPC**       | [Docs](https://www.alchemy.com/docs/reference/chain-apis-overview)                          | —                                           | -                | Planned      |
-| **Alchemy WSS**       | [Docs](https://www.alchemy.com/docs/reference/subscription-api)                             | —                                           | -                | Planned      |
-| **Thirdweb RPC Edge** | [Docs](https://portal.thirdweb.com/references/typescript/v5/functions#rpc)                  | `https://6342.rpc.thirdweb.com`             | Supported        | -            |
-| **Envio HyperRPC**    | [Docs](https://docs.envio.dev/docs/HyperRPC/overview-hyperrpc) *Read-only RPC*              | `https://megaeth-testnet.rpc.hypersync.xyz` | Supported        | -            |
+| Provider        | Protocol  | Get Started                                     |  Endpoint                                | Testnet (Carrot) | Mainnet  |
+| ----------------| --------- | ----------------------------------------------- | ------------------------------------------- | ---------------- | -------- |
+| **MegaETH** | HTTP |  [Docs](https://docs.megaeth.com/rpc)            | `https://carrot.megaeth.com/rpc`                | Supported        | Planned  |
+| **MegaETH** | WebSocket | [Docs](https://docs.megaeth.com/realtime-api)   | `wss://carrot.megaeth.com/wss`                  | In Progress      | Planned  |
+| **Alchemy** | HTTP | [Docs](https://www.alchemy.com/docs/reference/chain-apis-overview)                          | -                                           | -                | Planned      |
+| **Alchemy** | WebSocket | [Docs](https://www.alchemy.com/docs/reference/subscription-api)                             | -                                           | -                | Planned      |
+| **Thirdweb RPC Edge** | HTTP | [Docs](https://portal.thirdweb.com/references/typescript/v5/functions#rpc)                  | `https://6342.rpc.thirdweb.com`             | Supported        | -            |
+| **Envio HyperRPC**    | HTTP _(Read-only)_ | [Docs](https://docs.envio.dev/docs/HyperRPC/overview-hyperrpc)              | `https://megaeth-testnet.rpc.hypersync.xyz` | Supported        | -            |
