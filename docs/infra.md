@@ -23,35 +23,53 @@ Many tooling and infrastructure are still being finalized:
 | [ThirdWeb](Thirdweb)                                     | [Docs](https://portal.thirdweb.com/)                                                                  | [ Embedded Wallets, Wallet Connectors](https://playground.thirdweb.com/connect/sign-in/button) Authentication: [Passkey, Social, Email, SMS](https://portal.thirdweb.com/connect/wallet/sign-in-methods/configure), [Custom Auth ++ Embedded Smart Accounts](https://portal.thirdweb.com/connect/in-app-wallet/custom-auth/overview), [Gas Sponsorship](https://portal.thirdweb.com/connect/account-abstraction/sponsorship-rules), Session Keys (Transaction Automation), [Bundler](http://portal.thirdweb.com/connect/account-abstraction/infrastructure), [Paymaster](http://portal.thirdweb.com/connect/account-abstraction/infrastructure) | Supported |
 | [MetaMask Delegation Toolkit](https://metamask.io/en-GB) | [Docs](https://docs.metamask.io/delegation-toolkit/)                                                  | [Embedded Smart Accounts](https://docs.metamask.io/delegation-toolkit/concepts/smart-accounts/#smart-account-implementation-types)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Supported |
 
-# Analytics and Block Explorers
+# Analytics
 
-| Tool                                                              | Notes                         | Status      |
-| ----------------------------------------------------------------- | ----------------------------- | ----------- |
-| [OKX Explorer](https://www.okx.com/web3/explorer/megaeth-testnet) |                               | Supported   |
-| [Mega Explorer](https://www.megaexplorer.xyz)                     | Community maintained explorer | Supported   |
-| [Uptime](https://uptime.megaeth.com)                              | Native performance dashboard  | Supported   |
-| [Parsec](https://parsec.fi)                                       |                               | In Progress |
+| Tool                                                              | Notes                         | Testnet (Carrot)     | Mainnet        |
+| ----------------------------------------------------------------- | ----------------------------- | -------------------- | -------------- |
+| [Uptime Dashboard](https://uptime.megaeth.com)                    | Native performance dashboard  | Supported            | Planned    |
+| [Dune Dashboard](https://dune.com)                                |                               | -                    | Planned    |
+
+
+
+# Block Explorers
+
+| Tool                                                              | Notes                         | Testnet (Carrot)     | Mainnet        |
+| ----------------------------------------------------------------- | ----------------------------- | -------------------- | -------------- |
+| [Etherscan](https://etherscan.io)                                 |                               | -                    | Planned    |
+| [Blockscout](https://megaeth-testnet.blockscout.com)              |                               | Supported            | Planned    |
+| [OKX Explorer](https://www.okx.com/web3/explorer/megaeth-testnet) |                               | Supported            | Will Not Support   |
+| [Mega Explorer](https://www.megaexplorer.xyz)                     | Community maintained explorer | Supported            | Will Not Support |
 
 # Oracles
 
-| Provider                                  | Get Started                                             | Contract Addresses                         | Supported Feeds                                                                                                                           | Status    |
-| ----------------------------------------- | ------------------------------------------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | --------- |
-| [Redstone](https://www.redstone.finance/) | [Docs](https://docs.redstone.finance/docs/introduction) | 0xbEb886F1A51803d7e9FD4514a91E89b81F4fdE58 | [ Push Model (on-chain Feeds) ](https://app.redstone.finance/app/feeds/?networks=6342&page=1&sortBy=popularity&sortDesc=false&perPage=32) | Supported |
-| [Chainlink](https://chain.link)           | [Docs](https://docs.chain.link/)                        | 0xfBFff08fE4169853F7B1b5Ac67eC10dc8806801d | [Data Streams](https://docs.chain.link/data-streams/crypto-streams?page=1)                                                                | Supported |
-| [Gelato](https://www.gelato.network)      | [Docs](https://docs.gelato.network/web3-services/vrf)   | -                                          | [Verifiable Random Function](https://www.notion.so/gelato-network/Gelato-VRF-1cb69e877ab681ad8867ca621802022b)                            | Supported |
-| [Pyth](https://www.pyth.network/)         | [Docs](https://docs.pyth.network/price-feeds)           | 0x2880aB155794e7179c9eE2e38200202908C17B43 | [Price Feeds](https://docs.pyth.network/price-feeds/contract-addresses/evm)                                                               | Supported |
+| Provider                                  | Get Started                                             | Contract Addresses                         | Supported Feeds                                                                                                                           | Testnet (Carrot)   | Mainnet      |
+| ----------------------------------------- | ------------------------------------------------------- | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- | ---------- | ------------ |
+| [Redstone](https://www.redstone.finance/) | [Docs](https://docs.redstone.finance/docs/introduction) | 0xbEb886F1A51803d7e9FD4514a91E89b81F4fdE58 | [Push Model (on-chain Feeds)](https://app.redstone.finance/app/feeds/?networks=6342&page=1&sortBy=popularity&sortDesc=false&perPage=32) | Supported  | Planned  |
+| [Chainlink](https://chain.link)           | [Docs](https://docs.chain.link/)                        | 0xfBFff08fE4169853F7B1b5Ac67eC10dc8806801d | [Data Streams](https://docs.chain.link/data-streams/crypto-streams?page=1)                                                                | Supported  | Planned  |
+| [Gelato](https://www.gelato.network)      | [Docs](https://docs.gelato.network/web3-services/vrf)   | -                                          | [Verifiable Random Function](https://www.notion.so/gelato-network/Gelato-VRF-1cb69e877ab681ad8867ca621802022b)                            | Supported  | -            |
+| [Pyth](https://www.pyth.network/)         | [Docs](https://docs.pyth.network/price-feeds)           | 0x2880aB155794e7179c9eE2e38200202908C17B43 | [Price Feeds](https://docs.pyth.network/price-feeds/contract-addresses/evm)                                                               | Supported  | -            |
 
 # Indexers
 
-| Indexer                                      | Get Started                                                               | Status    |
-| -------------------------------------------- | ------------------------------------------------------------------------- | --------- |
-| [Goldsky](https://goldsky.com)               | [Docs](https://docs.goldsky.com/)                                         | Supported |
-| [The Indexing Co.](https://www.indexing.co/) | [Docs](https://docs.indexing.co/networks/megaeth_testnet#megaeth-testnet) | Supported |
-| [The Graph](https://thegraph.com)            | [Docs](https://thegraph.com/docs/en/)                                     | Supported |
-| [Thirdweb](https://thirdweb.com)             | [Docs](https://portal.thirdweb.com)                                       | Supported |
-| [Envio](https://envio.dev/)                  | [Docs](https://docs.envio.dev/docs/HyperIndex/contract-import)            | Supported |
-| [Mobula](https://mobula.io)                  | [Docs](https://docs.mobula.io/)                                           | Supported |
+| Indexer                                      | Get Started                                                               | Supported Services                                                                                                                                                                                                                                 | Testnet (Carrot) | Mainnet      |
+| -------------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ------------ |
+| [Goldsky](https://goldsky.com)               | [Docs](https://docs.goldsky.com/chains/megaeth)                           | [Subgraphs](https://docs.goldsky.com/chains/megaeth#subgraphs), [Mirror (Data Pipelines)](https://docs.goldsky.com/chains/megaeth#mirror)                                                                                                           | Supported        | Planned  |
+| [Envio](https://envio.dev/)                  | [Docs](https://docs.envio.dev/docs/HyperIndex/contract-import)            | [HyperIndex (Subgraphs)](https://docs.envio.dev/blog/how-to-index-megaeth-data-using-envio#hyperindex), [HyperSync (Data Access)](https://docs.envio.dev/blog/how-to-index-megaeth-data-using-envio#hypersync)                                                                | Supported        | Planned  |
+| [Mobula](https://mobula.io)                  | [Docs](https://docs.mobula.io/)                                           | [Subgraphs](https://docs.mobula.io/indexing-stream/introduction)                                                                                                                                                                                                                    | Supported        | Planned  |
+| [The Indexing Co.](https://www.indexing.co/) | [Docs](https://docs.indexing.co/networks/megaeth_testnet#megaeth-testnet) | [Pipelines](https://docs.indexing.co/guide/overview#what-you-can-do)                                                                                                             | Supported        | -            |
+| [The Graph](https://thegraph.com)            | [Docs](https://thegraph.com/docs/en/supported-networks/megaeth-testnet/)                                     | [Subgraphs](https://thegraph.com/docs/en/subgraphs/developing/subgraphs/#what-is-a-subgraph)                                                                                                                                                                                                                                | Supported        | -            |
+| [Thirdweb](https://thirdweb.com)             | [Docs](https://thirdweb.com/megaeth-testnet)                                       | [Insight API](https://thirdweb.com/insight)                                                                                                                                                                                                                         | Supported        | -            |
 
-# RPC
 
-Nodes of MegaETH are highly specialized, so RPC infrastructure requires careful design and operation. As a result, we are currently self-hosting all RPC endpoints and do not support external RPC providers at this time. We are working closely and experimenting with a number of providers and will update here as soon as one is ready.
+
+# RPC Providers
+
+| Provider        | Protocol  | Get Started                                     |  Endpoint                                | Testnet (Carrot) | Mainnet  |
+| ----------------| --------- | ----------------------------------------------- | ------------------------------------------- | ---------------- | -------- |
+| **MegaETH** | HTTP |  [Docs](https://docs.megaeth.com/rpc)            | `https://carrot.megaeth.com/rpc`                | Supported        | Planned  |
+| **MegaETH** | WebSocket | [Docs](https://docs.megaeth.com/realtime-api)   | `wss://carrot.megaeth.com/wss`                  | In Progress      | Planned  |
+| **Alchemy** | HTTP | [Docs](https://www.alchemy.com/docs/reference/chain-apis-overview)                          | -                                           | -                | Planned      |
+| **Alchemy** | WebSocket | [Docs](https://www.alchemy.com/docs/reference/subscription-api)                             | -                                           | -                | Planned      |
+| **Thirdweb RPC Edge** | HTTP | [Docs](https://portal.thirdweb.com/references/typescript/v5/functions#rpc)                  | `https://6342.rpc.thirdweb.com`             | Supported        | -            |
+| **Envio HyperRPC**    | HTTP _(Read-only)_ | [Docs](https://docs.envio.dev/docs/HyperRPC/overview-hyperrpc)              | `https://megaeth-testnet.rpc.hypersync.xyz` | Supported        | -            |
