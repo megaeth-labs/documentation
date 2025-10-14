@@ -73,3 +73,11 @@ Many tooling and infrastructure are still being finalized:
 | **Alchemy** | WebSocket | [Docs](https://www.alchemy.com/docs/reference/subscription-api)                             | -                                           | -                | Planned      |
 | **Thirdweb RPC Edge** | HTTP | [Docs](https://portal.thirdweb.com/references/typescript/v5/functions#rpc)                  | `https://6342.rpc.thirdweb.com`             | Supported        | -            |
 | **Envio HyperRPC**    | HTTP _(Read-only)_ | [Docs](https://docs.envio.dev/docs/HyperRPC/overview-hyperrpc)              | `https://megaeth-testnet.rpc.hypersync.xyz` | Supported        | -            |
+
+# Onchain Monitoring and Security
+
+
+| Provider                                                              | Notes                         | Testnet (Carrot)     | Mainnet        |
+| ----------------------------------------------------------------- | ----------------------------- | -------------------- | -------------- |
+| Chainalysis | | | |
+| Hexagate | | | |
