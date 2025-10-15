@@ -6,7 +6,6 @@ title: Overview
 
 MegaETH is currently in **Testnet**, which means:
 
-- **Onboarding Developers and Infrastructure Providers** → The initial phase of the Testnet focuses on onboarding developers and infrastructure providers. They are deploying on the Testnet and checking their integration. In the meantime, the public faucet is disabled.
 - **RPC Endpoints Are Rate Limited And May Change** → Always check this page for the latest URLs and status.
 - **Network Maintenance May Occur** → RPCs may go offline during upgrades. Contracts and states may be rolled back in rare cases.
 - **Testnet Is Not Incentivized** → Testnet tokens and transactions have no real monetary value. _Everything happening on the chain is solely for experimental purposes._
