@@ -38,7 +38,6 @@ Many tooling and infrastructure are still being finalized:
 | ----------------------------------------------------------------- | ----------------------------- | -------------------- | -------------- |
 | [Etherscan](https://etherscan.io)                                 |                               | -                    | Planned    |
 | [Blockscout](https://megaeth-testnet.blockscout.com)              |                               | Supported            | Planned    |
-| [OKX Explorer](https://www.okx.com/web3/explorer/megaeth-testnet) |                               | Supported            | Will Not Support   |
 | [Mega Explorer](https://www.megaexplorer.xyz)                     | Community maintained explorer | Supported            | Will Not Support |
 
 # Oracles
