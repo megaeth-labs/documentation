@@ -61,7 +61,8 @@ Many tooling and infrastructure are still being finalized:
 | [The Indexing Co.](https://www.indexing.co/) | [Docs](https://docs.indexing.co/networks/megaeth_testnet#megaeth-testnet) | [Pipelines](https://docs.indexing.co/guide/overview#what-you-can-do)                                                                                                             | Supported        | -            |
 | [The Graph](https://thegraph.com)            | [Docs](https://thegraph.com/docs/en/supported-networks/megaeth-testnet/)                                     | [Subgraphs](https://thegraph.com/docs/en/subgraphs/developing/subgraphs/#what-is-a-subgraph)                                                                                                                                                                                                                                | Supported        | -            |
 | [Thirdweb](https://thirdweb.com)             | [Docs](https://thirdweb.com/megaeth-testnet)                                       | [Insight API](https://thirdweb.com/insight)                                                                                                                                                                                                                         | Supported        | -            |
- 
+
+
 # RPC Providers
 
 | Provider        | Protocol  | Get Started                                     |  Endpoint                                | Testnet (Carrot) | Mainnet  |
