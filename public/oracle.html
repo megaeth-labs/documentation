@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>MegaETH Docs – Enshrined Oracle Interface</title>
+        <link rel="stylesheet" type="text/css" href="style.css">
+            </head>
+    <body>
+        <header class="site-header">
+                        <nav class="main-nav"><ul>
+                        <li><a href="/architecture.html">Architecture</a></li>
+                        <li><a href="/faq.html">FAQ</a></li>
+                        <li><a href="/index.html">Overview</a></li>
+                        <li><a href="/infra.html">Tooling</a></li>
+                        <li><a href="/miniblocks.html">Mini Blocks</a></li>
+                        <li><a href="/oracle.html">Enshrined Oracle Interface</a></li>
+                        <li><a href="/realtime-api.html">Realtime API</a></li>
+                        <li><a href="/rpc.html">RPC</a></li>
+                        </ul></nav>
+                        <div class="site-logo">
+                <a href="https://www.megaeth.com">
+                    <svg width="876" height="110" viewBox="0 0 876 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#clip0_3001_7242)">
+                        <path d="M851.78 25.7251H851.728L847.605 13.6316H842.154V30.9606C843.092 30.4655 844.157 30.0442 845.317 29.7071V18.8882L845.37 17.4977L850.199 28.917C850.821 28.8643 851 28.8432 851.643 28.8432C852.287 28.8432 852.455 28.8748 853.077 28.917L857.907 17.3713L857.959 18.7618V29.7071C859.109 30.0442 860.173 30.4655 861.122 30.9606V13.6316H855.671L851.77 25.7251H851.78Z" fill="currentColor"></path>
+                        <path d="M847.268 37.5551C848.438 37.5551 849.387 36.6071 849.387 35.4377C849.387 34.2683 848.438 33.3203 847.268 33.3203C846.097 33.3203 845.148 34.2683 845.148 35.4377C845.148 36.6071 846.097 37.5551 847.268 37.5551Z" fill="currentColor"></path>
+                        <path d="M856.02 37.5551C857.19 37.5551 858.139 36.6071 858.139 35.4377C858.139 34.2683 857.19 33.3203 856.02 33.3203C854.849 33.3203 853.901 34.2683 853.901 35.4377C853.901 36.6071 854.849 37.5551 856.02 37.5551Z" fill="currentColor"></path>
+                        <path d="M851.644 0C838.21 0 827.287 10.9136 827.287 24.3344C827.287 37.7553 838.21 48.6689 851.644 48.6689C865.077 48.6689 876 37.7553 876 24.3344C876 10.9136 865.077 0 851.644 0ZM851.644 45.4243C840.003 45.4243 830.534 35.9644 830.534 24.3344C830.534 12.7045 840.003 3.24459 851.644 3.24459C863.284 3.24459 872.753 12.7045 872.753 24.3344C872.753 35.9644 863.284 45.4243 851.644 45.4243Z" fill="currentColor"></path>
+                        <path d="M117.904 26.9576V109.874H72.8172V82.2103L58.8885 98.7808L45.0758 82.3262V109.874H0V26.9576H45.0864V27.0734L58.8991 43.5281L72.8278 27.0102V26.947H117.914L117.904 26.9576Z" fill="currentColor"></path>
+                        <path d="M172.121 43.5281V60.1619H231.073V76.7325H172.121V93.3031H231.073V109.874H127.035V26.9575H231.073V43.5281H172.121Z" fill="currentColor"></path>
+                        <path d="M342.734 27.0732V43.6438H292.397C290.004 43.6859 287.979 44.5076 286.324 46.1299C284.626 47.7417 283.783 49.6905 283.783 51.9659C283.783 52.0397 283.761 63.5327 283.73 86.4344C283.804 88.5518 284.573 90.2267 286.039 91.4593C287.462 92.6497 289.35 93.2712 291.701 93.3028H297.659V60.2776H342.745V110H248.133C245.55 110 243.336 109.115 241.49 107.345C239.645 105.617 238.717 103.5 238.717 100.993V36.0907C238.717 33.5835 239.645 31.4766 241.49 29.7384C243.336 27.9687 245.55 27.0838 248.133 27.0838H342.745L342.734 27.0732Z" fill="currentColor"></path>
+                        <path d="M420.528 93.3031H399.725L396.256 109.874H351.17L368.504 26.9575H451.728L469.063 109.874H423.976L420.507 93.3031H420.528ZM417.06 76.7325L410.122 43.5281L403.184 76.7325H417.06Z" fill="currentColor"></path>
+                        <path d="M522.595 43.5281V60.1619H581.547V76.7325H522.595V93.3031H581.547V109.874H477.509V26.9575H581.547V43.5281H522.595Z" fill="currentColor"></path>
+                        <path d="M693.441 43.5281H663.96V109.874H618.884V43.5281H589.403V26.9575H693.441V43.5281Z" fill="currentColor"></path>
+                        <path d="M819.441 26.9575V109.874H774.366V76.7325H746.624V109.874H701.538V26.9575H746.624V60.1619H774.366V26.9575H819.441Z" fill="currentColor"></path>
+                        </g>
+                        <defs>
+                        <clipPath id="clip0_3001_7242">
+                        <rect width="876" height="110" fill="currentColor"></rect>
+                        </clipPath>
+                        </defs>
+                    </svg>
+                </a>
+                <h3>Manual</h3>
+            </div>
+            <div class="page-title">
+                <h1>Enshrined Oracle Interface</h1>
+                
+                
+                
+                                <nav id="TOC">
+                    <ul>
+                    <li><a href="#motivation"
+                    id="toc-motivation">Motivation</a></li>
+                    <li><a href="#design"
+                    id="toc-design">Design</a></li>
+                    <li><a
+                    href="#programming-interfaces-for-oracle-providers"
+                    id="toc-programming-interfaces-for-oracle-providers">Programming
+                    Interfaces for Oracle Providers</a></li>
+                    </ul>
+                </nav>
+                            </div>
+        </header>
+
+        <main class="site-content">
+            <p>Enshrined Oracle Interface grants on-chain transactions
+            low-latency access to off-chain data. This document explains
+            the interface for end users and oracle providers.</p>
+            <h2 id="motivation">Motivation</h2>
+            <p>The fundamental task of oracles is to reliably transport
+            data from off-chain providers to on-chain consumers. Oracles
+            traditionally fall into two categories with respective pros
+            and cons.</p>
+            <p><em>Push-based oracles</em> publish data points through
+            on-chain smart contracts. Providers preemptively push new
+            data points to the smart contracts which are then read by
+            consumers asynchronously. Such oracles excel in simplicity
+            since reading them is as simple as calling the oracle smart
+            contracts. But, because providers cannot predict when
+            consumers will want to read the oracles, they have to rely
+            on heuristics to decide when to push new data points. Any
+            resulting timing mismatches between pushing and reading add
+            to latency or cause redundant refreshes which waste chain
+            capacity.</p>
+            <p><em>Pull-based oracles</em> publish data points over
+            off-chain streams such as WebSocket connections. Consumers
+            then bring data points to the blockchain on a need basis.
+            This mechanism minimizes latency and redundancy since
+            consumers upload the most recent data points exactly when
+            they want to use them. However, integrating with pull-based
+            oracles can be complicated because of the added logic on the
+            consumer side.</p>
+            <p>Enshrined Oracle Interface combines the best of both
+            worlds. Like push-based oracles, it provides the same
+            on-chain API, so integration is equally simple and requires
+            minimal or no change to existing applications. Meanwhile,
+            like pull-based oracles, data points are refreshed just
+            before they are read by consumers, so there is no added
+            latency or redundancy from mismatched refreshes and
+            reads.</p>
+            <h2 id="design">Design</h2>
+            <p>For users, an oracle built with the Enshrined Oracle
+            Interface functions just like a push-based oracle. A
+            <em>user transaction</em> can read the oracle simply by
+            calling a smart contract, denoted as the <em>oracle
+            contract</em>. Under the hood, the following happens.</p>
+            <p>First, the oracle contract, which the oracle provider
+            develops, calls a <em>system contract</em> to signal to the
+            MegaETH sequencer that the current user transaction attempts
+            to read the oracle. The system contract is a regular EVM
+            smart contract. But, instead of actually executing the
+            system contract, the sequencer handles the call by running
+            an <em>off-chain routine</em> that is pre-arranged with the
+            oracle provider. The purpose of the routine is to fetch the
+            latest data point of the oracle. For example, for an oracle
+            that provides the current wall-clock time, this routine can
+            be as simple as reading the hardware clock. The sequencer
+            passes the result of the off-chain routine to the oracle
+            contract. In other words, the call made by the oracle
+            contract to the system contract is silently replaced by the
+            off-chain routine, with the result of the latter being used
+            as the return value. At this point, the oracle contract has
+            obtained the latest data point of the oracle, fetched just
+            in time using the off-chain routine, and can return it to
+            the user transaction after optional validation or
+            postprocessing.</p>
+            <p>While intercepting the call to the system contract allows
+            the sequencer to pause the user transaction and fetch the
+            latest oracle data by running the off-chain routine, other
+            nodes cannot re-execute or validate the user transaction
+            just yet. For them to agree with the sequencer on its
+            outcome, they must arrive at the same result as the
+            sequencer when handling the call to the system contract.
+            However, they cannot simply run the same off-chain routine
+            as the sequencer does, because the result of the routine is
+            specific to the context in which the sequencer runs it, and
+            other nodes cannot reproduce the result unless they run the
+            routine in identical context. In the aforementioned example
+            of a time oracle, a node re-executing the user transaction
+            on a different day is bound to get a different result if it
+            reads its hardware clock. The sequencer must convey to other
+            nodes the unique result it gets when running the off-chain
+            routine, so that they can plug in the same result when they
+            re-execute the remainder of the user transaction.</p>
+            <p>There are many potential ways for the sequencer to pass
+            the information to other nodes, such as injecting it to the
+            block header or a new section of the block body.
+            Unfortunately, the sequencer is not afforded the flexibility
+            if it wishes to stay compatible with standard EVMs. In
+            MegaETH, the sequencer injects the result of the off-chain
+            routine in a separate <em>system transaction</em> that
+            appears immediately before the user transaction in the
+            assembled block. The job of the system transaction is to
+            update the state of system contract, such that the call to
+            the system contract, triggered by the subsequent user
+            transaction, returns the result injected by the sequencer.
+            In the eyes of a re-executing node, the system transaction
+            appears as a just-in-time write to the system contract that
+            causes the subsequent read to the system contract to return
+            the latest oracle data point. For all nodes other than the
+            sequencer, the system transaction and the system contract
+            are handled as normal EVM transactions and contracts.</p>
+            <h2
+            id="programming-interfaces-for-oracle-providers">Programming
+            Interfaces for Oracle Providers</h2>
+            <p>Use of the Enshrined Oracle Interface is permissioned.
+            Each oracle has its own system contract whose behavior can
+            be customized by defining the following methods.</p>
+            <ul>
+            <li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">validate</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo><mo>→</mo><mo stretchy="false" form="prefix">{</mo><mtext mathvariant="normal">true</mtext><mo>,</mo><mtext mathvariant="normal">false</mtext><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\text{validate}(k, v) \rightarrow \{\text{true}, \text{false}\}</annotation></semantics></math>.
+            The oracle provider should use it to define how the
+            sequencer should verify the fetched data.
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
+            is a parameter that the oracle provider may use to identify
+            the data point, and
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>v</mi><annotation encoding="application/x-tex">v</annotation></semantics></math>
+            should be used to pass in the fetched data.</li>
+            <li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">write</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{write}(k, v)</annotation></semantics></math>.
+            The oracle provider should use it to define how the
+            sequencer should update the state of the system contract
+            with the fetched data.
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
+            is a parameter that the oracle provider may use to identify
+            the data point, and
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>v</mi><annotation encoding="application/x-tex">v</annotation></semantics></math>
+            should be used to pass in the fetched data.</li>
+            <li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">read</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo stretchy="false" form="postfix">)</mo><mo>→</mo><mo stretchy="false" form="prefix">{</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">}</mo><mo>*</mo></mrow><annotation encoding="application/x-tex">\text{read}(k) \rightarrow \{0, 1\}*</annotation></semantics></math>,
+            a view function of the system contract. The oracle provider
+            should use it to define how the sequencer returns the value
+            associated with key
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
+            given the state of the system contract.</li>
+            </ul>
+            <p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">read</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{read}(k)</annotation></semantics></math>
+            is the only method that can be called in any transaction.
+            The other methods can only be called by system transactions
+            and this is enforced by a special key pair.</p>
+            <p>In addition, the interface allows the oracle provider to
+            specify the following off-chain routine.</p>
+            <ul>
+            <li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">fetch</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{fetch}(k)</annotation></semantics></math>.
+            The oracle provider should use this routine to define how
+            the sequencer should fetch data for the oracle from
+            off-chain sources.
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
+            is a parameter that the oracle provider may use to identify
+            the data point.</li>
+            </ul>
+            <p>The Enshrined Oracle Interface augments the behavior of
+            the sequencer as the following when it executes any
+            transaction
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
+            that is not a system transaction and encounters
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">read</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{read}(k)</annotation></semantics></math>.</p>
+            <ol type="1">
+            <li>Run
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">fetch</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{fetch}(k)</annotation></semantics></math>.
+            Let the result be
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>v</mi><annotation encoding="application/x-tex">v</annotation></semantics></math>.</li>
+            <li>Run
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">validate</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{validate}(k, v)</annotation></semantics></math>.
+            <ol type="a">
+            <li>If it attempts to read any storage slot that has so far
+            been written by
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>,
+            or write any storage slot that has so far been read by
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>,
+            return
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">read</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{read}(k)</annotation></semantics></math>
+            and ignore remaining steps.</li>
+            <li>If the result is false, return
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">read</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{read}(k)</annotation></semantics></math>
+            and ignore remaining steps.</li>
+            </ol></li>
+            <li>Run
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">write</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{write}(k, v)</annotation></semantics></math>.
+            <ol type="a">
+            <li>If it attempts to read any storage slot that has so far
+            been written by
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>,
+            or write any storage slot that has so far been read by
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>,
+            return
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">read</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{read}(k)</annotation></semantics></math>
+            and ignore remaining steps.</li>
+            </ol></li>
+            <li>Generate a system transaction
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>
+            that has the following behavior and insert
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>s</mi><annotation encoding="application/x-tex">s</annotation></semantics></math>
+            immediately before
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
+            in the assembled block.
+            <ol type="a">
+            <li>Run
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">validate</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{validate}(k, v)</annotation></semantics></math>
+            and assert that the result is true.</li>
+            <li>Run
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">write</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{write}(k, v)</annotation></semantics></math>.</li>
+            </ol></li>
+            </ol>
+            <p>The system transaction does not consume gas.</p>
+            <p>TODO: formally verify (prove) that the interface, along
+            with the dynamic checks, is safe</p>
+        </main>
+
+        <footer class="site-footer">
+            <p>© 2025 MegaETH. All rights reserved.</p>
+                    </footer>
+    </body>
+</html>

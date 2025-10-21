@@ -7,7 +7,7 @@ OUTPUTS := $(FILE_OUTPUTS) $(DIR_OUTPUTS)
 
 MANIFESTS := $(patsubst public/%.html,manifest/%.txt,$(OUTPUTS))
 
-PANDOC_OPTS := --toc --standalone --shift-heading-level-by=1
+PANDOC_OPTS := --toc --standalone --shift-heading-level-by=1 --mathml 
 TEMPLATE := template/template.html
 NAVBAR := manifest/navbar.html
 
