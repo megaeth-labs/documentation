@@ -3,8 +3,8 @@ title: Enshrined Oracle Interface
 ---
 
 Enshrined Oracle Interface grants on-chain transactions low-latency access to
-off-chain data. This document explains the interface for end users and oracle
-providers.
+off-chain data. This document explains the interface for app developers and
+oracle providers.
 
 # Motivation
 
@@ -35,14 +35,46 @@ pull-based oracles, data points are refreshed just before they are read by
 consumers, so there is no added latency or redundancy from mismatched refreshes
 and reads.
 
-# Design
+# Design Overview
 
 For users, an oracle built with the Enshrined Oracle Interface functions just
 like a push-based oracle. A _user transaction_ can read the oracle simply by
-calling a smart contract, denoted as the _oracle contract_. Under the hood, the
-following happens.
+calling a smart contract developed by the oracle provider; we call this smart
+contract the _oracle contract_. It is a regular EVM smart contract and can
+perform arbitrary computation and state updates. Under the hood, the oracle
+contract reads a _system contract_, developed by MegaETH, to fetch the latest
+data point for the oracle.
 
-First, the oracle contract, which the oracle provider develops, calls a _system
+system contract has two states: on chain and off chain; off chain state can be updates frequently; when system contract is read, the off chain and the on chain state synchronize
+
+The MegaETH sequencer ensures that whenever the system contract is read by the
+oracle contract, it has the latest data point for the oracle ready to be
+returned. To achieve that, the MegaETH sequencer runs off-chain logic
+prescribed by the oracle provider to acquire new data points for the oracle,
+and feeds them to the on-chain system contract by sending _system transactions_
+that update its state. Oracle providers can customize the behavior of the
+sequencer in two aspects: _when_ and _how_ the sequencer should acquire new data
+points.
+
+# Fetching Data Points
+
+An oracle provider defines two functions, $\text{fetch}()$ and
+$\text{write}(r)$, to specify how the sequencer should acquire new data points
+and feed them to the system contract. $\text{fetch}()$ is an off-chain routine;
+its job is to fetch new data points from sources external to the chain, such as
+HTTP APIs or local resources of the sequencer. $\text{write}(r)$ is a Solidity
+function; it takes a fetched data point $r$ and updates the state of the system
+contract to make the new data point available on chain. 
+
+data source
+
+timing
+
+how to achieve passive oracles and 
+inject on-chain write in the frontrunning transaction; always write from the current on-chain state;
+
+
+ a _system
 contract_ to signal to the MegaETH sequencer that the current user transaction
 attempts to read the oracle. The system contract is a regular EVM smart
 contract. But, instead of actually executing the system contract, the sequencer
@@ -90,9 +122,9 @@ contracts.
 
 # Programming Interfaces for Oracle Providers
 
-Use of the Enshrined Oracle Interface is permissioned. Each oracle has its own
-system contract whose behavior can be customized by defining the following
-methods.
+To build an oracle using the Enshrined Oracle Interface, an oracle provider
+needs to define how the sequencer should fetch the latest data point for the
+oracle and update the system contract. This is in the form of two functions: fetch and update
 
 - $\text{validate}(k, v) \rightarrow \{\text{true}, \text{false}\}$. The oracle
   provider should use it to define how the sequencer should verify the fetched

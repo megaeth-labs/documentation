@@ -52,8 +52,11 @@
                     <ul>
                     <li><a href="#motivation"
                     id="toc-motivation">Motivation</a></li>
-                    <li><a href="#design"
-                    id="toc-design">Design</a></li>
+                    <li><a href="#design-overview"
+                    id="toc-design-overview">Design Overview</a></li>
+                    <li><a href="#fetching-data-points"
+                    id="toc-fetching-data-points">Fetching Data
+                    Points</a></li>
                     <li><a
                     href="#programming-interfaces-for-oracle-providers"
                     id="toc-programming-interfaces-for-oracle-providers">Programming
@@ -66,7 +69,7 @@
         <main class="site-content">
             <p>Enshrined Oracle Interface grants on-chain transactions
             low-latency access to off-chain data. This document explains
-            the interface for end users and oracle providers.</p>
+            the interface for app developers and oracle providers.</p>
             <h2 id="motivation">Motivation</h2>
             <p>The fundamental task of oracles is to reliably transport
             data from off-chain providers to on-chain consumers. Oracles
@@ -99,19 +102,52 @@
             before they are read by consumers, so there is no added
             latency or redundancy from mismatched refreshes and
             reads.</p>
-            <h2 id="design">Design</h2>
+            <h2 id="design-overview">Design Overview</h2>
             <p>For users, an oracle built with the Enshrined Oracle
             Interface functions just like a push-based oracle. A
             <em>user transaction</em> can read the oracle simply by
-            calling a smart contract, denoted as the <em>oracle
-            contract</em>. Under the hood, the following happens.</p>
-            <p>First, the oracle contract, which the oracle provider
-            develops, calls a <em>system contract</em> to signal to the
-            MegaETH sequencer that the current user transaction attempts
-            to read the oracle. The system contract is a regular EVM
-            smart contract. But, instead of actually executing the
-            system contract, the sequencer handles the call by running
-            an <em>off-chain routine</em> that is pre-arranged with the
+            calling a smart contract developed by the oracle provider;
+            we call this smart contract the <em>oracle contract</em>. It
+            is a regular EVM smart contract and can perform arbitrary
+            computation and state updates. Under the hood, the oracle
+            contract reads a <em>system contract</em>, developed by
+            MegaETH, to fetch the latest data point for the oracle.</p>
+            <p>The MegaETH sequencer ensures that whenever the system
+            contract is read by the oracle contract, it has the latest
+            data point for the oracle ready to be returned. To achieve
+            that, the MegaETH sequencer runs off-chain logic prescribed
+            by the oracle provider to acquire new data points for the
+            oracle, and feeds them to the on-chain system contract by
+            sending <em>system transactions</em> that update its state.
+            Oracle providers can customize the behavior of the sequencer
+            in two aspects: <em>when</em> and <em>how</em> the sequencer
+            should acquire new data points.</p>
+            <h2 id="fetching-data-points">Fetching Data Points</h2>
+            <p>An oracle provider defines two functions,
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">fetch</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{fetch}()</annotation></semantics></math>
+            and
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">write</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>r</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{write}(r)</annotation></semantics></math>,
+            to specify how the sequencer should acquire new data points
+            and feed them to the system contract.
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">fetch</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{fetch}()</annotation></semantics></math>
+            is an off-chain routine; its job is to fetch new data points
+            from sources external to the chain, such as HTTP APIs or
+            local resources of the sequencer.
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">write</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>r</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{write}(r)</annotation></semantics></math>
+            is a Solidity function; it takes a fetched data point
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>r</mi><annotation encoding="application/x-tex">r</annotation></semantics></math>
+            and updates the state of the system contract to make the new
+            data point available on chain.</p>
+            <p>data source</p>
+            <p>timing</p>
+            <p>inject on-chain write in the frontrunning transaction;
+            always write from the current on-chain state;</p>
+            <p>a <em>system contract</em> to signal to the MegaETH
+            sequencer that the current user transaction attempts to read
+            the oracle. The system contract is a regular EVM smart
+            contract. But, instead of actually executing the system
+            contract, the sequencer handles the call by running an
+            <em>off-chain routine</em> that is pre-arranged with the
             oracle provider. The purpose of the routine is to fetch the
             latest data point of the oracle. For example, for an oracle
             that provides the current wall-clock time, this routine can
@@ -164,11 +200,13 @@
             <h2
             id="programming-interfaces-for-oracle-providers">Programming
             Interfaces for Oracle Providers</h2>
-            <p>Use of the Enshrined Oracle Interface is permissioned.
-            Each oracle has its own system contract whose behavior can
-            be customized by defining the following methods.</p>
+            <p>To build an oracle using the Enshrined Oracle Interface,
+            an oracle provider needs to define how the sequencer should
+            fetch the latest data point for the oracle and update the
+            system contract. This is in the form of two functions: fetch
+            and update</p>
             <ul>
-            <li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">validate</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo><mo>→</mo><mo stretchy="false" form="prefix">{</mo><mtext mathvariant="normal">true</mtext><mo>,</mo><mtext mathvariant="normal">false</mtext><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\text{validate}(k, v) \rightarrow \{\text{true}, \text{false}\}</annotation></semantics></math>.
+            <li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">validate</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo>,</mo><mi>v</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>→</mo><mo stretchy="false" form="prefix">{</mo><mtext mathvariant="normal">true</mtext><mo>,</mo><mtext mathvariant="normal">false</mtext><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\text{validate}(k, v) \rightarrow \{\text{true}, \text{false}\}</annotation></semantics></math>.
             The oracle provider should use it to define how the
             sequencer should verify the fetched data.
             <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
@@ -176,7 +214,7 @@
             the data point, and
             <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>v</mi><annotation encoding="application/x-tex">v</annotation></semantics></math>
             should be used to pass in the fetched data.</li>
-            <li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">write</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{write}(k, v)</annotation></semantics></math>.
+            <li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">write</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo>,</mo><mi>v</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{write}(k, v)</annotation></semantics></math>.
             The oracle provider should use it to define how the
             sequencer should update the state of the system contract
             with the fetched data.
@@ -185,21 +223,21 @@
             the data point, and
             <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>v</mi><annotation encoding="application/x-tex">v</annotation></semantics></math>
             should be used to pass in the fetched data.</li>
-            <li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">read</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo stretchy="false" form="postfix">)</mo><mo>→</mo><mo stretchy="false" form="prefix">{</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">}</mo><mo>*</mo></mrow><annotation encoding="application/x-tex">\text{read}(k) \rightarrow \{0, 1\}*</annotation></semantics></math>,
+            <li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">read</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>→</mo><mo stretchy="false" form="prefix">{</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">}</mo><mo>*</mo></mrow><annotation encoding="application/x-tex">\text{read}(k) \rightarrow \{0, 1\}*</annotation></semantics></math>,
             a view function of the system contract. The oracle provider
             should use it to define how the sequencer returns the value
             associated with key
             <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
             given the state of the system contract.</li>
             </ul>
-            <p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">read</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{read}(k)</annotation></semantics></math>
+            <p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">read</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{read}(k)</annotation></semantics></math>
             is the only method that can be called in any transaction.
             The other methods can only be called by system transactions
             and this is enforced by a special key pair.</p>
             <p>In addition, the interface allows the oracle provider to
             specify the following off-chain routine.</p>
             <ul>
-            <li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">fetch</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{fetch}(k)</annotation></semantics></math>.
+            <li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">fetch</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{fetch}(k)</annotation></semantics></math>.
             The oracle provider should use this routine to define how
             the sequencer should fetch data for the oracle from
             off-chain sources.
@@ -212,14 +250,14 @@
             transaction
             <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
             that is not a system transaction and encounters
-            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">read</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{read}(k)</annotation></semantics></math>.</p>
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">read</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{read}(k)</annotation></semantics></math>.</p>
             <ol type="1">
             <li>Run
-            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">fetch</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{fetch}(k)</annotation></semantics></math>.
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">fetch</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{fetch}(k)</annotation></semantics></math>.
             Let the result be
             <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>v</mi><annotation encoding="application/x-tex">v</annotation></semantics></math>.</li>
             <li>Run
-            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">validate</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{validate}(k, v)</annotation></semantics></math>.
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">validate</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo>,</mo><mi>v</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{validate}(k, v)</annotation></semantics></math>.
             <ol type="a">
             <li>If it attempts to read any storage slot that has so far
             been written by
@@ -227,14 +265,14 @@
             or write any storage slot that has so far been read by
             <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>,
             return
-            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">read</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{read}(k)</annotation></semantics></math>
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">read</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{read}(k)</annotation></semantics></math>
             and ignore remaining steps.</li>
             <li>If the result is false, return
-            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">read</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{read}(k)</annotation></semantics></math>
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">read</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{read}(k)</annotation></semantics></math>
             and ignore remaining steps.</li>
             </ol></li>
             <li>Run
-            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">write</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{write}(k, v)</annotation></semantics></math>.
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">write</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo>,</mo><mi>v</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{write}(k, v)</annotation></semantics></math>.
             <ol type="a">
             <li>If it attempts to read any storage slot that has so far
             been written by
@@ -242,7 +280,7 @@
             or write any storage slot that has so far been read by
             <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>,
             return
-            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">read</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{read}(k)</annotation></semantics></math>
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">read</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{read}(k)</annotation></semantics></math>
             and ignore remaining steps.</li>
             </ol></li>
             <li>Generate a system transaction
@@ -254,10 +292,10 @@
             in the assembled block.
             <ol type="a">
             <li>Run
-            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">validate</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{validate}(k, v)</annotation></semantics></math>
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">validate</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo>,</mo><mi>v</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{validate}(k, v)</annotation></semantics></math>
             and assert that the result is true.</li>
             <li>Run
-            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">write</mtext><mo stretchy="false" form="prefix">(</mo><mi>k</mi><mo>,</mo><mi>v</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{write}(k, v)</annotation></semantics></math>.</li>
+            <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">write</mtext><mrow><mo stretchy="true" form="prefix">(</mo><mi>k</mi><mo>,</mo><mi>v</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{write}(k, v)</annotation></semantics></math>.</li>
             </ol></li>
             </ol>
             <p>The system transaction does not consume gas.</p>
