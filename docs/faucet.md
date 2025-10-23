@@ -1,5 +1,6 @@
 ---
 title: Faucet
+header-includes: <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 ---
 
 
@@ -21,16 +22,11 @@ title: Faucet
         </p>
         
         <p>
-            <div class="cf-turnstile" 
-                 data-sitekey="0x4AAAAAABA4JXCaw9E2Py-9" 
-                 data-callback="onTurnstileSuccess"
-                 data-error-callback="onTurnstileError"
-                 data-expired-callback="onTurnstileExpired">
-            </div>
+            <div class="cf-turnstile" data-sitekey="0x4AAAAAAB8N9XQ8u4dRKBt_"></div>
         </p>
         
         <p>
-            <button type="submit" id="submit-btn" disabled>
+            <button type="submit" id="submit-btn">
                 Get Testnet Tokens
             </button>
         </p>
@@ -41,31 +37,7 @@ title: Faucet
     </div>
 </div>
 
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-
 <script>
-// Store the Turnstile token
-let turnstileToken = null;
-
-// Turnstile callback functions
-function onTurnstileSuccess(token) {
-    turnstileToken = token;
-    document.getElementById('submit-btn').disabled = false;
-    console.log('Turnstile verification successful');
-}
-
-function onTurnstileError(error) {
-    turnstileToken = null;
-    document.getElementById('submit-btn').disabled = true;
-    console.error('Turnstile verification failed:', error);
-}
-
-function onTurnstileExpired() {
-    turnstileToken = null;
-    document.getElementById('submit-btn').disabled = true;
-    console.log('Turnstile verification expired');
-}
-
 // Form submission handler
 document.getElementById('faucet-form').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -75,7 +47,8 @@ document.getElementById('faucet-form').addEventListener('submit', async function
     const resultContent = document.getElementById('result-content');
     const walletAddress = document.getElementById('wallet-address').value;
     
-    // Check if Turnstile token is available
+    // Get the Turnstile token from the hidden input field
+    const turnstileToken = document.querySelector('input[name="cf-turnstile-response"]')?.value;
     if (!turnstileToken) {
         alert('Please complete the captcha verification first.');
         return;

@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>MegaETH Docs – Faucet</title>
         <link rel="stylesheet" type="text/css" href="style.css">
+                <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
             </head>
     <body>
         <header class="site-header">
@@ -15,7 +16,6 @@
                         <li><a href="/index.html">Overview</a></li>
                         <li><a href="/infra.html">Tooling</a></li>
                         <li><a href="/miniblocks.html">Mini Blocks</a></li>
-                        <li><a href="/oracle.html">Enshrined Oracle Interface</a></li>
                         <li><a href="/realtime-api.html">Realtime API</a></li>
                         <li><a href="/rpc.html">RPC</a></li>
                         </ul></nav>
@@ -70,16 +70,11 @@
                     </p>
                     
                     <p>
-                        <div class="cf-turnstile" 
-                             data-sitekey="0x4AAAAAABA4JXCaw9E2Py-9" 
-                             data-callback="onTurnstileSuccess"
-                             data-error-callback="onTurnstileError"
-                             data-expired-callback="onTurnstileExpired">
-                        </div>
+                        <div class="cf-turnstile" data-sitekey="0x4AAAAAAB8N9XQ8u4dRKBt_"></div>
                     </p>
                     
                     <p>
-                        <button type="submit" id="submit-btn" disabled>
+                        <button type="submit" id="submit-btn">
                             Get Testnet Tokens
                         </button>
                     </p>
@@ -90,31 +85,7 @@
                 </div>
             </div>
 
-            <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-
             <script>
-            // Store the Turnstile token
-            let turnstileToken = null;
-
-            // Turnstile callback functions
-            function onTurnstileSuccess(token) {
-                turnstileToken = token;
-                document.getElementById('submit-btn').disabled = false;
-                console.log('Turnstile verification successful');
-            }
-
-            function onTurnstileError(error) {
-                turnstileToken = null;
-                document.getElementById('submit-btn').disabled = true;
-                console.error('Turnstile verification failed:', error);
-            }
-
-            function onTurnstileExpired() {
-                turnstileToken = null;
-                document.getElementById('submit-btn').disabled = true;
-                console.log('Turnstile verification expired');
-            }
-
             // Form submission handler
             document.getElementById('faucet-form').addEventListener('submit', async function(e) {
                 e.preventDefault();
@@ -124,7 +95,8 @@
                 const resultContent = document.getElementById('result-content');
                 const walletAddress = document.getElementById('wallet-address').value;
                 
-                // Check if Turnstile token is available
+                // Get the Turnstile token from the hidden input field
+                const turnstileToken = document.querySelector('input[name="cf-turnstile-response"]')?.value;
                 if (!turnstileToken) {
                     alert('Please complete the captcha verification first.');
                     return;
