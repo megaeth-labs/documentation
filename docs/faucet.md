@@ -59,7 +59,7 @@ document.getElementById('faucet-form').addEventListener('submit', async function
     submitBtn.textContent = 'Submitting...';
     
     try {
-        const response = await fetch('https://faucet.megaeth.com', {
+        const response = await fetch('https://faucet.timothy.megaeth.com/claim', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
