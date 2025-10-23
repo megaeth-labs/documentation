@@ -79,7 +79,7 @@ document.getElementById('faucet-form').addEventListener('submit', async function
             resultContent.innerHTML = `
                 <p><strong>Success!</strong> ${data.message}</p>
                 <p><strong>Transaction Hash:</strong> <code>${data.txhash}</code></p>
-                <p>You can view your transaction on the <a href="https://megaexplorer.xyz/tx/${data.txhash}" target="_blank">block explorer</a>.</p>
+                //<p>You can view your transaction on the <a href="https://megaexplorer.xyz/tx/${data.txhash}" target="_blank">block explorer</a>.</p>
             `;
         } else {
             resultContent.innerHTML = `
