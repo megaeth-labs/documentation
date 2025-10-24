@@ -1,1 +1,1 @@
-<li><a href="/faucet.html">Faucet</a></li>
+1000	<li><a href="/faucet.html">Faucet</a></li>

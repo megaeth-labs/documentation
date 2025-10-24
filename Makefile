@@ -30,7 +30,7 @@ public/style.css: template/style.css
 $(NAVBAR): $(MANIFESTS)
 	@mkdir -p manifest
 	echo '<nav class="main-nav"><ul>' > $@
-	cat manifest/*.txt >> $@
+	cat manifest/*.txt | sort -k1 -n | cut -f2 >> $@
 	echo '</ul></nav>' >> $@
 
 manifest/%.txt: docs/%.md template/navitem.txt

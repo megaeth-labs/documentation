@@ -1,6 +1,7 @@
 ---
 title: RPC
 owners: krabat
+rank: 50
 ---
 
 # Available Methods

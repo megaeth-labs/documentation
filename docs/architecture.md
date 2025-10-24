@@ -1,5 +1,6 @@
 ---
 title: Architecture
+rank: 10
 ---
 
 The complete MegaETH system will consist of the following logical components:

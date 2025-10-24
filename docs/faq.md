@@ -1,6 +1,7 @@
 ---
 title: FAQ
 owners: sami, alex
+rank: 900
 ---
 
 # Chain Behavior & EVM Compatibility 

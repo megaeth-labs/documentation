@@ -1,1 +1,1 @@
-<li><a href="/$filename$.html">$title$</a></li>
+$rank$	<li><a href="/$filename$.html">$title$</a></li>
