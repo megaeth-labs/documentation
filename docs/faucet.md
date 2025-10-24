@@ -98,6 +98,19 @@ document.getElementById('faucet-form').addEventListener('submit', async function
         // Re-enable submit button
         submitBtn.disabled = false;
         submitBtn.textContent = 'Get Testnet Tokens';
+        
+        // Reset the captcha widget by removing and recreating it
+        const turnstileContainer = document.querySelector('.cf-turnstile');
+        if (turnstileContainer) {
+            // Remove the current widget
+            turnstileContainer.innerHTML = '';
+            // Recreate the widget by setting the data attribute again
+            turnstileContainer.setAttribute('data-sitekey', '0x4AAAAAAB8N9XQ8u4dRKBt_');
+            // Trigger Turnstile to re-render
+            if (window.turnstile) {
+                window.turnstile.render(turnstileContainer);
+            }
+        }
     }
 });
 </script>
