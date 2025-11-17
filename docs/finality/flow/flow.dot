@@ -1,0 +1,50 @@
+digraph MegaETH_DataFlow {
+	rankdir=TB;
+	nodesep=2.2;
+	ranksep=0.4;
+	bgcolor="transparent"
+
+	Sequencer   [label="Sequencer", shape=box, style="filled", fillcolor="#E3F2FD"];
+	RPC         [label="RPC Nodes", shape=box, style="filled", fillcolor="#FFF9C4"];
+	OpBatcher   [label="op-batcher", shape=box, style="filled", fillcolor="#E3F2FD"];
+	L1          [label="Ethereum", shape=box, style="filled", fillcolor="#E8F5E9"];
+	EigenDA     [label="EigenDA", shape=box, style="filled", fillcolor="#E8F5E9"];
+	OpNode      [label="op-node\n(derivation mode)", shape=box, style="filled", fillcolor="#FFF9C4"];
+
+	Transactions [label="Transactions", shape=plaintext];
+	RPCResp [label="RPC Responses", shape=plaintext];
+	FinalityInfo [label="Finality Assertions", shape=plaintext];
+
+	Transactions -> Sequencer;
+
+	Sequencer -> RPC [label="Ordered Transactions +\nMetadata +\nExecution Results"];
+	Sequencer -> OpBatcher [label="Ordered Transactions +\nMetadata"];
+
+	OpBatcher -> L1 [label="Metadata"];
+	OpBatcher -> EigenDA [label="Ordered Transactions"];
+	L1 -> OpNode;
+	EigenDA -> OpNode;
+
+	RPC -> RPCResp;
+	OpNode -> FinalityInfo;
+
+	Legend [shape=none, margin=0, label=<
+		<TABLE BORDER="1" CELLBORDER="0" CELLSPACING="4" CELLPADDING="4">
+		<TR><TD COLSPAN="2">Operating Entity</TD></TR>
+		<TR>
+		<TD FIXEDSIZE="TRUE" WIDTH="25" HEIGHT="15" BGCOLOR="#E3F2FD"></TD>
+		<TD ALIGN="LEFT">MegaETH</TD>
+		</TR>
+		<TR>
+		<TD FIXEDSIZE="TRUE" WIDTH="25" HEIGHT="15" BGCOLOR="#E8F5E9"></TD>
+		<TD ALIGN="LEFT">Trusted Third Party</TD>
+		</TR>
+		<TR>
+		<TD FIXEDSIZE="TRUE" WIDTH="25" HEIGHT="15" BGCOLOR="#FFF9C4"></TD>
+		<TD ALIGN="LEFT">Anyone</TD>
+		</TR>
+		</TABLE>
+		>];
+	RPCResp -> Legend [style=invis, weight=10];
+}
+
