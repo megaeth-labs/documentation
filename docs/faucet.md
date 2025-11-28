@@ -4,8 +4,6 @@ header-includes: <script src="https://challenges.cloudflare.com/turnstile/v0/api
 rank: 1000
 ---
 
-# Timothy
-
 ```{=html}
 <div id="faucet-form-container">
     <form id="faucet-form">
@@ -116,7 +114,3 @@ document.getElementById('faucet-form').addEventListener('submit', async function
 </script>
 ```
 
-# Carrot
-
-Please refer to
-[testnet.megaeth.com](https://testnet.megaeth.com).
