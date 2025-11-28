@@ -16,12 +16,12 @@ MegaETH is currently in **Testnet**, which means:
 | Parameter | Value |
 | --------- | ------------------------------- |
 | **Network Name** | MegaETH Testnet |
-| **Chain ID** | 6342 |
-| **Network ID** | 6342 |
+| **Chain ID** | 6343 |
+| **Network ID** | 6343 |
 | **Native Token (Symbol)** | MegaETH Testnet Ether (ETH) |
 | **Native Token Decimals** | 18 |
-| **RPC HTTP URL** | https://carrot.megaeth.com/rpc |
-| **Block Explorer** | Performance dashboard: [https://uptime.megaeth.com](https://uptime.megaeth.com) <br/> Community explorer: [https://megaexplorer.xyz](https://megaexplorer.xyz) |
+| **RPC HTTP URL** | https://timothy.megaeth.com/rpc |
+| **Block Explorer** | Performance dashboard: [https://uptime.megaeth.com](https://uptime.megaeth.com) <br/> Blockscout: [https://megaeth-testnet-v2.blockscout.com](https://megaeth-testnet-v2.blockscout.com) |
 | **EIP-1559 Parameters** | Base fee price target: 0.0025 Gwei<br/>Base fee price floor: 0.001 Gwei<br/>Max block size: 2 Giga gas<br/>Target block size: 50% (1 Giga gas) |
 | **Block Time** | 10ms for mini blocks<br/>1s for EVM blocks |
 
