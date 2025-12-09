@@ -8,7 +8,7 @@ The **MegaEVM** is MegaETH's execution environment, fully compatible with Ethere
 
 ## Compatibility
 
-MegaEVM builds on established standards. The REX specification is based on Optimism Isthmus, which in turn inherits from Ethereum Prague.
+MegaEVM builds on established standards. The latest hardfork, Rex, is based on Optimism Isthmus, which in turn inherits from Ethereum Prague.
 
 This means:
 
@@ -25,8 +25,6 @@ MegaETH's low fees and high gas limits create new opportunities but also require
 - **Larger Contracts**: Deploy contracts up to 512 KB (vs 24 KB on Ethereum)
 - **Modified Gas Forwarding**: Subcalls receive at most 98/100 of remaining gas (vs 63/64)
 
----
-
 # Key Differences at a Glance
 
 | Feature             | Ethereum     | MegaETH (REX)                          |
@@ -38,8 +36,6 @@ MegaETH's low fees and high gas limits create new opportunities but also require
 | Gas model           | Single (gas) | **Dual (compute + storage)**           |
 | Resource limits     | Gas only     | **4 dimensions**                       |
 | Base intrinsic gas  | 21,000       | **60,000** (21K compute + 39K storage) |
-
----
 
 #  Gas Model
 
@@ -106,7 +102,6 @@ multiplier = bucket_capacity / MIN_BUCKET_SIZE
 
 3. **Prefer transient storage or memory over persistent storage** - Allocating new storage slots incurs storage gas and counts toward state growth limits. Use transient storage (EIP-1153: `TSTORE`/`TLOAD`) for data that only needs to persist within a transaction, or memory for data within a single call. This avoids storage gas costs entirely and keeps your contract within state growth limits.
 
----
 
 # Resource Limits
 
@@ -172,8 +167,6 @@ When a transaction exceeds any limit:
 mapping(address => uint256) public balances;
 ```
 
----
-
 # Volatile Data Access
 
 ## The Problem
@@ -238,8 +231,6 @@ function processWithTimestamp() external {
 }
 ```
 
----
-
 # Contract Deployment and Destruction
 
 ## Larger Contracts Supported
@@ -255,8 +246,6 @@ The `SELFDESTRUCT` opcode is completely disabled and will cause transaction fail
 ## Gas Forwarding (98/100 Rule)
 
 MegaETH forwards **98/100** of remaining gas to subcalls (vs 63/64 on Ethereum).
-
----
 
 # System Contracts & Oracle Service
 
@@ -280,8 +269,6 @@ Note that the oracle data are served by the sequencer on demand, only when a tra
 
 **Trust Assumption**: The oracle service requires trusting the sequencer to publish accurate data. Consider this when building applications.
 
----
-
 # Precompiles
 
 MegaETH inherits all precompiles from Optimism Isthmus, which includes Ethereum Prague precompiles, EIP-2537 BLS12-381 precompiles, and RIP-7212 P256VERIFY.
@@ -298,4 +285,3 @@ MegaETH inherits all precompiles from Optimism Isthmus, which includes Ethereum 
 
 - Uses EIP-7883 pricing
 
----
