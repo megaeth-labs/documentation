@@ -51,92 +51,50 @@
                 
                                 <nav id="TOC">
                     <ul>
-                    <li><a href="#compatibility"
-                    id="toc-compatibility">Compatibility</a></li>
-                    <li><a href="#whats-different"
-                    id="toc-whats-different">What’s Different?</a></li>
+                    <li><a href="#overview"
+                    id="toc-overview">Overview</a>
+                    <ul>
                     <li><a href="#key-differences-at-a-glance"
                     id="toc-key-differences-at-a-glance">Key Differences
                     at a Glance</a></li>
-                    <li><a href="#gas-model" id="toc-gas-model">Gas
-                    Model</a>
+                    </ul></li>
+                    <li><a href="#multidimensional-gas-model"
+                    id="toc-multidimensional-gas-model">Multidimensional
+                    Gas Model</a>
                     <ul>
-                    <li><a href="#overview"
-                    id="toc-overview">Overview</a></li>
+                    <li><a href="#compute-gas-costs"
+                    id="toc-compute-gas-costs">Compute Gas
+                    Costs</a></li>
                     <li><a href="#storage-gas-costs"
                     id="toc-storage-gas-costs">Storage Gas
                     Costs</a></li>
-                    <li><a href="#what-is-the-bucket-multiplier"
-                    id="toc-what-is-the-bucket-multiplier">What is the
-                    Bucket Multiplier?</a></li>
-                    <li><a href="#gas-estimation-tips"
-                    id="toc-gas-estimation-tips">Gas Estimation
-                    Tips</a></li>
+                    <li><a href="#bucket-multiplier"
+                    id="toc-bucket-multiplier">Bucket
+                    Multiplier</a></li>
+                    <li><a href="#tips-for-developers"
+                    id="toc-tips-for-developers">Tips for
+                    Developers</a></li>
                     </ul></li>
-                    <li><a href="#resource-limits"
-                    id="toc-resource-limits">Resource Limits</a>
+                    <li><a href="#multidimensional-resource-limits"
+                    id="toc-multidimensional-resource-limits">Multidimensional
+                    Resource Limits</a>
                     <ul>
-                    <li><a href="#four-dimensional-limits"
-                    id="toc-four-dimensional-limits">Four-Dimensional
-                    Limits</a></li>
-                    <li><a href="#what-counts-toward-each-limit"
-                    id="toc-what-counts-toward-each-limit">What Counts
-                    Toward Each Limit</a></li>
-                    <li><a href="#what-happens-when-exceeded"
-                    id="toc-what-happens-when-exceeded">What Happens
-                    When Exceeded</a></li>
-                    <li><a href="#best-practices"
-                    id="toc-best-practices">Best Practices</a></li>
+                    <li><a href="#definitions-of-resource-types"
+                    id="toc-definitions-of-resource-types">Definitions
+                    of Resource Types</a></li>
                     </ul></li>
-                    <li><a href="#volatile-data-access"
-                    id="toc-volatile-data-access">Volatile Data
-                    Access</a>
+                    <li><a href="#miscellaneous"
+                    id="toc-miscellaneous">Miscellaneous</a>
                     <ul>
-                    <li><a href="#the-problem" id="toc-the-problem">The
-                    Problem</a></li>
-                    <li><a href="#block-environment-opcodes"
-                    id="toc-block-environment-opcodes">Block Environment
-                    Opcodes</a></li>
-                    <li><a href="#beneficiary-account-access"
-                    id="toc-beneficiary-account-access">Beneficiary
-                    Account Access</a></li>
-                    <li><a href="#oracle-access"
-                    id="toc-oracle-access">Oracle Access</a></li>
-                    <li><a href="#most-restrictive-limit-applies"
-                    id="toc-most-restrictive-limit-applies">Most
-                    Restrictive Limit Applies</a></li>
-                    <li><a href="#patterns-to-avoid"
-                    id="toc-patterns-to-avoid">Patterns to
-                    Avoid</a></li>
-                    </ul></li>
-                    <li><a href="#contract-deployment-and-destruction"
-                    id="toc-contract-deployment-and-destruction">Contract
-                    Deployment and Destruction</a>
-                    <ul>
-                    <li><a href="#larger-contracts-supported"
-                    id="toc-larger-contracts-supported">Larger Contracts
-                    Supported</a></li>
+                    <li><a href="#increased-contract-size-limit"
+                    id="toc-increased-contract-size-limit">Increased
+                    Contract Size Limit</a></li>
                     <li><a href="#selfdestruct-is-disabled"
-                    id="toc-selfdestruct-is-disabled">SELFDESTRUCT is
-                    Disabled</a></li>
-                    <li><a href="#gas-forwarding-98100-rule"
-                    id="toc-gas-forwarding-98100-rule">Gas Forwarding
-                    (98/100 Rule)</a></li>
-                    </ul></li>
-                    <li><a href="#system-contracts-oracle-service"
-                    id="toc-system-contracts-oracle-service">System
-                    Contracts &amp; Oracle Service</a>
-                    <ul>
-                    <li><a href="#high-precision-timestamp-oracle"
-                    id="toc-high-precision-timestamp-oracle">High-Precision
-                    Timestamp Oracle</a></li>
-                    </ul></li>
-                    <li><a href="#precompiles"
-                    id="toc-precompiles">Precompiles</a>
-                    <ul>
-                    <li><a href="#megaeth-specific-modifications"
-                    id="toc-megaeth-specific-modifications">MegaETH-Specific
-                    Modifications</a></li>
+                    id="toc-selfdestruct-is-disabled"><code>SELFDESTRUCT</code>
+                    is Disabled</a></li>
+                    <li><a href="#rule-for-gas-forwarding"
+                    id="toc-rule-for-gas-forwarding">“98/100” Rule for
+                    Gas Forwarding</a></li>
                     </ul></li>
                     </ul>
                 </nav>
@@ -144,47 +102,51 @@
         </header>
 
         <main class="site-content">
-            <p>The <strong>MegaEVM</strong> is MegaETH’s execution
-            environment, fully compatible with Ethereum smart contracts
-            while introducing optimizations for the unique
-            characteristics of MegaETH’s architecture.</p>
-            <h3 id="compatibility">Compatibility</h3>
-            <p>MegaEVM builds on established standards. The latest
-            hardfork, Rex, is based on Optimism Isthmus, which in turn
-            inherits from Ethereum Prague.</p>
-            <p>This means:</p>
+            <p><em>MegaEVM</em> is MegaETH’s execution environment. It
+            is fully compatible with Ethereum smart contracts while
+            introducing optimizations for the unique characteristics of
+            MegaETH’s architecture.</p>
+            <h2 id="overview">Overview</h2>
+            <p>MegaEVM builds on established standards. Its latest
+            hardfork, <em>Rex</em>, is based on <a
+            href="https://specs.optimism.io/protocol/isthmus/overview.html">Optimism
+            Isthmus</a>, which in turn is adapted from <a
+            href="https://ethereum.org/roadmap/pectra/">Ethereum
+            Prague</a>. This means:</p>
             <ul>
-            <li>All standard Solidity contracts work on MegaETH</li>
-            <li>Standard development tools (Hardhat, Foundry, Remix) are
-            compatible</li>
-            <li>Existing Ethereum libraries and patterns apply</li>
+            <li>All standard Solidity contracts work on MegaETH.</li>
+            <li>Standard development tools (Hardhat, Foundry, Remix,
+            etc.) are compatible.</li>
+            <li>Existing Ethereum libraries and patterns apply.</li>
             </ul>
-            <h3 id="whats-different">What’s Different?</h3>
-            <p>MegaETH’s low fees and high gas limits create new
-            opportunities but also require some adjustments:</p>
-            <ul>
-            <li><strong>Dual Gas Model</strong>: Transactions pay both
-            compute gas and storage gas</li>
-            <li><strong>Resource Limits</strong>: Four independent
-            limits prevent abuse while enabling high throughput</li>
-            <li><strong>Larger Contracts</strong>: Deploy contracts up
-            to 512 KB (vs 24 KB on Ethereum)</li>
-            <li><strong>Modified Gas Forwarding</strong>: Subcalls
-            receive at most 98/100 of remaining gas (vs 63/64)</li>
-            </ul>
-            <h2 id="key-differences-at-a-glance">Key Differences at a
-            Glance</h2>
+            <p>Meanwhile, MegaEVM introduces a few changes to
+            accommodate MegaETH’s low fees and high capacity. The most
+            important change is the <em>multidimensional gas model and
+            resource limits</em>. In MegaEVM, transactions consume two
+            types of gas: <em>compute gas</em>, which models computation
+            at large and is identically defined as Ethereum’s gas; and
+            <em>storage gas</em>, a new concept that models the storage
+            subsystem in particular. Similarly, MegaEVM caps resource
+            usage of transactions using rules that each targets an
+            individual type of resource. Developers should consider
+            these changes in contrast to Ethereum’s EVM, where gas is
+            the singular metric for metering and limiting the amount of
+            resources consumed by transactions.</p>
+            <h3 id="key-differences-at-a-glance">Key Differences at a
+            Glance</h3>
             <table>
             <colgroup>
-            <col style="width: 27%" />
-            <col style="width: 17%" />
-            <col style="width: 55%" />
+            <col style="width: 24%" />
+            <col style="width: 20%" />
+            <col style="width: 20%" />
+            <col style="width: 34%" />
             </colgroup>
             <thead>
             <tr>
             <th>Feature</th>
             <th>Ethereum</th>
-            <th>MegaETH (REX)</th>
+            <th>MegaETH</th>
+            <th>Remarks</th>
             </tr>
             </thead>
             <tbody>
@@ -192,53 +154,80 @@
             <td>Max contract size</td>
             <td>24 KB</td>
             <td><strong>512 KB</strong></td>
+            <td></td>
             </tr>
             <tr>
             <td>Max initcode size</td>
             <td>48 KB</td>
             <td><strong>536 KB</strong></td>
+            <td></td>
             </tr>
             <tr>
             <td>Gas forwarding rule</td>
             <td>63/64</td>
             <td><strong>98/100</strong></td>
+            <td>As defined in <a
+            href="https://eips.ethereum.org/EIPS/eip-150">EIP-150</a>.</td>
             </tr>
             <tr>
-            <td>SELFDESTRUCT</td>
-            <td>Enabled</td>
+            <td><code>SELFDESTRUCT</code></td>
+            <td>Deprecated</td>
             <td><strong>Disabled</strong></td>
+            <td>Deprecated in <a
+            href="https://eips.ethereum.org/EIPS/eip-6049">EIP-6049</a>.</td>
             </tr>
             <tr>
             <td>Gas model</td>
-            <td>Single (gas)</td>
-            <td><strong>Dual (compute + storage)</strong></td>
+            <td>Unidimensional</td>
+            <td><strong>Multidimensional</strong></td>
+            <td>Compute gas and storage gas. Compute gas is identical to
+            Ethereum’s gas.</td>
             </tr>
             <tr>
             <td>Resource limits</td>
-            <td>Gas only</td>
-            <td><strong>4 dimensions</strong></td>
+            <td>Unidimensional</td>
+            <td><strong>Multidimensional</strong></td>
+            <td>4 limits in addition to total gas limit specified by
+            sender.</td>
             </tr>
             <tr>
             <td>Base intrinsic gas</td>
             <td>21,000</td>
-            <td><strong>60,000</strong> (21K compute + 39K storage)</td>
+            <td><strong>60,000</strong></td>
+            <td>21,000 compute gas plus 39,000 storage gas.</td>
             </tr>
             </tbody>
             </table>
-            <h2 id="gas-model">Gas Model</h2>
-            <h3 id="overview">Overview</h3>
-            <p>MegaETH uses a <strong>dual gas model</strong> that
-            separates costs into two categories:</p>
-            <pre><code>Total Gas = Compute Gas + Storage Gas</code></pre>
+            <h2 id="multidimensional-gas-model">Multidimensional Gas
+            Model</h2>
+            <p>MegaETH uses a <em>multidimensional gas model</em> that
+            separates gas costs into two categories:</p>
             <ul>
-            <li><strong>Compute Gas</strong>: Standard EVM execution
-            costs (same as Ethereum)</li>
+            <li><strong>Compute Gas</strong>: Standard execution costs
+            as defined in Ethereum’s EVM</li>
             <li><strong>Storage Gas</strong>: Additional costs for
             operations that create persistent data</li>
             </ul>
-            <p>This separation keeps computation affordable while
-            appropriately pricing storage-intensive operations.</p>
+            <p>The total gas of a transaction is the sum of its compute
+            gas and storage gas.</p>
+            <h3 id="compute-gas-costs">Compute Gas Costs</h3>
+            <p>For any operation, its compute gas cost in MegaEVM is
+            equal to its gas cost in standard EVM. For example, updating
+            a cold storage slot from zero to nonzero costs 22,100 gas in
+            standard EVM, so the compute gas cost of the said operation
+            in MegaEVM is also 22,100. As another example, every
+            transaction incurs an intrinsic gas cost of 21,000 in
+            standard EVM, so every transaction also incurs an intrinsic
+            compute gas cost of 21,000 in MegaEVM.</p>
+            <p>As a rule of thumb, the amount of compute gas a
+            transaction burns is equal to the amount of gas it would
+            burn in Ethereum’s EVM.</p>
             <h3 id="storage-gas-costs">Storage Gas Costs</h3>
+            <p>The storage gas cost of most operations is zero. The
+            following table lists all operations where storage gas does
+            apply. Some storage gas calculations involve a parameter
+            called <em>bucket multiplier</em> (denoted as m). The next
+            section explains this concept.</p>
             <table>
             <colgroup>
             <col style="width: 32%" />
@@ -249,95 +238,107 @@
             <tr>
             <th>Operation</th>
             <th>Storage Gas Cost</th>
-            <th>Notes</th>
+            <th>Remarks</th>
             </tr>
             </thead>
             <tbody>
             <tr>
-            <td><strong>Intrinsic</strong></td>
-            <td>39,000 (flat)</td>
-            <td>Added to every transaction. Note that the base intrinsic
-            gas cost is 39,000 + 21,000 (for compute gas)</td>
+            <td>Intrinsic</td>
+            <td>39,000</td>
+            <td>Incurred by every transaction. Combined with the
+            intrinsic compute gas cost of 21,000, the total intrinsic
+            gas cost of a transaction is 60,000.</td>
             </tr>
             <tr>
-            <td><strong>SSTORE (0→non-zero)</strong></td>
+            <td>Zero-to-nonzero <code>SSTORE</code></td>
             <td>20,000 × (m-1)</td>
-            <td>Only for zero-to-non-zero writes</td>
+            <td>Only applies to zero-to-nonzero writes.</td>
             </tr>
             <tr>
-            <td><strong>Account creation</strong></td>
+            <td>Account creation</td>
             <td>25,000 × (m-1)</td>
-            <td>Value transfer to empty account</td>
+            <td>Value transfer to empty account.</td>
             </tr>
             <tr>
-            <td><strong>Contract creation</strong></td>
+            <td>Contract creation</td>
             <td>32,000 × (m-1)</td>
-            <td>CREATE/CREATE2 operations</td>
+            <td><code>CREATE</code>/<code>CREATE2</code>
+            operations.</td>
             </tr>
             <tr>
-            <td><strong>Code deposit</strong></td>
+            <td>Code deposit</td>
             <td>10,000/byte</td>
-            <td>Per byte of deployed bytecode</td>
+            <td>Per byte of deployed bytecode.</td>
             </tr>
             <tr>
-            <td><strong>LOG topic</strong></td>
+            <td><code>LOG</code> topic</td>
             <td>3,750/topic</td>
-            <td>Per topic in event</td>
+            <td>Per topic in event.</td>
             </tr>
             <tr>
-            <td><strong>LOG data</strong></td>
+            <td><code>LOG</code> data</td>
             <td>80/byte</td>
-            <td>Per byte of event data</td>
+            <td>Per byte of event data.</td>
             </tr>
             <tr>
-            <td><strong>Calldata (zero byte)</strong></td>
+            <td>Calldata (zero)</td>
             <td>40/byte</td>
-            <td>Per zero byte in tx input</td>
+            <td>Per zero byte in transaction input.</td>
             </tr>
             <tr>
-            <td><strong>Calldata (non-zero)</strong></td>
+            <td>Calldata (nonzero)</td>
             <td>160/byte</td>
-            <td>Per non-zero byte in tx input</td>
+            <td>Per nonzero byte in transaction input.</td>
             </tr>
             <tr>
-            <td><strong>Floor (zero byte)</strong></td>
+            <td>EIP-7623 floor (zero)</td>
             <td>100/byte</td>
-            <td>EIP-7623 floor cost for zero byte</td>
+            <td><a
+            href="https://eips.ethereum.org/EIPS/eip-7623">EIP-7623</a>
+            floor cost per zero byte in transaction input.</td>
             </tr>
             <tr>
-            <td><strong>Floor (non-zero)</strong></td>
+            <td>EIP-7623 floor (nonzero)</td>
             <td>400/byte</td>
-            <td>EIP-7623 floor cost for non-zero byte</td>
+            <td><a
+            href="https://eips.ethereum.org/EIPS/eip-7623">EIP-7623</a>
+            floor cost per nonzero byte in transaction input.</td>
             </tr>
             </tbody>
             </table>
-            <p><em><code>m</code> = bucket multiplier (explained
-            below)</em></p>
-            <p><em>Note: EIP-7623 defines a minimum “floor” gas cost for
-            calldata. If the floor cost exceeds the regular calldata
-            cost, the floor is charged instead.</em></p>
-            <h3 id="what-is-the-bucket-multiplier">What is the Bucket
-            Multiplier?</h3>
-            <p>Accounts and their storage are stored in
-            <code>bucket</code>’s of MegaETH’s <code>SALT</code> state
-            trie. The cost of writing new data (excluding chaning
-            existing data) to the buckets induces varying storage gas
-            costs depending on the capacity of the bucket measured by a
-            <strong>bucket multiplier</strong>:</p>
-            <pre><code>multiplier = bucket_capacity / MIN_BUCKET_SIZE</code></pre>
-            <p><strong>In practice:</strong></p>
+            <p>All other operations not mentioned in the previous table
+            incurs no storage gas cost.</p>
+            <h3 id="bucket-multiplier">Bucket Multiplier</h3>
+            <p>Accounts and their storage slots are stored in segments
+            of MegaETH’s SALT state trie called “buckets”. Buckets grow
+            in size and capacity as they hold more data. The cost of
+            writing new data to a bucket (creating new accounts or
+            changing storage slots from zero to nonzero) varies based on
+            its capacity, and such variation is reflected in storage gas
+            costs of these operations in the form of the <em>bucket
+            multiplier</em> (denoted as m).</p>
+            <p>The bucket multiplier of a bucket is simply defined as
+            the ratio of its capacity and the minimum capacity of
+            buckets. The latter is a system parameter. In other
+            words,</p>
+            <pre><code>Bucket Multiplier = Bucket Capacity / MIN_BUCKET_CAP.</code></pre>
+            <p>SALT’s design ensures that bucket multiplier is always an
+            integer.</p>
+            <p>Without diving into details of SALT, here are a few rules
+            of thumb for developers.</p>
             <ul>
-            <li>Fresh storage (new contracts, new slots) typically has
-            multiplier = 1, if the bucket is not expanded to meet heavy
-            storage needs.</li>
-            <li>At multiplier = 1, the formula <code>base × (m-1)</code>
-            = 0, meaning <strong>zero additional storage
-            gas</strong></li>
-            <li>As buckets fill up, they get expanded, the multiplier
-            increases and costs rise</li>
+            <li>Unless a bucket has expanded to handle heavy storage
+            needs, bucket multiplier is typically 1.</li>
+            <li>When bucket multiplier is 1, <code>SSTORE</code>,
+            account creation, and contract creation incurs zero storage
+            gas cost.</li>
+            <li>Bucket expand as they fill up; the multiplier increases
+            and storage gas costs rise.</li>
+            <li>Developers typically do not need to consider bucket
+            multiplier when designing contracts.</li>
             </ul>
-            <p><strong>Example costs at different
-            multipliers:</strong></p>
+            <p>Below are a few examples of storage gas costs at
+            different bucket multiplier values.</p>
             <table>
             <thead>
             <tr>
@@ -349,7 +350,7 @@
             </thead>
             <tbody>
             <tr>
-            <td>SSTORE (0→non-zero)</td>
+            <td>Zero-to-nonzero <code>SSTORE</code></td>
             <td>0</td>
             <td>20,000</td>
             <td>60,000</td>
@@ -368,307 +369,248 @@
             </tr>
             </tbody>
             </table>
-            <h3 id="gas-estimation-tips">Gas Estimation Tips</h3>
-            <ol type="1">
-            <li><p><strong>Use MegaETH’s native gas estimation
-            APIs</strong> - Local estimation may be inaccurate due to
-            dynamic bucket multipliers</p></li>
-            <li><p><strong>Account for storage gas</strong> - A simple
-            transfer costs 60,000 gas minimum (21K compute + 39K storage
-            intrinsic). This is the minimum gas cost (intrinsic gas) for
-            any transaction.</p></li>
-            <li><p><strong>Prefer transient storage or memory over
-            persistent storage</strong> - Allocating new storage slots
-            incurs storage gas and counts toward state growth limits.
-            Use transient storage (EIP-1153:
+            <h3 id="tips-for-developers">Tips for Developers</h3>
+            <ul>
+            <li><strong>Use MegaETH’s native gas estimation
+            APIs.</strong> Tools not explicitly modified for MegaEVM
+            does not account for storage gas and will report overly
+            small numbers.
+            <ul>
+            <li>For example, when running <code>forge script</code>, use
+            <code>--skip-simulation</code> to avoid its built-in EVM and
+            use <code>--gas-limit</code> to manually specify a
+            sufficiently high gas limit.</li>
+            </ul></li>
+            <li><strong>Account for storage gas.</strong> A Ether
+            transfer costs 60,000 gas (21,000 compute gas plus 39,000
+            storage gas). This is the minimum gas cost (intrinsic gas)
+            for any transaction.
+            <ul>
+            <li>The RPC returns “intrinsic gas too low” when transaction
+            gas limit is smaller than 60,000.</li>
+            </ul></li>
+            <li><strong>Prefer transient storage or memory over
+            persistent storage.</strong> Allocating new storage slots
+            costs storage gas and counts towards various resource limits
+            (explained in the next section). Use transient storage (<a
+            href="https://eips.ethereum.org/EIPS/eip-1153">EIP-1153</a>
             <code>TSTORE</code>/<code>TLOAD</code>) for data that only
             needs to persist within a transaction, or memory for data
             within a single call. This avoids storage gas costs entirely
-            and keeps your contract within state growth limits.</p></li>
-            </ol>
-            <h2 id="resource-limits">Resource Limits</h2>
-            <h3 id="four-dimensional-limits">Four-Dimensional
-            Limits</h3>
-            <p>MegaETH enforces four independent resource limits per
-            transaction in addition to Ethereum’s gas limit:</p>
+            and ensures calling transactions stay within resource
+            limits.</li>
+            <li><strong>Reuse storage slots.</strong> Storage gas
+            applies when changing a slot from zero to nonzero and does
+            not apply when overwriting a slot that is already nonzero.
+            When a slot can be freed (i.e., changed to zero) but is
+            expected to be allocated again (i.e., changed to nonzero)
+            very soon, consider keeping the slot at nonzero so that no
+            storage gas is charged the next time it is used.
+            <ul>
+            <li>As a rule of thumb, avoid design patterns that allocate
+            a lot of slots only to free them soon after.</li>
+            </ul></li>
+            </ul>
+            <h2 id="multidimensional-resource-limits">Multidimensional
+            Resource Limits</h2>
+            <p>In addition to the sender-specified limit on total gas,
+            MegaEVM enforces four additional limits on how much
+            resources each transaction may consume. The following table
+            is an overview. The next few sections explain what counts
+            towards each type of resource and the respective limit.</p>
             <table>
             <thead>
             <tr>
-            <th>Limit Type</th>
-            <th>Transaction Limit</th>
+            <th>Resource Type</th>
+            <th>Per-Transaction Limit</th>
             </tr>
             </thead>
             <tbody>
             <tr>
-            <td><strong>Compute Gas</strong></td>
-            <td>200,000,000 (200M)</td>
+            <td>Total Gas</td>
+            <td>Specified by sender</td>
             </tr>
             <tr>
-            <td><strong>Data Size</strong></td>
+            <td>Compute Gas</td>
+            <td>200,000,000</td>
+            </tr>
+            <tr>
+            <td>Data Size</td>
             <td>12.5 MB</td>
             </tr>
             <tr>
-            <td><strong>KV Updates</strong></td>
+            <td>KV Updates</td>
             <td>500,000</td>
             </tr>
             <tr>
-            <td><strong>State Growth</strong></td>
+            <td>State Growth</td>
             <td>1,000</td>
             </tr>
             </tbody>
             </table>
-            <h3 id="what-counts-toward-each-limit">What Counts Toward
-            Each Limit</h3>
-            <p><strong>Compute Gas:</strong></p>
-            <ul>
-            <li>All EVM instruction execution costs (i.e., the gas cost
-            in the vanilla EVM), including precompile costs, memory
-            expansion costs, etc.</li>
-            </ul>
-            <p><strong>Data Size:</strong></p>
-            <p>Data size measures the total amount of data needs to be
-            transmitted and stored for each transaction, including the
-            transaction itself and its execution outcome:</p>
+            <p>When a transaction hits <em>any</em> of the
+            aforementioned limits, the following happens:</p>
+            <ol type="1">
+            <li>Execution halts immediately.</li>
+            <li>Any remaining gas is preserved and refunded to
+            sender.</li>
+            <li>Transaction is included in the block with status set to
+            failed (status=0).</li>
+            <li>No state changes from the transaction are applied.</li>
+            </ol>
+            <h3 id="definitions-of-resource-types">Definitions of
+            Resource Types</h3>
+            <h4 id="compute-gas">Compute Gas</h4>
+            <p>Compute gas cost of a transaction as defined in previous
+            sections.</p>
+            <h4 id="data-size">Data Size</h4>
+            <p>Data size measures the amount of data that needs to be
+            transmitted and stored for each transaction. Both the
+            transaction itself and its execution results are considered.
+            It is the total size of the following items:</p>
             <ul>
             <li>Transaction calldata</li>
-            <li>Event logs (topics + data)</li>
+            <li>Event logs (topics and data)</li>
             <li>Storage writes (40 bytes per write)</li>
             <li>Account updates (40 bytes each)</li>
             <li>Deployed contract code</li>
             </ul>
-            <p><strong>KV Updates:</strong></p>
-            <p>KV updates measure the total amount of data entry
-            (account or storage slot) updated by the end of the
-            transaction execution in the MegaETH’s world state:</p>
-            <ul>
-            <li>Storage writes (SSTORE when value changes).</li>
-            <li>Account state changes (balance, nonce, code).</li>
-            </ul>
-            <p><strong>State Growth:</strong></p>
-            <p>State growth measures the amount of new data entry
-            (account or storage slot) that are created by the end of the
-            transaction execution. These new data contribute to the
-            monotonically-increasing world state so they are
-            restricted:</p>
-            <ul>
-            <li>New storage slots (0→non-zero writes)</li>
-            <li>New accounts created</li>
-            <li>New contracts deployed</li>
-            <li><em>Note: Clearing slots back to zero (or reverting
-            account creation) within the same transaction reduces the
-            count, not clearing a slot created in previous transactions
-            do not.</em></li>
-            </ul>
-            <h3 id="what-happens-when-exceeded">What Happens When
-            Exceeded</h3>
-            <p>When a transaction exceeds any limit:</p>
-            <ol type="1">
-            <li><strong>Execution halts</strong> immediately</li>
-            <li><strong>Remaining gas is preserved</strong> and refunded
-            to sender</li>
-            <li><strong>Transaction is included</strong> in the block
-            with failed status (status=0)</li>
-            <li><strong>No state changes</strong> from the transaction
-            are applied</li>
-            </ol>
-            <h3 id="best-practices">Best Practices</h3>
-            <p><strong>Be mindful of storage slot creation:</strong></p>
-            <pre class="solidity"><code>// Each new mapping entry = 1 state growth
-// 1,000 limit means max ~1,000 new entries per tx
-mapping(address =&gt; uint256) public balances;</code></pre>
-            <h2 id="volatile-data-access">Volatile Data Access</h2>
-            <h3 id="the-problem">The Problem</h3>
-            <p>MegaETH achieves high throughput through parallel
-            transaction execution. Transactions that access
-            frequently-changing data (like block timestamps or
-            high-frequency updated oracles) create conflicts that limit
-            parallelism. Such frequently-changing data is called
-            <code>volatile data</code>.</p>
-            <p>To support efficient execution, MegaETH implements
-            <strong>compute gas restriction</strong> - when you access
-            volatile data, your remaining compute gas is capped.</p>
-            <h3 id="block-environment-opcodes">Block Environment
-            Opcodes</h3>
-            <p>Accessing these opcodes caps remaining compute gas to
-            <strong>20,000,000</strong>:</p>
-            <table>
-            <thead>
-            <tr>
-            <th>Opcode</th>
-            <th>Description</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-            <td><code>NUMBER</code></td>
-            <td>Current block number</td>
-            </tr>
-            <tr>
-            <td><code>TIMESTAMP</code></td>
-            <td>Current block timestamp</td>
-            </tr>
-            <tr>
-            <td><code>COINBASE</code></td>
-            <td>Block beneficiary address</td>
-            </tr>
-            <tr>
-            <td><code>DIFFICULTY</code></td>
-            <td>Block difficulty</td>
-            </tr>
-            <tr>
-            <td><code>GASLIMIT</code></td>
-            <td>Block gas limit</td>
-            </tr>
-            <tr>
-            <td><code>BASEFEE</code></td>
-            <td>Base fee per gas</td>
-            </tr>
-            <tr>
-            <td><code>PREVRANDAO</code></td>
-            <td>Previous block randomness</td>
-            </tr>
-            <tr>
-            <td><code>BLOCKHASH</code></td>
-            <td>Historical block hash</td>
-            </tr>
-            <tr>
-            <td><code>BLOBBASEFEE</code></td>
-            <td>Blob base fee</td>
-            </tr>
-            <tr>
-            <td><code>BLOBHASH</code></td>
-            <td>Blob hash lookup</td>
-            </tr>
-            </tbody>
-            </table>
-            <h3 id="beneficiary-account-access">Beneficiary Account
-            Access</h3>
-            <p>Accessing the block beneficiary (coinbase) account also
-            caps remaining compute gas to
-            <strong>20,000,000</strong>:</p>
-            <table>
-            <colgroup>
-            <col style="width: 52%" />
-            <col style="width: 47%" />
-            </colgroup>
-            <thead>
-            <tr>
-            <th>Trigger</th>
-            <th>Description</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-            <td><code>BALANCE</code>, <code>SELFBALANCE</code></td>
-            <td>Reading beneficiary’s balance</td>
-            </tr>
-            <tr>
-            <td><code>EXTCODECOPY</code>, <code>EXTCODESIZE</code>,
-            <code>EXTCODEHASH</code></td>
-            <td>Accessing beneficiary’s code</td>
-            </tr>
-            <tr>
-            <td>Transaction sender is beneficiary</td>
-            <td>When <code>msg.sender == block.coinbase</code></td>
-            </tr>
-            <tr>
-            <td>Transaction recipient is beneficiary</td>
-            <td>When call target is <code>block.coinbase</code></td>
-            </tr>
-            <tr>
-            <td><code>DELEGATECALL</code> to beneficiary</td>
-            <td>Delegated context accessing beneficiary</td>
-            </tr>
-            </tbody>
-            </table>
-            <h3 id="oracle-access">Oracle Access</h3>
-            <p>Accessing the oracle contract caps remaining compute gas
-            to <strong>1,000,000</strong>:</p>
-            <ul>
-            <li>Oracle contract address:
-            <code>0x6342000000000000000000000000000000000001</code></li>
-            <li>Applies to CALL, STATICCALL, DELEGATECALL, CALLCODE</li>
-            </ul>
-            <h3 id="most-restrictive-limit-applies">Most Restrictive
-            Limit Applies</h3>
-            <p>When multiple volatile data types are accessed in the
-            same transaction, the <strong>most restrictive limit
-            applies</strong>:</p>
-            <ul>
-            <li>Block env access (20M) + Oracle access (1M) = <strong>1M
-            cap</strong></li>
-            <li>The order of access doesn’t matter - the lowest cap is
-            enforced globally</li>
-            </ul>
-            <h3 id="patterns-to-avoid">Patterns to Avoid</h3>
-            <pre class="solidity"><code>// Bad: Heavy computation after reading timestamp
-function processWithTimestamp() external {
-    uint256 currentTime = block.timestamp; // Triggers 20M gas cap
-    // This loop might run out of gas!
-    for (uint i = 0; i &lt; 10000; i++) {
-        heavyComputation(i, currentTime);
-    }
-}</code></pre>
-            <h2 id="contract-deployment-and-destruction">Contract
-            Deployment and Destruction</h2>
-            <h3 id="larger-contracts-supported">Larger Contracts
-            Supported</h3>
-            <p>MegaETH supports contracts up to <strong>512 KB</strong>
-            (vs 24 KB on Ethereum):</p>
-            <p><strong>Note:</strong> Larger contracts cost more gas to
-            deploy due to code deposit storage gas (10,000
-            gas/byte).</p>
-            <h3 id="selfdestruct-is-disabled">SELFDESTRUCT is
-            Disabled</h3>
+            <h4 id="kv-updates">KV Updates</h4>
+            <p>KV updates measure the total number of state entries
+            (accounts and storage slots) updated by a transaction. Each
+            update to a storage slot or an account counts as one update
+            towards the limit. Repeated updates to the same storage slot
+            or account counts as only one update.</p>
+            <h4 id="state-growth">State Growth</h4>
+            <p>State growth measures the number of new state entries
+            (accounts and storage slots) created by a transaction. Each
+            new storage slot (created by a zero-to-nonzero
+            <code>SSTORE</code>), account, or contract counts as one
+            unit towards the limit. If a newly created storage slot or
+            account is cleared before the transaction ends, thus
+            occupying no storage space permanently, it does not count
+            towards the limit.</p>
+            <!-- next time
+
+            # Volatile Data Access
+
+            ## The Problem
+
+            MegaETH achieves high throughput through parallel transaction execution. Transactions that access frequently-changing data (like block timestamps or high-frequency updated oracles) create conflicts that limit parallelism. Such frequently-changing data is called `volatile data`.
+
+            To support efficient execution, MegaETH implements **compute gas restriction** - when you access volatile data, your remaining compute gas is capped.
+
+            ## Block Environment Opcodes
+
+            Accessing these opcodes caps remaining compute gas to **20,000,000**:
+
+            | Opcode        | Description               |
+            | ------------- | ------------------------- |
+            | `NUMBER`      | Current block number      |
+            | `TIMESTAMP`   | Current block timestamp   |
+            | `COINBASE`    | Block beneficiary address |
+            | `DIFFICULTY`  | Block difficulty          |
+            | `GASLIMIT`    | Block gas limit           |
+            | `BASEFEE`     | Base fee per gas          |
+            | `PREVRANDAO`  | Previous block randomness |
+            | `BLOCKHASH`   | Historical block hash     |
+            | `BLOBBASEFEE` | Blob base fee             |
+            | `BLOBHASH`    | Blob hash lookup          |
+
+            ## Beneficiary Account Access
+
+            Accessing the block beneficiary (coinbase) account also caps remaining compute gas to **20,000,000**:
+
+            | Trigger                                     | Description                             |
+            | ------------------------------------------- | --------------------------------------- |
+            | `BALANCE`, `SELFBALANCE`                    | Reading beneficiary's balance           |
+            | `EXTCODECOPY`, `EXTCODESIZE`, `EXTCODEHASH` | Accessing beneficiary's code            |
+            | Transaction sender is beneficiary           | When `msg.sender == block.coinbase`     |
+            | Transaction recipient is beneficiary        | When call target is `block.coinbase`    |
+            | `DELEGATECALL` to beneficiary               | Delegated context accessing beneficiary |
+
+            ## Oracle Access
+
+            Accessing the oracle contract caps remaining compute gas to **1,000,000**:
+
+            - Oracle contract address: `0x6342000000000000000000000000000000000001`
+            - Applies to CALL, STATICCALL, DELEGATECALL, CALLCODE
+
+            ## Most Restrictive Limit Applies
+
+            When multiple volatile data types are accessed in the same transaction, the **most restrictive limit applies**:
+
+            - Block env access (20M) + Oracle access (1M) = **1M cap**
+            - The order of access doesn't matter - the lowest cap is enforced globally
+
+            ## Patterns to Avoid
+
+            ```solidity
+            // Bad: Heavy computation after reading timestamp
+            function processWithTimestamp() external {
+                uint256 currentTime = block.timestamp; // Triggers 20M gas cap
+                // This loop might run out of gas!
+                for (uint i = 0; i < 10000; i++) {
+                    heavyComputation(i, currentTime);
+                }
+            }
+            ```
+
+            # System Contracts & Oracle Service
+
+            ## High-Precision Timestamp Oracle
+
+            **Address:** `0x6342000000000000000000000000000000000002`
+
+            **Interface:**
+
+            ```solidity
+            interface HighPrecisionTimestampOracle {
+                function timestamp() external view returns (uint256);
+            }
+            ```
+
+            Use case: microsecond timestamp precision when `block.timestamp` isn't granular enough.
+
+            Note that the oracle data are served by the sequencer on demand, only when a transaction tries to read the oracle data, will the sequencer submits system transactions to update the oracle contract.
+
+            **Volatile Data**: The High-Precision Timestamp Oracle internally reads oracle data from the core oracle contract `0x6342000000000000000000000000000000000001`. Hence, obtaining high-precision timestamp is essentially a volatile data access and is subject to the "compute gas restriction" in Section 5.1.
+
+            **Trust Assumption**: The oracle service requires trusting the sequencer to publish accurate data. Consider this when building applications.
+
+            # Precompiles
+
+            MegaETH inherits all precompiles from Optimism Isthmus, which includes Ethereum Prague precompiles, EIP-2537 BLS12-381 precompiles, and RIP-7212 P256VERIFY.
+
+            ## MegaETH-Specific Modifications
+
+            **KZG Point Evaluation (0x0A):**
+
+            - MegaETH: **100,000 gas**
+            - Ethereum: 50,000 gas
+            - Reason: 2x increase to reflect computational cost
+
+            **ModExp (0x05):**
+
+            - Uses EIP-7883 pricing
+            -->
+            <h2 id="miscellaneous">Miscellaneous</h2>
+            <h3 id="increased-contract-size-limit">Increased Contract
+            Size Limit</h3>
+            <p>MegaETH supports contracts up to 512 KB in size. This is
+            increased from 24 KB in Ethereum.</p>
+            <h3 id="selfdestruct-is-disabled"><code>SELFDESTRUCT</code>
+            is Disabled</h3>
             <p>The <code>SELFDESTRUCT</code> opcode is completely
-            disabled and will cause transaction failure (treated as an
-            <code>INVALID</code> opcode).</p>
-            <h3 id="gas-forwarding-98100-rule">Gas Forwarding (98/100
-            Rule)</h3>
-            <p>MegaETH forwards <strong>98/100</strong> of remaining gas
-            to subcalls (vs 63/64 on Ethereum).</p>
-            <h2 id="system-contracts-oracle-service">System Contracts
-            &amp; Oracle Service</h2>
-            <h3 id="high-precision-timestamp-oracle">High-Precision
-            Timestamp Oracle</h3>
-            <p><strong>Address:</strong>
-            <code>0x6342000000000000000000000000000000000002</code></p>
-            <p><strong>Interface:</strong></p>
-            <pre class="solidity"><code>interface HighPrecisionTimestampOracle {
-    function timestamp() external view returns (uint256);
-}</code></pre>
-            <p>Use case: microsecond timestamp precision when
-            <code>block.timestamp</code> isn’t granular enough.</p>
-            <p>Note that the oracle data are served by the sequencer on
-            demand, only when a transaction tries to read the oracle
-            data, will the sequencer submits system transactions to
-            update the oracle contract.</p>
-            <p><strong>Volatile Data</strong>: The High-Precision
-            Timestamp Oracle internally reads oracle data from the core
-            oracle contract
-            <code>0x6342000000000000000000000000000000000001</code>.
-            Hence, obtaining high-precision timestamp is essentially a
-            volatile data access and is subject to the “compute gas
-            restriction” in Section 5.1.</p>
-            <p><strong>Trust Assumption</strong>: The oracle service
-            requires trusting the sequencer to publish accurate data.
-            Consider this when building applications.</p>
-            <h2 id="precompiles">Precompiles</h2>
-            <p>MegaETH inherits all precompiles from Optimism Isthmus,
-            which includes Ethereum Prague precompiles, EIP-2537
-            BLS12-381 precompiles, and RIP-7212 P256VERIFY.</p>
-            <h3 id="megaeth-specific-modifications">MegaETH-Specific
-            Modifications</h3>
-            <p><strong>KZG Point Evaluation (0x0A):</strong></p>
-            <ul>
-            <li>MegaETH: <strong>100,000 gas</strong></li>
-            <li>Ethereum: 50,000 gas</li>
-            <li>Reason: 2x increase to reflect computational cost</li>
-            </ul>
-            <p><strong>ModExp (0x05):</strong></p>
-            <ul>
-            <li>Uses EIP-7883 pricing</li>
-            </ul>
+            disabled and is treated as an <code>INVALID</code> opcode.
+            It will cause any transaction using this opcode to fail. In
+            Ethereum, <code>SELFDESTRUCT</code> is deprecated but still
+            available.</p>
+            <h3 id="rule-for-gas-forwarding">“98/100” Rule for Gas
+            Forwarding</h3>
+            <p>MegaETH allows a caller to forward at most 98/100 of
+            remaining gas to callee. The parameter is 63/64 in
+            Ethereum.</p>
         </main>
 
         <footer class="site-footer">
