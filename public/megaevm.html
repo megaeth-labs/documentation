@@ -127,11 +127,11 @@
             at large and is identically defined as Ethereum’s gas; and
             <em>storage gas</em>, a new concept that models the storage
             subsystem in particular. Similarly, MegaEVM caps resource
-            usage of transactions using rules that each targets an
-            individual type of resource. Developers should consider
-            these changes in contrast to Ethereum’s EVM, where gas is
-            the singular metric for metering and limiting the amount of
-            resources consumed by transactions.</p>
+            usage of transactions and blocks using rules that each
+            targets an individual type of resource. Developers should
+            consider these changes in contrast to Ethereum’s EVM, where
+            gas is the singular metric for metering and limiting
+            resource consumption.</p>
             <h3 id="key-differences-at-a-glance">Key Differences at a
             Glance</h3>
             <table>
@@ -413,43 +413,46 @@
             </ul>
             <h2 id="multidimensional-resource-limits">Multidimensional
             Resource Limits</h2>
-            <p>In addition to the sender-specified limit on total gas,
+            <p>In addition to limits already defined in standard EVM,
             MegaEVM enforces four additional limits on how much
-            resources each transaction may consume. The following table
-            is an overview. The next few sections explain what counts
-            towards each type of resource and the respective limit.</p>
+            resources each transaction or block may consume. The
+            following table is an overview. The next few sections
+            explain what counts towards each type of resource and the
+            respective limit.</p>
             <table>
             <thead>
             <tr>
             <th>Resource Type</th>
             <th>Per-Transaction Limit</th>
+            <th>Per-Block Limit</th>
             </tr>
             </thead>
             <tbody>
             <tr>
-            <td>Total Gas</td>
-            <td>Specified by sender</td>
-            </tr>
-            <tr>
             <td>Compute Gas</td>
             <td>200,000,000</td>
+            <td>N/A</td>
             </tr>
             <tr>
             <td>Data Size</td>
+            <td>12.5 MB</td>
             <td>12.5 MB</td>
             </tr>
             <tr>
             <td>KV Updates</td>
             <td>500,000</td>
+            <td>500,000</td>
             </tr>
             <tr>
             <td>State Growth</td>
+            <td>1,000</td>
             <td>1,000</td>
             </tr>
             </tbody>
             </table>
             <p>When a transaction hits <em>any</em> of the
-            aforementioned limits, the following happens:</p>
+            aforementioned per-transaction limits, the following
+            happens:</p>
             <ol type="1">
             <li>Execution halts immediately.</li>
             <li>Any remaining gas is preserved and refunded to
@@ -458,8 +461,24 @@
             failed (status=0).</li>
             <li>No state changes from the transaction are applied.</li>
             </ol>
+            <p>If any of the aforementioned per-block limits is hit when
+            building a block, the following happens:</p>
+            <ol type="1">
+            <li>The transaction that caused the block to go over limits
+            is allowed to execute to completion and will be included in
+            the block. Per-transaction limits still apply.</li>
+            <li>No more transaction will be executed or added to this
+            block.</li>
+            </ol>
             <h3 id="definitions-of-resource-types">Definitions of
             Resource Types</h3>
+            <p>For all resource types, the usage incurred by a block is
+            simply the sum of the usage incurred by each transaction in
+            the block. For example, if a block contains two
+            transactions, one using 300 KV updates and the other using
+            400 KV updates, then the block uses 700 KV updates.</p>
+            <p>The usage incurred by an individual transaction is
+            defined as following.</p>
             <h4 id="compute-gas">Compute Gas</h4>
             <p>Compute gas cost of a transaction as defined in previous
             sections.</p>

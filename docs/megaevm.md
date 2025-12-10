@@ -19,10 +19,9 @@ and resource limits_. In MegaEVM, transactions consume two types of gas:
 _compute gas_, which models computation at large and is identically defined as
 Ethereum's gas; and _storage gas_, a new concept that models the storage
 subsystem in particular. Similarly, MegaEVM caps resource usage of transactions
-using rules that each targets an individual type of resource.
+and blocks using rules that each targets an individual type of resource.
 Developers should consider these changes in contrast to Ethereum's EVM, where
-gas is the singular metric for metering and limiting the amount of resources
-consumed by transactions.
+gas is the singular metric for metering and limiting resource consumption.
 
 ## Key Differences at a Glance
 
@@ -125,27 +124,39 @@ values.
 
 # Multidimensional Resource Limits
 
-In addition to the sender-specified limit on total gas, MegaEVM enforces four
-additional limits on how much resources each transaction may consume. The
-following table is an overview. The next few sections explain what counts
+In addition to limits already defined in standard EVM, MegaEVM enforces four
+additional limits on how much resources each transaction or block may consume.
+The following table is an overview. The next few sections explain what counts
 towards each type of resource and the respective limit.
 
-| Resource Type | Per-Transaction Limit  |
-| ---------------- | ------------------ |
-| Total Gas | Specified by sender |
-| Compute Gas  | 200,000,000 |
-| Data Size    | 12.5 MB            |
-| KV Updates   | 500,000            |
-| State Growth | 1,000              |
+| Resource Type | Per-Transaction Limit  | Per-Block Limit |
+| ---------------- | ------------------ | ------------------ |
+| Compute Gas  | 200,000,000 | N/A |
+| Data Size    | 12.5 MB            | 12.5 MB |
+| KV Updates   | 500,000            | 500,000 |
+| State Growth | 1,000              | 1,000 |
 
-When a transaction hits _any_ of the aforementioned limits, the following happens:
+When a transaction hits _any_ of the aforementioned per-transaction limits, the following happens:
 
 1. Execution halts immediately.
 2. Any remaining gas is preserved and refunded to sender.
 3. Transaction is included in the block with status set to failed (status=0).
 4. No state changes from the transaction are applied.
 
+If any of the aforementioned per-block limits is hit when building a block, the
+following happens:
+
+1. The transaction that caused the block to go over limits is allowed to execute to completion and will be included in the block. Per-transaction limits still apply.
+2. No more transaction will be executed or added to this block.
+
 ## Definitions of Resource Types
+
+For all resource types, the usage incurred by a block is simply the sum of the
+usage incurred by each transaction in the block. For example, if a block
+contains two transactions, one using 300 KV updates and the other using 400 KV
+updates, then the block uses 700 KV updates.
+
+The usage incurred by an individual transaction is defined as following.
 
 ### Compute Gas
 
