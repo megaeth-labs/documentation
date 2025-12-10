@@ -114,7 +114,7 @@ values.
 
 ## Tips for Developers
 
-- **Use MegaETH's native gas estimation APIs.** Tools not explicitly modified for MegaEVM does not account for storage gas and will report overly small numbers.
+- **Use MegaETH's native gas estimation APIs.** Tools not explicitly modified for MegaEVM do not account for storage gas and will report overly small numbers.
     - For example, when running `forge script`, use `--skip-simulation` to avoid its built-in EVM and use `--gas-limit` to manually specify a sufficiently high gas limit.
 - **Account for storage gas.** An Ether transfer costs 60,000 gas (21,000 compute gas plus 39,000 storage gas). This is the minimum gas cost (intrinsic gas) for any transaction.
     - The RPC returns "intrinsic gas too low" when transaction gas limit is smaller than 60,000.
