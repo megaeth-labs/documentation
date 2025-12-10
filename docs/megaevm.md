@@ -117,7 +117,7 @@ values.
 
 - **Use MegaETH's native gas estimation APIs.** Tools not explicitly modified for MegaEVM does not account for storage gas and will report overly small numbers.
     - For example, when running `forge script`, use `--skip-simulation` to avoid its built-in EVM and use `--gas-limit` to manually specify a sufficiently high gas limit.
-- **Account for storage gas.** A Ether transfer costs 60,000 gas (21,000 compute gas plus 39,000 storage gas). This is the minimum gas cost (intrinsic gas) for any transaction.
+- **Account for storage gas.** An Ether transfer costs 60,000 gas (21,000 compute gas plus 39,000 storage gas). This is the minimum gas cost (intrinsic gas) for any transaction.
     - The RPC returns "intrinsic gas too low" when transaction gas limit is smaller than 60,000.
 - **Prefer transient storage or memory over persistent storage.** Allocating new storage slots costs storage gas and counts towards various resource limits (explained in the next section). Use transient storage ([EIP-1153](https://eips.ethereum.org/EIPS/eip-1153) `TSTORE`/`TLOAD`) for data that only needs to persist within a transaction, or memory for data within a single call. This avoids storage gas costs entirely and ensures calling transactions stay within resource limits.
 - **Reuse storage slots.** Storage gas applies when changing a slot from zero to nonzero and does not apply when overwriting a slot that is already nonzero. When a slot can be freed (i.e., changed to zero) but is expected to be allocated again (i.e., changed to nonzero) very soon, consider keeping the slot at nonzero so that no storage gas is charged the next time it is used.
