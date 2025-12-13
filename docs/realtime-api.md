@@ -104,14 +104,14 @@ The schema of each log entry is the same as in `eth_getLogs`.
 
 ## State Changes
 
-`stateChange` is a new type of subscription that streams state changes of an account as soon as the transactions making the changes are packaged into mini blocks. It takes a list of account addresses to monitor as a parameter. Here is an example.
+`stateChanges` is a new type of subscription that streams state changes of an account as soon as the transactions making the changes are packaged into mini blocks. It takes a list of account addresses to monitor as a parameter. Here is an example.
 
 ```
 {
     "jsonrpc": "2.0",
     "method": "eth_subscribe",
     "params": [
-        "stateChange",
+        "stateChanges",
         ["0x2ef038991d64c72646d4f06ba78d93f4f1654e3f"]
     ],
     "id": 83
