@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>MegaETH Docs – Overview</title>
+        <title>MegaETH Docs – Testnet</title>
         <link rel="stylesheet" type="text/css" href="style.css">
             </head>
     <body>
@@ -46,29 +46,97 @@
                 <h3>Manual</h3>
             </div>
             <div class="page-title">
-                <h1>Overview</h1>
+                <h1>Testnet</h1>
                 
                 
                 
+                                <nav id="TOC">
+                    <ul>
+                    <li><a href="#important-messages"
+                    id="toc-important-messages">Important
+                    Messages</a></li>
+                    <li><a href="#chain-parameters"
+                    id="toc-chain-parameters">Chain Parameters</a></li>
+                    <li><a href="#connecting-to-the-testnet"
+                    id="toc-connecting-to-the-testnet">Connecting to the
+                    Testnet</a>
+                    <ul>
+                    <li><a href="#rpc" id="toc-rpc">RPC</a></li>
+                    <li><a href="#block-explorer"
+                    id="toc-block-explorer">Block Explorer</a></li>
+                    </ul></li>
+                    </ul>
+                </nav>
                             </div>
         </header>
 
         <main class="site-content">
-            <p>You have reached the user manual of MegaETH.</p>
+            <h2 id="important-messages">Important Messages</h2>
             <ul>
-            <li><a href="/testnet">Testnet</a>: instructions on
-            connecting to the testnet</li>
-            <li><a href="/megaevm">MegaEVM</a>: differences between
-            MegaETH’s execution environment and vanilla EVM</li>
-            <li><a href="/realtime-api">Realtime API</a>: MegaETH’s
-            performance-focused enhancements to Ethereum JSON-RPC</li>
-            <li><a href="/infra">Tooling</a>: a list of infrastructure
-            and tools supporting MegaETH</li>
-            <li><a href="/faq">FAQ</a>: a list of commonly asked
-            questions and answers</li>
-            <li><a href="/faucet">Faucet</a>: supply of free gas tokens
-            for the testnet</li>
+            <li><strong>RPC Endpoints Are Rate Limited And May
+            Change.</strong> Always check this page for the latest URLs
+            and status.</li>
+            <li><strong>Network Maintenance May Occur.</strong> RPCs may
+            go offline during upgrades. Contracts and states may be
+            rolled back in rare cases.</li>
+            <li><strong>Testnet Is Not Incentivized.</strong> Testnet
+            tokens and transactions have no real monetary value.
+            <em>Everything happening on the chain is solely for
+            experimental purposes.</em></li>
             </ul>
+            <h2 id="chain-parameters">Chain Parameters</h2>
+            <table>
+            <colgroup>
+            <col style="width: 22%" />
+            <col style="width: 77%" />
+            </colgroup>
+            <thead>
+            <tr>
+            <th>Item</th>
+            <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+            <td><strong>Chain ID</strong></td>
+            <td>6343</td>
+            </tr>
+            <tr>
+            <td><strong>Native &amp; Gas Token</strong></td>
+            <td>Ether (ETH), 18 decimals</td>
+            </tr>
+            <tr>
+            <td><strong>Block Time</strong></td>
+            <td>Mini blocks: 10ms<br/>EVM blocks: 1s</td>
+            </tr>
+            <tr>
+            <td><strong>Block Gas Limit</strong></td>
+            <td>10 billion (<span
+            class="math display">10<sup>10</sup></span>) gas per EVM
+            block</td>
+            </tr>
+            <tr>
+            <td><strong>Base Fee Per Gas</strong></td>
+            <td>0.001 gwei (<span
+            class="math display">10<sup>6</sup></span> wei)</td>
+            </tr>
+            <tr>
+            <td><strong>EIP-1559 Parameters</strong></td>
+            <td>Base fee adjustment is effectively disabled</td>
+            </tr>
+            </tbody>
+            </table>
+            <h2 id="connecting-to-the-testnet">Connecting to the
+            Testnet</h2>
+            <h3 id="rpc">RPC</h3>
+            <p>MegaETH provides a public endpoint at <a
+            href="https://timothy.megaeth.com/rpc">https://timothy.megaeth.com/rpc</a>.
+            Alchemy sells managed endpoints.</p>
+            <h3 id="block-explorer">Block Explorer</h3>
+            <p>Check out <a
+            href="https://megaeth-testnet-v2.blockscout.com/">Blockscout</a>
+            and <a
+            href="https://uptime.megaeth.com">uptime.megaeth.com</a>.</p>
         </main>
 
         <footer class="site-footer">
