@@ -190,6 +190,16 @@
             plain native transfer. The same amount of Ether sans gas
             fees will appear in sender’s address on MegaETH after the
             transfer is finalized on Ethereum mainnet.</p>
+            <p>For more control, use the <code>depositETH</code> method
+            of the bridge contract. It allows for specifying the
+            (approximate) amount of gas that should be charged by and
+            forwarded from Ethereum mainnet to MegaETH for the deposit
+            transaction to use, as well as adding extra data to the
+            transaction. As an example, the following
+            <code>cast send</code> command calls <code>depositETH</code>
+            to bridge 0.001 Ether with 61000 gas and extra data
+            <code>bunny</code>.</p>
+            <pre><code>cast send 0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75 &#39;depositETH(uint32, bytes)&#39; 61000 &quot;0x62756e6e79&quot; --value 0.001ether</code></pre>
             <h2 id="running-a-node">Running a Node</h2>
             <p>Please reach out to the team.</p>
             <h2 id="contracts-of-potential-interest">Contracts of
