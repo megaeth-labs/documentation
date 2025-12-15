@@ -80,7 +80,7 @@ as well as adding extra data to the transaction. As an example, the following
 `cast send` command calls `depositETH` to bridge 0.001 Ether with 61000 gas and
 extra data `bunny`.
 
-```
+```bash
 cast send 0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75 'depositETH(uint32, bytes)' 61000 "0x62756e6e79" --value 0.001ether
 ```
 
