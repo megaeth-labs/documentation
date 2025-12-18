@@ -36,7 +36,7 @@ endpoints provided by MegaETH; availability varies on third-party endpoints.
 
 ## Block Explorer
 
-[Blockscout](https://mainnet.blockscout.com/) is available. 
+[Blockscout](https://megaeth.blockscout.com/) is available. 
 
 # Developing Smart Contracts
 
