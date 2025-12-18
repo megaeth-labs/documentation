@@ -5,6 +5,7 @@ rank: 0
 
 You have reached the user manual of MegaETH.
 
+- [Frontier](/frontier): instructions on connecting to and using Frontier
 - [Testnet](/testnet): instructions on connecting to the testnet
 - [MegaEVM](/megaevm): differences between MegaETH's execution environment and vanilla EVM
 - [Realtime API](/realtime-api): MegaETH's performance-focused enhancements to Ethereum JSON-RPC
