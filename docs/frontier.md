@@ -65,6 +65,13 @@ using `mega-evme` are available
 
 # Using the Canonical Bridge
 
+__As a reminder, Frontier is for developers to deploy their apps ahead of the
+public mainnet launch. For regular users, bridging tokens to Frontier is
+considered EXTREMELY RISKY AND RECKLESS and SHOULD NOT BE ATTEMPTED.__
+
+__No
+guarantee of any kind is made for any token bridged to Frontier through any mechanism.__
+
 MegaETH's canonical bridge is the preferred method to bridge Ether (ETH) and
 ERC20 tokens from Ethereum to MegaETH. The Ethereum side of the bridge is at
 `0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75` on Ethereum mainnet. Currently, it
