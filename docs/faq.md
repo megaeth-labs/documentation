@@ -140,7 +140,7 @@ guarantees as that of EVM blocks.
 
 Miniblocks.
 
-## Why am I seeing `null` `blockHash` in a realtime transaction receipt, particularly when I do get a valid `blockNumber`?
+## Why am I seeing `0xfff[...]fff` `blockHash` in a realtime transaction receipt, particularly when I do get a valid `blockNumber`?
 
 In the realtime RPC, if a transaction receipt has a `null` `blockHash` but a
 valid `blockNumber`, it means the transaction was included in a miniblock and
