@@ -150,11 +150,12 @@
                     display the block height in miniblocks or EVM
                     blocks?</a></li>
                     <li><a
-                    href="#why-am-i-seeing-null-blockhash-in-a-realtime-transaction-receipt-particularly-when-i-do-get-a-valid-blocknumber"
-                    id="toc-why-am-i-seeing-null-blockhash-in-a-realtime-transaction-receipt-particularly-when-i-do-get-a-valid-blocknumber">Why
-                    am I seeing <code>null</code> <code>blockHash</code>
-                    in a realtime transaction receipt, particularly when
-                    I do get a valid <code>blockNumber</code>?</a></li>
+                    href="#why-am-i-seeing-0xfff...fff-blockhash-in-a-realtime-transaction-receipt-particularly-when-i-do-get-a-valid-blocknumber"
+                    id="toc-why-am-i-seeing-0xfff...fff-blockhash-in-a-realtime-transaction-receipt-particularly-when-i-do-get-a-valid-blocknumber">Why
+                    am I seeing <code>0xfff[...]fff</code>
+                    <code>blockHash</code> in a realtime transaction
+                    receipt, particularly when I do get a valid
+                    <code>blockNumber</code>?</a></li>
                     <li><a
                     href="#why-does-eth_subscribe-return-an-internal-error"
                     id="toc-why-does-eth_subscribe-return-an-internal-error">Why
@@ -482,10 +483,11 @@
             block height in miniblocks or EVM blocks?</h3>
             <p>Miniblocks.</p>
             <h3
-            id="why-am-i-seeing-null-blockhash-in-a-realtime-transaction-receipt-particularly-when-i-do-get-a-valid-blocknumber">Why
-            am I seeing <code>null</code> <code>blockHash</code> in a
-            realtime transaction receipt, particularly when I do get a
-            valid <code>blockNumber</code>?</h3>
+            id="why-am-i-seeing-0xfff...fff-blockhash-in-a-realtime-transaction-receipt-particularly-when-i-do-get-a-valid-blocknumber">Why
+            am I seeing <code>0xfff[...]fff</code>
+            <code>blockHash</code> in a realtime transaction receipt,
+            particularly when I do get a valid
+            <code>blockNumber</code>?</h3>
             <p>In the realtime RPC, if a transaction receipt has a
             <code>null</code> <code>blockHash</code> but a valid
             <code>blockNumber</code>, it means the transaction was
