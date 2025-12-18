@@ -10,6 +10,7 @@
         <header class="site-header">
                         <nav class="main-nav"><ul>
                         <li><a href="/index.html">Overview</a></li>
+                        <li><a href="/frontier.html">Frontier</a></li>
                         <li><a href="/testnet.html">Testnet</a></li>
                         <li><a href="/megaevm.html">MegaEVM</a></li>
                         <li><a href="/architecture.html">Architecture</a></li>
@@ -52,9 +53,9 @@
                 
                                 <nav id="TOC">
                     <ul>
-                    <li><a href="#a-very-important-message"
-                    id="toc-a-very-important-message">A Very Important
-                    Message</a></li>
+                    <li><a href="#important-messages"
+                    id="toc-important-messages">Important
+                    Messages</a></li>
                     <li><a href="#chain-parameters"
                     id="toc-chain-parameters">Chain Parameters</a></li>
                     <li><a href="#connecting-to-frontier"
@@ -71,8 +72,6 @@
                     <li><a href="#using-the-canonical-bridge"
                     id="toc-using-the-canonical-bridge">Using the
                     Canonical Bridge</a></li>
-                    <li><a href="#running-a-node"
-                    id="toc-running-a-node">Running a Node</a></li>
                     <li><a href="#contracts-of-potential-interest"
                     id="toc-contracts-of-potential-interest">Contracts
                     of Potential Interest</a>
@@ -90,11 +89,12 @@
         </header>
 
         <main class="site-content">
-            <h2 id="a-very-important-message">A Very Important
-            Message</h2>
-            <p><strong>Access to Frontier is permissioned.</strong></p>
-            <p><strong>Please refrain from sharing your private RPC
-            endpoints or your whitelisted wallets!</strong></p>
+            <h2 id="important-messages">Important Messages</h2>
+            <p><strong>Frontier is for developers to deploy and test
+            their apps before public launch of the mainnet. Only
+            whitelisted wallets held by developers can transact on
+            Frontier.</strong></p>
+            <p><strong>This page is regularly updated.</strong></p>
             <hr />
             <h2 id="chain-parameters">Chain Parameters</h2>
             <table>
@@ -140,39 +140,45 @@
             </table>
             <h2 id="connecting-to-frontier">Connecting to Frontier</h2>
             <h3 id="rpc">RPC</h3>
-            <p>Contact the team for a private endpoint. Alchemy and
-            Quicknode sell managed endpoints.</p>
+            <p>MegaETH hosts a public RPC endpoint at
+            https://mainnet.megaeth.com/rpc.</p>
             <p>See <a href="/realtime-api.html">Realtime API</a> for a
             list of additional features on top of the standard Ethereum
             JSON-RPC. These features are available on RPC endpoints
             provided by MegaETH; availability varies on third-party
             endpoints.</p>
             <h3 id="block-explorer">Block Explorer</h3>
-            <p><a
-            href="https://user:Mpp0gRdftB1ynLMbmLUg@megaeth-testnet-v3.blockscout.com/">Blockscout</a>
-            is available. For the time being, its frontend and URL are
-            dubbed “testnet-v3” instead of “mainnet” for
-            confidentiality, but it is indeed for Frontier.</p>
-            <p>Etherscan is integrating.</p>
+            <p><a href="https://mainnet.blockscout.com/">Blockscout</a>
+            is available.</p>
             <h2 id="developing-smart-contracts">Developing Smart
             Contracts</h2>
-            <p>MegaETH is fully compatible with Ethereum smart contracts
-            but there are a few differences between MegaETH and Ethereum
-            especially around the gas model. See <a
-            href="/megaevm.html">MegaEVM</a> for a complete list of
-            differences.</p>
-            <p>Because of the said differences, existing toolchains
-            might incorrectly estimate the amount of gas a transaction
-            needs if they use their own EVM implementations to locally
-            simulate the transaction. Sometimes, this issue causes the
-            RPC to throw “intrinsic gas too low” errors or the
-            transaction to run out of gas and revert. The solution is to
-            either tell the toolchain to skip local gas estimation and
-            use a hardcoded gas limit (for <code>forge script</code>, as
-            an example, <code>--gas-limit</code> with a sufficiently
-            large number plus <code>--skip-simulation</code>), or use
-            MegaETH’s RPC servers to estimate gas. See <a
-            href="/megaevm.html">MegaEVM</a> for more details.</p>
+            <p>MegaETH’s execution environment is called
+            <em>MegaEVM</em>. It is fully compatible with Ethereum smart
+            contracts but introduces a few differences compared to
+            Ethereum’s EVM especially around the gas model. See the <a
+            href="/megaevm.html">MegaEVM manual page</a> for a list of
+            differences. Implementation of MegaEVM is opensource and can
+            be found on <a
+            href="https://github.com/megaeth-labs/mega-evm">GitHub</a>.</p>
+            <p>Because of the said differences, toolchains not yet
+            customized for MegaETH might incorrectly estimate the amount
+            of gas a transaction needs if they use their own EVM
+            implementations, as opposed to MegaEVM, to locally simulate
+            the transaction. Sometimes, this issue causes the RPC to
+            throw “intrinsic gas too low” errors or the transaction to
+            run out of gas and revert. The solution is to either tell
+            the toolchain to skip local gas estimation and use a
+            hardcoded gas limit (for <code>forge script</code>, as an
+            example, <code>--gas-limit</code> with a sufficiently large
+            number plus <code>--skip-simulation</code>), or use
+            MegaETH’s RPC servers to estimate gas.</p>
+            <p><em>The best tool for debugging MegaETH transactions is
+            <code>mega-evme</code>.</em> It uses the aforementioned
+            opensource implementation of MegaEVM and can thus perfectly
+            simulate any transaction’s behavior on MegaETH. Instructions
+            on building and using <code>mega-evme</code> are available
+            <a
+            href="https://github.com/megaeth-labs/mega-evm/blob/main/bin/mega-evme/README.md">here</a>.</p>
             <h2 id="using-the-canonical-bridge">Using the Canonical
             Bridge</h2>
             <p>MegaETH’s canonical bridge is the preferred method to
@@ -201,8 +207,6 @@
             <code>bunny</code>.</p>
             <div class="sourceCode" id="cb1"><pre
             class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">cast</span> send 0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75 <span class="st">&#39;depositETH(uint32, bytes)&#39;</span> 61000 <span class="st">&quot;0x62756e6e79&quot;</span> <span class="at">--value</span> 0.001ether</span></code></pre></div>
-            <h2 id="running-a-node">Running a Node</h2>
-            <p>Please reach out to the team.</p>
             <h2 id="contracts-of-potential-interest">Contracts of
             Potential Interest</h2>
             <h3 id="on-megaeth-mainnet-frontier">On MegaETH Mainnet

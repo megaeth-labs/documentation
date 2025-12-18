@@ -3,12 +3,13 @@ title: Frontier
 rank: 1
 ---
 
-# A Very Important Message
+# Important Messages
 
-__Access to Frontier is permissioned.__
+__Frontier is for developers to deploy and test their apps before public launch
+of the mainnet. Only whitelisted wallets held by developers can transact on
+Frontier.__
 
-__Please refrain from sharing your private RPC
-endpoints or your whitelisted wallets!__
+__This page is regularly updated.__
 
 ---
 
@@ -27,7 +28,7 @@ endpoints or your whitelisted wallets!__
 
 ## RPC
 
-Contact the team for a private endpoint. Alchemy and Quicknode sell managed endpoints.
+MegaETH hosts a public RPC endpoint at https://mainnet.megaeth.com/rpc.
 
 See [Realtime API](/realtime-api.html) for a list of additional features on top
 of the standard Ethereum JSON-RPC. These features are available on RPC
@@ -35,27 +36,32 @@ endpoints provided by MegaETH; availability varies on third-party endpoints.
 
 ## Block Explorer
 
-[Blockscout](https://user:Mpp0gRdftB1ynLMbmLUg@megaeth-testnet-v3.blockscout.com/)
-is available. For the time being, its frontend and URL are dubbed "testnet-v3"
-instead of "mainnet" for confidentiality, but it is indeed for Frontier.
-
-Etherscan is integrating.
+[Blockscout](https://mainnet.blockscout.com/) is available. 
 
 # Developing Smart Contracts
 
-MegaETH is fully compatible with Ethereum smart contracts but there are a few
-differences between MegaETH and Ethereum especially around the gas model. See
-[MegaEVM](/megaevm.html) for a complete list of differences.
+MegaETH's execution environment is called _MegaEVM_. It is fully compatible
+with Ethereum smart contracts but introduces a few differences compared to
+Ethereum's EVM especially around the gas model. See the [MegaEVM manual
+page](/megaevm.html) for a list of differences. Implementation of MegaEVM is
+opensource and can be found on
+[GitHub](https://github.com/megaeth-labs/mega-evm).
 
-Because of the said differences, existing toolchains might incorrectly estimate
-the amount of gas a transaction needs if they use their own EVM implementations
-to locally simulate the transaction. Sometimes, this issue causes the RPC to
-throw "intrinsic gas too low" errors or the transaction to run out of gas and
-revert. The solution is to either tell the toolchain to skip local gas
-estimation and use a hardcoded gas limit (for `forge script`, as an example,
-`--gas-limit` with a sufficiently large number plus `--skip-simulation`), or
-use MegaETH's RPC servers to estimate gas. See [MegaEVM](/megaevm.html) for
-more details.
+Because of the said differences, toolchains not yet customized for MegaETH
+might incorrectly estimate the amount of gas a transaction needs if they use
+their own EVM implementations, as opposed to MegaEVM, to locally simulate the
+transaction. Sometimes, this issue causes the RPC to throw "intrinsic gas too
+low" errors or the transaction to run out of gas and revert. The solution is to
+either tell the toolchain to skip local gas estimation and use a hardcoded gas
+limit (for `forge script`, as an example, `--gas-limit` with a sufficiently
+large number plus `--skip-simulation`), or use MegaETH's RPC servers to
+estimate gas.
+
+_The best tool for debugging MegaETH transactions is `mega-evme`._ It uses the
+aforementioned opensource implementation of MegaEVM and can thus perfectly
+simulate any transaction's behavior on MegaETH. Instructions on building and
+using `mega-evme` are available
+[here](https://github.com/megaeth-labs/mega-evm/blob/main/bin/mega-evme/README.md).
 
 # Using the Canonical Bridge
 
@@ -83,10 +89,6 @@ extra data `bunny`.
 ```bash
 cast send 0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75 'depositETH(uint32, bytes)' 61000 "0x62756e6e79" --value 0.001ether
 ```
-
-# Running a Node
-
-Please reach out to the team.
 
 # Contracts of Potential Interest
 
