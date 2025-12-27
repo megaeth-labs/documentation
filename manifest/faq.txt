@@ -1,1 +1,0 @@
-900	<li><a href="/faq.html">FAQ</a></li>
