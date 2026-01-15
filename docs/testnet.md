@@ -24,7 +24,7 @@ rank: 2
 
 ## RPC
 
-MegaETH provides a public endpoint at [https://timothy.megaeth.com/rpc](https://timothy.megaeth.com/rpc). Alchemy sells managed endpoints.
+MegaETH provides a public endpoint at https://carrot.megaeth.com/rpc. Alchemy sells managed endpoints.
 
 ## Block Explorer
 
