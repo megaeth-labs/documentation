@@ -62,7 +62,7 @@ Continuing the previous example, Alice invokes `eth_getTransactionReceipt` on he
 
 When invoked over WebSocket, `eth_subscribe` streams data as soon as the corresponding mini block is produced. This is the mechanism to get transaction preconfirmation and execution results with the minimum amount of latency. As a reminder, please call `eth_unsubscribe` when a subscription is no longer needed.
 
-**Note:** WebSocket connections require periodic client activity to remain open. Clients should send `eth_chainId` (or any JSON-RPC request) at least once every 30 seconds to keep the WebSocket connection alive. Idle connections may be closed by the server.
+**Note:** WebSocket connections require periodic client activity to remain open. Clients should send `eth_chainId` at least once every 30 seconds to keep the WebSocket connection alive. Idle connections may be closed by the server.
 
 ## Logs
 
