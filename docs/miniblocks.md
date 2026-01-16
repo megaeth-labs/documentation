@@ -32,6 +32,8 @@ On the other hand, there are some key differences
 For example:
 ```json
 {
+  ...
   "number": "0x57f898",
   "miniBlockCount": 87
+  ...
 }
