@@ -115,6 +115,14 @@
             API</a>—MegaETH’s extension to the standard Ethereum
             JSON-RPC API.</li>
             </ul>
+            <p>The number of mini blocks included in an EVM block is not
+            a protocol-level guarantee and may vary. Clients can observe
+            the per-EVM-block count via the <code>miniBlockCount</code>
+            field in the <code>eth_subscribe</code> →
+            <code>newHeads</code> payload.</p>
+            <p>For example:</p>
+            <p>```json { … “number”: “0x57f898”, “miniBlockCount”: 87 …
+            }</p>
         </main>
 
         <footer class="site-footer">

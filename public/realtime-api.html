@@ -249,6 +249,11 @@
             amount of latency. As a reminder, please call
             <code>eth_unsubscribe</code> when a subscription is no
             longer needed.</p>
+            <p><strong>Note:</strong> WebSocket connections require
+            periodic client activity to remain open. Clients should send
+            <code>eth_chainId</code> at least once every 30 seconds to
+            keep the WebSocket connection alive. Idle connections may be
+            closed by the server.</p>
             <h3 id="logs">Logs</h3>
             <p>When both <code>startBlock</code> and
             <code>endBlock</code> are set to <code>pending</code>, the
