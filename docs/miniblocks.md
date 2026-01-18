@@ -26,3 +26,15 @@ On the other hand, there are some key differences
 
 - Mini blocks contain a different set of metadata fields compared to EVM blocks.
 - To access information related to transactions that have been included in a mini block but not an EVM block, it is necessary to use the [Realtime API](/realtime-api)—MegaETH’s extension to the standard Ethereum JSON-RPC API.
+
+The number of mini blocks included in an EVM block is not a protocol-level guarantee and may vary. Clients can observe the per-EVM-block count via the `miniBlockCount` field in the `eth_subscribe` → `newHeads` payload.
+
+For example:
+
+```json
+{
+  ...
+  "number": "0x57f898",
+  "miniBlockCount": 87
+  ...
+}
