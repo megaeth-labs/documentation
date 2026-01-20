@@ -35,6 +35,6 @@ For example:
 {
   ...
   "number": "0x57f898",
-  "miniBlockCount": 87
+  "miniBlockCount": "0x57"
   ...
 }
