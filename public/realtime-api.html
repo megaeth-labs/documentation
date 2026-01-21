@@ -341,14 +341,12 @@
 }</code></pre>
             <p>The returned mini blocks use the following schema.</p>
             <pre><code>{
-     &quot;payload_id&quot;: HexString, // EngineAPI payload ID of the EVM block that this mini-block belongs to
-     &quot;block_number&quot;: number, // The block number of that EVM block that this mini-block belongs to
-     &quot;index&quot;: number, // Index of this mini-block in the EVM block.
-     &quot;tx_offset&quot;: number, // The number of transactions in all previous mini-blocks of the same EVM block.
-     &quot;log_offset&quot;: number, // The number of logs in all previous mini-blocks of the same EVM block.
-     &quot;gas_offset&quot;: number, // The gas used in all previous mini-blocks of the same EVM block.
-     &quot;timestamp&quot;: number, // The timestamp when this mini-block is created. Unix timestamp in milliseconds.
-     &quot;gas_used&quot;: number, // Gas used inside this mini-block
+     &quot;block_number&quot;: HexString, // The block number of that EVM block that this mini-block belongs to
+     &quot;block_timestamp&quot;: HexString, // Timestamp of the EVM block
+     &quot;index&quot;: HexString, // Index of this mini-block in the EVM block
+     &quot;mini_block_number&quot;: HexString, // The number of this mini-block in blockchain history
+     &quot;mini_block_timestamp&quot;: HexString, // The timestamp when this mini-block is created. Unix timestamp in microseconds.
+     &quot;gas_used&quot;: HexString, // Gas used inside this mini-block
      &quot;transactions&quot;: [ ... ], // Transactions included in this mini-block. The schema of each transaction is the same as `eth_getTransactionByHash`.
      &quot;receipts&quot;: [ ... ] // Receipts of the transactions in this mini-block. The schema of each receipt is the same as `eth_getTransactionReceipt`.
 }</code></pre>
