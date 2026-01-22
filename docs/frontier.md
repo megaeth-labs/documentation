@@ -106,6 +106,7 @@ cast send 0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75 'depositETH(uint32, bytes)'
 | MEGA Token | `0x28B7E77f82B25B95953825F1E3eA0E36c1c29861` | ERC20; 18 decimals. |
 | WETH9 | `0x4200000000000000000000000000000000000006` | |
 | Multicall3 | `0xcA11bde05977b3631167028862bE2a173976CA11` | | 
+| USDM | `0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7` | |
 <!--
 | **High Resolution Timestamp** | `0x6342000000000000000000000000000000000002` | The function signature is `function timestamp() external view returns (uint256)` where the return value is timestamp in microseconds. |
 -->
@@ -114,6 +115,8 @@ See OP Stack docs for a complete list of
 [predeployed](https://docs.optimism.io/op-stack/protocol/smart-contracts#layer-2-contracts-predeploys) and
 [preinstalled](https://docs.optimism.io/op-stack/features/preinstalls#contracts-and-deployed-addresses)
 contracts.
+
+See the [mega-tokenlist](https://github.com/megaeth-labs/mega-tokenlist) for a more comprehensive list of tokens in the ecosystem. 
 
 ## On Ethereum Mainnet
 
@@ -125,6 +128,7 @@ contracts.
 | OptimismPortalProxy                 | `0x7f82f57F0Dd546519324392e408b01fcC7D709e8` | |
 | OptimismMintableERC20FactoryProxy   | `0xF875030B9464001fC0f964E47546b0AFEEbD7C61` | |
 | SystemConfigProxy                   | `0x1ED92E1bc9A2735216540EDdD0191144681cb77E` | |
+| USDM                                | `0xEc2AF1C8B110a61fD9C3Fa6a554a031Ca9943926` | |
 
 MegaETH's smart contracts are from OP Stack's [op-contracts/v3.0.0
 release](https://github.com/ethereum-optimism/optimism/tree/backports/op-contracts/v3.0.0/packages/contracts-bedrock).
