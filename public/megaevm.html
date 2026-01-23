@@ -83,6 +83,32 @@
                     id="toc-definitions-of-resource-types">Definitions
                     of Resource Types</a></li>
                     </ul></li>
+                    <li><a href="#access-to-volatile-data"
+                    id="toc-access-to-volatile-data">Access to Volatile
+                    Data</a>
+                    <ul>
+                    <li><a
+                    href="#opcodes-for-access-the-block-environment"
+                    id="toc-opcodes-for-access-the-block-environment">Opcodes
+                    for Access the Block Environment</a></li>
+                    <li><a href="#accessing-the-beneficiary-account"
+                    id="toc-accessing-the-beneficiary-account">Accessing
+                    the Beneficiary Account</a></li>
+                    <li><a href="#accessing-the-native-oracle-interface"
+                    id="toc-accessing-the-native-oracle-interface">Accessing
+                    the Native Oracle Interface</a></li>
+                    <li><a href="#remarks"
+                    id="toc-remarks">Remarks</a></li>
+                    </ul></li>
+                    <li><a
+                    href="#system-contracts-the-native-oracle-service"
+                    id="toc-system-contracts-the-native-oracle-service">System
+                    Contracts &amp; the Native Oracle Service</a>
+                    <ul>
+                    <li><a href="#high-precision-timestamp-oracle"
+                    id="toc-high-precision-timestamp-oracle">High-Precision
+                    Timestamp Oracle</a></li>
+                    </ul></li>
                     <li><a href="#miscellaneous"
                     id="toc-miscellaneous">Miscellaneous</a>
                     <ul>
@@ -509,93 +535,180 @@
             account is cleared before the transaction ends, thus
             occupying no storage space permanently, it does not count
             towards the limit.</p>
+            <h2 id="access-to-volatile-data">Access to Volatile
+            Data</h2>
+            <p>MegaEVM provides APIs for transactions to access
+            <em>volatile data</em>, or data that changes frequently and
+            thus expires quickly after being accessed. This includes
+            metadata of the current block such as the block number,
+            states of the block beneficiary, as well as data available
+            through the native oracle interface (see below).</p>
+            <p>When a transaction accesses volatile data, dependency
+            forms between the transaction and other transactions or
+            operations that attempt to update the data. Such dependency
+            harms performance. For example, if a transaction reads the
+            current block number using the <code>NUMBER</code> opcode,
+            the sequencer cannot start a new block until the transaction
+            finishes and gets included in the current block, as doing so
+            would cause the block number to change and invalidate the
+            value previously read by the transaction. If the transaction
+            takes long to finish, block production would be blocked (no
+            pun intended), which impacts latency.</p>
+            <p>MegaEVM mitigates this issue by limiting the amount of
+            compute gas a transaction may use <em>after it accesses
+            volatile data</em>. This ensures transactions that access
+            volatile data yield quickly. In the following subsections,
+            we detail the limits.</p>
+            <h3 id="opcodes-for-access-the-block-environment">Opcodes
+            for Access the Block Environment</h3>
+            <p>Accessing these opcodes caps remaining compute gas to
+            20,000,000.</p>
+            <table>
+            <thead>
+            <tr>
+            <th>Opcode</th>
+            <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+            <td><code>NUMBER</code></td>
+            <td>Current block number</td>
+            </tr>
+            <tr>
+            <td><code>TIMESTAMP</code></td>
+            <td>Current block timestamp</td>
+            </tr>
+            <tr>
+            <td><code>COINBASE</code></td>
+            <td>Block beneficiary address</td>
+            </tr>
+            <tr>
+            <td><code>DIFFICULTY</code></td>
+            <td>Block difficulty</td>
+            </tr>
+            <tr>
+            <td><code>GASLIMIT</code></td>
+            <td>Block gas limit</td>
+            </tr>
+            <tr>
+            <td><code>BASEFEE</code></td>
+            <td>Base fee per gas</td>
+            </tr>
+            <tr>
+            <td><code>PREVRANDAO</code></td>
+            <td>Previous block randomness</td>
+            </tr>
+            <tr>
+            <td><code>BLOCKHASH</code></td>
+            <td>Historical block hash</td>
+            </tr>
+            <tr>
+            <td><code>BLOBBASEFEE</code></td>
+            <td>Blob base fee</td>
+            </tr>
+            <tr>
+            <td><code>BLOBHASH</code></td>
+            <td>Blob hash lookup</td>
+            </tr>
+            </tbody>
+            </table>
+            <h3 id="accessing-the-beneficiary-account">Accessing the
+            Beneficiary Account</h3>
+            <p>Accessing the block beneficiary (coinbase) account also
+            caps remaining compute gas to 20,000,000.</p>
+            <table>
+            <colgroup>
+            <col style="width: 52%" />
+            <col style="width: 47%" />
+            </colgroup>
+            <thead>
+            <tr>
+            <th>Trigger</th>
+            <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+            <td><code>BALANCE</code>, <code>SELFBALANCE</code></td>
+            <td>Reading beneficiary’s balance</td>
+            </tr>
+            <tr>
+            <td><code>EXTCODECOPY</code>, <code>EXTCODESIZE</code>,
+            <code>EXTCODEHASH</code></td>
+            <td>Accessing beneficiary’s code</td>
+            </tr>
+            <tr>
+            <td>Transaction sender is beneficiary</td>
+            <td>When <code>msg.sender == block.coinbase</code></td>
+            </tr>
+            <tr>
+            <td>Transaction recipient is beneficiary</td>
+            <td>When call target is <code>block.coinbase</code></td>
+            </tr>
+            <tr>
+            <td><code>DELEGATECALL</code> to beneficiary</td>
+            <td>Delegated context accessing beneficiary</td>
+            </tr>
+            </tbody>
+            </table>
+            <h3 id="accessing-the-native-oracle-interface">Accessing the
+            Native Oracle Interface</h3>
+            <p>Accessing the system contract of the native oracle
+            interface caps remaining compute gas to 1,000,000.</p>
+            <ul>
+            <li>Oracle contract address:
+            <code>0x6342000000000000000000000000000000000001</code></li>
+            <li>Applies to <code>CALL</code>, <code>STATICCALL</code>,
+            <code>DELEGATECALL</code>, <code>CALLCODE</code></li>
+            </ul>
+            <h3 id="remarks">Remarks</h3>
+            <p>When multiple types of volatile data are accessed in the
+            same transaction, the <em>most restrictive limit
+            applies</em>. For example, if a transaction accesses both
+            the block environment (triggering the 20m limit) and the
+            oracle interface (triggering the 1m limit), the cap will be
+            1m. The order in which the transaction accesses the data
+            types does not matter. The lowest cap is enforced
+            globally.</p>
+            <p>Because these limits apply <em>after</em> accesssing
+            volatile data, developers should perform heavy computation
+            before any attempt to access volatile data. The following is
+            a counterexample.</p>
+            <pre class="solidity"><code>// Bad: Heavy computation after reading timestamp
+function processWithTimestamp() external {
+    uint256 currentTime = block.timestamp; // Triggers 20M gas cap
+    // This loop might run out of gas!
+    for (uint i = 0; i &lt; 10000; i++) {
+        heavyComputation(i, currentTime);
+    }
+}</code></pre>
+            <h2 id="system-contracts-the-native-oracle-service">System
+            Contracts &amp; the Native Oracle Service</h2>
+            <p>MegaEVM provides a native oracle interface that provides
+            realtime access to data from off-chain sources.</p>
+            <h3 id="high-precision-timestamp-oracle">High-Precision
+            Timestamp Oracle</h3>
+            <p>This oracle provides timestamps at microsecond
+            resolution. Developers might find it useful if
+            <code>block.timestamp</code> is not granular enough.</p>
+            <p><strong>Address:</strong>
+            <code>0x6342000000000000000000000000000000000002</code></p>
+            <p><strong>Interface:</strong></p>
+            <pre class="solidity"><code>interface HighPrecisionTimestampOracle {
+    function timestamp() external view returns (uint256);
+}</code></pre>
+            <p>Note that data for this oracle is supplied solely by the
+            sequencer based on its local clock. This implies that the
+            sequencer must be trusted to publish accurate data. Avoid
+            using this oracle if such trust assumption is too strong for
+            your use case.</p>
+            <p>This oracle internally reads the core oracle contract
+            <code>0x6342000000000000000000000000000000000001</code>.
+            Hence, obtaining high-precision timestamps is accesses
+            volatile data and is subject to the compute gas limits
+            detailed in the previous section.</p>
             <!-- next time
-
-            # Volatile Data Access
-
-            ## The Problem
-
-            MegaETH achieves high throughput through parallel transaction execution. Transactions that access frequently-changing data (like block timestamps or high-frequency updated oracles) create conflicts that limit parallelism. Such frequently-changing data is called `volatile data`.
-
-            To support efficient execution, MegaETH implements **compute gas restriction** - when you access volatile data, your remaining compute gas is capped.
-
-            ## Block Environment Opcodes
-
-            Accessing these opcodes caps remaining compute gas to **20,000,000**:
-
-            | Opcode        | Description               |
-            | ------------- | ------------------------- |
-            | `NUMBER`      | Current block number      |
-            | `TIMESTAMP`   | Current block timestamp   |
-            | `COINBASE`    | Block beneficiary address |
-            | `DIFFICULTY`  | Block difficulty          |
-            | `GASLIMIT`    | Block gas limit           |
-            | `BASEFEE`     | Base fee per gas          |
-            | `PREVRANDAO`  | Previous block randomness |
-            | `BLOCKHASH`   | Historical block hash     |
-            | `BLOBBASEFEE` | Blob base fee             |
-            | `BLOBHASH`    | Blob hash lookup          |
-
-            ## Beneficiary Account Access
-
-            Accessing the block beneficiary (coinbase) account also caps remaining compute gas to **20,000,000**:
-
-            | Trigger                                     | Description                             |
-            | ------------------------------------------- | --------------------------------------- |
-            | `BALANCE`, `SELFBALANCE`                    | Reading beneficiary's balance           |
-            | `EXTCODECOPY`, `EXTCODESIZE`, `EXTCODEHASH` | Accessing beneficiary's code            |
-            | Transaction sender is beneficiary           | When `msg.sender == block.coinbase`     |
-            | Transaction recipient is beneficiary        | When call target is `block.coinbase`    |
-            | `DELEGATECALL` to beneficiary               | Delegated context accessing beneficiary |
-
-            ## Oracle Access
-
-            Accessing the oracle contract caps remaining compute gas to **1,000,000**:
-
-            - Oracle contract address: `0x6342000000000000000000000000000000000001`
-            - Applies to CALL, STATICCALL, DELEGATECALL, CALLCODE
-
-            ## Most Restrictive Limit Applies
-
-            When multiple volatile data types are accessed in the same transaction, the **most restrictive limit applies**:
-
-            - Block env access (20M) + Oracle access (1M) = **1M cap**
-            - The order of access doesn't matter - the lowest cap is enforced globally
-
-            ## Patterns to Avoid
-
-            ```solidity
-            // Bad: Heavy computation after reading timestamp
-            function processWithTimestamp() external {
-                uint256 currentTime = block.timestamp; // Triggers 20M gas cap
-                // This loop might run out of gas!
-                for (uint i = 0; i < 10000; i++) {
-                    heavyComputation(i, currentTime);
-                }
-            }
-            ```
-
-            # System Contracts & Oracle Service
-
-            ## High-Precision Timestamp Oracle
-
-            **Address:** `0x6342000000000000000000000000000000000002`
-
-            **Interface:**
-
-            ```solidity
-            interface HighPrecisionTimestampOracle {
-                function timestamp() external view returns (uint256);
-            }
-            ```
-
-            Use case: microsecond timestamp precision when `block.timestamp` isn't granular enough.
-
-            Note that the oracle data are served by the sequencer on demand, only when a transaction tries to read the oracle data, will the sequencer submits system transactions to update the oracle contract.
-
-            **Volatile Data**: The High-Precision Timestamp Oracle internally reads oracle data from the core oracle contract `0x6342000000000000000000000000000000000001`. Hence, obtaining high-precision timestamp is essentially a volatile data access and is subject to the "compute gas restriction" in Section 5.1.
-
-            **Trust Assumption**: The oracle service requires trusting the sequencer to publish accurate data. Consider this when building applications.
 
             # Precompiles
 

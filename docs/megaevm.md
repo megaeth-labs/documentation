@@ -190,19 +190,32 @@ limit. If a newly created storage slot or account is cleared before the
 transaction ends, thus occupying no storage space permanently, it does not
 count towards the limit.
 
-<!-- next time
+# Access to Volatile Data
 
-# Volatile Data Access
+MegaEVM provides APIs for transactions to access _volatile data_, or data that
+changes frequently and thus expires quickly after being accessed. This includes
+metadata of the current block such as the block number, states of the block
+beneficiary, as well as data available through the native oracle interface (see
+below).
 
-## The Problem
+When a transaction accesses volatile data, dependency forms between the
+transaction and other transactions or operations that attempt to update the
+data. Such dependency harms performance. For example, if a transaction reads
+the current block number using the `NUMBER` opcode, the sequencer cannot start
+a new block until the transaction finishes and gets included in the current
+block, as doing so would cause the block number to change and invalidate the
+value previously read by the transaction. If the transaction takes long to
+finish, block production would be blocked (no pun intended), which impacts
+latency. 
 
-MegaETH achieves high throughput through parallel transaction execution. Transactions that access frequently-changing data (like block timestamps or high-frequency updated oracles) create conflicts that limit parallelism. Such frequently-changing data is called `volatile data`.
+MegaEVM mitigates this issue by limiting the amount of compute gas a
+transaction may use _after it accesses volatile data_. This ensures
+transactions that access volatile data yield quickly. In the following
+subsections, we detail the limits.
 
-To support efficient execution, MegaETH implements **compute gas restriction** - when you access volatile data, your remaining compute gas is capped.
+## Opcodes for Access the Block Environment
 
-## Block Environment Opcodes
-
-Accessing these opcodes caps remaining compute gas to **20,000,000**:
+Accessing these opcodes caps remaining compute gas to 20,000,000.
 
 | Opcode        | Description               |
 | ------------- | ------------------------- |
@@ -217,9 +230,9 @@ Accessing these opcodes caps remaining compute gas to **20,000,000**:
 | `BLOBBASEFEE` | Blob base fee             |
 | `BLOBHASH`    | Blob hash lookup          |
 
-## Beneficiary Account Access
+## Accessing the Beneficiary Account
 
-Accessing the block beneficiary (coinbase) account also caps remaining compute gas to **20,000,000**:
+Accessing the block beneficiary (coinbase) account also caps remaining compute gas to 20,000,000.
 
 | Trigger                                     | Description                             |
 | ------------------------------------------- | --------------------------------------- |
@@ -229,21 +242,26 @@ Accessing the block beneficiary (coinbase) account also caps remaining compute g
 | Transaction recipient is beneficiary        | When call target is `block.coinbase`    |
 | `DELEGATECALL` to beneficiary               | Delegated context accessing beneficiary |
 
-## Oracle Access
+## Accessing the Native Oracle Interface
 
-Accessing the oracle contract caps remaining compute gas to **1,000,000**:
+Accessing the system contract of the native oracle interface caps remaining
+compute gas to 1,000,000.
 
 - Oracle contract address: `0x6342000000000000000000000000000000000001`
-- Applies to CALL, STATICCALL, DELEGATECALL, CALLCODE
+- Applies to `CALL`, `STATICCALL`, `DELEGATECALL`, `CALLCODE`
 
-## Most Restrictive Limit Applies
+## Remarks
 
-When multiple volatile data types are accessed in the same transaction, the **most restrictive limit applies**:
+When multiple types of volatile data are accessed in the same transaction, the
+_most restrictive limit applies_. For example, if a transaction accesses both
+the block environment (triggering the 20m limit) and the oracle interface
+(triggering the 1m limit), the cap will be 1m. The order in which the
+transaction accesses the data types does not matter. The lowest cap is enforced
+globally.
 
-- Block env access (20M) + Oracle access (1M) = **1M cap**
-- The order of access doesn't matter - the lowest cap is enforced globally
-
-## Patterns to Avoid
+Because these limits apply _after_ accesssing volatile data, developers should
+perform heavy computation before any attempt to access volatile data. The
+following is a counterexample.
 
 ```solidity
 // Bad: Heavy computation after reading timestamp
@@ -256,9 +274,15 @@ function processWithTimestamp() external {
 }
 ```
 
-# System Contracts & Oracle Service
+# System Contracts & the Native Oracle Service
+
+MegaEVM provides a native oracle interface that provides realtime access to
+data from off-chain sources.
 
 ## High-Precision Timestamp Oracle
+
+This oracle provides timestamps at microsecond resolution. Developers might
+find it useful if `block.timestamp` is not granular enough.
 
 **Address:** `0x6342000000000000000000000000000000000002`
 
@@ -270,13 +294,17 @@ interface HighPrecisionTimestampOracle {
 }
 ```
 
-Use case: microsecond timestamp precision when `block.timestamp` isn't granular enough.
+Note that data for this oracle is supplied solely by the sequencer based on its
+local clock. This implies that the sequencer must be trusted to publish
+accurate data. Avoid using this oracle if such trust assumption is too strong
+for your use case.
 
-Note that the oracle data are served by the sequencer on demand, only when a transaction tries to read the oracle data, will the sequencer submits system transactions to update the oracle contract.
+This oracle internally reads the core oracle contract
+`0x6342000000000000000000000000000000000001`. Hence, obtaining high-precision
+timestamps is accesses volatile data and is subject to the compute gas limits
+detailed in the previous section.
 
-**Volatile Data**: The High-Precision Timestamp Oracle internally reads oracle data from the core oracle contract `0x6342000000000000000000000000000000000001`. Hence, obtaining high-precision timestamp is essentially a volatile data access and is subject to the "compute gas restriction" in Section 5.1.
-
-**Trust Assumption**: The oracle service requires trusting the sequencer to publish accurate data. Consider this when building applications.
+<!-- next time
 
 # Precompiles
 
