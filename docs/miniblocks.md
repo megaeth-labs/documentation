@@ -38,3 +38,4 @@ MegaETH produces an EVM block roughly every second and a mini block roughly ever
   "miniBlockCount": "0x57"
   ...
 }
+```
