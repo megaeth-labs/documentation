@@ -51,11 +51,11 @@
                 
                                 <nav id="TOC">
                     <ul>
-                    <li><a href="#why-mini-blocks"
-                    id="toc-why-mini-blocks">Why Mini Blocks</a></li>
-                    <li><a href="#what-are-mini-blocks"
-                    id="toc-what-are-mini-blocks">What Are Mini
-                    Blocks</a></li>
+                    <li><a href="#motivation"
+                    id="toc-motivation">Motivation</a></li>
+                    <li><a href="#properties-of-mini-blocks"
+                    id="toc-properties-of-mini-blocks">Properties of
+                    Mini Blocks</a></li>
                     </ul>
                 </nav>
                             </div>
@@ -69,18 +69,18 @@
             anchor an ecosystem of applications, tools, and
             infrastructure propose-built for minimum end-to-end
             latency.</p>
-            <h2 id="why-mini-blocks">Why Mini Blocks</h2>
+            <h2 id="motivation">Motivation</h2>
             <p>Handling blocks at 10 millisecond intervals requires a
             significant amount of resources. While software
             optimizations and powerful hardware give the sequencer ample
             headroom to produce 100 blocks per second, pushing the data
-            to the other nodes, especially light clients with limited
-            connectivity, quickly becomes a bottleneck.</p>
+            to other nodes, especially ones with limited connectivity,
+            quickly becomes a bottleneck.</p>
             <p>The key issue with standard EVM blocks is that their
             headers take up quite some space—more than 500 bytes per
             block. At 100 blocks per second, this translates to 1.57 TB
-            of data per year, which is a significant burden on mobile
-            devices.</p>
+            of data per year just for the headers, a significant burden
+            for lightweight setups.</p>
             <p>Besides the resource overhead, the standard EVM block
             header is designed for chains whose block times are seconds
             or higher as well as light clients who use block headers as
@@ -90,8 +90,9 @@
             the headers. We believe that interactions with a chain in
             realtime—at tens of milliseconds of latency—will take on a
             different paradigm, and it is the right opportunity to
-            redesign the block for compactness and low latency.</p>
-            <h2 id="what-are-mini-blocks">What Are Mini Blocks</h2>
+            redesign blocks for compactness and low latency.</p>
+            <h2 id="properties-of-mini-blocks">Properties of Mini
+            Blocks</h2>
             <p>Mini blocks share a lot of similarities with EVM blocks.
             Like EVM blocks,</p>
             <ul>
@@ -109,18 +110,28 @@
             <ul>
             <li>Mini blocks contain a different set of metadata fields
             compared to EVM blocks.</li>
-            <li>To access information related to transactions that have
-            been included in a mini block but not an EVM block, it is
-            necessary to use the <a href="/realtime-api">Realtime
-            API</a>—MegaETH’s extension to the standard Ethereum
-            JSON-RPC API.</li>
+            <li>To make effective use of mini blocks, such as retrieving
+            mini blocks with minimum latency, applications should use
+            the <a href="/realtime-api">Realtime API</a>—MegaETH’s
+            extension to the standard Ethereum JSON-RPC API.</li>
             </ul>
-            <p>The number of mini blocks included in an EVM block is not
-            a protocol-level guarantee and may vary. Clients can observe
-            the per-EVM-block count via the <code>miniBlockCount</code>
-            field in the <code>eth_subscribe</code> →
-            <code>newHeads</code> payload.</p>
-            <p>For example:</p>
+            <p>Transactions in a mini block never span multiple EVM
+            blocks. In other words, for every mini block, the
+            transactions it contains all appear in the same EVM block.
+            Naturally, this establishes a mapping between mini blocks
+            and EVM blocks; we say a mini block is <em>included</em> in
+            an EVM block if the former contains transactions that appear
+            in the latter.</p>
+            <p>MegaETH produces an EVM block roughly every second and a
+            mini block roughly every 10 milliseconds. This implies a
+            rough 1-to-100 ratio between the number of EVM blocks and
+            the number of mini blocks. However, there is no guarantee on
+            the number of mini blocks included in an EVM block. To get
+            the precise number, developers should use the
+            <code>miniBlockCount</code> field in the responses when
+            calling <code>eth_subscribe</code> to subscribe to
+            <code>newHeads</code>. This is an example of the
+            responses:</p>
             <p>```json { … “number”: “0x57f898”, “miniBlockCount”:
             “0x57” … }</p>
         </main>
