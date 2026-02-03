@@ -51,25 +51,16 @@
                 
                                 <nav id="TOC">
                     <ul>
-                    <li><a
-                    href="#docs__rpc__1-method.md__available-methods"
-                    id="toc-docs__rpc__1-method.md__available-methods">Available
-                    Methods</a></li>
-                    <li><a href="#docs__rpc__1-method.md__rate-limiting"
-                    id="toc-docs__rpc__1-method.md__rate-limiting">Rate
-                    Limiting</a></li>
-                    <li><a
-                    href="#docs__rpc__2-error-codes.md__error-codes"
-                    id="toc-docs__rpc__2-error-codes.md__error-codes">Error
-                    Codes</a></li>
+                    <li><a href="#available-methods">Available Methods</a></li>
+                    <li><a href="#rate-limiting">Rate Limiting</a></li>
+                    <li><a href="#error-codes">Error Codes</a></li>
                     </ul>
                 </nav>
                             </div>
         </header>
 
         <main class="site-content">
-            <h2 id="docs__rpc__1-method.md__available-methods">Available
-            Methods</h2>
+            <h2 id="available-methods">Available Methods</h2>
             <table>
             <colgroup>
             <col style="width: 53%" />
@@ -77,390 +68,388 @@
             <col style="width: 30%" />
             </colgroup>
             <thead>
-            <tr>
+            <tr class="header">
             <th>Method</th>
             <th>Availability</th>
             <th>Additional Restrictions</th>
             </tr>
             </thead>
             <tbody>
-            <tr>
+            <tr class="odd">
             <td><code>debug_getRawBlock</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>debug_getRawHeader</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>debug_getRawReceipts</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>debug_getRawTransaction</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>debug_replyBlock</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>debug_traceBlock</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>debug_traceBlockByHash</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>debug_traceBlockByNumber</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>debug_traceCall</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>debug_traceCallMany</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>debug_traceTransaction</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_accounts</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>eth_blockNumber</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_call</code></td>
             <td>Available</td>
             <td>Gas is limited to 10,000,000.</td>
             </tr>
-            <tr>
+            <tr class="odd">
+            <td><code>eth_callAfter</code></td>
+            <td>Available</td>
+            <td>Gas is limited to 10,000,000. Timeout is limited to 60 seconds.</td>
+            </tr>
+            <tr class="even">
             <td><code>eth_chainId</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>eth_createAccessList</code></td>
             <td>Available</td>
             <td>Gas is limited to 10,000,000.</td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_estimateGas</code></td>
             <td>Available</td>
             <td>Gas is limited to 10,000,000.</td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>eth_feeHistory</code></td>
             <td>Available</td>
             <td>Block range is limited to 10,000.</td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_gasPrice</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>eth_getBalance</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_getBlockByHash</code></td>
             <td>Available</td>
             <td>Full block is disabled.</td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>eth_getBlockByNumber</code></td>
             <td>Available</td>
             <td>Full block is disabled.</td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_getBlockReceipts</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>eth_getBlockTransactionCountByHash</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_getBlockTransactionCountByNumber</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>eth_getCode</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_getFilterChanges</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>eth_getFilterLogs</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_getLogs</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>eth_getLogsWithCursor</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_getStorageAt</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>eth_getTransactionByBlockHashAndIndex</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_getTransactionByBlockNumberAndIndex</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>eth_getTransactionByHash</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_getTransactionCount</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>eth_getTransactionReceipt</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_getUncleByBlockHashAndIndex</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>eth_getUncleByBlockNumberAndIndex</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_getUncleCountByBlockHash</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>eth_getUncleCountByBlockNumber</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_maxPriorityFeePerGas</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>eth_mining</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_newBlockFilter</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>eth_newFilter</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_newPendingTransactionFilter</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>eth_protocolVersion</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_sendRawTransaction</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>eth_sendTransaction</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_sign</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>eth_signTransaction</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_signTypedData</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>eth_subscribe</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_syncing</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>eth_uninstallFilter</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>eth_unsubscribe</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>net_listening</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>net_peerCount</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>net_version</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>realtime_sendRawTransaction</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>trace_block</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>trace_call</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>trace_callMany</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>trace_get</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>trace_rawTransaction</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>trace_replayBlockTransactions</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>trace_replayTransaction</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>trace_transaction</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>txpool_content</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>txpool_contentFrom</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>txpool_inspect</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="even">
             <td><code>txpool_status</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td><code>web3_clientVersion</code></td>
             <td>Available</td>
             <td></td>
             </tr>
             </tbody>
             </table>
-            <h2 id="docs__rpc__1-method.md__rate-limiting">Rate
-            Limiting</h2>
-            <p>All available methods are subject to rate limiting based
-            on two criteria:</p>
+            <h2 id="rate-limiting">Rate Limiting</h2>
+            <p>All available methods are subject to rate limiting based on two criteria:</p>
             <ul>
-            <li><strong>Compute Unit (CU) Limiting</strong>: Limits the
-            computational cost of requests based on their
-            complexity.</li>
-            <li><strong>Network Bandwidth Limiting</strong>: Limits the
-            network traffic based on response sizes.</li>
+            <li><strong>Compute Unit (CU) Limiting</strong>: Limits the computational cost of requests based on their complexity.</li>
+            <li><strong>Network Bandwidth Limiting</strong>: Limits the network traffic based on response sizes.</li>
             </ul>
-            <p>User limits are dynamically updated in response to
-            individual behavior.</p>
-            <h2 id="docs__rpc__2-error-codes.md__error-codes">Error
-            Codes</h2>
+            <p>User limits are dynamically updated in response to individual behavior.</p>
+            <h2 id="error-codes">Error Codes</h2>
             <table>
             <colgroup>
             <col style="width: 8%" />
@@ -470,7 +459,7 @@
             <col style="width: 29%" />
             </colgroup>
             <thead>
-            <tr>
+            <tr class="header">
             <th>HTTP Error Code</th>
             <th>RPC Error Code</th>
             <th>Error Message</th>
@@ -479,67 +468,54 @@
             </tr>
             </thead>
             <tbody>
-            <tr>
+            <tr class="odd">
             <td>400</td>
             <td>-32700</td>
             <td>parse error</td>
             <td>The request body contains invalid JSON.</td>
-            <td>Check the request format and ensure valid JSON
-            syntax.</td>
+            <td>Check the request format and ensure valid JSON syntax.</td>
             </tr>
-            <tr>
+            <tr class="even">
             <td>403</td>
             <td>-32601</td>
             <td>rpc method is not whitelisted</td>
-            <td>The requested RPC method is not allowed by the proxy
-            configuration.</td>
-            <td>Use only whitelisted RPC methods. Contact MegaETH if you
-            need access to additional methods.</td>
+            <td>The requested RPC method is not allowed by the proxy configuration.</td>
+            <td>Use only whitelisted RPC methods. Contact MegaETH if you need access to additional methods.</td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td>400</td>
             <td>-32019</td>
             <td>block is out of range</td>
             <td>The requested block number is out of range.</td>
-            <td>Check the block number and ensure it’s within the valid
-            range.</td>
+            <td>Check the block number and ensure it’s within the valid range.</td>
             </tr>
-            <tr>
+            <tr class="even">
             <td>500</td>
             <td>-32020</td>
             <td>backend response too large</td>
             <td>The backend response is too large.</td>
-            <td>Reduce the scope of the request or contact MegaETH for
-            assistance.</td>
+            <td>Reduce the scope of the request or contact MegaETH for assistance.</td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td>429</td>
             <td>-32021</td>
             <td>over network traffic limit, retry in X seconds</td>
             <td>The user is incurring too much network traffic.</td>
-            <td>Wait for the specified number of seconds before
-            retrying. Reduce the number of requests sent per
-            second.</td>
+            <td>Wait for the specified number of seconds before retrying. Reduce the number of requests sent per second.</td>
             </tr>
-            <tr>
+            <tr class="even">
             <td>429</td>
             <td>-32022</td>
             <td>over compute unit limit, retry in X seconds</td>
-            <td>The user is incurring too much computation on the
-            backend RPC server.</td>
-            <td>Wait for the specified number of seconds before
-            retrying. Reduce the number of requests sent per
-            second.</td>
+            <td>The user is incurring too much computation on the backend RPC server.</td>
+            <td>Wait for the specified number of seconds before retrying. Reduce the number of requests sent per second.</td>
             </tr>
-            <tr>
+            <tr class="odd">
             <td>200</td>
             <td>-32000</td>
-            <td>permanent error forwarding request context deadline
-            exceeded</td>
-            <td>The API proxy cannot connect to the backend RPC
-            server.</td>
-            <td>Pause for a while and retry. Notify MegaETH if the error
-            persists.</td>
+            <td>permanent error forwarding request context deadline exceeded</td>
+            <td>The API proxy cannot connect to the backend RPC server.</td>
+            <td>Pause for a while and retry. Notify MegaETH if the error persists.</td>
             </tr>
             </tbody>
             </table>

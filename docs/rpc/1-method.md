@@ -22,6 +22,7 @@ rank: 50
 | `eth_accounts`                             | Available    | |
 | `eth_blockNumber`                          | Available    | | 
 | `eth_call`                                 | Available    | Gas is limited to 10,000,000. |
+| `eth_callAfter`                            | Available    | Gas is limited to 10,000,000. Timeout is limited to 60 seconds. |
 | `eth_chainId`                              | Available    | |
 | `eth_createAccessList`                     | Available    | Gas is limited to 10,000,000. |
 | `eth_estimateGas`                          | Available    | Gas is limited to 10,000,000. |
