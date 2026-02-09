@@ -3,16 +3,6 @@ title: Frontier
 rank: 1
 ---
 
-# Important Messages
-
-__Frontier is for developers to deploy and test their apps before public launch
-of the mainnet. Only whitelisted wallets held by developers can transact on
-Frontier.__
-
-__This page is regularly updated.__
-
----
-
 # Chain Parameters
 
 | Item | Value |
@@ -36,7 +26,7 @@ endpoints provided by MegaETH; availability varies on third-party endpoints.
 
 ## Block Explorer
 
-[Blockscout](https://megaeth.blockscout.com/) is available. 
+[Blockscout](https://megaeth.blockscout.com/) and [Etherscan](https://mega.etherscan.io) are available. 
 
 # Developing Smart Contracts
 
@@ -65,12 +55,6 @@ using `mega-evme` are available
 
 # Using the Canonical Bridge
 
-__As a reminder, Frontier is for developers to deploy their apps ahead of the
-public mainnet launch. For regular users, bridging tokens to Frontier is
-considered EXTREMELY RISKY AND RECKLESS and SHOULD NOT BE ATTEMPTED.__
-
-__No
-guarantee of any kind is made for any token bridged to Frontier through any mechanism.__
 
 MegaETH's canonical bridge is the preferred method to bridge Ether (ETH) and
 ERC20 tokens from Ethereum to MegaETH. The Ethereum side of the bridge is at
