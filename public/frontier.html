@@ -3,14 +3,14 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>MegaETH Docs – Frontier</title>
+        <title>MegaETH Docs – Mainnet</title>
         <link rel="stylesheet" type="text/css" href="style.css">
             </head>
     <body>
         <header class="site-header">
                         <nav class="main-nav"><ul>
                         <li><a href="/index.html">Overview</a></li>
-                        <li><a href="/frontier.html">Frontier</a></li>
+                        <li><a href="/frontier.html">Mainnet</a></li>
                         <li><a href="/testnet.html">Testnet</a></li>
                         <li><a href="/megaevm.html">MegaEVM</a></li>
                         <li><a href="/architecture.html">Architecture</a></li>
@@ -45,20 +45,17 @@
                 <h3>Manual</h3>
             </div>
             <div class="page-title">
-                <h1>Frontier</h1>
+                <h1>Mainnet</h1>
                 
                 
                 
                                 <nav id="TOC">
                     <ul>
-                    <li><a href="#important-messages"
-                    id="toc-important-messages">Important
-                    Messages</a></li>
                     <li><a href="#chain-parameters"
                     id="toc-chain-parameters">Chain Parameters</a></li>
-                    <li><a href="#connecting-to-frontier"
-                    id="toc-connecting-to-frontier">Connecting to
-                    Frontier</a>
+                    <li><a href="#connecting-to-megaeth-mainnet"
+                    id="toc-connecting-to-megaeth-mainnet">Connecting to
+                    MegaETH Mainnet</a>
                     <ul>
                     <li><a href="#rpc" id="toc-rpc">RPC</a></li>
                     <li><a href="#block-explorer"
@@ -74,9 +71,9 @@
                     id="toc-contracts-of-potential-interest">Contracts
                     of Potential Interest</a>
                     <ul>
-                    <li><a href="#on-megaeth-mainnet-frontier"
-                    id="toc-on-megaeth-mainnet-frontier">On MegaETH
-                    Mainnet (Frontier)</a></li>
+                    <li><a href="#on-megaeth-mainnet"
+                    id="toc-on-megaeth-mainnet">On MegaETH
+                    Mainnet</a></li>
                     <li><a href="#on-ethereum-mainnet"
                     id="toc-on-ethereum-mainnet">On Ethereum
                     Mainnet</a></li>
@@ -87,13 +84,6 @@
         </header>
 
         <main class="site-content">
-            <h2 id="important-messages">Important Messages</h2>
-            <p><strong>Frontier is for developers to deploy and test
-            their apps before public launch of the mainnet. Only
-            whitelisted wallets held by developers can transact on
-            Frontier.</strong></p>
-            <p><strong>This page is regularly updated.</strong></p>
-            <hr />
             <h2 id="chain-parameters">Chain Parameters</h2>
             <table>
             <colgroup>
@@ -136,7 +126,8 @@
             </tr>
             </tbody>
             </table>
-            <h2 id="connecting-to-frontier">Connecting to Frontier</h2>
+            <h2 id="connecting-to-megaeth-mainnet">Connecting to MegaETH
+            Mainnet</h2>
             <h3 id="rpc">RPC</h3>
             <p>MegaETH hosts a public RPC endpoint at
             https://mainnet.megaeth.com/rpc.</p>
@@ -147,7 +138,8 @@
             endpoints.</p>
             <h3 id="block-explorer">Block Explorer</h3>
             <p><a href="https://megaeth.blockscout.com/">Blockscout</a>
-            is available.</p>
+            and <a href="https://mega.etherscan.io">Etherscan</a> are
+            available.</p>
             <h2 id="developing-smart-contracts">Developing Smart
             Contracts</h2>
             <p>MegaETH’s execution environment is called
@@ -179,16 +171,9 @@
             href="https://github.com/megaeth-labs/mega-evm/blob/main/bin/mega-evme/README.md">here</a>.</p>
             <h2 id="using-the-canonical-bridge">Using the Canonical
             Bridge</h2>
-            <p><strong>As a reminder, Frontier is for developers to
-            deploy their apps ahead of the public mainnet launch. For
-            regular users, bridging tokens to Frontier is considered
-            EXTREMELY RISKY AND RECKLESS and SHOULD NOT BE
-            ATTEMPTED.</strong></p>
-            <p><strong>No guarantee of any kind is made for any token
-            bridged to Frontier through any mechanism.</strong></p>
             <p>MegaETH’s canonical bridge is the preferred method to
-            bridge Ether (ETH) and ERC20 tokens from Ethereum to
-            MegaETH. The Ethereum side of the bridge is at
+            bridge Ether (ETH) from Ethereum to MegaETH. The Ethereum
+            side of the bridge is at
             <code>0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75</code> on
             Ethereum mainnet. Currently, it runs OP Stack’s <a
             href="https://docs.optimism.io/app-developers/guides/bridging/standard-bridge">Standard
@@ -214,8 +199,7 @@
             class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">cast</span> send 0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75 <span class="st">&#39;depositETH(uint32, bytes)&#39;</span> 61000 <span class="st">&quot;0x62756e6e79&quot;</span> <span class="at">--value</span> 0.001ether</span></code></pre></div>
             <h2 id="contracts-of-potential-interest">Contracts of
             Potential Interest</h2>
-            <h3 id="on-megaeth-mainnet-frontier">On MegaETH Mainnet
-            (Frontier)</h3>
+            <h3 id="on-megaeth-mainnet">On MegaETH Mainnet</h3>
             <table>
             <colgroup>
             <col style="width: 18%" />
