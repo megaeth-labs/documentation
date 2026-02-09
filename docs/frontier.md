@@ -1,16 +1,6 @@
 ---
-title: Frontier
+title: Mainnet 
 rank: 1
----
-
-# Important Messages
-
-__Frontier is for developers to deploy and test their apps before public launch
-of the mainnet. Only whitelisted wallets held by developers can transact on
-Frontier.__
-
-__This page is regularly updated.__
-
 ---
 
 # Chain Parameters
@@ -24,7 +14,7 @@ __This page is regularly updated.__
 | __Base Fee Per Gas__ | 0.001 gwei ($$10^6$$ wei) |
 | __EIP-1559 Parameters__ | Base fee adjustment is effectively disabled |
 
-# Connecting to Frontier
+# Connecting to MegaETH Mainnet
 
 ## RPC
 
@@ -36,7 +26,8 @@ endpoints provided by MegaETH; availability varies on third-party endpoints.
 
 ## Block Explorer
 
-[Blockscout](https://megaeth.blockscout.com/) is available. 
+[Blockscout](https://megaeth.blockscout.com/) and
+[Etherscan](https://mega.etherscan.io) are available. 
 
 # Developing Smart Contracts
 
@@ -65,15 +56,7 @@ using `mega-evme` are available
 
 # Using the Canonical Bridge
 
-__As a reminder, Frontier is for developers to deploy their apps ahead of the
-public mainnet launch. For regular users, bridging tokens to Frontier is
-considered EXTREMELY RISKY AND RECKLESS and SHOULD NOT BE ATTEMPTED.__
-
-__No
-guarantee of any kind is made for any token bridged to Frontier through any mechanism.__
-
-MegaETH's canonical bridge is the preferred method to bridge Ether (ETH) and
-ERC20 tokens from Ethereum to MegaETH. The Ethereum side of the bridge is at
+MegaETH's canonical bridge is the preferred method to bridge Ether (ETH) from Ethereum to MegaETH. The Ethereum side of the bridge is at
 `0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75` on Ethereum mainnet. Currently, it
 runs OP Stack's [Standard
 Bridge](https://docs.optimism.io/app-developers/guides/bridging/standard-bridge)
@@ -99,7 +82,7 @@ cast send 0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75 'depositETH(uint32, bytes)'
 
 # Contracts of Potential Interest
 
-## On MegaETH Mainnet (Frontier)
+## On MegaETH Mainnet
 
 | Item | Address | Remarks |
 | --------- | ------------- | ---------------------------- |
