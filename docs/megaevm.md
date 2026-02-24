@@ -7,7 +7,7 @@ _MegaEVM_ is MegaETH's execution environment. It is fully compatible with Ethere
 
 # Overview
 
-MegaEVM builds on established standards. Its latest hardfork, _Rex_, is based on [Optimism Isthmus](https://specs.optimism.io/protocol/isthmus/overview.html), which in turn is adapted from [Ethereum Prague](https://ethereum.org/roadmap/pectra/). This means:
+MegaEVM builds on established standards. Its latest hardfork, _Rex3_, is based on [Optimism Isthmus](https://specs.optimism.io/protocol/isthmus/overview.html), which in turn is adapted from [Ethereum Prague](https://ethereum.org/roadmap/pectra/). This means:
 
 - All standard Solidity contracts work on MegaETH.
 - Standard development tools (Hardhat, Foundry, Remix, etc.) are compatible.
@@ -30,7 +30,7 @@ gas is the singular metric for metering and limiting resource consumption.
 | Max contract size   | 24 KB        | **512 KB**                             | |
 | Max initcode size   | 48 KB        | **536 KB**                             | |
 | Gas forwarding rule | 63/64        | **98/100**                             | As defined in [EIP-150](https://eips.ethereum.org/EIPS/eip-150). |
-| `SELFDESTRUCT`      | Deprecated      | **Disabled**                           | Deprecated in [EIP-6049](https://eips.ethereum.org/EIPS/eip-6049). |
+| `SELFDESTRUCT`      | Deprecated      | **EIP-6780 semantics**                 | Active only within the creating transaction, per [EIP-6780](https://eips.ethereum.org/EIPS/eip-6780). |
 | Gas model           | Unidimensional | **Multidimensional**           | Compute gas and storage gas. Compute gas is identical to Ethereum's gas. |
 | Resource limits     | Unidimensional | **Multidimensional**                       | 4 limits in addition to total gas limit specified by sender. |
 | Base intrinsic gas  | 21,000       | **60,000** | 21,000 compute gas plus 39,000 storage gas.|
@@ -244,22 +244,20 @@ Accessing the block beneficiary (coinbase) account also caps remaining compute g
 
 ## Accessing the Native Oracle Interface
 
-Accessing the system contract of the native oracle interface caps remaining
-compute gas to 1,000,000.
+Reading oracle data via `SLOAD` from the oracle contract storage caps remaining
+compute gas to 20,000,000. This is the same limit as accessing the block environment.
 
 - Oracle contract address: `0x6342000000000000000000000000000000000001`
-- Applies to `CALL`, `STATICCALL`, `DELEGATECALL`, `CALLCODE`
+- Triggered by: `SLOAD` from oracle contract storage
+- `DELEGATECALL` to the oracle contract does **not** trigger this limit
 
 ## Remarks
 
 When multiple types of volatile data are accessed in the same transaction, the
-_most restrictive limit applies_. For example, if a transaction accesses both
-the block environment (triggering the 20m limit) and the oracle interface
-(triggering the 1m limit), the cap will be 1m. The order in which the
-transaction accesses the data types does not matter. The lowest cap is enforced
-globally.
+most restrictive limit applies. All volatile data sources currently share the
+same 20,000,000 compute gas cap.
 
-Because these limits apply _after_ accesssing volatile data, developers should
+Because these limits apply _after_ accessing volatile data, developers should
 perform heavy computation before any attempt to access volatile data. The
 following is a counterexample.
 
@@ -301,7 +299,7 @@ for your use case.
 
 This oracle internally reads the core oracle contract
 `0x6342000000000000000000000000000000000001`. Hence, obtaining high-precision
-timestamps is accesses volatile data and is subject to the compute gas limits
+timestamps accesses volatile data and is subject to the compute gas limits
 detailed in the previous section.
 
 <!-- next time
@@ -330,11 +328,9 @@ MegaETH inherits all precompiles from Optimism Isthmus, which includes Ethereum 
 MegaETH supports contracts up to 512 KB in size. This is increased from 24 KB
 in Ethereum. 
 
-## `SELFDESTRUCT` is Disabled
+## `SELFDESTRUCT` with EIP-6780 Semantics
 
-The `SELFDESTRUCT` opcode is completely disabled and is treated as an `INVALID`
-opcode. It will cause any transaction using this opcode to fail. In Ethereum,
-`SELFDESTRUCT` is deprecated but still available.
+The `SELFDESTRUCT` opcode follows [EIP-6780](https://eips.ethereum.org/EIPS/eip-6780) semantics. It only destroys a contract when called within the same transaction that created the contract. In all other cases, `SELFDESTRUCT` behaves as a simple Ether transfer without destroying the contract or clearing its storage.
 
 ## "98/100" Rule for Gas Forwarding
 
