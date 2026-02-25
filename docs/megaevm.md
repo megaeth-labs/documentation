@@ -215,7 +215,7 @@ subsections, we detail the limits.
 
 ## Opcodes for Access the Block Environment
 
-Accessing these opcodes caps remaining compute gas to 20,000,000.
+Accessing these opcodes caps the transaction's global compute gas to 20,000,000.
 
 | Opcode        | Description               |
 | ------------- | ------------------------- |
@@ -232,7 +232,7 @@ Accessing these opcodes caps remaining compute gas to 20,000,000.
 
 ## Accessing the Beneficiary Account
 
-Accessing the block beneficiary (coinbase) account also caps remaining compute gas to 20,000,000.
+Accessing the block beneficiary (coinbase) account also caps the transaction's global compute gas to 20,000,000.
 
 | Trigger                                     | Description                             |
 | ------------------------------------------- | --------------------------------------- |
@@ -244,7 +244,7 @@ Accessing the block beneficiary (coinbase) account also caps remaining compute g
 
 ## Accessing the Native Oracle Interface
 
-Reading oracle data via `SLOAD` from the oracle contract storage caps remaining
+Reading oracle data via `SLOAD` from the oracle contract storage caps the transaction's global
 compute gas to 20,000,000. This is the same limit as accessing the block environment.
 
 - Oracle contract address: `0x6342000000000000000000000000000000000001`
