@@ -28,5 +28,5 @@ MegaETH provides a public endpoint at https://carrot.megaeth.com/rpc. Alchemy se
 
 ## Block Explorer
 
-Check out [Blockscout](https://megaeth-testnet-v2.blockscout.com/) and [uptime.megaeth.com](https://uptime.megaeth.com).
+Check out [testnet-mega.etherscan.io](https://testnet-mega.etherscan.io) and [uptime.megaeth.com](https://uptime.megaeth.com).
 
