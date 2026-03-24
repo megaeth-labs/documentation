@@ -338,11 +338,13 @@
             <li>Transaction is included in the block with status set to failed (status=0).</li>
             <li>No state changes from the transaction are applied.</li>
             </ol>
-            <p>If any of the aforementioned per-block limits is hit when building a block, the following happens:</p>
+            <p>The per-block limits for data size, KV updates, and state growth can only be fully evaluated after a transaction has been executed. When building a block, these limits are enforced as follows:</p>
             <ol type="1">
-            <li>The transaction that caused the block to go over limits is allowed to execute to completion and will be included in the block. Per-transaction limits still apply.</li>
-            <li>No more transaction will be executed or added to this block.</li>
+            <li>Before executing a transaction, the block builder checks whether <em>any previous transaction</em> has already caused the block to exceed a per-block limit. If so, the new transaction is rejected <em>before</em> execution and the block is sealed.</li>
+            <li>Otherwise, the transaction is executed. If its execution causes the block to exceed a per-block limit, the transaction is still included — it is not reverted or discarded. Per-transaction limits still apply.</li>
+            <li>No further transactions will be added to the block after it exceeds any per-block limit.</li>
             </ol>
+            <p>In other words, the last transaction in a block is allowed to push the block’s resource usage beyond the per-block limit. This maximizes block utilization by avoiding the waste of a valid transaction whose resource consumption can only be known after execution.</p>
             <h3 id="definitions-of-resource-types">Definitions of Resource Types</h3>
             <p>For all resource types, the usage incurred by a block is simply the sum of the usage incurred by each transaction in the block. For example, if a block contains two transactions, one using 300 KV updates and the other using 400 KV updates, then the block uses 700 KV updates.</p>
             <p>The usage incurred by an individual transaction is defined as following.</p>
