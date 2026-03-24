@@ -21,6 +21,7 @@ The Realtime API introduces three types of changes to the vanilla Ethereum JSON-
 3. `eth_subscribe`, when invoked over WebSocket, streams transaction logs, state changes, and block content as soon as the corresponding mini block is produced.
 4. `realtime_sendRawTransaction` submits a transaction and returns the receipt in a single call — without requiring polling.
 5. `eth_getLogsWithCursor` supports paginated log queries using a cursor, allowing applications to retrieve large datasets incrementally and reliably.
+6. `eth_callAfter` allows executing `eth_call` after waiting for an account's nonce to reach a target value.
 
 # Querying Account and Chain States
 
@@ -243,6 +244,90 @@ the sequencer, it returns an error.
   "error": {
     "code": -32000,
     "message": "realtime transaction expired"
+  }
+}
+```
+
+# Executing Calls After Nonce Conditions
+
+## Overview
+
+`eth_callAfter` is a specialized version of `eth_call` that waits for an account's nonce to reach a target value before executing the call.
+This is useful for simulating transactions that depend on the completion of prior transactions, such as checking the result of a swap after a preceding approval transaction has been confirmed.
+
+## Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `request` | Object | Yes | Standard `eth_call` request object (same as `eth_call`) |
+| `condition` | Object | Yes | Condition that must be met before executing the call |
+| `state_override` | Object | No | State overrides to apply (same as `eth_call`) |
+| `block_overrides` | Object | No | Block overrides to apply (same as `eth_call`) |
+
+### Condition Object
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `account` | Address | Yes | The account address whose nonce to monitor |
+| `nonce` | Hex Number | Yes | The target nonce value to wait for |
+| `timeout` | Number | No | Maximum time to wait in milliseconds (default: 3000, max: 60000) |
+
+## Returns
+
+Returns the same result as `eth_call` — the return data from the executed call.
+
+## Error Codes
+
+| Code | Message | Description |
+|------|---------|-------------|
+| -32000 | `Timeout: timeout waiting for nonce condition` | The nonce condition was not met within the timeout period |
+| -32000 | `InternalError` | An internal error occurred while processing the request |
+
+## Example
+
+### Basic Usage
+
+Execute an `eth_call` after waiting for an account's nonce to reach 5:
+
+```
+{
+  "jsonrpc": "2.0",
+  "method": "eth_callAfter",
+  "params": [
+    {
+      "from": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+      "to": "0x1234567890abcdef1234567890abcdef12345678",
+      "data": "0x70a08231000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266"
+    },
+    {
+      "account": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
+      "nonce": "0x5",
+      "timeout": 30000
+    }
+  ],
+  "id": 1
+}
+```
+
+### Successful Response
+
+```
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": "0x0000000000000000000000000000000000000000000000000de0b6b3a7640000"
+}
+```
+
+### Error Response (Condition Not Met)
+
+```
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "error": {
+    "code": -32000,
+    "message": "Timeout: timeout waiting for nonce condition"
   }
 }
 ```
