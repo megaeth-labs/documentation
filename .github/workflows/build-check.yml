@@ -19,9 +19,9 @@ jobs:
         run: make
 
       - name: Check public/ is up to date
-          if [ -n "$(git status --porcelain public/ manifest/)" ]; then
-          if [ -n "$(git diff --name-only public/)" ]; then
+        run: |
+          if [ -n "$(git status --porcelain public/)" ]; then
             echo "::error::public/ is out of date. Run 'make' locally and commit the output."
-            git diff --stat public/
+            git status --short public/
             exit 1
           fi
