@@ -51,32 +51,18 @@
                 
                                 <nav id="TOC">
                     <ul>
-                    <li><a href="#chain-parameters"
-                    id="toc-chain-parameters">Chain Parameters</a></li>
-                    <li><a href="#connecting-to-megaeth-mainnet"
-                    id="toc-connecting-to-megaeth-mainnet">Connecting to
-                    MegaETH Mainnet</a>
+                    <li><a href="#chain-parameters">Chain Parameters</a></li>
+                    <li><a href="#connecting-to-megaeth-mainnet">Connecting to MegaETH Mainnet</a>
                     <ul>
-                    <li><a href="#rpc" id="toc-rpc">RPC</a></li>
-                    <li><a href="#block-explorer"
-                    id="toc-block-explorer">Block Explorer</a></li>
+                    <li><a href="#rpc">RPC</a></li>
+                    <li><a href="#block-explorer">Block Explorer</a></li>
                     </ul></li>
-                    <li><a href="#developing-smart-contracts"
-                    id="toc-developing-smart-contracts">Developing Smart
-                    Contracts</a></li>
-                    <li><a href="#using-the-canonical-bridge"
-                    id="toc-using-the-canonical-bridge">Using the
-                    Canonical Bridge</a></li>
-                    <li><a href="#contracts-of-potential-interest"
-                    id="toc-contracts-of-potential-interest">Contracts
-                    of Potential Interest</a>
+                    <li><a href="#developing-smart-contracts">Developing Smart Contracts</a></li>
+                    <li><a href="#using-the-canonical-bridge">Using the Canonical Bridge</a></li>
+                    <li><a href="#contracts-of-potential-interest">Contracts of Potential Interest</a>
                     <ul>
-                    <li><a href="#on-megaeth-mainnet"
-                    id="toc-on-megaeth-mainnet">On MegaETH
-                    Mainnet</a></li>
-                    <li><a href="#on-ethereum-mainnet"
-                    id="toc-on-ethereum-mainnet">On Ethereum
-                    Mainnet</a></li>
+                    <li><a href="#on-megaeth-mainnet">On MegaETH Mainnet</a></li>
+                    <li><a href="#on-ethereum-mainnet">On Ethereum Mainnet</a></li>
                     </ul></li>
                     </ul>
                 </nav>
@@ -86,10 +72,6 @@
         <main class="site-content">
             <h2 id="chain-parameters">Chain Parameters</h2>
             <table>
-            <colgroup>
-            <col style="width: 27%" />
-            <col style="width: 72%" />
-            </colgroup>
             <thead>
             <tr class="header">
             <th>Item</th>
@@ -111,14 +93,11 @@
             </tr>
             <tr class="even">
             <td><strong>Block Gas Limit</strong></td>
-            <td>10 billion (<span
-            class="math display">10<sup>10</sup></span>) gas per EVM
-            block</td>
+            <td>10 billion (<br /><span class="math display">10<sup>10</sup></span><br />) gas per EVM block</td>
             </tr>
             <tr class="odd">
             <td><strong>Base Fee Per Gas</strong></td>
-            <td>0.001 gwei (<span
-            class="math display">10<sup>6</sup></span> wei)</td>
+            <td>0.001 gwei (<br /><span class="math display">10<sup>6</sup></span><br /> wei)</td>
             </tr>
             <tr class="even">
             <td><strong>EIP-1559 Parameters</strong></td>
@@ -126,86 +105,24 @@
             </tr>
             </tbody>
             </table>
-            <h2 id="connecting-to-megaeth-mainnet">Connecting to MegaETH
-            Mainnet</h2>
+            <h2 id="connecting-to-megaeth-mainnet">Connecting to MegaETH Mainnet</h2>
             <h3 id="rpc">RPC</h3>
-            <p>MegaETH hosts a public RPC endpoint at
-            https://mainnet.megaeth.com/rpc.</p>
-            <p>See <a href="/realtime-api.html">Realtime API</a> for a
-            list of additional features on top of the standard Ethereum
-            JSON-RPC. These features are available on RPC endpoints
-            provided by MegaETH; availability varies on third-party
-            endpoints.</p>
+            <p>MegaETH hosts a public RPC endpoint at https://mainnet.megaeth.com/rpc.</p>
+            <p>See <a href="/realtime-api.html">Realtime API</a> for a list of additional features on top of the standard Ethereum JSON-RPC. These features are available on RPC endpoints provided by MegaETH; availability varies on third-party endpoints.</p>
             <h3 id="block-explorer">Block Explorer</h3>
-            <p><a href="https://megaeth.blockscout.com/">Blockscout</a>
-            and <a href="https://mega.etherscan.io">Etherscan</a> are
-            available.</p>
-            <h2 id="developing-smart-contracts">Developing Smart
-            Contracts</h2>
-            <p>MegaETH’s execution environment is called
-            <em>MegaEVM</em>. It is fully compatible with Ethereum smart
-            contracts but introduces a few differences compared to
-            Ethereum’s EVM especially around the gas model. See the <a
-            href="/megaevm.html">MegaEVM manual page</a> for a list of
-            differences. Implementation of MegaEVM is opensource and can
-            be found on <a
-            href="https://github.com/megaeth-labs/mega-evm">GitHub</a>.</p>
-            <p>Because of the said differences, toolchains not yet
-            customized for MegaETH might incorrectly estimate the amount
-            of gas a transaction needs if they use their own EVM
-            implementations, as opposed to MegaEVM, to locally simulate
-            the transaction. Sometimes, this issue causes the RPC to
-            throw “intrinsic gas too low” errors or the transaction to
-            run out of gas and revert. The solution is to either tell
-            the toolchain to skip local gas estimation and use a
-            hardcoded gas limit (for <code>forge script</code>, as an
-            example, <code>--gas-limit</code> with a sufficiently large
-            number plus <code>--skip-simulation</code>), or use
-            MegaETH’s RPC servers to estimate gas.</p>
-            <p><em>The best tool for debugging MegaETH transactions is
-            <code>mega-evme</code>.</em> It uses the aforementioned
-            opensource implementation of MegaEVM and can thus perfectly
-            simulate any transaction’s behavior on MegaETH. Instructions
-            on building and using <code>mega-evme</code> are available
-            <a
-            href="https://github.com/megaeth-labs/mega-evm/blob/main/bin/mega-evme/README.md">here</a>.</p>
-            <h2 id="using-the-canonical-bridge">Using the Canonical
-            Bridge</h2>
-            <p>MegaETH’s canonical bridge is the preferred method to
-            bridge Ether (ETH) from Ethereum to MegaETH. The Ethereum
-            side of the bridge is at
-            <code>0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75</code> on
-            Ethereum mainnet. Currently, it runs OP Stack’s <a
-            href="https://docs.optimism.io/app-developers/guides/bridging/standard-bridge">Standard
-            Bridge</a> in its <a
-            href="https://github.com/ethereum-optimism/optimism/blob/backports/op-contracts/v3.0.0/packages/contracts-bedrock/src/universal/StandardBridge.sol">op-contracts/v3.0.0
-            release</a> with a small patch adjusting a few
-            parameters.</p>
-            <p>The easiest way to bridge Ether to MegaETH is sending
-            Ether to the aforementioned address on Ethereum mainnet in a
-            plain native transfer. The same amount of Ether sans gas
-            fees will appear in sender’s address on MegaETH after the
-            transfer is finalized on Ethereum mainnet.</p>
-            <p>For more control, use the <code>depositETH</code> method
-            of the bridge contract. It allows for specifying the
-            (approximate) amount of gas that should be charged by and
-            forwarded from Ethereum mainnet to MegaETH for the deposit
-            transaction to use, as well as adding extra data to the
-            transaction. As an example, the following
-            <code>cast send</code> command calls <code>depositETH</code>
-            to bridge 0.001 Ether with 61000 gas and extra data
-            <code>bunny</code>.</p>
-            <div class="sourceCode" id="cb1"><pre
-            class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">cast</span> send 0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75 <span class="st">&#39;depositETH(uint32, bytes)&#39;</span> 61000 <span class="st">&quot;0x62756e6e79&quot;</span> <span class="at">--value</span> 0.001ether</span></code></pre></div>
-            <h2 id="contracts-of-potential-interest">Contracts of
-            Potential Interest</h2>
+            <p><a href="https://megaeth.blockscout.com/">Blockscout</a> and <a href="https://mega.etherscan.io">Etherscan</a> are available.</p>
+            <h2 id="developing-smart-contracts">Developing Smart Contracts</h2>
+            <p>MegaETH’s execution environment is called <em>MegaEVM</em>. It is fully compatible with Ethereum smart contracts but introduces a few differences compared to Ethereum’s EVM especially around the gas model. See the <a href="/megaevm.html">MegaEVM manual page</a> for a list of differences. Implementation of MegaEVM is opensource and can be found on <a href="https://github.com/megaeth-labs/mega-evm">GitHub</a>.</p>
+            <p>Because of the said differences, toolchains not yet customized for MegaETH might incorrectly estimate the amount of gas a transaction needs if they use their own EVM implementations, as opposed to MegaEVM, to locally simulate the transaction. Sometimes, this issue causes the RPC to throw “intrinsic gas too low” errors or the transaction to run out of gas and revert. The solution is to either tell the toolchain to skip local gas estimation and use a hardcoded gas limit (for <code>forge script</code>, as an example, <code>--gas-limit</code> with a sufficiently large number plus <code>--skip-simulation</code>), or use MegaETH’s RPC servers to estimate gas.</p>
+            <p><em>The best tool for debugging MegaETH transactions is <code>mega-evme</code>.</em> It uses the aforementioned opensource implementation of MegaEVM and can thus perfectly simulate any transaction’s behavior on MegaETH. Instructions on building and using <code>mega-evme</code> are available <a href="https://github.com/megaeth-labs/mega-evm/blob/main/bin/mega-evme/README.md">here</a>.</p>
+            <h2 id="using-the-canonical-bridge">Using the Canonical Bridge</h2>
+            <p>MegaETH’s canonical bridge is the preferred method to bridge Ether (ETH) from Ethereum to MegaETH. The Ethereum side of the bridge is at <code>0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75</code> on Ethereum mainnet. Currently, it runs OP Stack’s <a href="https://docs.optimism.io/app-developers/guides/bridging/standard-bridge">Standard Bridge</a> in its <a href="https://github.com/ethereum-optimism/optimism/blob/backports/op-contracts/v3.0.0/packages/contracts-bedrock/src/universal/StandardBridge.sol">op-contracts/v3.0.0 release</a> with a small patch adjusting a few parameters.</p>
+            <p>The easiest way to bridge Ether to MegaETH is sending Ether to the aforementioned address on Ethereum mainnet in a plain native transfer. The same amount of Ether sans gas fees will appear in sender’s address on MegaETH after the transfer is finalized on Ethereum mainnet.</p>
+            <p>For more control, use the <code>depositETH</code> method of the bridge contract. It allows for specifying the (approximate) amount of gas that should be charged by and forwarded from Ethereum mainnet to MegaETH for the deposit transaction to use, as well as adding extra data to the transaction. As an example, the following <code>cast send</code> command calls <code>depositETH</code> to bridge 0.001 Ether with 61000 gas and extra data <code>bunny</code>.</p>
+            <div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ex">cast</span> send 0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75 <span class="st">&#39;depositETH(uint32, bytes)&#39;</span> 61000 <span class="st">&quot;0x62756e6e79&quot;</span> --value 0.001ether</span></code></pre></div>
+            <h2 id="contracts-of-potential-interest">Contracts of Potential Interest</h2>
             <h3 id="on-megaeth-mainnet">On MegaETH Mainnet</h3>
             <table>
-            <colgroup>
-            <col style="width: 18%" />
-            <col style="width: 26%" />
-            <col style="width: 56%" />
-            </colgroup>
             <thead>
             <tr class="header">
             <th>Item</th>
@@ -239,15 +156,8 @@
             <!--
             | **High Resolution Timestamp** | `0x6342000000000000000000000000000000000002` | The function signature is `function timestamp() external view returns (uint256)` where the return value is timestamp in microseconds. |
             -->
-            <p>See OP Stack docs for a complete list of <a
-            href="https://docs.optimism.io/op-stack/protocol/smart-contracts#layer-2-contracts-predeploys">predeployed</a>
-            and <a
-            href="https://docs.optimism.io/op-stack/features/preinstalls#contracts-and-deployed-addresses">preinstalled</a>
-            contracts.</p>
-            <p>See the <a
-            href="https://github.com/megaeth-labs/mega-tokenlist">mega-tokenlist</a>
-            for a more comprehensive list of tokens in the
-            ecosystem.</p>
+            <p>See OP Stack docs for a complete list of <a href="https://docs.optimism.io/op-stack/protocol/smart-contracts#layer-2-contracts-predeploys">predeployed</a> and <a href="https://docs.optimism.io/op-stack/features/preinstalls#contracts-and-deployed-addresses">preinstalled</a> contracts.</p>
+            <p>See the <a href="https://github.com/megaeth-labs/mega-tokenlist">mega-tokenlist</a> for a more comprehensive list of tokens in the ecosystem.</p>
             <h3 id="on-ethereum-mainnet">On Ethereum Mainnet</h3>
             <table>
             <colgroup>
@@ -315,11 +225,7 @@
             </tr>
             </tbody>
             </table>
-            <p>MegaETH’s smart contracts are from OP Stack’s <a
-            href="https://github.com/ethereum-optimism/optimism/tree/backports/op-contracts/v3.0.0/packages/contracts-bedrock">op-contracts/v3.0.0
-            release</a>. See OP Stack docs for <a
-            href="https://docs.optimism.io/op-stack/protocol/smart-contracts#l1-contract-details">descriptions
-            of these contracts</a>.</p>
+            <p>MegaETH’s smart contracts are from OP Stack’s <a href="https://github.com/ethereum-optimism/optimism/tree/backports/op-contracts/v3.0.0/packages/contracts-bedrock">op-contracts/v3.0.0 release</a>. See OP Stack docs for <a href="https://docs.optimism.io/op-stack/protocol/smart-contracts#l1-contract-details">descriptions of these contracts</a>.</p>
         </main>
 
         <footer class="site-footer">

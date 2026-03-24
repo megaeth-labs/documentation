@@ -15,6 +15,12 @@
 - No broken links to internal pages or external resources
 - Code examples are syntactically correct and use appropriate language tags in fenced code blocks
 
+## Previous comments
+
+- Before writing new comments, check all previous review comments and threads on this PR
+- If a previous comment has been addressed by the latest changes, resolve that thread
+- Do not repeat feedback that has already been addressed
+
 ## Skip
 
 - Changes to `public/` that are simply regenerated output from `make`

@@ -51,25 +51,17 @@
                 
                                 <nav id="TOC">
                     <ul>
-                    <li><a
-                    href="#docs__rpc__2-error-codes.md__error-codes"
-                    id="toc-docs__rpc__2-error-codes.md__error-codes">Error
-                    Codes</a></li>
+                    <li><a href="#available-methods">Available Methods</a></li>
+                    <li><a href="#rate-limiting">Rate Limiting</a></li>
+                    <li><a href="#error-codes">Error Codes</a></li>
                     </ul>
                 </nav>
                             </div>
         </header>
 
         <main class="site-content">
-            <div id="docs__rpc__1-method.md">
-            <h2 id="docs__rpc__1-method.md__available-methods">Available
-            Methods</h2>
+            <h2 id="available-methods">Available Methods</h2>
             <table>
-            <colgroup>
-            <col style="width: 53%" />
-            <col style="width: 16%" />
-            <col style="width: 30%" />
-            </colgroup>
             <thead>
             <tr class="header">
             <th>Method</th>
@@ -440,23 +432,14 @@
             </tr>
             </tbody>
             </table>
-            <h2 id="docs__rpc__1-method.md__rate-limiting">Rate
-            Limiting</h2>
-            <p>All available methods are subject to rate limiting based
-            on two criteria:</p>
+            <h2 id="rate-limiting">Rate Limiting</h2>
+            <p>All available methods are subject to rate limiting based on two criteria:</p>
             <ul>
-            <li><strong>Compute Unit (CU) Limiting</strong>: Limits the
-            computational cost of requests based on their
-            complexity.</li>
-            <li><strong>Network Bandwidth Limiting</strong>: Limits the
-            network traffic based on response sizes.</li>
+            <li><strong>Compute Unit (CU) Limiting</strong>: Limits the computational cost of requests based on their complexity.</li>
+            <li><strong>Network Bandwidth Limiting</strong>: Limits the network traffic based on response sizes.</li>
             </ul>
-            <p>User limits are dynamically updated in response to
-            individual behavior.</p>
-            </div>
-            <div id="docs__rpc__2-error-codes.md">
-            <h2 id="docs__rpc__2-error-codes.md__error-codes">Error
-            Codes</h2>
+            <p>User limits are dynamically updated in response to individual behavior.</p>
+            <h2 id="error-codes">Error Codes</h2>
             <table>
             <colgroup>
             <col style="width: 8%" />
@@ -480,66 +463,52 @@
             <td>-32700</td>
             <td>parse error</td>
             <td>The request body contains invalid JSON.</td>
-            <td>Check the request format and ensure valid JSON
-            syntax.</td>
+            <td>Check the request format and ensure valid JSON syntax.</td>
             </tr>
             <tr class="even">
             <td>403</td>
             <td>-32601</td>
             <td>rpc method is not whitelisted</td>
-            <td>The requested RPC method is not allowed by the proxy
-            configuration.</td>
-            <td>Use only whitelisted RPC methods. Contact MegaETH if you
-            need access to additional methods.</td>
+            <td>The requested RPC method is not allowed by the proxy configuration.</td>
+            <td>Use only whitelisted RPC methods. Contact MegaETH if you need access to additional methods.</td>
             </tr>
             <tr class="odd">
             <td>400</td>
             <td>-32019</td>
             <td>block is out of range</td>
             <td>The requested block number is out of range.</td>
-            <td>Check the block number and ensure it’s within the valid
-            range.</td>
+            <td>Check the block number and ensure it’s within the valid range.</td>
             </tr>
             <tr class="even">
             <td>500</td>
             <td>-32020</td>
             <td>backend response too large</td>
             <td>The backend response is too large.</td>
-            <td>Reduce the scope of the request or contact MegaETH for
-            assistance.</td>
+            <td>Reduce the scope of the request or contact MegaETH for assistance.</td>
             </tr>
             <tr class="odd">
             <td>429</td>
             <td>-32021</td>
             <td>over network traffic limit, retry in X seconds</td>
             <td>The user is incurring too much network traffic.</td>
-            <td>Wait for the specified number of seconds before
-            retrying. Reduce the number of requests sent per
-            second.</td>
+            <td>Wait for the specified number of seconds before retrying. Reduce the number of requests sent per second.</td>
             </tr>
             <tr class="even">
             <td>429</td>
             <td>-32022</td>
             <td>over compute unit limit, retry in X seconds</td>
-            <td>The user is incurring too much computation on the
-            backend RPC server.</td>
-            <td>Wait for the specified number of seconds before
-            retrying. Reduce the number of requests sent per
-            second.</td>
+            <td>The user is incurring too much computation on the backend RPC server.</td>
+            <td>Wait for the specified number of seconds before retrying. Reduce the number of requests sent per second.</td>
             </tr>
             <tr class="odd">
             <td>200</td>
             <td>-32000</td>
-            <td>permanent error forwarding request context deadline
-            exceeded</td>
-            <td>The API proxy cannot connect to the backend RPC
-            server.</td>
-            <td>Pause for a while and retry. Notify MegaETH if the error
-            persists.</td>
+            <td>permanent error forwarding request context deadline exceeded</td>
+            <td>The API proxy cannot connect to the backend RPC server.</td>
+            <td>Pause for a while and retry. Notify MegaETH if the error persists.</td>
             </tr>
             </tbody>
             </table>
-            </div>
         </main>
 
         <footer class="site-footer">
