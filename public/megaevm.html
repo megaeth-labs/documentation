@@ -338,7 +338,7 @@
             <li>Transaction is included in the block with status set to failed (status=0).</li>
             <li>No state changes from the transaction are applied.</li>
             </ol>
-            <p>The per-block limits for compute gas, data size, KV updates, and state growth can only be fully evaluated after a transaction has been executed. When building a block, these limits are enforced as follows:</p>
+            <p>The per-block limits for data size, KV updates, and state growth can only be fully evaluated after a transaction has been executed. When building a block, these limits are enforced as follows:</p>
             <ol type="1">
             <li>Before executing a transaction, the block builder checks whether <em>any previous transaction</em> has already caused the block to exceed a per-block limit. If so, the new transaction is rejected <em>before</em> execution and the block is sealed.</li>
             <li>Otherwise, the transaction is executed. If its execution causes the block to exceed a per-block limit, the transaction is still included — it is not reverted or discarded. Per-transaction limits still apply.</li>
