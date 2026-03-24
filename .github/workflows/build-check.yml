@@ -15,15 +15,18 @@ jobs:
           fetch-depth: 1
 
       - name: Install Pandoc
-        run: sudo apt-get update && sudo apt-get install -y pandoc
+        run: |
+          PANDOC_VERSION=2.9.2.1
+          wget -q "https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-amd64.deb" -O /tmp/pandoc.deb
+          sudo dpkg -i /tmp/pandoc.deb
 
       - name: Build
         run: make
 
       - name: Check public/ is up to date
         run: |
-          if [ -n "$(git status --porcelain public/)" ]; then
+          if [ -n "$(git status --porcelain public/ manifest/)" ]; then
             echo "::error::public/ is out of date. Run 'make' locally and commit the output."
-            git status --short public/
+            git status --short public/ manifest/
             exit 1
           fi
