@@ -119,7 +119,7 @@
             <p>MegaETH’s canonical bridge is the preferred method to bridge Ether (ETH) from Ethereum to MegaETH. The Ethereum side of the bridge is at <code>0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75</code> on Ethereum mainnet. Currently, it runs OP Stack’s <a href="https://docs.optimism.io/app-developers/guides/bridging/standard-bridge">Standard Bridge</a> in its <a href="https://github.com/ethereum-optimism/optimism/blob/backports/op-contracts/v3.0.0/packages/contracts-bedrock/src/universal/StandardBridge.sol">op-contracts/v3.0.0 release</a> with a small patch adjusting a few parameters.</p>
             <p>The easiest way to bridge Ether to MegaETH is sending Ether to the aforementioned address on Ethereum mainnet in a plain native transfer. The same amount of Ether sans gas fees will appear in sender’s address on MegaETH after the transfer is finalized on Ethereum mainnet.</p>
             <p>For more control, use the <code>depositETH</code> method of the bridge contract. It allows for specifying the (approximate) amount of gas that should be charged by and forwarded from Ethereum mainnet to MegaETH for the deposit transaction to use, as well as adding extra data to the transaction. As an example, the following <code>cast send</code> command calls <code>depositETH</code> to bridge 0.001 Ether with 61000 gas and extra data <code>bunny</code>.</p>
-            <div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="ex">cast</span> send 0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75 <span class="st">&#39;depositETH(uint32, bytes)&#39;</span> 61000 <span class="st">&quot;0x62756e6e79&quot;</span> --value 0.001ether</span></code></pre></div>
+            <div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1"></a><span class="ex">cast</span> send 0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75 <span class="st">&#39;depositETH(uint32, bytes)&#39;</span> 61000 <span class="st">&quot;0x62756e6e79&quot;</span> --value 0.001ether</span></code></pre></div>
             <h2 id="contracts-of-potential-interest">Contracts of Potential Interest</h2>
             <h3 id="on-megaeth-mainnet">On MegaETH Mainnet</h3>
             <table>
@@ -174,23 +174,23 @@
             </thead>
             <tbody>
             <tr class="odd">
+            <td>DisputeGameFactoryProxy</td>
+            <td><code>0x8546840adf796875cd9aacc5b3b048f6b2c9d563</code></td>
+            <td></td>
+            </tr>
+            <tr class="even">
             <td>L1CrossDomainMessengerProxy</td>
             <td><code>0x6C7198250087B29A8040eC63903Bc130f4831Cc9</code></td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td>L1ERC721BridgeProxy</td>
             <td><code>0x3D8ee269F87A7f3F0590c5C0d825FFF06212A242</code></td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td>L1StandardBridgeProxy</td>
             <td><code>0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75</code></td>
-            <td></td>
-            </tr>
-            <tr class="even">
-            <td>OptimismPortalProxy</td>
-            <td><code>0x7f82f57F0Dd546519324392e408b01fcC7D709e8</code></td>
             <td></td>
             </tr>
             <tr class="odd">
@@ -199,11 +199,26 @@
             <td></td>
             </tr>
             <tr class="even">
+            <td>OptimismPortalProxy</td>
+            <td><code>0x7f82f57F0Dd546519324392e408b01fcC7D709e8</code></td>
+            <td></td>
+            </tr>
+            <tr class="odd">
+            <td>ProtocolVersionsProxy</td>
+            <td><code>0x150355311f965af4937fcca526f9df0573fd5b85</code></td>
+            <td></td>
+            </tr>
+            <tr class="even">
+            <td>SuperchainConfigProxy</td>
+            <td><code>0x5d0ff601bc8580d8682c0462df55343cb0b99285</code></td>
+            <td></td>
+            </tr>
+            <tr class="odd">
             <td>SystemConfigProxy</td>
             <td><code>0x1ED92E1bc9A2735216540EDdD0191144681cb77E</code></td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td>USDM</td>
             <td><code>0xEc2AF1C8B110a61fD9C3Fa6a554a031Ca9943926</code></td>
             <td></td>
