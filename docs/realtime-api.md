@@ -281,7 +281,7 @@ Returns the same result as `eth_call` — the return data from the executed call
 | Code | Message | Description |
 |------|---------|-------------|
 | -32000 | `Timeout: timeout waiting for nonce condition` | The nonce condition was not met within the timeout period |
-| -32000 | InternalError | An internal error occurred while processing the request |
+| -32000 | `InternalError` | An internal error occurred while processing the request |
 
 ## Example
 
