@@ -6,6 +6,8 @@ on:
 jobs:
   build-check:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
