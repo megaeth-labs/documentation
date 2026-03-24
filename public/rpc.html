@@ -10,7 +10,7 @@
         <header class="site-header">
                         <nav class="main-nav"><ul>
                         <li><a href="/index.html">Overview</a></li>
-                        <li><a href="/frontier.html">Frontier</a></li>
+                        <li><a href="/frontier.html">Mainnet</a></li>
                         <li><a href="/testnet.html">Testnet</a></li>
                         <li><a href="/megaevm.html">MegaEVM</a></li>
                         <li><a href="/architecture.html">Architecture</a></li>
@@ -62,11 +62,6 @@
         <main class="site-content">
             <h2 id="available-methods">Available Methods</h2>
             <table>
-            <colgroup>
-            <col style="width: 53%" />
-            <col style="width: 16%" />
-            <col style="width: 30%" />
-            </colgroup>
             <thead>
             <tr class="header">
             <th>Method</th>
@@ -146,296 +141,291 @@
             <td>Gas is limited to 10,000,000.</td>
             </tr>
             <tr class="odd">
-            <td><code>eth_callAfter</code></td>
-            <td>Available</td>
-            <td>Gas is limited to 10,000,000. Timeout is limited to 60 seconds.</td>
-            </tr>
-            <tr class="even">
             <td><code>eth_chainId</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>eth_createAccessList</code></td>
             <td>Available</td>
             <td>Gas is limited to 10,000,000.</td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>eth_estimateGas</code></td>
             <td>Available</td>
             <td>Gas is limited to 10,000,000.</td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>eth_feeHistory</code></td>
             <td>Available</td>
             <td>Block range is limited to 10,000.</td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>eth_gasPrice</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>eth_getBalance</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>eth_getBlockByHash</code></td>
             <td>Available</td>
             <td>Full block is disabled.</td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>eth_getBlockByNumber</code></td>
             <td>Available</td>
             <td>Full block is disabled.</td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>eth_getBlockReceipts</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>eth_getBlockTransactionCountByHash</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>eth_getBlockTransactionCountByNumber</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>eth_getCode</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>eth_getFilterChanges</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>eth_getFilterLogs</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>eth_getLogs</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>eth_getLogsWithCursor</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>eth_getStorageAt</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>eth_getTransactionByBlockHashAndIndex</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>eth_getTransactionByBlockNumberAndIndex</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>eth_getTransactionByHash</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>eth_getTransactionCount</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>eth_getTransactionReceipt</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>eth_getUncleByBlockHashAndIndex</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>eth_getUncleByBlockNumberAndIndex</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>eth_getUncleCountByBlockHash</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>eth_getUncleCountByBlockNumber</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>eth_maxPriorityFeePerGas</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>eth_mining</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>eth_newBlockFilter</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>eth_newFilter</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>eth_newPendingTransactionFilter</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>eth_protocolVersion</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>eth_sendRawTransaction</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>eth_sendTransaction</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>eth_sign</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>eth_signTransaction</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>eth_signTypedData</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>eth_subscribe</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>eth_syncing</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>eth_uninstallFilter</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>eth_unsubscribe</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>net_listening</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>net_peerCount</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>net_version</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>realtime_sendRawTransaction</code></td>
             <td>Available</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>trace_block</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>trace_call</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>trace_callMany</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>trace_get</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>trace_rawTransaction</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>trace_replayBlockTransactions</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>trace_replayTransaction</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>trace_transaction</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>txpool_content</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>txpool_contentFrom</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>txpool_inspect</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr class="even">
+            <tr class="odd">
             <td><code>txpool_status</code></td>
             <td>Unavailable</td>
             <td></td>
             </tr>
-            <tr class="odd">
+            <tr class="even">
             <td><code>web3_clientVersion</code></td>
             <td>Available</td>
             <td></td>

@@ -1,16 +1,6 @@
 ---
-title: Frontier
+title: Mainnet 
 rank: 1
----
-
-# Important Messages
-
-__Frontier is for developers to deploy and test their apps before public launch
-of the mainnet. Only whitelisted wallets held by developers can transact on
-Frontier.__
-
-__This page is regularly updated.__
-
 ---
 
 # Chain Parameters
@@ -24,7 +14,7 @@ __This page is regularly updated.__
 | __Base Fee Per Gas__ | 0.001 gwei ($$10^6$$ wei) |
 | __EIP-1559 Parameters__ | Base fee adjustment is effectively disabled |
 
-# Connecting to Frontier
+# Connecting to MegaETH Mainnet
 
 ## RPC
 
@@ -36,7 +26,8 @@ endpoints provided by MegaETH; availability varies on third-party endpoints.
 
 ## Block Explorer
 
-[Blockscout](https://megaeth.blockscout.com/) is available. 
+[Blockscout](https://megaeth.blockscout.com/) and
+[Etherscan](https://mega.etherscan.io) are available. 
 
 # Developing Smart Contracts
 
@@ -65,15 +56,7 @@ using `mega-evme` are available
 
 # Using the Canonical Bridge
 
-__As a reminder, Frontier is for developers to deploy their apps ahead of the
-public mainnet launch. For regular users, bridging tokens to Frontier is
-considered EXTREMELY RISKY AND RECKLESS and SHOULD NOT BE ATTEMPTED.__
-
-__No
-guarantee of any kind is made for any token bridged to Frontier through any mechanism.__
-
-MegaETH's canonical bridge is the preferred method to bridge Ether (ETH) and
-ERC20 tokens from Ethereum to MegaETH. The Ethereum side of the bridge is at
+MegaETH's canonical bridge is the preferred method to bridge Ether (ETH) from Ethereum to MegaETH. The Ethereum side of the bridge is at
 `0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75` on Ethereum mainnet. Currently, it
 runs OP Stack's [Standard
 Bridge](https://docs.optimism.io/app-developers/guides/bridging/standard-bridge)
@@ -99,7 +82,7 @@ cast send 0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75 'depositETH(uint32, bytes)'
 
 # Contracts of Potential Interest
 
-## On MegaETH Mainnet (Frontier)
+## On MegaETH Mainnet
 
 | Item | Address | Remarks |
 | --------- | ------------- | ---------------------------- |
@@ -122,11 +105,14 @@ See the [mega-tokenlist](https://github.com/megaeth-labs/mega-tokenlist) for a m
 
 | Item | Address | Remarks |
 | --------- | ------------- | ---------------------------- |
+| DisputeGameFactoryProxy             | `0x8546840adf796875cd9aacc5b3b048f6b2c9d563` | |
 | L1CrossDomainMessengerProxy         | `0x6C7198250087B29A8040eC63903Bc130f4831Cc9` | |
 | L1ERC721BridgeProxy                 | `0x3D8ee269F87A7f3F0590c5C0d825FFF06212A242` | |
 | L1StandardBridgeProxy               | `0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75` | |
-| OptimismPortalProxy                 | `0x7f82f57F0Dd546519324392e408b01fcC7D709e8` | |
 | OptimismMintableERC20FactoryProxy   | `0xF875030B9464001fC0f964E47546b0AFEEbD7C61` | |
+| OptimismPortalProxy                 | `0x7f82f57F0Dd546519324392e408b01fcC7D709e8` | |
+| ProtocolVersionsProxy               | `0x150355311f965af4937fcca526f9df0573fd5b85` | |
+| SuperchainConfigProxy               | `0x5d0ff601bc8580d8682c0462df55343cb0b99285` | |
 | SystemConfigProxy                   | `0x1ED92E1bc9A2735216540EDdD0191144681cb77E` | |
 | USDM                                | `0xEc2AF1C8B110a61fD9C3Fa6a554a031Ca9943926` | |
 

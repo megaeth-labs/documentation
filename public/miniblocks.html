@@ -10,7 +10,7 @@
         <header class="site-header">
                         <nav class="main-nav"><ul>
                         <li><a href="/index.html">Overview</a></li>
-                        <li><a href="/frontier.html">Frontier</a></li>
+                        <li><a href="/frontier.html">Mainnet</a></li>
                         <li><a href="/testnet.html">Testnet</a></li>
                         <li><a href="/megaevm.html">MegaEVM</a></li>
                         <li><a href="/architecture.html">Architecture</a></li>
@@ -79,12 +79,12 @@
             </ul>
             <p>Transactions in a mini block never span multiple EVM blocks. In other words, for every mini block, the transactions it contains all appear in the same EVM block. Naturally, this establishes a mapping between mini blocks and EVM blocks; we say a mini block is <em>included</em> in an EVM block if the former contains transactions that appear in the latter.</p>
             <p>MegaETH produces an EVM block roughly every second and a mini block roughly every 10 milliseconds. This implies a rough 1-to-100 ratio between the number of EVM blocks and the number of mini blocks. However, there is no guarantee on the number of mini blocks included in an EVM block. To get the precise number, developers should use the <code>miniBlockCount</code> field in the responses when calling <code>eth_subscribe</code> to subscribe to <code>newHeads</code>. This is an example of the responses:</p>
-            <div class="sourceCode" id="cb1"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true"></a><span class="fu">{</span></span>
-            <span id="cb1-2"><a href="#cb1-2" aria-hidden="true"></a>  <span class="er">...</span></span>
-            <span id="cb1-3"><a href="#cb1-3" aria-hidden="true"></a>  <span class="dt">&quot;number&quot;</span><span class="fu">:</span> <span class="st">&quot;0x57f898&quot;</span><span class="fu">,</span></span>
-            <span id="cb1-4"><a href="#cb1-4" aria-hidden="true"></a>  <span class="dt">&quot;miniBlockCount&quot;</span><span class="fu">:</span> <span class="st">&quot;0x57&quot;</span></span>
-            <span id="cb1-5"><a href="#cb1-5" aria-hidden="true"></a>  <span class="er">...</span></span>
-            <span id="cb1-6"><a href="#cb1-6" aria-hidden="true"></a><span class="fu">}</span></span></code></pre></div>
+            <div class="sourceCode" id="cb1"><pre class="sourceCode json"><code class="sourceCode json"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">{</span></span>
+            <span id="cb1-2"><a href="#cb1-2"></a>  <span class="er">...</span></span>
+            <span id="cb1-3"><a href="#cb1-3"></a>  <span class="dt">&quot;number&quot;</span><span class="fu">:</span> <span class="st">&quot;0x57f898&quot;</span><span class="fu">,</span></span>
+            <span id="cb1-4"><a href="#cb1-4"></a>  <span class="dt">&quot;miniBlockCount&quot;</span><span class="fu">:</span> <span class="st">&quot;0x57&quot;</span></span>
+            <span id="cb1-5"><a href="#cb1-5"></a>  <span class="er">...</span></span>
+            <span id="cb1-6"><a href="#cb1-6"></a><span class="fu">}</span></span></code></pre></div>
         </main>
 
         <footer class="site-footer">

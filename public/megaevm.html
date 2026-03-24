@@ -10,7 +10,7 @@
         <header class="site-header">
                         <nav class="main-nav"><ul>
                         <li><a href="/index.html">Overview</a></li>
-                        <li><a href="/frontier.html">Frontier</a></li>
+                        <li><a href="/frontier.html">Mainnet</a></li>
                         <li><a href="/testnet.html">Testnet</a></li>
                         <li><a href="/megaevm.html">MegaEVM</a></li>
                         <li><a href="/architecture.html">Architecture</a></li>
@@ -73,14 +73,10 @@
                     <li><a href="#accessing-the-native-oracle-interface">Accessing the Native Oracle Interface</a></li>
                     <li><a href="#remarks">Remarks</a></li>
                     </ul></li>
-                    <li><a href="#system-contracts-the-native-oracle-service">System Contracts &amp; the Native Oracle Service</a>
-                    <ul>
-                    <li><a href="#high-precision-timestamp-oracle">High-Precision Timestamp Oracle</a></li>
-                    </ul></li>
                     <li><a href="#miscellaneous">Miscellaneous</a>
                     <ul>
                     <li><a href="#increased-contract-size-limit">Increased Contract Size Limit</a></li>
-                    <li><a href="#selfdestruct-is-disabled"><code>SELFDESTRUCT</code> is Disabled</a></li>
+                    <li><a href="#selfdestruct-with-eip-6780-semantics"><code>SELFDESTRUCT</code> with EIP-6780 Semantics</a></li>
                     <li><a href="#rule-for-gas-forwarding">“98/100” Rule for Gas Forwarding</a></li>
                     </ul></li>
                     </ul>
@@ -91,7 +87,7 @@
         <main class="site-content">
             <p><em>MegaEVM</em> is MegaETH’s execution environment. It is fully compatible with Ethereum smart contracts while introducing optimizations for the unique characteristics of MegaETH’s architecture.</p>
             <h2 id="overview">Overview</h2>
-            <p>MegaEVM builds on established standards. Its latest hardfork, <em>Rex</em>, is based on <a href="https://specs.optimism.io/protocol/isthmus/overview.html">Optimism Isthmus</a>, which in turn is adapted from <a href="https://ethereum.org/roadmap/pectra/">Ethereum Prague</a>. This means:</p>
+            <p>MegaEVM builds on established standards. Its latest hardfork, <em>Rex3</em>, is based on <a href="https://specs.optimism.io/protocol/isthmus/overview.html">Optimism Isthmus</a>, which in turn is adapted from <a href="https://ethereum.org/roadmap/pectra/">Ethereum Prague</a>. This means:</p>
             <ul>
             <li>All standard Solidity contracts work on MegaETH.</li>
             <li>Standard development tools (Hardhat, Foundry, Remix, etc.) are compatible.</li>
@@ -101,10 +97,10 @@
             <h3 id="key-differences-at-a-glance">Key Differences at a Glance</h3>
             <table>
             <colgroup>
-            <col style="width: 24%" />
-            <col style="width: 20%" />
-            <col style="width: 20%" />
-            <col style="width: 34%" />
+            <col style="width: 12%" />
+            <col style="width: 8%" />
+            <col style="width: 14%" />
+            <col style="width: 64%" />
             </colgroup>
             <thead>
             <tr class="header">
@@ -136,8 +132,8 @@
             <tr class="even">
             <td><code>SELFDESTRUCT</code></td>
             <td>Deprecated</td>
-            <td><strong>Disabled</strong></td>
-            <td>Deprecated in <a href="https://eips.ethereum.org/EIPS/eip-6049">EIP-6049</a>.</td>
+            <td><strong>EIP-6780 semantics</strong></td>
+            <td>Active only within the creating transaction, per <a href="https://eips.ethereum.org/EIPS/eip-6780">EIP-6780</a>.</td>
             </tr>
             <tr class="odd">
             <td>Gas model</td>
@@ -173,9 +169,9 @@
             <p>The storage gas cost of most operations is zero. The following table lists all operations where storage gas does apply. Some storage gas calculations involve a parameter called <em>bucket multiplier</em> (denoted as m). The next section explains this concept.</p>
             <table>
             <colgroup>
-            <col style="width: 32%" />
-            <col style="width: 20%" />
-            <col style="width: 47%" />
+            <col style="width: 13%" />
+            <col style="width: 8%" />
+            <col style="width: 78%" />
             </colgroup>
             <thead>
             <tr class="header">
@@ -342,11 +338,13 @@
             <li>Transaction is included in the block with status set to failed (status=0).</li>
             <li>No state changes from the transaction are applied.</li>
             </ol>
-            <p>If any of the aforementioned per-block limits is hit when building a block, the following happens:</p>
+            <p>The per-block limits for data size, KV updates, and state growth can only be fully evaluated after a transaction has been executed. When building a block, these limits are enforced as follows:</p>
             <ol type="1">
-            <li>The transaction that caused the block to go over limits is allowed to execute to completion and will be included in the block. Per-transaction limits still apply.</li>
-            <li>No more transaction will be executed or added to this block.</li>
+            <li>Before executing a transaction, the block builder checks whether <em>any previous transaction</em> has already caused the block to exceed a per-block limit. If so, the new transaction is rejected <em>before</em> execution and the block is sealed.</li>
+            <li>Otherwise, the transaction is executed. If its execution causes the block to exceed a per-block limit, the transaction is still included — it is not reverted or discarded. Per-transaction limits still apply.</li>
+            <li>No further transactions will be added to the block after it exceeds any per-block limit.</li>
             </ol>
+            <p>In other words, the last transaction in a block is allowed to push the block’s resource usage beyond the per-block limit. This maximizes block utilization by avoiding the waste of a valid transaction whose resource consumption can only be known after execution.</p>
             <h3 id="definitions-of-resource-types">Definitions of Resource Types</h3>
             <p>For all resource types, the usage incurred by a block is simply the sum of the usage incurred by each transaction in the block. For example, if a block contains two transactions, one using 300 KV updates and the other using 400 KV updates, then the block uses 700 KV updates.</p>
             <p>The usage incurred by an individual transaction is defined as following.</p>
@@ -370,7 +368,7 @@
             <p>When a transaction accesses volatile data, dependency forms between the transaction and other transactions or operations that attempt to update the data. Such dependency harms performance. For example, if a transaction reads the current block number using the <code>NUMBER</code> opcode, the sequencer cannot start a new block until the transaction finishes and gets included in the current block, as doing so would cause the block number to change and invalidate the value previously read by the transaction. If the transaction takes long to finish, block production would be blocked (no pun intended), which impacts latency.</p>
             <p>MegaEVM mitigates this issue by limiting the amount of compute gas a transaction may use <em>after it accesses volatile data</em>. This ensures transactions that access volatile data yield quickly. In the following subsections, we detail the limits.</p>
             <h3 id="opcodes-for-access-the-block-environment">Opcodes for Access the Block Environment</h3>
-            <p>Accessing these opcodes caps remaining compute gas to 20,000,000.</p>
+            <p>Accessing these opcodes caps the transaction’s global compute gas to 20,000,000.</p>
             <table>
             <thead>
             <tr class="header">
@@ -422,7 +420,7 @@
             </tbody>
             </table>
             <h3 id="accessing-the-beneficiary-account">Accessing the Beneficiary Account</h3>
-            <p>Accessing the block beneficiary (coinbase) account also caps remaining compute gas to 20,000,000.</p>
+            <p>Accessing the block beneficiary (coinbase) account also caps the transaction’s global compute gas to 20,000,000.</p>
             <table>
             <thead>
             <tr class="header">
@@ -454,14 +452,15 @@
             </tbody>
             </table>
             <h3 id="accessing-the-native-oracle-interface">Accessing the Native Oracle Interface</h3>
-            <p>Accessing the system contract of the native oracle interface caps remaining compute gas to 1,000,000.</p>
+            <p>Reading oracle data via <code>SLOAD</code> from the oracle contract storage caps the transaction’s global compute gas to 20,000,000. This is the same limit as accessing the block environment.</p>
             <ul>
             <li>Oracle contract address: <code>0x6342000000000000000000000000000000000001</code></li>
-            <li>Applies to <code>CALL</code>, <code>STATICCALL</code>, <code>DELEGATECALL</code>, <code>CALLCODE</code></li>
+            <li>Triggered by: <code>SLOAD</code> from oracle contract storage</li>
+            <li><code>DELEGATECALL</code> to the oracle contract does <strong>not</strong> trigger this limit</li>
             </ul>
             <h3 id="remarks">Remarks</h3>
-            <p>When multiple types of volatile data are accessed in the same transaction, the <em>most restrictive limit applies</em>. For example, if a transaction accesses both the block environment (triggering the 20m limit) and the oracle interface (triggering the 1m limit), the cap will be 1m. The order in which the transaction accesses the data types does not matter. The lowest cap is enforced globally.</p>
-            <p>Because these limits apply <em>after</em> accesssing volatile data, developers should perform heavy computation before any attempt to access volatile data. The following is a counterexample.</p>
+            <p>When multiple types of volatile data are accessed in the same transaction, the most restrictive limit applies. All volatile data sources currently share the same 20,000,000 compute gas cap.</p>
+            <p>Note that the further restricted compute gas limit is enforced on the compute gas consumption across the entire transaction execution. That is, if the transaction has already consumed more than 20M compute gas before accessing volatile data (e.g., from an oracle contract or the block environment), the transaction execution will halt immediately. Therefore, developers should avoid accessing volatile data in a transaction performing heavy computation. The following is a counterexample.</p>
             <pre class="solidity"><code>// Bad: Heavy computation after reading timestamp
             function processWithTimestamp() external {
                 uint256 currentTime = block.timestamp; // Triggers 20M gas cap
@@ -469,18 +468,28 @@
                 for (uint i = 0; i &lt; 10000; i++) {
                     heavyComputation(i, currentTime);
                 }
-            }</code></pre>
-            <h2 id="system-contracts-the-native-oracle-service">System Contracts &amp; the Native Oracle Service</h2>
-            <p>MegaEVM provides a native oracle interface that provides realtime access to data from off-chain sources.</p>
-            <h3 id="high-precision-timestamp-oracle">High-Precision Timestamp Oracle</h3>
-            <p>This oracle provides timestamps at microsecond resolution. Developers might find it useful if <code>block.timestamp</code> is not granular enough.</p>
-            <p><strong>Address:</strong> <code>0x6342000000000000000000000000000000000002</code></p>
-            <p><strong>Interface:</strong></p>
-            <pre class="solidity"><code>interface HighPrecisionTimestampOracle {
+            }
+
+            # System Contracts &amp; the Native Oracle Service
+
+            MegaEVM provides a native oracle interface that provides realtime access to
+            data from off-chain sources.
+
+            ## High-Precision Timestamp Oracle
+
+            This oracle provides timestamps at microsecond resolution. Developers might
+            find it useful if `block.timestamp` is not granular enough.
+
+            **Address:** `0x6342000000000000000000000000000000000002`
+
+            **Interface:**
+
+            ```solidity
+            interface HighPrecisionTimestampOracle {
                 function timestamp() external view returns (uint256);
             }</code></pre>
             <p>Note that data for this oracle is supplied solely by the sequencer based on its local clock. This implies that the sequencer must be trusted to publish accurate data. Avoid using this oracle if such trust assumption is too strong for your use case.</p>
-            <p>This oracle internally reads the core oracle contract <code>0x6342000000000000000000000000000000000001</code>. Hence, obtaining high-precision timestamps is accesses volatile data and is subject to the compute gas limits detailed in the previous section.</p>
+            <p>This oracle internally reads the core oracle contract <code>0x6342000000000000000000000000000000000001</code>. Hence, obtaining high-precision timestamps accesses volatile data and is subject to the compute gas limits detailed in the previous section.</p>
             <!-- next time
 
             # Precompiles
@@ -502,8 +511,8 @@
             <h2 id="miscellaneous">Miscellaneous</h2>
             <h3 id="increased-contract-size-limit">Increased Contract Size Limit</h3>
             <p>MegaETH supports contracts up to 512 KB in size. This is increased from 24 KB in Ethereum.</p>
-            <h3 id="selfdestruct-is-disabled"><code>SELFDESTRUCT</code> is Disabled</h3>
-            <p>The <code>SELFDESTRUCT</code> opcode is completely disabled and is treated as an <code>INVALID</code> opcode. It will cause any transaction using this opcode to fail. In Ethereum, <code>SELFDESTRUCT</code> is deprecated but still available.</p>
+            <h3 id="selfdestruct-with-eip-6780-semantics"><code>SELFDESTRUCT</code> with EIP-6780 Semantics</h3>
+            <p>The <code>SELFDESTRUCT</code> opcode follows <a href="https://eips.ethereum.org/EIPS/eip-6780">EIP-6780</a> semantics. It only destroys a contract when called within the same transaction that created the contract. In all other cases, <code>SELFDESTRUCT</code> behaves as a simple Ether transfer without destroying the contract or clearing its storage.</p>
             <h3 id="rule-for-gas-forwarding">“98/100” Rule for Gas Forwarding</h3>
             <p>MegaETH allows a caller to forward at most 98/100 of remaining gas to callee. The parameter is 63/64 in Ethereum.</p>
         </main>

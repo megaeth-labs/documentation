@@ -1,1 +1,1 @@
-1	<li><a href="/frontier.html">Frontier</a></li>
+1	<li><a href="/frontier.html">Mainnet</a></li>
