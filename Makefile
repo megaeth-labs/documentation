@@ -1,9 +1,3 @@
-PANDOC_VERSION := 2.9.2.1
-ACTUAL_VERSION := $(shell pandoc --version | head -1 | cut -d' ' -f2)
-ifneq ($(ACTUAL_VERSION),$(PANDOC_VERSION))
-$(error Pandoc version mismatch: expected $(PANDOC_VERSION), got $(ACTUAL_VERSION). Install the correct version.)
-endif
-
 FILE_PAGES := $(wildcard docs/*.md)
 DIR_PAGES := $(wildcard docs/*/)
 

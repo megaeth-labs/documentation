@@ -40,12 +40,6 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Install Pandoc
-        run: |
-          PANDOC_VERSION=2.9.2.1
-          wget -q "https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-amd64.deb" -O /tmp/pandoc.deb
-          sudo dpkg -i /tmp/pandoc.deb
-
       - uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}

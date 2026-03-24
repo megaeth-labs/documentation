@@ -6,7 +6,8 @@ This file provides guidance to AI agents (e.g., Claude Code, Codex, Cursor, etc.
 
 MegaETH Documentation — the official user-facing documentation site for MegaETH, hosted at [docs.megaeth.com](https://docs.megaeth.com).
 Documentation is written in Pandoc-flavored Markdown and converted to a static website via Pandoc and Make.
-The site is deployed automatically via Cloudflare Pages from the `public/` directory — there is no CI build step; `public/` is pre-built and committed.
+The site is deployed automatically via Cloudflare Pages from the `public/` directory.
+CI automatically rebuilds `public/` on every PR and push to `main` — contributors do not need to run `make` or commit build output.
 
 ## Build Commands
 
@@ -43,7 +44,8 @@ The entire toolchain is Pandoc + GNU Make + standard Unix tools (`echo`, `cat`, 
 ├── AGENTS.md              # This file
 ├── CLAUDE.md              # Agent guidance (mirrors AGENTS.md)
 └── .github/workflows/
-    └── claude.yml         # Claude Code Action: PR review, label check, issue triage
+    ├── claude.yml         # Claude Code Action: PR review, interactive assistance
+    └── build-check.yml    # Auto-rebuilds public/ on PRs and pushes to main
 ```
 
 ## Page Inventory
@@ -118,16 +120,14 @@ Example: `[MegaEVM](/megaevm)`, `[Testnet](/testnet)`.
 
 ### CI / GitHub Actions
 
-`.github/workflows/claude.yml` configures Claude Code Action with four jobs:
+`.github/workflows/claude.yml` configures Claude Code Action with two jobs:
 
 | Job | Trigger | Purpose |
 |-----|---------|---------|
 | `interactive` | `@claude` mention in PR/issue comments | Interactive Claude assistance (can write + commit) |
 | `pr-review` | PR opened/updated | Automated code review with inline comments |
-| `label-check` | PR opened/labeled/unlabeled | Validates PR labels are correct |
-| `issue-triage` | Issue opened | Auto-labels new issues |
 
-The `interactive` job installs Pandoc and can run `make`.
+`.github/workflows/build-check.yml` automatically rebuilds `public/` and `manifest/` on every PR and push to `main`, committing the output back to the branch.
 
 ## Version Control
 
@@ -149,47 +149,44 @@ Example: `william/doc/clarify-block-limit-overfill`, `alice/fix/broken-navbar-li
 ### Editing documentation
 
 1. Edit or create Markdown files under `docs/`.
-2. Run `make` to rebuild the site.
-3. Verify the output in `public/` (open the HTML file in a browser if needed).
-4. Commit both the source changes and the rebuilt `public/` output.
+2. Commit the source changes.
+3. CI will automatically rebuild `public/` and commit the output.
 
 ### Adding a new page
 
 1. Create `docs/newpage.md` with `title` and `rank` frontmatter.
 2. Pick a rank that slots into the desired navbar position (see Page Inventory).
-3. Run `make` — this generates `manifest/newpage.txt`, updates `manifest/navbar.html`, and produces `public/newpage.html`.
-4. Commit all generated files alongside the source.
+3. Commit the new file — CI handles the build.
 
 ### Adding a multi-file page
 
 1. Create `docs/newpage/1-intro.md` with `title` and `rank` frontmatter.
 2. Create `docs/newpage/2-details.md` (no `title`/`rank` needed).
-3. Run `make` → produces `public/newpage.html`.
+3. Commit — CI produces `public/newpage.html`.
 
 ### Committing changes
 
 When requested to commit changes, first review all changes in the working tree, regardless of whether they are staged.
-Always run `make` before committing to ensure `public/` is up to date.
-The commit should include both the source Markdown changes and the regenerated `public/` files.
+Do **not** commit `public/` or `manifest/` files — CI rebuilds these automatically.
+Only commit source Markdown, templates, and configuration changes.
 
 ### Creating PRs
 
 When a PR creation is requested, the agent should:
 
 1. Check if the repo is on a branch other than `main`; if not, create and checkout a new branch and inform the user.
-2. Run `make` to rebuild the site.
-3. Commit all changes (source + built output).
-4. Push to the remote.
-5. Use the `gh` CLI tool to create a PR with a `Summary` section at the top of the description.
+2. Commit all source changes (do **not** run `make` or commit built output).
+3. Push to the remote.
+4. Use the `gh` CLI tool to create a PR with a `Summary` section at the top of the description.
 
 PRs will be merged on GitHub.
 The PR description should clearly describe what documentation was added or changed.
 
 ## Caveats for Agents
 
-- **Always run `make` before committing.**
-  The `public/` directory must stay in sync with the source Markdown.
-  Cloudflare Pages deploys directly from `public/`, so stale output means stale docs.
+- **Do not commit `public/` or `manifest/` manually.**
+  CI automatically rebuilds and commits these on every PR and push to `main`.
+  Do not run `make` before committing — only commit source changes.
 - **Never gitignore `public/`.**
   The built website output must be committed so Cloudflare Pages can serve it.
 - **Use Pandoc-flavored Markdown.**
