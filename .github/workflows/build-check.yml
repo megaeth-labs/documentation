@@ -1,0 +1,27 @@
+name: Build Check
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  build-check:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install Pandoc
+        run: sudo apt-get update && sudo apt-get install -y pandoc
+
+      - name: Build
+        run: make
+
+      - name: Check public/ is up to date
+        run: |
+          if [ -n "$(git diff --name-only public/)" ]; then
+            echo "::error::public/ is out of date. Run 'make' locally and commit the output."
+            git diff --stat public/
+            exit 1
+          fi
