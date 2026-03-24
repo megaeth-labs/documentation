@@ -53,19 +53,49 @@
         </header>
 
         <main class="site-content">
-            <p>The complete MegaETH system will consist of the following logical components:</p>
-            <p><strong>Sequencers.</strong> Users’ transactions (write requests) coming into the system end up with them. They execute users’ transactions, assemble executed transactions into blocks, and disseminate execution results such as transaction receipts and state changes. They also submit the blocks to the L1 for finality.</p>
-            <p><strong>Read replicas.</strong> They maintain replicas of the chain’s state and (recent) history to service read requests. They may also choose to screen write requests by validating them against local replicas of the chain’s state. Depending on how a replica maintains the state and the history, there are two types of nodes.</p>
+            <p>The complete MegaETH system will consist of the following
+            logical components:</p>
+            <p><strong>Sequencers.</strong> Users’ transactions (write
+            requests) coming into the system end up with them. They
+            execute users’ transactions, assemble executed transactions
+            into blocks, and disseminate execution results such as
+            transaction receipts and state changes. They also submit the
+            blocks to the L1 for finality.</p>
+            <p><strong>Read replicas.</strong> They maintain replicas of
+            the chain’s state and (recent) history to service read
+            requests. They may also choose to screen write requests by
+            validating them against local replicas of the chain’s state.
+            Depending on how a replica maintains the state and the
+            history, there are two types of nodes.</p>
             <ul>
-            <li><em>Replica nodes.</em> They receive new blocks and execution results and apply them to local replicas of the chain’s state and history without validation.</li>
-            <li><em>Full nodes.</em> They receive new blocks, locally re-execute the blocks, and update local replicas of the chain’s state and history.</li>
+            <li><em>Replica nodes.</em> They receive new blocks and
+            execution results and apply them to local replicas of the
+            chain’s state and history without validation.</li>
+            <li><em>Full nodes.</em> They receive new blocks, locally
+            re-execute the blocks, and update local replicas of the
+            chain’s state and history.</li>
             </ul>
-            <p><strong>Provers.</strong> They receive new blocks, locally re-execute the blocks, and generate proofs for the blocks. These proofs might be fault proofs or validity proofs, depending on how the chain is operated.</p>
-            <p><strong>Data availability (DA) service.</strong> When a sequencer produces a block, it must submit to the DA service any associated data that the rest of the network depends on to process the block; the DA service will return a receipt certifying that the data is received and make the data publicly available for a finite period of time. Without the receipt, the sequencer cannot submit the block to the L1. The DA service ensures that replica nodes and full nodes can keep up with the chain’s state, and prover nodes can produce proofs for any block that is submitted to the L1, even if the sequencer maliciously withholds data.</p>
-            <p>The current phase of the MegaETH Testnet contains the following components:</p>
+            <p><strong>Provers.</strong> They receive new blocks,
+            locally re-execute the blocks, and generate proofs for the
+            blocks. These proofs might be fault proofs or validity
+            proofs, depending on how the chain is operated.</p>
+            <p><strong>Data availability (DA) service.</strong> When a
+            sequencer produces a block, it must submit to the DA service
+            any associated data that the rest of the network depends on
+            to process the block; the DA service will return a receipt
+            certifying that the data is received and make the data
+            publicly available for a finite period of time. Without the
+            receipt, the sequencer cannot submit the block to the L1.
+            The DA service ensures that replica nodes and full nodes can
+            keep up with the chain’s state, and prover nodes can produce
+            proofs for any block that is submitted to the L1, even if
+            the sequencer maliciously withholds data.</p>
+            <p>The current phase of the MegaETH Testnet contains the
+            following components:</p>
             <ul>
             <li>One sequencer</li>
-            <li>Multiple replica nodes maintained by MegaETH to serve RPC requests</li>
+            <li>Multiple replica nodes maintained by MegaETH to serve
+            RPC requests</li>
             <li>EigenDA devnet as the DA service</li>
             <li>An Ethereum devnet as the L1</li>
             </ul>
@@ -74,7 +104,8 @@
             <li>Multiple sequencers for failover and rotation</li>
             <li>Permissionless full nodes</li>
             <li>Permissionless replica nodes</li>
-            <li>Permissionless prover nodes running in optimistic (fault proof) mode</li>
+            <li>Permissionless prover nodes running in optimistic (fault
+            proof) mode</li>
             <li>Ethereum Testnet as the L1</li>
             </ul>
         </main>
