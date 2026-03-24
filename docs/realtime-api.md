@@ -252,7 +252,8 @@ the sequencer, it returns an error.
 
 ## Overview
 
-`eth_callAfter` is a specialized version of `eth_call` that waits for an account's nonce to reach a target value before executing the call. This is useful for simulating transactions that depend on the completion of prior transactions, such as checking the result of a swap after a preceding approval transaction has been confirmed.
+`eth_callAfter` is a specialized version of `eth_call` that waits for an account's nonce to reach a target value before executing the call.
+This is useful for simulating transactions that depend on the completion of prior transactions, such as checking the result of a swap after a preceding approval transaction has been confirmed.
 
 ## Parameters
 
@@ -279,8 +280,7 @@ Returns the same result as `eth_call` — the return data from the executed call
 
 | Code | Message | Description |
 |------|---------|-------------|
-| -32000 | ConditionNotMet | The nonce condition was not met within the timeout period |
-| -32000 | Timeout | The request timed out before the condition was met |
+| -32000 | Timeout | The nonce condition was not met within the timeout period |
 | -32000 | InternalError | An internal error occurred while processing the request |
 
 ## Example
