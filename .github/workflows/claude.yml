@@ -81,6 +81,12 @@ jobs:
             Review this pull request following the guidelines in CLAUDE.md and REVIEW.md.
             Be concise and actionable. Only comment on issues that matter.
 
+            Before writing new comments, check all previous review threads on this PR.
+            If a previous comment has been addressed by the latest changes, resolve that thread using:
+            gh api graphql -f query='mutation { resolveReviewThread(input:{threadId:"THREAD_ID"}) { thread { id } } }'
+            To find thread IDs, query: gh api graphql -f query='{ repository(owner:"${{ github.repository_owner }}", name:"${{ github.event.repository.name }}") { pullRequest(number:${{ github.event.pull_request.number }}) { reviewThreads(first:50) { nodes { id isResolved comments(first:1) { nodes { body path } } } } } } }'
+            Do not repeat feedback that has already been addressed.
+
             Use `gh pr comment` for top-level feedback.
             Use `mcp__github_inline_comment__create_inline_comment` (with `confirmed: true`) to highlight specific code issues.
 
