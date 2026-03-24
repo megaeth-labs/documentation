@@ -71,10 +71,18 @@
                     <li><a href="#overview">Overview</a></li>
                     <li><a href="#example-2">Example</a></li>
                     </ul></li>
-                    <li><a href="#paginated-log-queries-with-cursors">Paginated Log Queries with Cursors</a>
+                    <li><a href="#executing-calls-after-nonce-conditions">Executing Calls After Nonce Conditions</a>
                     <ul>
                     <li><a href="#overview-1">Overview</a></li>
+                    <li><a href="#parameters">Parameters</a></li>
+                    <li><a href="#returns">Returns</a></li>
+                    <li><a href="#error-codes">Error Codes</a></li>
                     <li><a href="#example-3">Example</a></li>
+                    </ul></li>
+                    <li><a href="#paginated-log-queries-with-cursors">Paginated Log Queries with Cursors</a>
+                    <ul>
+                    <li><a href="#overview-2">Overview</a></li>
+                    <li><a href="#example-4">Example</a></li>
                     </ul></li>
                     </ul>
                 </nav>
@@ -94,6 +102,7 @@
             <li><code>eth_subscribe</code>, when invoked over WebSocket, streams transaction logs, state changes, and block content as soon as the corresponding mini block is produced.</li>
             <li><code>realtime_sendRawTransaction</code> submits a transaction and returns the receipt in a single call — without requiring polling.</li>
             <li><code>eth_getLogsWithCursor</code> supports paginated log queries using a cursor, allowing applications to retrieve large datasets incrementally and reliably.</li>
+            <li><code>eth_callAfter</code> allows executing <code>eth_call</code> after waiting for an account’s nonce to reach a target value.</li>
             </ol>
             <h2 id="querying-account-and-chain-states">Querying Account and Chain States</h2>
             <p>The following API methods that query account and chain states, when invoked with <code>pending</code> or <code>latest</code> as the block tag, return results up to the most recent mini block.</p>
@@ -282,11 +291,157 @@
                 &quot;message&quot;: &quot;realtime transaction expired&quot;
               }
             }</code></pre>
-            <h2 id="paginated-log-queries-with-cursors">Paginated Log Queries with Cursors</h2>
+            <h2 id="executing-calls-after-nonce-conditions">Executing Calls After Nonce Conditions</h2>
             <h3 id="overview-1">Overview</h3>
+            <p><code>eth_callAfter</code> is a specialized version of <code>eth_call</code> that waits for an account’s nonce to reach a target value before executing the call. This is useful for simulating transactions that depend on the completion of prior transactions, such as checking the result of a swap after a preceding approval transaction has been confirmed.</p>
+            <h3 id="parameters">Parameters</h3>
+            <table>
+            <thead>
+            <tr class="header">
+            <th>Parameter</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="odd">
+            <td><code>request</code></td>
+            <td>Object</td>
+            <td>Yes</td>
+            <td>Standard <code>eth_call</code> request object (same as <code>eth_call</code>)</td>
+            </tr>
+            <tr class="even">
+            <td><code>condition</code></td>
+            <td>Object</td>
+            <td>Yes</td>
+            <td>Condition that must be met before executing the call</td>
+            </tr>
+            <tr class="odd">
+            <td><code>state_override</code></td>
+            <td>Object</td>
+            <td>No</td>
+            <td>State overrides to apply (same as <code>eth_call</code>)</td>
+            </tr>
+            <tr class="even">
+            <td><code>block_overrides</code></td>
+            <td>Object</td>
+            <td>No</td>
+            <td>Block overrides to apply (same as <code>eth_call</code>)</td>
+            </tr>
+            </tbody>
+            </table>
+            <h4 id="condition-object">Condition Object</h4>
+            <table>
+            <colgroup>
+            <col style="width: 19%" />
+            <col style="width: 16%" />
+            <col style="width: 27%" />
+            <col style="width: 36%" />
+            </colgroup>
+            <thead>
+            <tr class="header">
+            <th>Field</th>
+            <th>Type</th>
+            <th>Required</th>
+            <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="odd">
+            <td><code>account</code></td>
+            <td>Address</td>
+            <td>Yes</td>
+            <td>The account address whose nonce to monitor</td>
+            </tr>
+            <tr class="even">
+            <td><code>nonce</code></td>
+            <td>Hex Number</td>
+            <td>Yes</td>
+            <td>The target nonce value to wait for</td>
+            </tr>
+            <tr class="odd">
+            <td><code>timeout</code></td>
+            <td>Number</td>
+            <td>No</td>
+            <td>Maximum time to wait in milliseconds (default: 3000, max: 60000)</td>
+            </tr>
+            </tbody>
+            </table>
+            <h3 id="returns">Returns</h3>
+            <p>Returns the same result as <code>eth_call</code> — the return data from the executed call.</p>
+            <h3 id="error-codes">Error Codes</h3>
+            <table>
+            <colgroup>
+            <col style="width: 21%" />
+            <col style="width: 32%" />
+            <col style="width: 46%" />
+            </colgroup>
+            <thead>
+            <tr class="header">
+            <th>Code</th>
+            <th>Message</th>
+            <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr class="odd">
+            <td>-32000</td>
+            <td>ConditionNotMet</td>
+            <td>The nonce condition was not met within the timeout period</td>
+            </tr>
+            <tr class="even">
+            <td>-32000</td>
+            <td>Timeout</td>
+            <td>The request timed out before the condition was met</td>
+            </tr>
+            <tr class="odd">
+            <td>-32000</td>
+            <td>InternalError</td>
+            <td>An internal error occurred while processing the request</td>
+            </tr>
+            </tbody>
+            </table>
+            <h3 id="example-3">Example</h3>
+            <h4 id="basic-usage">Basic Usage</h4>
+            <p>Execute an <code>eth_call</code> after waiting for an account’s nonce to reach 5:</p>
+            <pre><code>{
+              &quot;jsonrpc&quot;: &quot;2.0&quot;,
+              &quot;method&quot;: &quot;eth_callAfter&quot;,
+              &quot;params&quot;: [
+                {
+                  &quot;from&quot;: &quot;0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266&quot;,
+                  &quot;to&quot;: &quot;0x1234567890abcdef1234567890abcdef12345678&quot;,
+                  &quot;data&quot;: &quot;0x70a08231000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266&quot;
+                },
+                {
+                  &quot;account&quot;: &quot;0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266&quot;,
+                  &quot;nonce&quot;: &quot;0x5&quot;,
+                  &quot;timeout&quot;: 30000
+                }
+              ],
+              &quot;id&quot;: 1
+            }</code></pre>
+            <h4 id="successful-response">Successful Response</h4>
+            <pre><code>{
+              &quot;jsonrpc&quot;: &quot;2.0&quot;,
+              &quot;id&quot;: 1,
+              &quot;result&quot;: &quot;0x0000000000000000000000000000000000000000000000000de0b6b3a7640000&quot;
+            }</code></pre>
+            <h4 id="error-response-condition-not-met">Error Response (Condition Not Met)</h4>
+            <pre><code>{
+              &quot;jsonrpc&quot;: &quot;2.0&quot;,
+              &quot;id&quot;: 1,
+              &quot;error&quot;: {
+                &quot;code&quot;: -32000,
+                &quot;message&quot;: &quot;Timeout: timeout waiting for nonce condition&quot;
+              }
+            }</code></pre>
+            <h2 id="paginated-log-queries-with-cursors">Paginated Log Queries with Cursors</h2>
+            <h3 id="overview-2">Overview</h3>
             <p><code>eth_getLogsWithCursor</code> is an enhanced version of <code>eth_getLogs</code> that adds support for pagination via a cursor. This allows applications to query large sets of logs while gracefully handing execution or memory limits on the RPC server. When a query exceeds server-side resource caps, the server returns a partial result and a cursor that marks where it left off. The client can then continue the query from that point.</p>
             <p>This method accepts the same parameters as <code>eth_getLogs</code>, with an additional optional <code>cursor</code>, which is an opaque string. If the query is too large and hits the server-side caps, it returns a partial list of logs and a <code>cursor</code> pointing to the next log to fetch. Clients can resume the query using the provided <code>cursor</code>. Absence of a <code>cursor</code> in the request indicates that the server should start the query at <code>fromBlock</code> as usual. Absence of a returned <code>cursor</code> indicates the query is complete. The cursor is derived from <code>(blockNumber + logIndex)</code> of the last log in the current batch, but users should treat it as an opaque string.</p>
-            <h3 id="example-3">Example</h3>
+            <h3 id="example-4">Example</h3>
             <p>To send an initial request, start with a standard <code>eth_getLogs</code>-style query. Set <code>fromBlock</code> and <code>toBlock</code> (or <code>blockHash</code>) and do <em>not</em> include a cursor.</p>
             <pre><code>{
               &quot;jsonrpc&quot;: &quot;2.0&quot;,
