@@ -143,18 +143,18 @@ When a transaction hits _any_ of the aforementioned per-transaction limits, the 
 3. Transaction is included in the block with status set to failed (status=0).
 4. No state changes from the transaction are applied.
 
-The per-block limits for compute gas, data size, KV updates, and state growth
-can only be fully evaluated after a transaction has been executed. When building
-a block, these limits are enforced as follows:
+The per-block limits for data size, KV updates, and state growth can only be fully evaluated after a transaction has been executed.
+When building a block, these limits are enforced as follows:
 
-1. Before executing a transaction, the block builder checks whether _any previous transaction_ has already caused the block to exceed a per-block limit. If so, the new transaction is rejected _before_ execution and the block is sealed.
-2. Otherwise, the transaction is executed. If its execution causes the block to exceed a per-block limit, the transaction is still included — it is not reverted or discarded. Per-transaction limits still apply.
+1. Before executing a transaction, the block builder checks whether _any previous transaction_ has already caused the block to exceed a per-block limit.
+   If so, the new transaction is rejected _before_ execution and the block is sealed.
+2. Otherwise, the transaction is executed.
+   If its execution causes the block to exceed a per-block limit, the transaction is still included — it is not reverted or discarded.
+   Per-transaction limits still apply.
 3. No further transactions will be added to the block after it exceeds any per-block limit.
 
-In other words, the last transaction in a block is allowed to push the block's
-resource usage beyond the per-block limit. This maximizes block utilization by
-avoiding the waste of a valid transaction whose resource consumption can only be
-known after execution.
+In other words, the last transaction in a block is allowed to push the block's resource usage beyond the per-block limit.
+This maximizes block utilization by avoiding the waste of a valid transaction whose resource consumption can only be known after execution.
 
 ## Definitions of Resource Types
 
