@@ -1,6 +1,5 @@
 ---
 title: MegaEVM
-rank: 5
 ---
 
 _MegaEVM_ is MegaETH's execution environment. It is fully compatible with Ethereum smart contracts while introducing optimizations for the unique characteristics of MegaETH's architecture.

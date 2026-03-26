@@ -1,6 +1,5 @@
 ---
 title: Testnet
-rank: 2
 ---
 
 # Important Messages

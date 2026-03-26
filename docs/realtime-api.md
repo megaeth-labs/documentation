@@ -1,7 +1,5 @@
 ---
 title: Realtime API
-owner: sami, william
-rank: 30
 ---
 
 MegaETH executes transactions as soon as they arrive at the sequencer. The sequencer emits _preconfirmations_ and _execution results_ of the transactions within 10 milliseconds of their arrival at the sequencer.

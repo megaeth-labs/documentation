@@ -1,7 +1,5 @@
 ---
 title: Faucet
-header-includes: <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-rank: 1000
 ---
 
 ```{=html}

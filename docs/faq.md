@@ -1,7 +1,5 @@
 ---
 title: FAQ
-owners: sami, alex
-rank: 900
 ---
 
 # Chain Behavior & EVM Compatibility 
@@ -13,7 +11,7 @@ rank: 900
 | **EIP-55**   | Mixed-case checksum address encoding                      |  Not enforced        | Addresses may appear in lowercase, especially in logs and WebSocket responses. |
 | **EIP-170**  | Contract code size limit                                  |  Not enforced        | MegaETH raises the contract size limit to **512KB** to support larger deployments. |
 | **EIP-1559** | Fee market change for ETH 1.0 chain                       |  Supported           | MegaETH uses a dynamically adjusting base fee model with a different set of parameters. |
-| **EIP-7702** | Account abstraction via temporary smart contract accounts |  Supported           | EOAs can be delegated to smart contracts and behave like smart contract wallets. See compatible tools [here](https://docs.megaeth.com/infra). |
+| **EIP-7702** | Account abstraction via temporary smart contract accounts |  Supported           | EOAs can be delegated to smart contracts and behave like smart contract wallets. See compatible tools [here](infra.md). |
 
 ## What versions of Solidity does MegaETH support?
 

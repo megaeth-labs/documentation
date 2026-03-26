@@ -1,6 +1,5 @@
 ---
 title: Mainnet 
-rank: 1
 ---
 
 # Chain Parameters
@@ -20,7 +19,7 @@ rank: 1
 
 MegaETH hosts a public RPC endpoint at https://mainnet.megaeth.com/rpc.
 
-See [Realtime API](/realtime-api.html) for a list of additional features on top
+See [Realtime API](realtime-api.md) for a list of additional features on top
 of the standard Ethereum JSON-RPC. These features are available on RPC
 endpoints provided by MegaETH; availability varies on third-party endpoints.
 
@@ -34,7 +33,7 @@ endpoints provided by MegaETH; availability varies on third-party endpoints.
 MegaETH's execution environment is called _MegaEVM_. It is fully compatible
 with Ethereum smart contracts but introduces a few differences compared to
 Ethereum's EVM especially around the gas model. See the [MegaEVM manual
-page](/megaevm.html) for a list of differences. Implementation of MegaEVM is
+page](megaevm.md) for a list of differences. Implementation of MegaEVM is
 opensource and can be found on
 [GitHub](https://github.com/megaeth-labs/mega-evm).
 
