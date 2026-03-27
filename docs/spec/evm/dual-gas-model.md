@@ -17,6 +17,8 @@ The dual gas model addresses this by pricing storage burden independently of com
 
 ## Specification
 
+The named constants referenced in this section are defined later in [Constants](#constants).
+
 ### Total Gas
 
 A node MUST compute total gas for every transaction as:
