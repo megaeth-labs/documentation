@@ -125,10 +125,10 @@ But for any page that defines behavioral rules, the full structure SHOULD be fol
 The user is the ultimate source of truth.
 This documentation is the canonical written specification of MegaETH's verifiable behavior, but user instructions override both the docs and the implementation when there is ambiguity or conflict.
 
-The `mega-evm` repository is a side channel for verification only.
-Agents MUST inspect the relevant implementation in `mega-evm` to confirm whether the documented behavior matches the current implementation, but the implementation code is not the final authority.
+The implementation repositories are side channels for verification only.
+Agents MUST inspect the relevant implementation in `mega-evm`, `mega-reth`, and any other repository that materially affects the documented behavior to confirm whether the specification matches the current implementation, but implementation code is not the final authority.
 
-If an agent finds or suspects any discrepancy between user intent, this specification, and the `mega-evm` implementation, the agent MUST NOT silently resolve it.
+If an agent finds or suspects any discrepancy between user intent, this specification, and the implementation behavior across `mega-evm`, `mega-reth`, or other relevant repositories, the agent MUST NOT silently resolve it.
 Instead, the agent MUST surface the discrepancy clearly and ask the user to confirm the intended behavior before changing the spec text.
 
 Do not describe this spec as "mirrored from mega-evm/docs".
