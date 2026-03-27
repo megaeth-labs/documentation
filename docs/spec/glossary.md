@@ -126,9 +126,9 @@ Per-call-frame resource budgets are introduced in Rex4.
 
 ## Spec (`MegaSpecId`)
 
-A set of MegaEVM behaviors: what the EVM does at a given stage.
+A set of MegaETH verifiable behaviors: the complete definition of what a correct node does at a given stage.
 
-Captures only execution-layer semantics.
+Captures the execution-layer semantics that determine node correctness.
 
 Progression: `EQUIVALENCE → MINI_REX → REX → REX1 → REX2 → REX3 → REX4`.
 

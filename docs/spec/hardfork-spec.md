@@ -8,14 +8,14 @@ This page defines both concepts and summarizes what each spec introduces.
 The protocol distinguishes between two related concepts:
 
 - **[Hardfork](glossary.md#hardfork-megahardfork)** — A network upgrade event: *when* changes are activated on the chain. A hardfork may include protocol-level changes beyond MegaEVM (e.g., networking, state sync, RPC behavior). Represented as `MegaHardfork` in the reference implementation.
-- **[Spec](glossary.md#spec-megaspecid)** — A set of MegaEVM behaviors: *what* the EVM does. A spec captures only the execution-layer semantics. Represented as `MegaSpecId` in the reference implementation.
+- **[Spec](glossary.md#spec-megaspecid)** — A set of MegaETH verifiable behaviors: *what* a correct node does. A spec captures the execution-layer semantics that determine node correctness. Represented as `MegaSpecId` in the reference implementation.
 
 Multiple hardforks can map to the same spec.
 A hardfork can also map to an older spec.
 For example: `MiniRex` → `MINI_REX`, `MiniRex1` → `EQUIVALENCE` (rollback), `MiniRex2` → `MINI_REX` (restoration).
 
-This documentation covers specs (MegaEVM behavior).
-Protocol-level changes outside MegaEVM that are part of a hardfork are not covered here.
+This documentation covers specs — the verifiable behavioral definitions that determine correctness of a MegaETH node.
+Protocol-level changes outside the verifiable execution layer (e.g., networking, peer discovery) that are part of a hardfork are not covered here.
 
 ## Spec Progression
 
@@ -37,7 +37,7 @@ This means:
 - Contracts deployed under a given spec will continue to behave identically after future upgrades.
 - Adding or modifying a system contract requires introducing a new spec.
 - Changing gas costs, opcode behavior, or resource limits requires a new spec.
-- Implementations should gate spec-specific behavior on the active spec (e.g., `spec.is_enabled(MINI_REX)`).
+- Implementations MUST gate spec-specific behavior on the active spec.
 
 ## Spec Summary
 

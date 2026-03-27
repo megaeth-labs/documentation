@@ -50,7 +50,7 @@ This specification is the normative reference that the developer docs summarize.
 
 ## Spec Progression
 
-MegaETH uses a spec system to version MegaEVM behavior at each stage of the protocol's evolution.
+MegaETH uses a spec system to version its verifiable behavior at each stage of the protocol's evolution.
 Each newer spec includes all previous behaviors:
 
 ```

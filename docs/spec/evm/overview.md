@@ -264,7 +264,7 @@ See [System Contracts Overview](../system-contracts/overview.md) for the full re
 
 | Topic | Description |
 | ----- | ----------- |
-| [Hardforks and Specs](../hardfork-spec.md) | How MegaETH versions MegaEVM behavior through hardforks and a linear spec progression |
+| [Hardforks and Specs](../hardfork-spec.md) | How MegaETH versions its verifiable behavior through hardforks and a linear spec progression |
 | [Dual Gas Model](dual-gas-model.md) | Compute gas vs storage gas formulas and SALT mechanics |
 | [Resource Limits](resource-limits.md) | Transaction and block limit values, two-phase checking, enforcement |
 | [Resource Accounting](resource-accounting.md) | How each resource dimension is tracked during execution |
