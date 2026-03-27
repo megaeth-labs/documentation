@@ -21,14 +21,13 @@ Use relative paths from the current file: `[Mainnet](../user/mainnet.md)` or `[E
 
 ### To the EVM Specification
 
-The EVM spec is a separate GitBook space. Use absolute URLs:
-`[Dual Gas Model](https://docs.megaeth.com/evm-spec/evm/dual-gas-model)`.
-Never use relative paths to the spec — it's in a different repository.
+The EVM spec is in `docs/spec/`. Use relative paths:
+`[Dual Gas Model](../spec/evm/dual-gas-model.md)`.
 
 ### Direction rule
 
 - **User docs → Developer docs**: "For technical details, see [Developer Docs](../dev/...)."
-- **Developer docs → EVM Spec**: "For the formal specification, see [EVM Spec](https://docs.megaeth.com/evm-spec/...)."
+- **Developer docs → EVM Spec**: "For the formal specification, see [Dual Gas Model](../spec/evm/dual-gas-model.md)."
 - **EVM Spec → nothing**: The spec is self-contained. It never links to user or developer docs.
 
 ## Content Reuse

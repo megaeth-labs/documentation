@@ -11,16 +11,17 @@ https://raw.githubusercontent.com/GitbookIO/public-docs/refs/heads/main/skill.md
 
 ## Documentation Architecture
 
-The site is organized into three layers, each targeting a different audience:
+The site is organized into four layers, each targeting a different audience:
 
 | Layer | Directory | Audience | Tone |
 |-------|-----------|----------|------|
 | **User Guide** | `docs/user/` | End users (wallets, DeFi users) | Plain language, no code |
 | **Developer Docs** | `docs/dev/` | Dapp/contract builders | Practical guidance, code examples |
 | **Integration Guide** | `docs/integration/` | Infra/ecosystem partners (wallets, indexers, bridges, oracles) | Integration-focused, config-heavy |
+| **Specification** | `docs/spec/` | Protocol implementers, auditors | Normative (MUST/SHALL), exhaustive |
 
 Each layer has its own `AGENTS.md` with layer-specific writing rules.
-A separate GitBook space for the **EVM Specification** lives in `mega-evm/docs/` (normative, MUST/SHALL language).
+The spec content is mirrored from `mega-evm/docs/` in the [mega-evm repository](https://github.com/megaeth-labs/mega-evm).
 
 ## Project Structure
 
@@ -40,9 +41,15 @@ A separate GitBook space for the **EVM Specification** lives in `mega-evm/docs/`
 │   │   ├── AGENTS.md          # Developer layer writing rules
 │   │   ├── rpc/               # RPC reference subsection
 │   │   └── *.md
-│   └── integration/           # Integration Guide layer
-│       ├── AGENTS.md          # Integration layer writing rules
-│       └── *.md
+│   ├── integration/           # Integration Guide layer
+│   │   ├── AGENTS.md          # Integration layer writing rules
+│   │   └── *.md
+│   └── spec/                  # Specification layer (mirrored from mega-evm/docs)
+│       ├── AGENTS.md          # Spec layer writing rules
+│       ├── evm/               # EVM behavioral spec
+│       ├── system-contracts/  # System contract specs
+│       ├── oracle-services/   # Oracle service specs
+│       └── upgrades/          # Per-upgrade behavioral deltas
 ├── docs-legacy/               # Previous Pandoc-based docs (archived)
 ├── .sisyphus/plans/           # Restructure planning docs
 └── .github/workflows/
@@ -108,7 +115,7 @@ When a PR creation is requested, the agent should:
 - **One sentence, one line.**
   When writing Markdown files, put each sentence on a separate line.
   This improves diff readability and makes reviews easier.
-- **Cross-link to the EVM spec with absolute URLs.**
-  The EVM spec is a separate GitBook space. Link to it as `https://docs.megaeth.com/evm-spec/...` (not relative paths).
+- **Cross-link to the EVM spec with relative paths.**
+  The EVM spec is in `docs/spec/`. Link to it as `[text](spec/evm/dual-gas-model.md)` from docs root, or `[text](../spec/evm/dual-gas-model.md)` from layer subdirectories.
 - **Keep commit messages simple.**
   No co-author information or "generated with" footers.
