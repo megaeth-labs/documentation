@@ -1,6 +1,6 @@
 # Hardforks and Specs
 
-MegaETH versions MegaEVM behavior through **hardforks** and **specs**.
+MegaETH versions its verifiable behavior through **hardforks** and **specs**.
 This page defines both concepts and summarizes what each spec introduces.
 
 ## Hardfork vs Spec

@@ -1,11 +1,13 @@
 # MegaETH Specification
 
-This documentation is the specification for the [MegaETH](https://megaeth.com) blockchain's execution layer.
-It covers everything that differs from standard Ethereum and Optimism: the EVM modifications, system contracts, oracle services, resource metering, and the upgrade history that defines how these features evolved.
+This is the formal specification of MegaETH's verifiable behavior — the complete, normative definition of how MegaETH processes transactions, enforces resource limits, and manages protocol state.
+It covers every behavioral difference from standard Ethereum and Optimism: the EVM modifications, system contracts, oracle services, resource metering, and the upgrade history that defines how these features evolved.
+
+Any node implementation that produces the same outputs given the same inputs for every case defined in this specification is a correct MegaETH node.
 
 The reference implementation is [MegaEVM](https://github.com/megaeth-labs/mega-evm), built on [revm](https://github.com/bluealloy/revm) and [op-revm](https://github.com/bluealloy/op-revm).
 All standard EVM semantics are inherited from Optimism Isthmus (Ethereum Prague) unless explicitly overridden.
-Contracts that don't touch MegaETH-specific features behave identically to Optimism.
+Transactions that don't touch MegaETH-specific features behave identically to Optimism.
 
 ## Why MegaETH Differs from Standard Ethereum
 
