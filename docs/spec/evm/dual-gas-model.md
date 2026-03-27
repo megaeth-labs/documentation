@@ -1,3 +1,7 @@
+---
+spec: Rex3
+---
+
 # Dual Gas Model
 
 MegaETH's dual gas model separates transaction gas costs into two independent dimensions: [compute gas](../glossary.md#compute-gas) (the gas charged for EVM computation, derived from standard EVM gas semantics) and [storage gas](../glossary.md#storage-gas) (an additional charge for operations that impose persistent storage burden on nodes).
@@ -107,10 +111,65 @@ The following rules MUST apply:
 - When `multiplier > 1`: storage gas MUST scale linearly as `base × (multiplier − 1)`.
 - The multiplier MUST be determined from the SALT bucket state of the **parent block**, not the current transaction's intermediate state.
 
-#### Bucket Assignment for New State
+#### Bucket ID Calculation
 
-For a storage slot or account that does not yet exist in the parent block's state, the node MUST determine the SALT bucket using the same bucket assignment algorithm used for existing state.
-The bucket capacity is determined by the existing entries in that bucket region, not by the new entry being written.
+For storage gas calculation, a node MUST determine the SALT bucket from the target key, regardless of whether the account or storage slot already exists.
+
+The bucket ID formula is:
+
+```
+bucket_id(key) = (ahash(key) mod NUM_KV_BUCKETS) + NUM_META_BUCKETS
+```
+
+Where `ahash` is the fixed-seed deterministic hash function defined by SALT.
+The canonical bucket-mapping implementation is in the [SALT repository](https://github.com/megaeth-labs/salt/blob/main/salt/src/state/hasher.rs).
+
+- For account creation, the bucket ID MUST be computed from the target account address.
+- For an `SSTORE`-triggered new storage write, the bucket ID MUST be computed from the concatenation of the contract address and storage slot key.
+
+Equivalently:
+
+```
+account_bucket_id = bucket_id(address_bytes)
+slot_bucket_id = bucket_id(address_bytes || slot_key_bytes)
+```
+
+The multiplier MUST be computed from the capacity of that bucket in the parent-block state, before the new account or storage slot is created.
+
+#### Bucket Capacity Determination
+
+Bucket capacity is determined by SALT bucket metadata.
+Each data bucket has a minimum capacity of `MIN_BUCKET_SIZE` (256 slots).
+
+SALT determines capacity using the following rule:
+
+1. A bucket starts at `MIN_BUCKET_SIZE`.
+2. Let `used` be the number of occupied slots in the bucket.
+3. If `used > capacity × 80%`, the bucket MUST expand.
+4. Expansion doubles the bucket capacity.
+5. Expansion repeats until `used / capacity ≤ 80%`.
+
+Equivalently:
+
+```
+new_capacity = capacity
+while used * 100 > new_capacity * 80:
+    new_capacity = new_capacity * 2
+```
+
+The resulting capacity is a power-of-two multiple of `MIN_BUCKET_SIZE` under normal operation.
+The maximum bucket capacity is `2^40` slots.
+
+Buckets larger than `MIN_BUCKET_SIZE` are represented as multiple 256-slot segments under a local SALT bucket subtree.
+As capacity grows, the bucket subtree root moves upward to cover the larger slot range.
+
+For storage gas calculation, a node MUST use the capacity recorded for the target bucket in the parent-block state.
+It MUST NOT derive capacity from the transaction's intermediate writes.
+
+The canonical design references are:
+
+- [SALT README — Dynamic Bucket Sizing and Bucket Management](https://github.com/megaeth-labs/salt/blob/main/salt/README.md)
+- [`salt/src/constant.rs`](https://github.com/megaeth-labs/salt/blob/main/salt/src/constant.rs) for `MIN_BUCKET_SIZE`, resize threshold, and resize multiplier
 
 ### Transaction Intrinsic Costs
 
@@ -143,6 +202,8 @@ A transaction with `gas_limit < 60,000 + calldata_gas` MUST be rejected as inval
 | `CALLDATA_FLOOR_NONZERO_STORAGE_GAS` | 400 | Storage gas floor per non-zero byte of calldata |
 | `STORAGE_GAS_MULTIPLIER` | 10 | Ratio of calldata/LOG storage gas to standard EVM costs |
 | [`MIN_BUCKET_SIZE`](../glossary.md#min_bucket_size) | 256 | Smallest [SALT bucket](../glossary.md#salt-bucket) capacity |
+| `NUM_META_BUCKETS` | 65,536 | Number of SALT buckets reserved for metadata |
+| `NUM_KV_BUCKETS` | 16,711,680 | Number of SALT buckets available for key-value state |
 
 ## Rationale
 

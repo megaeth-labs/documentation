@@ -32,6 +32,26 @@ bytes32 value = oracle.getSlot(slot);
 Some oracle services also provide a dedicated wrapper contract with a typed interface (such as the High-Precision Timestamp below).
 Check the service's documentation for the wrapper address and ABI.
 
+### How Oracle-Backed Services Work
+
+Oracle-backed services are not separate storage systems.
+They are sequencer-operated data feeds built on top of the Oracle contract.
+Each service is allocated a range of Oracle storage slots.
+
+For each user transaction, the sequencer opens an oracle window and takes a snapshot of the current service data.
+If the transaction reads one of those slots, the sequencer records the accessed slots and generates a system transaction that writes the snapshot values into the Oracle contract before the user transaction in the final block order.
+
+This means:
+
+- each transaction sees a stable snapshot,
+- successive transactions can observe updated values,
+- and no on-chain Oracle write is required when a transaction does not access Oracle-backed data.
+
+{% hint style="info" %}
+Oracle-backed values are published by the sequencer.
+Using them requires trusting the sequencer to provide accurate off-chain data.
+{% endhint %}
+
 ## High-Precision Timestamp Oracle
 
 This oracle provides timestamps at microsecond resolution.
@@ -83,6 +103,14 @@ uint256 timestampUs = uint256(oracle.getSlot(0));
 - **Monotonicity:** Non-decreasing within a block
 
 **Common use cases:** HFT strategies, rate limiting, latency measurements, sub-second auctions, TWAP calculations.
+
+### Timestamp Snapshot Semantics
+
+The timestamp value is captured per transaction.
+Within a single transaction, repeated reads observe the same snapshot value.
+Across transactions in the same block, the value is non-decreasing and may increase.
+
+The timestamp is capped above by `block.timestamp × 1_000_000`, so it never exceeds the block timestamp converted to microseconds.
 
 {% hint style="success" %}
 Read the timestamp as late as possible in your execution flow.

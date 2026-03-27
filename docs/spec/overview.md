@@ -1,3 +1,7 @@
+---
+spec: Rex3
+---
+
 # MegaETH Specification
 
 This is the formal specification of MegaETH's verifiable behavior — the complete, normative definition of how MegaETH processes transactions, enforces resource limits, and manages protocol state.

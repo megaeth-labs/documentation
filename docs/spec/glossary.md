@@ -1,3 +1,7 @@
+---
+spec: Rex3
+---
+
 # Glossary
 
 ## Compute gas

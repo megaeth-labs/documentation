@@ -9,6 +9,10 @@ This includes but is not limited to EVM execution — gas accounting, resource l
 
 ## Page Structure
 
+Every spec page MUST include YAML frontmatter with a `spec` field — the latest stable spec that this page's main content describes (e.g., `Rex3`).
+This field is the single source of truth for which spec version the page reflects.
+When the latest stable spec changes, update this field and the page content together.
+
 Every spec page MUST follow this section order:
 
 ```
@@ -42,6 +46,62 @@ Links to upgrade pages showing how this behavior evolved across specs.
 
 **Sections may be omitted** when they genuinely don't apply (e.g., a glossary page has no Constants or Motivation).
 But for any page that defines behavioral rules, the full structure SHOULD be followed.
+
+### Spec History Format
+
+For **overview pages**, the Spec History section SHOULD be a simple list of specs linking to their upgrade pages.
+Each item SHOULD include one short sentence summarizing the main change introduced by that spec.
+Do not use tables or detailed changelog breakdowns there.
+
+Example:
+
+```markdown
+## Spec History
+
+- [MiniRex](../upgrades/minirex.md) — Introduced the initial MegaEVM execution model.
+- [Rex](../upgrades/rex.md) — Revised gas forwarding and storage-gas semantics.
+- [Rex1](../upgrades/rex1.md) — Fixed detained compute-gas reset behavior.
+- [Rex2](../upgrades/rex2.md) — Added KeylessDeploy and enabled SELFDESTRUCT with EIP-6780 semantics.
+- [Rex3](../upgrades/rex3.md) — Revised oracle detention to use SLOAD-based triggering.
+- [Rex4](../upgrades/rex4.md) *(unstable)* — Introduces per-call-frame limits and relative detention.
+```
+
+For **concept pages**, the Spec History section MAY summarize what changed at each spec if that helps explain the evolution of the behavior.
+
+Rules for the Spec History table:
+- Only list specs that changed behavior relevant to this page. Do not list specs that inherited behavior unchanged (unless noting "No changes" is clarifying).
+- The "Change" column is a short summary (one sentence). Detailed previous/new behavior belongs in the linked upgrade page.
+- The "Key values" column shows the concrete values introduced at that spec — constants, limits, formulas. Use "N/A" if the change is purely behavioral with no new numeric values.
+- Link each spec name to its upgrade page under `upgrades/`.
+
+**Overview-page exception**: overview/index pages that summarize and organize links to authoritative subpages SHOULD omit Motivation and Rationale.
+For those pages, use a lighter structure such as:
+
+```
+# Page Title
+Abstract: 1-2 sentence summary.
+
+## Stable Scope
+What stable behavior the overview summarizes.
+
+## Specifications
+Grouped summaries of the relevant concept pages.
+
+## Spec History
+Optional, if it helps orient readers.
+```
+
+## Accuracy
+
+- **Verify constants against source code.**
+  Every numeric value (gas limits, storage gas bases, detention caps, contract addresses) MUST be verified against the implementation source (`mega-evm`, `mega-reth`, etc.) before writing or updating.
+  Do not copy values from other documentation pages without cross-checking.
+- **Attribute behavior to the correct spec.**
+  If a behavior was introduced in Rex3, reference Rex3 — not Rex4, even if Rex4 inherits it.
+  Each spec's contribution must be precisely scoped.
+- **Do not invent guarantees.**
+  The specification MUST NOT introduce constraints or behavioral rules that are not verified against the implementation.
+  If uncertain, surface the ambiguity to the user rather than guessing.
 
 ## Tone & Language
 
@@ -83,8 +143,16 @@ But for any page that defines behavioral rules, the full structure SHOULD be fol
 - For any cost or fee, specify WHEN it is charged: before execution, at the opcode, or post-execution.
 - Specify what happens on failure: is the cost consumed, refunded, or rolled back?
 
-### Unstable Features
+### Spec Versioning
 
+- Main content in concept pages MUST describe the latest stable spec's behavior only.
+  Previous spec behavior belongs in the Spec History table or upgrade pages.
+  Unstable spec behavior MUST be placed in `<details>` blocks, never in main prose or tables.
+- **The latest spec is implicit.**
+  Do not mention the latest spec name in the Specification, Constants, or Motivation sections.
+  The `spec` frontmatter field declares which spec the page describes.
+  Readers should be able to read the main content without encountering "as of Rex3" or "in Rex3" qualifiers.
+  The Rationale section MAY reference spec names when explaining historical design decisions.
 - Wrap unstable (not-yet-activated) spec content in `<details>` blocks with a clear label (e.g., "Rex4 (unstable): ...").
 - Unstable content MUST still use normative language within the `<details>` block.
 
@@ -101,6 +169,61 @@ But for any page that defines behavioral rules, the full structure SHOULD be fol
 - Each design decision is a **named paragraph** starting with bold text (e.g., "**Why `base × (multiplier − 1)` instead of `base × multiplier`?**").
 - Explain the trade-off: what was considered, what was rejected, and why.
 - Reference historical changes where applicable (e.g., "MiniRex used X, Rex changed to Y because...").
+
+## Upgrade Page Rules
+
+Upgrade pages under `upgrades/` are the authoritative record of what changed at each spec.
+They complement concept pages: concept pages describe the current behavior, upgrade pages describe the delta.
+
+### Required Structure
+
+Every upgrade page MUST follow this structure:
+
+```markdown
+---
+spec: <SpecName>
+---
+
+# <SpecName> Network Upgrade
+
+This page is an informative summary of the <SpecName> specification.
+
+## Summary
+2-4 paragraphs: what changed, what problem it solves, developer impact.
+
+## What Changed
+
+### <Change Name>
+
+#### Previous behavior
+- Precise description of behavior before this spec.
+- Include concrete values, formulas, or rules that were in effect.
+
+#### New behavior
+- Precise description of behavior introduced by this spec.
+- Include the new values, formulas, or rules.
+
+### <Next Change Name>
+...
+
+## Developer Impact
+What contract authors, integrators, and tooling authors need to know.
+
+## Safety and Compatibility
+Backward-compatibility boundaries, failure-mode differences.
+
+## References
+Links to the implementation repo, related EIPs, or other specs.
+```
+
+### Precision Requirements
+
+- Every "Previous behavior" section MUST state the exact prior values, formulas, or rules — not just "it was different."
+  A reader should be able to implement the previous spec from the "Previous behavior" text alone.
+- Every "New behavior" section MUST state the exact new values, formulas, or rules.
+- Do not merge changes so aggressively that the previous/new mapping becomes unclear.
+  Each behavioral change gets its own subsection under "What Changed."
+- If a change fixes a bug in a prior spec, state what the buggy behavior was and what the corrected behavior is.
 
 ## What Belongs Here
 
@@ -134,9 +257,21 @@ Instead, the agent MUST surface the discrepancy clearly and ask the user to conf
 Do not describe this spec as "mirrored from mega-evm/docs".
 The old `mega-evm/docs` content is transitional and may be removed.
 
+## Linking Rules
+
+- **Link glossary terms on first use.**
+  The first mention of a MegaETH-specific term on a page SHOULD link to its glossary entry.
+  Do not over-link — subsequent uses on the same page need not be linked.
+- **Link spec names to their upgrade pages.**
+  When a spec is mentioned by name (e.g., MiniRex, Rex, Rex3), link it to the corresponding upgrade page under `upgrades/`.
+- **Anchor targets must be headings.**
+  Any content that is the target of a `#fragment` link MUST be a markdown heading (`##`, `###`, etc.), not bold text or other inline formatting.
+  GitBook generates anchors only from headings.
+
 ## Formatting Preferences
 
 - Use tables for structured data (gas costs, opcode lists, resource limits, constants).
+- Use unambiguous table values. Write "Unlimited", "No limit", or "N/A" — never use bare dashes ("—") which are ambiguous (not applicable? unknown? unlimited?).
 - Use `<details>` blocks for unstable (Rex4) features.
 - Use `{% hint style="info" %}` sparingly — only for non-normative notes that help implementers understand design intent. Never for developer tips.
 - Use `{% hint style="warning" %}` for unstable spec warnings.

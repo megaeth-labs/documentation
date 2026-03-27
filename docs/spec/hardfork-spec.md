@@ -1,3 +1,7 @@
+---
+spec: Rex3
+---
+
 # Hardforks and Specs
 
 MegaETH versions its verifiable behavior through **hardforks** and **specs**.

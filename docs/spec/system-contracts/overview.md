@@ -1,49 +1,71 @@
+---
+description: Registry and protocol-level semantics of MegaETH system contracts.
+spec: Rex3
+---
+
 # System Contracts
 
-MegaETH pre-deploys **system contracts** at well-known addresses as part of the protocol.
-They provide infrastructure services (oracle storage, keyless deployment, access control) that are available to all smart contracts on the network.
-System contracts are deployed idempotently during block execution, gated by [hardfork](../hardfork-spec.md) activation.
+This page specifies the system-contract registry and the protocol-level rules that apply to system contracts in MegaETH.
+It defines the system-contract set.
 
-## Registry
+## Specifications
 
-| Contract             | Address                                        | Since  | Purpose                               |
-| -------------------- | ---------------------------------------------- | ------ | ------------------------------------- |
-| [Oracle](oracle.md)  | `0x6342000000000000000000000000000000000001`    | [MiniRex](../hardfork-spec.md#mini_rex) | Off-chain data key-value storage      |
-| [High-Precision Timestamp](../oracle-services/timestamp.md) | `0x6342000000000000000000000000000000000002` | [MiniRex](../hardfork-spec.md#mini_rex) | Sub-second block timestamp ([oracle service](../oracle-services/overview.md)) |
-| [KeylessDeploy](keyless-deploy.md) | `0x6342000000000000000000000000000000000003`    | [Rex2](../hardfork-spec.md#rex2)   | Deterministic cross-chain deployment  |
+### Stable Registry
 
-<details>
+A node MUST recognize the following contracts as system contracts:
 
-<summary>Rex4 (unstable): New System Contracts</summary>
+| Contract | Address | Since | Purpose |
+| -------- | ------- | ----- | ------- |
+| [Oracle](oracle.md) | `ORACLE_CONTRACT_ADDRESS` | [MiniRex](../upgrades/minirex.md) | Off-chain data key-value storage |
+| [High-Precision Timestamp](../oracle-services/timestamp.md) | `HIGH_PRECISION_TIMESTAMP_ADDRESS` | [MiniRex](../upgrades/minirex.md) | Sub-second timestamp oracle service |
+| [KeylessDeploy](keyless-deploy.md) | `KEYLESS_DEPLOY_ADDRESS` | [Rex2](../upgrades/rex2.md) | Deterministic cross-chain deployment |
 
-| Contract          | Address                                        | Purpose                               |
-| ----------------- | ---------------------------------------------- | ------------------------------------- |
-| MegaAccessControl | `0x6342000000000000000000000000000000000004`    | Disable [volatile data](../glossary.md#volatile-data) access detection |
-| MegaLimitControl  | `0x6342000000000000000000000000000000000005`    | Query remaining [compute gas](../glossary.md#compute-gas) budget    |
+### Deployment Semantics
 
-See [Rex4 Network Upgrade](../upgrades/rex4.md) for details.
-
-</details>
-
-## Key Design Aspects
-
-### MEGA_SYSTEM_ADDRESS
-
-The `MEGA_SYSTEM_ADDRESS` (`0xA887dCB9D5f39Ef79272801d05Abdf707CFBbD1d`) is a special account intended for sequencer-managed maintenance operations.
-Whitelisted transactions from this address are processed as deposit-like transactions, bypassing signature validation and execution-fee charging.
-This is how the sequencer updates oracle storage.
-
-See [Mega System Transactions](system-tx.md) for details.
-
-### Backward Compatibility
-
-Any system contract modification requires a new spec.
-This ensures that the behavior of existing specs is preserved across upgrades.
+System contracts MUST be available at their specified addresses when the corresponding spec is active.
+Their availability is gated by [spec](../hardfork-spec.md) activation.
 
 ### Intercepted Methods
 
-Some system contract methods are handled at the EVM level rather than by on-chain bytecode.
-These methods are only available via direct CALL — DELEGATECALL and CALLCODE to system contract addresses are not intercepted and fall through to on-chain bytecode.
+Some system-contract methods are handled at the EVM level rather than exclusively by contract bytecode.
+The following interception rules apply:
 
-- [KeylessDeploy](keyless-deploy.md): `keylessDeploy` is intercepted at depth 0 only. Unknown selectors or non-top-level calls fall through to on-chain bytecode, which reverts with `NotIntercepted()`.
-- [Oracle](oracle.md): `sendHint` is intercepted to forward hints to the sequencer. All other methods execute via deployed bytecode.
+- [`KeylessDeploy.keylessDeploy`](keyless-deploy.md) MUST be intercepted at transaction depth 0 only.
+- Unknown selectors sent to `KeylessDeploy`, or calls that are not intercepted, MUST fall through to contract bytecode and revert with `NotIntercepted()`.
+- [`Oracle.sendHint`](oracle.md) MUST be intercepted to forward hint data to the external oracle backend.
+- Other Oracle methods MUST execute via ordinary contract bytecode unless explicitly specified otherwise.
+
+`DELEGATECALL` and `CALLCODE` to system-contract addresses MUST NOT receive special interception semantics unless explicitly specified on the corresponding concept page.
+
+### Backward Compatibility Rule
+
+Any change to system-contract semantics, bytecode-visible interface behavior, or interception rules MUST be introduced by a new spec.
+Stable behavior for an already-activated spec MUST remain unchanged.
+
+<details>
+<summary>Rex4 (unstable): Additional system contracts</summary>
+
+For Rex4, a node MUST additionally recognize:
+
+| Contract | Address | Purpose |
+| -------- | ------- | ------- |
+| MegaAccessControl | `MEGA_ACCESS_CONTROL_ADDRESS` | Volatile-data access control |
+| MegaLimitControl | `MEGA_LIMIT_CONTROL_ADDRESS` | Query remaining compute-gas budget |
+
+</details>
+
+## Constants
+
+| Constant | Value | Description |
+| -------- | ----- | ----------- |
+| `ORACLE_CONTRACT_ADDRESS` | `0x6342000000000000000000000000000000000001` | Stable Oracle system-contract address |
+| `HIGH_PRECISION_TIMESTAMP_ADDRESS` | `0x6342000000000000000000000000000000000002` | Stable high-precision timestamp wrapper address |
+| `KEYLESS_DEPLOY_ADDRESS` | `0x6342000000000000000000000000000000000003` | Stable KeylessDeploy system-contract address |
+| `MEGA_ACCESS_CONTROL_ADDRESS` | `0x6342000000000000000000000000000000000004` | Unstable Rex4 MegaAccessControl address |
+| `MEGA_LIMIT_CONTROL_ADDRESS` | `0x6342000000000000000000000000000000000005` | Unstable Rex4 MegaLimitControl address |
+
+## Spec History
+
+- [MiniRex](../upgrades/minirex.md) introduced the Oracle and High-Precision Timestamp contracts.
+- [Rex2](../upgrades/rex2.md) introduced KeylessDeploy.
+- [Rex4](../upgrades/rex4.md) adds unstable MegaAccessControl and MegaLimitControl contracts.
