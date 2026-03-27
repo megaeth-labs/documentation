@@ -122,9 +122,17 @@ But for any page that defines behavioral rules, the full structure SHOULD be fol
 
 ## Source of Truth
 
-This content is mirrored from `mega-evm/docs/` in the [mega-evm repository](https://github.com/megaeth-labs/mega-evm).
-When updating spec content, ensure both locations stay in sync.
-The mega-evm repository is the authoritative source.
+The user is the ultimate source of truth.
+This documentation is the canonical written specification of MegaETH's verifiable behavior, but user instructions override both the docs and the implementation when there is ambiguity or conflict.
+
+The `mega-evm` repository is a side channel for verification only.
+Agents MUST inspect the relevant implementation in `mega-evm` to confirm whether the documented behavior matches the current implementation, but the implementation code is not the final authority.
+
+If an agent finds or suspects any discrepancy between user intent, this specification, and the `mega-evm` implementation, the agent MUST NOT silently resolve it.
+Instead, the agent MUST surface the discrepancy clearly and ask the user to confirm the intended behavior before changing the spec text.
+
+Do not describe this spec as "mirrored from mega-evm/docs".
+The old `mega-evm/docs` content is transitional and may be removed.
 
 ## Formatting Preferences
 
