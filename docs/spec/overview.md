@@ -27,14 +27,15 @@ MegaETH addresses these problems with a targeted set of protocol-level modificat
 
 ## How to Use This Documentation
 
-This documentation serves two audiences:
+This specification targets teams implementing MegaETH-compatible execution clients, auditors verifying protocol correctness, and anyone who needs the exact behavioral semantics of MegaEVM.
 
-**App builders** — developers building smart contracts and dApps on MegaETH.
-Start with the [MegaEVM Overview](evm/overview.md) for a complete reference of current behavior, then check the [System Contracts](system-contracts/overview.md) and [Oracle Services](oracle-services/overview.md) for available infrastructure.
-You primarily need to understand how gas costs differ and what resource limits apply to your transactions.
-
-**Node builders** — teams implementing MegaETH-compatible execution clients.
 Start with [Hardforks and Specs](hardfork-spec.md) to understand how behavior is versioned, then read each [Network Upgrade](upgrades/overview.md) page for the exact behavioral deltas introduced at each spec.
+For the current stable behavior as a single reference, see the [MegaEVM Overview](evm/overview.md).
+
+{% hint style="info" %}
+If you are building smart contracts or dApps on MegaETH, the [Developer Docs](../dev/getting-started.md) provide practical guidance with code examples.
+This specification is the normative reference that the developer docs summarize.
+{% endhint %}
 
 ## Reference Implementation
 
