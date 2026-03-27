@@ -129,12 +129,19 @@ All transactions MUST pay both compute gas and storage gas as intrinsic costs be
 These costs are in addition to standard calldata gas (both compute and storage components).
 A transaction with `gas_limit < 60,000 + calldata_gas` MUST be rejected as invalid.
 
-## Rationale
+## Motivation
 
-**Why separate compute and storage gas?**
-MegaETH features extremely low base fees and high transaction gas limits.
-Under standard EVM gas pricing, operations that impose storage costs on nodes (state writes, logs, calldata) become dramatically underpriced relative to their actual cost to node operators.
-Separating gas into compute and storage dimensions allows storage-heavy operations to be priced at their true cost even when base fees are near zero.
+Standard EVM gas pricing assumes a base fee high enough that storage-heavy operations (state writes, logs, calldata) are adequately priced by compute gas alone.
+MegaETH breaks this assumption in two ways:
+
+1. **Extremely low base fees** — MegaETH's base fee is 0.001 gwei (10⁶ wei), orders of magnitude lower than Ethereum mainnet. At this fee level, the compute gas cost of an SSTORE (22,100 gas) is negligible relative to the actual cost of persisting the state change.
+
+2. **High transaction gas limits** — MegaETH allows up to 10 billion gas per block. A single transaction could write thousands of storage slots, deploy megabytes of bytecode, or emit massive logs for near-zero cost under standard gas pricing.
+
+Without a separate storage gas dimension, a single transaction could bloat on-chain state or history data to unsustainable levels.
+The dual gas model addresses this by pricing storage burden independently of computation, ensuring that state-heavy operations pay their true cost to node operators regardless of the base fee level.
+
+## Rationale
 
 **Why `base × (multiplier − 1)` instead of `base × multiplier`?**
 The MiniRex spec originally used `base × multiplier`, which charged storage gas even in uncrowded state regions (multiplier = 1).
@@ -147,6 +154,10 @@ The non-refundable design ensures that every state-expanding operation pays its 
 
 **Why 10× multiplier for calldata and LOG?**
 The `STORAGE_GAS_MULTIPLIER` of 10 was chosen to reflect the long-term storage and data availability costs that calldata and log operations impose on nodes, relative to their standard EVM gas costs which were designed for Ethereum's higher base fee regime.
+
+**Why a flat intrinsic storage gas?**
+Every transaction imposes a baseline storage cost on nodes regardless of its execution: the transaction itself must be stored, the receipt must be persisted, and account state (nonce, balance) must be updated.
+The 39,000 flat intrinsic storage gas covers this per-transaction overhead.
 
 ## Spec History
 
