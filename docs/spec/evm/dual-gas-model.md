@@ -15,25 +15,6 @@ MegaETH breaks this assumption in two ways:
 Without a separate storage gas dimension, a single transaction could bloat on-chain state or history data to unsustainable levels.
 The dual gas model addresses this by pricing storage burden independently of computation, ensuring that state-heavy operations pay their true cost to node operators regardless of the base fee level.
 
-## Constants
-
-| Constant | Value | Description |
-| -------- | ----- | ----------- |
-| `INTRINSIC_COMPUTE_GAS` | 21,000 | Standard EVM intrinsic gas for all transactions |
-| `INTRINSIC_STORAGE_GAS` | 39,000 | Storage gas intrinsic for all transactions |
-| `SSTORE_STORAGE_GAS_BASE` | 20,000 | Base storage gas for SSTORE (0 → non-0) |
-| `ACCOUNT_CREATION_STORAGE_GAS_BASE` | 25,000 | Base storage gas for account creation |
-| `CONTRACT_CREATION_STORAGE_GAS_BASE` | 32,000 | Base storage gas for contract creation |
-| `CODE_DEPOSIT_STORAGE_GAS` | 10,000 | Storage gas per byte of deployed bytecode |
-| `LOG_TOPIC_STORAGE_GAS` | 3,750 | Storage gas per LOG topic |
-| `LOG_DATA_STORAGE_GAS` | 80 | Storage gas per byte of LOG data |
-| `CALLDATA_ZERO_STORAGE_GAS` | 40 | Storage gas per zero byte of calldata |
-| `CALLDATA_NONZERO_STORAGE_GAS` | 160 | Storage gas per non-zero byte of calldata |
-| `CALLDATA_FLOOR_ZERO_STORAGE_GAS` | 100 | Storage gas floor per zero byte of calldata |
-| `CALLDATA_FLOOR_NONZERO_STORAGE_GAS` | 400 | Storage gas floor per non-zero byte of calldata |
-| `STORAGE_GAS_MULTIPLIER` | 10 | Ratio of calldata/LOG storage gas to standard EVM costs |
-| [`MIN_BUCKET_SIZE`](../glossary.md#min_bucket_size) | 256 | Smallest [SALT bucket](../glossary.md#salt-bucket) capacity |
-
 ## Specification
 
 ### Total Gas
@@ -141,6 +122,25 @@ All transactions MUST pay both compute gas and storage gas as intrinsic costs be
 
 These costs are in addition to standard calldata gas (both compute and storage components).
 A transaction with `gas_limit < 60,000 + calldata_gas` MUST be rejected as invalid.
+
+## Constants
+
+| Constant | Value | Description |
+| -------- | ----- | ----------- |
+| `INTRINSIC_COMPUTE_GAS` | 21,000 | Standard EVM intrinsic gas for all transactions |
+| `INTRINSIC_STORAGE_GAS` | 39,000 | Storage gas intrinsic for all transactions |
+| `SSTORE_STORAGE_GAS_BASE` | 20,000 | Base storage gas for SSTORE (0 → non-0) |
+| `ACCOUNT_CREATION_STORAGE_GAS_BASE` | 25,000 | Base storage gas for account creation |
+| `CONTRACT_CREATION_STORAGE_GAS_BASE` | 32,000 | Base storage gas for contract creation |
+| `CODE_DEPOSIT_STORAGE_GAS` | 10,000 | Storage gas per byte of deployed bytecode |
+| `LOG_TOPIC_STORAGE_GAS` | 3,750 | Storage gas per LOG topic |
+| `LOG_DATA_STORAGE_GAS` | 80 | Storage gas per byte of LOG data |
+| `CALLDATA_ZERO_STORAGE_GAS` | 40 | Storage gas per zero byte of calldata |
+| `CALLDATA_NONZERO_STORAGE_GAS` | 160 | Storage gas per non-zero byte of calldata |
+| `CALLDATA_FLOOR_ZERO_STORAGE_GAS` | 100 | Storage gas floor per zero byte of calldata |
+| `CALLDATA_FLOOR_NONZERO_STORAGE_GAS` | 400 | Storage gas floor per non-zero byte of calldata |
+| `STORAGE_GAS_MULTIPLIER` | 10 | Ratio of calldata/LOG storage gas to standard EVM costs |
+| [`MIN_BUCKET_SIZE`](../glossary.md#min_bucket_size) | 256 | Smallest [SALT bucket](../glossary.md#salt-bucket) capacity |
 
 ## Rationale
 

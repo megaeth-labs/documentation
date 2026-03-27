@@ -20,14 +20,16 @@ The problem statement: what problem exists that this spec solves.
 Describes the concrete failure modes or limitations that necessitate this behavior.
 This section explains WHY the spec exists, not how it works.
 
-## Constants
-Table of all named constants with values and descriptions.
-Every constant referenced in the Specification section MUST appear here.
-
 ## Specification
 The normative behavioral definition.
 Subsections organized by logical component.
 All behavioral rules use MUST/MUST NOT/SHALL/SHOULD/MAY per RFC 2119.
+
+## Constants
+Table of all named constants with values and descriptions.
+Every constant referenced in the Specification section MUST appear here.
+Placed after the Specification so readers encounter the behavioral rules first
+and can reference constants as needed.
 
 ## Rationale
 Design decisions: why this specific solution over alternatives.
