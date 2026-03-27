@@ -7,13 +7,98 @@ It targets protocol implementers, auditors, and anyone who needs to verify or re
 **Scope principle**: If a behavior affects whether a node produces correct outputs given the same inputs, it belongs in this spec.
 This includes but is not limited to EVM execution — gas accounting, resource limits, system contract semantics, oracle data lifecycle, and upgrade activation rules are all in scope.
 
+## Page Structure
+
+Every spec page MUST follow this section order:
+
+```
+# Page Title
+One-line scope statement: what this page specifies.
+
+## Constants
+Table of all named constants with values and descriptions.
+Every constant referenced in the Specification section MUST appear here.
+
+## Specification
+The normative behavioral definition.
+Subsections organized by logical component.
+All behavioral rules use MUST/MUST NOT/SHALL/SHOULD/MAY per RFC 2119.
+
+## Motivation
+The problem statement: what problem exists that this spec solves.
+Describes the concrete failure modes or limitations that necessitate this behavior.
+This section explains WHY the spec exists, not how it works.
+
+## Rationale
+Design decisions: why this specific solution over alternatives.
+Each decision is a named paragraph explaining the trade-off.
+This section explains WHY specific choices were made.
+
+## Spec History
+Links to upgrade pages showing how this behavior evolved across specs.
+```
+
+**Sections may be omitted** when they genuinely don't apply (e.g., a glossary page has no Constants or Motivation).
+But for any page that defines behavioral rules, the full structure SHOULD be followed.
+
 ## Tone & Language
 
-- **Normative and precise.** Use MUST, SHALL, SHOULD, MAY per RFC 2119 when defining behavior.
+- **Normative and precise.** Use MUST, MUST NOT, SHALL, SHOULD, MAY per RFC 2119 when defining behavior. Every behavioral rule in the Specification section MUST use normative language.
 - **Exhaustive.** Cover every corner case. Readability may be sacrificed for completeness.
-- **No developer guidance.** Do not include "tips", "best practices", or "how to use" sections. That belongs in `docs/dev/`.
-- **No user-facing language.** Do not explain "what this means for you". That belongs in `docs/user/` or `docs/dev/`.
-- **Self-contained.** The spec never links to user docs or developer docs. It may link to external references (EIPs, Ethereum Yellow Paper, OP Stack specs).
+- **No developer guidance.** Do not include "tips", "best practices", "how to use", or recommendations like "Use `eth_estimateGas`" or "Use transient storage". That belongs in `docs/dev/`.
+- **No user-facing language.** Do not address the reader as "you" in the Specification section. Do not explain "what this means for you". That belongs in `docs/user/` or `docs/dev/`.
+- **Self-contained.** The spec never links to user docs or developer docs. It may link to external references (EIPs, Ethereum Yellow Paper, OP Stack specs) and to other spec pages.
+- **No implementation details.** Do not reference specific code patterns, function names, or implementation strategies (e.g., `spec.is_enabled(MINI_REX)`). Describe the required behavior, not how to implement it.
+
+## Specification Section Rules
+
+### Normative Language
+
+- Use "A node MUST..." for required behavior.
+- Use "A node MUST NOT..." for prohibited behavior.
+- Use "SHOULD" only when non-compliance is acceptable in defined circumstances.
+- Descriptive prose (background, context) does not require normative keywords.
+
+### Constants
+
+- Every numeric value used in the Specification MUST be defined as a named constant in the Constants table.
+- Do not embed magic numbers in formulas — reference the constant name.
+- Each constant row MUST include: name, value, and a one-line description.
+
+### Formulas
+
+- Express formulas as inline code blocks: `` `total_gas = compute_gas + storage_gas` ``.
+- Define every variable immediately after the formula.
+- For complex logic, use pseudocode in fenced code blocks.
+
+### Edge Cases
+
+- State edge cases explicitly as normative rules (e.g., "For state that does not yet exist, the node MUST...").
+- Do not leave behavior undefined — if the spec doesn't say what happens, implementers will guess differently.
+
+### Charging Lifecycle
+
+- For any cost or fee, specify WHEN it is charged: before execution, at the opcode, or post-execution.
+- Specify what happens on failure: is the cost consumed, refunded, or rolled back?
+
+### Unstable Features
+
+- Wrap unstable (not-yet-activated) spec content in `<details>` blocks with a clear label (e.g., "Rex4 (unstable): ...").
+- Unstable content MUST still use normative language within the `<details>` block.
+
+## Motivation and Rationale Section Rules
+
+### Motivation
+
+- Describe the concrete problem: what breaks, what is underpriced, what attack becomes possible.
+- Use specific numbers where possible (e.g., "base fee of 0.001 gwei", "up to 10 billion gas per block").
+- Do NOT describe the solution — that is the Specification section's job.
+
+### Rationale
+
+- Each design decision is a **named paragraph** starting with bold text (e.g., "**Why `base × (multiplier − 1)` instead of `base × multiplier`?**").
+- Explain the trade-off: what was considered, what was rejected, and why.
+- Reference historical changes where applicable (e.g., "MiniRex used X, Rex changed to Y because...").
 
 ## What Belongs Here
 
@@ -30,6 +115,8 @@ This includes but is not limited to EVM execution — gas accounting, resource l
 - User-facing explanations → `docs/user/`
 - Integration configuration → `docs/integration/`
 - "Why should I care about this?" framing → `docs/dev/`
+- Implementation-specific code patterns or API references → `docs/dev/`
+- Recommendations ("Use X instead of Y") → `docs/dev/`
 
 ## Source of Truth
 
@@ -39,9 +126,9 @@ The mega-evm repository is the authoritative source.
 
 ## Formatting Preferences
 
-- Use tables for structured data (gas costs, opcode lists, resource limits).
+- Use tables for structured data (gas costs, opcode lists, resource limits, constants).
 - Use `<details>` blocks for unstable (Rex4) features.
-- Use `{% hint style="info" %}` for explanatory notes about design rationale.
+- Use `{% hint style="info" %}` sparingly — only for non-normative notes that help implementers understand design intent. Never for developer tips.
 - Use `{% hint style="warning" %}` for unstable spec warnings.
-- Use `{% hint style="danger" %}` for breaking changes or deprecations.
-- Use `{% hint style="success" %}` sparingly — only for notes that help implementers, not app developers.
+- Do NOT use `{% hint style="success" %}` in spec pages — it implies developer guidance.
+- Do NOT use `{% hint style="danger" %}` for normative rules — normative rules belong in plain prose with MUST/MUST NOT. Reserve `{% hint style="danger" %}` only for deprecation notices.
