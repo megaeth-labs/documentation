@@ -1,6 +1,6 @@
 # Dual Gas Model
 
-MegaETH's dual gas model separates transaction gas costs into two independent dimensions: [compute gas](../glossary.md#compute-gas) (standard EVM gas, identical to Ethereum) and [storage gas](../glossary.md#storage-gas) (an additional charge for operations that impose persistent storage burden on nodes).
+MegaETH's dual gas model separates transaction gas costs into two independent dimensions: [compute gas](../glossary.md#compute-gas) (the gas charged for EVM computation, derived from standard EVM gas semantics) and [storage gas](../glossary.md#storage-gas) (an additional charge for operations that impose persistent storage burden on nodes).
 A transaction's total gas is the sum of both.
 
 ## Motivation
@@ -31,9 +31,9 @@ The `gas_used` field in the transaction receipt MUST reflect the combined total.
 
 ### Compute Gas
 
-[Compute gas](../glossary.md#compute-gas) is standard EVM gas, identical to Ethereum (Optimism Isthmus / Ethereum Prague).
-Every opcode MUST cost exactly the same compute gas as it does on mainnet Ethereum.
-No opcode's compute gas cost is modified by the dual gas model.
+[Compute gas](../glossary.md#compute-gas) is based on standard EVM gas semantics inherited from Optimism Isthmus / Ethereum Prague.
+Unless explicitly overridden elsewhere in this specification, each opcode MUST use the same compute gas cost as in the inherited EVM semantics.
+The dual gas model itself does not redefine opcode compute gas costs; it adds the storage gas dimension on top of them.
 
 ### Storage Gas
 
