@@ -124,25 +124,33 @@ The `SELFDESTRUCT` opcode follows [EIP-6780](https://eips.ethereum.org/EIPS/eip-
 It only destroys a contract when called within the same transaction that created the contract.
 In all other cases, `SELFDESTRUCT` behaves as a simple Ether transfer without destroying the contract or clearing its storage.
 
+### No Storage Gas Refund for SSTORE Resets
+
+{% hint style="danger" %}
+Setting a storage slot back to its original value within the same transaction does **not** refund the storage gas.
+Use transient storage ([EIP-1153](https://eips.ethereum.org/EIPS/eip-1153) `TSTORE`/`TLOAD`) for scratch data that only needs to persist within a transaction.
+{% endhint %}
+
 ### "98/100" Rule for Gas Forwarding
 
 MegaETH allows a caller to forward at most **98/100** of remaining gas to a callee.
 The parameter is 63/64 in Ethereum.
 
-<details>
-<summary>Precompile notes</summary>
+{% hint style="danger" %}
+**Migration note:** Contracts that compute gas forwarding amounts assuming the standard 63/64 rule ([EIP-150](https://eips.ethereum.org/EIPS/eip-150)) will see different behavior.
+The parent call frame retains 2% instead of ~1.6%, so subcalls receive slightly less gas.
+Review any patterns that rely on precise gas forwarding calculations.
+{% endhint %}
+
+### Precompile Gas Overrides
 
 MegaETH inherits all precompiles from Optimism Isthmus, which includes Ethereum Prague precompiles, EIP-2537 BLS12-381 precompiles, and RIP-7212 P256VERIFY.
+Two precompiles have adjusted gas costs:
 
-**KZG Point Evaluation (0x0A):**
-- MegaETH: **100,000 gas**
-- Ethereum: 50,000 gas
-- Reason: 2x increase to reflect computational cost
-
-**ModExp (0x05):**
-- Uses EIP-7883 pricing
-
-</details>
+| Precompile | Address | Cost Override |
+| ---------- | ------- | ------------- |
+| KZG Point Evaluation | `0x0A` | 100,000 gas (2× the standard Prague cost of 50,000) |
+| ModExp | `0x05` | [EIP-7883](https://eips.ethereum.org/EIPS/eip-7883) gas schedule (raises the cost floor for large-exponent calls) |
 
 ## Related Pages
 

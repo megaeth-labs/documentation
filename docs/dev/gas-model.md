@@ -11,6 +11,31 @@ MegaETH uses a _multidimensional gas model_ that separates gas costs into two ca
 
 The total gas of a transaction is the sum of its compute gas and storage gas.
 
+## How Gas Limit, Compute Gas, and Storage Gas Relate
+
+The `gas_limit` field in a transaction works the same as on Ethereum — it sets the maximum total gas the transaction may consume.
+Both compute gas and storage gas are deducted from this single budget.
+In addition, MegaEVM enforces a separate compute gas ceiling of 200,000,000 that caps only the compute portion.
+A transaction can be halted by either ceiling: the total `gas_limit` or the compute gas cap.
+
+{% hint style="success" %}
+**In practice:**
+
+- **`gas_limit`:** Set this to cover your expected total gas (compute + storage). `eth_estimateGas` on a MegaETH endpoint accounts for both.
+- **`gas_used` in receipts:** Reports total gas consumed (compute + storage combined).
+- **Compute gas limit:** An invisible additional ceiling of 200,000,000. Most transactions stay well under it.
+{% endhint %}
+
+### Transaction Intrinsic Costs
+
+Every transaction pays a base cost before any execution begins:
+
+| Component | Cost |
+| --------- | ---- |
+| Compute gas | 21,000 |
+| Storage gas | 39,000 |
+| **Total** | **60,000** |
+
 ## Compute Gas Costs
 
 For any operation, its compute gas cost in MegaEVM equals its gas cost in standard EVM.
@@ -42,6 +67,13 @@ The next section explains this concept.
 
 All other operations not mentioned in the table incur no storage gas cost.
 
+**Calldata floor cost:** [EIP-7623](https://eips.ethereum.org/EIPS/eip-7623) introduced a minimum ("floor") charge for calldata.
+After execution, if total gas consumed is less than the calldata floor cost, the transaction is charged the floor cost instead.
+MegaETH applies the same 10× storage gas multiplier to the floor cost (hence the 100/byte and 400/byte entries in the table above).
+
+**Revert behavior for `LOG`:** `LOG` storage gas follows standard EVM gas semantics — gas spent in a reverted call frame is consumed and not refunded.
+However, the data size tracked for the `LOG` is rolled back on revert, since the log itself is discarded.
+
 ## Bucket Multiplier
 
 Accounts and their storage slots are stored in segments of MegaETH's SALT state trie called "buckets."
@@ -70,6 +102,12 @@ Below are examples of storage gas costs at different bucket multiplier values.
 | Zero-to-nonzero `SSTORE` | 0 | 20,000 | 60,000 |
 | Account creation | 0 | 25,000 | 75,000 |
 | Contract creation | 0 | 32,000 | 96,000 |
+
+{% hint style="success" %}
+**Gas estimation:** Use `eth_estimateGas` on a MegaETH RPC endpoint for accurate gas estimates.
+The endpoint accounts for SALT multipliers, storage gas, and all resource dimensions.
+Do not attempt to compute gas costs manually — the dynamic multiplier depends on on-chain SALT bucket state.
+{% endhint %}
 
 ## Tips for Developers
 
