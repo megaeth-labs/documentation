@@ -1,6 +1,19 @@
 # Dual Gas Model
 
-This page specifies MegaETH's dual gas model, which separates transaction gas costs into [compute gas](../glossary.md#compute-gas) and [storage gas](../glossary.md#storage-gas).
+MegaETH's dual gas model separates transaction gas costs into two independent dimensions: [compute gas](../glossary.md#compute-gas) (standard EVM gas, identical to Ethereum) and [storage gas](../glossary.md#storage-gas) (an additional charge for operations that impose persistent storage burden on nodes).
+A transaction's total gas is the sum of both.
+
+## Motivation
+
+Standard EVM gas pricing assumes a base fee high enough that storage-heavy operations (state writes, logs, calldata) are adequately priced by compute gas alone.
+MegaETH breaks this assumption in two ways:
+
+1. **Extremely low base fees** — MegaETH's base fee is 0.001 gwei (10⁶ wei), orders of magnitude lower than Ethereum mainnet. At this fee level, the compute gas cost of an SSTORE (22,100 gas) is negligible relative to the actual cost of persisting the state change.
+
+2. **High transaction gas limits** — MegaETH allows up to 10 billion gas per block. A single transaction could write thousands of storage slots, deploy megabytes of bytecode, or emit massive logs for near-zero cost under standard gas pricing.
+
+Without a separate storage gas dimension, a single transaction could bloat on-chain state or history data to unsustainable levels.
+The dual gas model addresses this by pricing storage burden independently of computation, ensuring that state-heavy operations pay their true cost to node operators regardless of the base fee level.
 
 ## Constants
 
@@ -128,18 +141,6 @@ All transactions MUST pay both compute gas and storage gas as intrinsic costs be
 
 These costs are in addition to standard calldata gas (both compute and storage components).
 A transaction with `gas_limit < 60,000 + calldata_gas` MUST be rejected as invalid.
-
-## Motivation
-
-Standard EVM gas pricing assumes a base fee high enough that storage-heavy operations (state writes, logs, calldata) are adequately priced by compute gas alone.
-MegaETH breaks this assumption in two ways:
-
-1. **Extremely low base fees** — MegaETH's base fee is 0.001 gwei (10⁶ wei), orders of magnitude lower than Ethereum mainnet. At this fee level, the compute gas cost of an SSTORE (22,100 gas) is negligible relative to the actual cost of persisting the state change.
-
-2. **High transaction gas limits** — MegaETH allows up to 10 billion gas per block. A single transaction could write thousands of storage slots, deploy megabytes of bytecode, or emit massive logs for near-zero cost under standard gas pricing.
-
-Without a separate storage gas dimension, a single transaction could bloat on-chain state or history data to unsustainable levels.
-The dual gas model addresses this by pricing storage burden independently of computation, ensuring that state-heavy operations pay their true cost to node operators regardless of the base fee level.
 
 ## Rationale
 
