@@ -1,7 +1,151 @@
 ---
-description: How MegaETH differs from standard Ethereum EVM
+description: How MegaEVM differs from standard Ethereum — contract size limits, gas forwarding, SELFDESTRUCT semantics, and volatile data access.
 ---
 
 # EVM Differences
 
-{% hint style="info" %}This page is under construction.{% endhint %}
+_MegaEVM_ is MegaETH's execution environment.
+It is fully compatible with Ethereum smart contracts while introducing optimizations for MegaETH's unique architecture.
+
+## Overview
+
+MegaEVM builds on established standards.
+Its latest hardfork, _Rex3_, is based on [Optimism Isthmus](https://specs.optimism.io/protocol/isthmus/overview.html), which in turn is adapted from [Ethereum Prague](https://ethereum.org/roadmap/pectra/).
+This means:
+
+- All standard Solidity contracts work on MegaETH.
+- Standard development tools (Hardhat, Foundry, Remix, etc.) are compatible.
+- Existing Ethereum libraries and patterns apply.
+
+MegaEVM introduces a few changes to accommodate MegaETH's low fees and high capacity.
+The most important change is the _multidimensional gas model and resource limits_.
+In MegaEVM, transactions consume two types of gas: _compute gas_, which models computation at large and is identically defined as Ethereum's gas; and _storage gas_, a new concept that models the storage subsystem in particular.
+Similarly, MegaEVM caps resource usage of transactions and blocks using rules that each target an individual type of resource.
+Developers should consider these changes in contrast to Ethereum's EVM, where gas is the singular metric for metering and limiting resource consumption.
+
+## Key Differences at a Glance
+
+| Feature | Ethereum | MegaETH | Remarks |
+| ------- | -------- | ------- | ------- |
+| Max contract size | 24 KB | **512 KB** | |
+| Max initcode size | 48 KB | **536 KB** | |
+| Gas forwarding rule | 63/64 | **98/100** | As defined in [EIP-150](https://eips.ethereum.org/EIPS/eip-150). |
+| `SELFDESTRUCT` | Deprecated | **EIP-6780 semantics** | Active only within the creating transaction, per [EIP-6780](https://eips.ethereum.org/EIPS/eip-6780). |
+| Gas model | Unidimensional | **Multidimensional** | Compute gas and storage gas. Compute gas is identical to Ethereum's gas. |
+| Resource limits | Unidimensional | **Multidimensional** | 4 limits in addition to total gas limit specified by sender. |
+| Base intrinsic gas | 21,000 | **60,000** | 21,000 compute gas plus 39,000 storage gas. |
+
+For the full gas model details, see [Gas Model](gas-model.md).
+
+## Access to Volatile Data
+
+MegaEVM provides APIs for transactions to access _volatile data_ — data that changes frequently and expires quickly after being accessed.
+This includes metadata of the current block (block number, timestamp, coinbase), states of the block beneficiary, and data available through the native oracle interface.
+
+When a transaction accesses volatile data, a dependency forms between the transaction and other transactions or operations that attempt to update the data.
+Such dependency harms performance.
+For example, if a transaction reads the current block number using the `NUMBER` opcode, the sequencer cannot start a new block until the transaction finishes and gets included in the current block, because doing so would change the block number and invalidate the value previously read.
+If the transaction takes long to finish, block production would be blocked, which impacts latency.
+
+MegaEVM mitigates this by limiting the amount of compute gas a transaction may use _after it accesses volatile data_.
+This ensures transactions that access volatile data yield quickly.
+
+### Opcodes for Accessing the Block Environment
+
+Accessing any of these opcodes caps the transaction's global compute gas to **20,000,000**.
+
+| Opcode | Description |
+| ------ | ----------- |
+| `NUMBER` | Current block number |
+| `TIMESTAMP` | Current block timestamp |
+| `COINBASE` | Block beneficiary address |
+| `DIFFICULTY` | Block difficulty |
+| `GASLIMIT` | Block gas limit |
+| `BASEFEE` | Base fee per gas |
+| `PREVRANDAO` | Previous block randomness |
+| `BLOCKHASH` | Historical block hash |
+| `BLOBBASEFEE` | Blob base fee |
+| `BLOBHASH` | Blob hash lookup |
+
+### Accessing the Beneficiary Account
+
+Accessing the block beneficiary (coinbase) account also caps the transaction's global compute gas to **20,000,000**.
+
+| Trigger | Description |
+| ------- | ----------- |
+| `BALANCE`, `SELFBALANCE` | Reading beneficiary's balance |
+| `EXTCODECOPY`, `EXTCODESIZE`, `EXTCODEHASH` | Accessing beneficiary's code |
+| Transaction sender is beneficiary | When `msg.sender == block.coinbase` |
+| Transaction recipient is beneficiary | When call target is `block.coinbase` |
+| `DELEGATECALL` to beneficiary | Delegated context accessing beneficiary |
+
+### Accessing the Native Oracle Interface
+
+Reading oracle data via `SLOAD` from the oracle contract storage caps the transaction's global compute gas to **20,000,000**.
+This is the same limit as accessing the block environment.
+
+- Oracle contract address: `0x6342000000000000000000000000000000000001`
+- Triggered by: `SLOAD` from oracle contract storage
+- `DELEGATECALL` to the oracle contract does **not** trigger this limit
+
+### Remarks
+
+When multiple types of volatile data are accessed in the same transaction, the most restrictive limit applies.
+All volatile data sources currently share the same 20,000,000 compute gas cap.
+
+The restricted compute gas limit is enforced on the compute gas consumption across the entire transaction execution.
+If the transaction has already consumed more than 20M compute gas before accessing volatile data (e.g., from an oracle contract or the block environment), the transaction execution will halt immediately.
+Developers should avoid accessing volatile data in transactions performing heavy computation.
+
+{% hint style="danger" %}
+The following is a counterexample — do not do this:
+
+```solidity
+// Bad: Heavy computation after reading timestamp
+function processWithTimestamp() external {
+    uint256 currentTime = block.timestamp; // Triggers 20M gas cap
+    // This loop might run out of gas!
+    for (uint i = 0; i < 10000; i++) {
+        heavyComputation(i, currentTime);
+    }
+}
+```
+{% endhint %}
+
+## Miscellaneous
+
+### Increased Contract Size Limit
+
+MegaETH supports contracts up to **512 KB** in size, increased from 24 KB in Ethereum.
+
+### `SELFDESTRUCT` with EIP-6780 Semantics
+
+The `SELFDESTRUCT` opcode follows [EIP-6780](https://eips.ethereum.org/EIPS/eip-6780) semantics.
+It only destroys a contract when called within the same transaction that created the contract.
+In all other cases, `SELFDESTRUCT` behaves as a simple Ether transfer without destroying the contract or clearing its storage.
+
+### "98/100" Rule for Gas Forwarding
+
+MegaETH allows a caller to forward at most **98/100** of remaining gas to a callee.
+The parameter is 63/64 in Ethereum.
+
+<details>
+<summary>Precompile notes</summary>
+
+MegaETH inherits all precompiles from Optimism Isthmus, which includes Ethereum Prague precompiles, EIP-2537 BLS12-381 precompiles, and RIP-7212 P256VERIFY.
+
+**KZG Point Evaluation (0x0A):**
+- MegaETH: **100,000 gas**
+- Ethereum: 50,000 gas
+- Reason: 2x increase to reflect computational cost
+
+**ModExp (0x05):**
+- Uses EIP-7883 pricing
+
+</details>
+
+## Related Pages
+
+- [Gas Model](gas-model.md) — full dual gas model and resource limits
+- [System Contracts](system-contracts.md) — native oracle interface and high-precision timestamp
+- [EVM Specification](https://docs.megaeth.com/evm-spec/) — formal normative specification
