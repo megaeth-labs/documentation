@@ -28,7 +28,7 @@ MegaETH is a high-performance Ethereum L2 with sub-millisecond block times and r
         <tr>
             <td><strong>User Guide</strong></td>
             <td>Connect your wallet, get testnet tokens, and start using MegaETH.</td>
-            <td><a href="user/mainnet.md">User Guide</a></td>
+            <td><a href="user/get-started.md">User Guide</a></td>
         </tr>
         <tr>
             <td><strong>Developer Docs</strong></td>

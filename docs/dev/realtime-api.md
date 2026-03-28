@@ -8,12 +8,12 @@ MegaETH executes transactions as soon as they arrive at the sequencer.
 The sequencer emits _preconfirmations_ and _execution results_ of the transactions within 10 milliseconds of their arrival.
 
 Such information is exposed through MegaETH's _Realtime API_, an extension to Ethereum JSON-RPC optimized for low-latency access.
-This API queries against the most recent _mini block_.
-Receipts and state changes associated with a transaction are reflected in this API as soon as the transaction is packaged into a mini block, which usually happens within 10 milliseconds of its arrival at the sequencer.
+This API queries against the most recent _mini-block_.
+Receipts and state changes associated with a transaction are reflected in this API as soon as the transaction is packaged into a mini-block, which usually happens within 10 milliseconds of its arrival at the sequencer.
 In comparison, the vanilla Ethereum JSON-RPC API queries against the most recent _EVM block_, which leads to much longer delay before execution results are reflected.
 
-Mini blocks in MegaETH are preconfirmed by the sequencer just like EVM blocks are.
-The sequencer makes as much effort not to roll back mini blocks as it does EVM blocks.
+Mini-blocks in MegaETH are preconfirmed by the sequencer just like EVM blocks are.
+The sequencer makes as much effort not to roll back mini-blocks as it does EVM blocks.
 Results returned by the Realtime API still fall under the preconfirmation guarantee by the sequencer.
 
 {% hint style="info" %}
@@ -26,16 +26,16 @@ This document will be kept up to date.
 
 The Realtime API introduces three types of changes to the vanilla Ethereum JSON-RPC API:
 
-1. Most methods that query chain and account states return values as of the most recent mini block, when invoked with `pending` or `latest` as the block tag.
-2. Most methods that query transaction data are able to "see" a transaction and return results as soon as the transaction of interest is packaged into a mini block.
-3. `eth_subscribe`, when invoked over WebSocket, streams transaction logs, state changes, and block content as soon as the corresponding mini block is produced.
+1. Most methods that query chain and account states return values as of the most recent mini-block, when invoked with `pending` or `latest` as the block tag.
+2. Most methods that query transaction data are able to "see" a transaction and return results as soon as the transaction of interest is packaged into a mini-block.
+3. `eth_subscribe`, when invoked over WebSocket, streams transaction logs, state changes, and block content as soon as the corresponding mini-block is produced.
 4. `realtime_sendRawTransaction` submits a transaction and returns the receipt in a single call — without requiring polling.
 5. `eth_getLogsWithCursor` supports paginated log queries using a cursor, allowing applications to retrieve large datasets incrementally and reliably.
 6. `eth_callAfter` allows executing `eth_call` after waiting for an account's nonce to reach a target value.
 
 ## Querying Account and Chain States
 
-The following methods, when invoked with `pending` or `latest` as the block tag, return results up to the most recent mini block.
+The following methods, when invoked with `pending` or `latest` as the block tag, return results up to the most recent mini-block.
 
 | Method |
 | ------ |
@@ -50,20 +50,20 @@ The following methods, when invoked with `pending` or `latest` as the block tag,
 
 ### Example
 
-At 5pm, the height of the most recent mini block is 10000, and the height of the most recent EVM block is 100.
+At 5pm, the height of the most recent mini-block is 10000, and the height of the most recent EVM block is 100.
 At this point, Alice's account has a balance of 10 Ether.
 
-At 100 milliseconds past 5pm, the height of the most recent mini block is 10010, and the height of the most recent EVM block is still 100.
+At 100 milliseconds past 5pm, the height of the most recent mini-block is 10010, and the height of the most recent EVM block is still 100.
 Now, Alice sends a transaction that transfers 1 Ether to Bob.
 This transaction will decrease her account balance by 1 Ether.
 
-At 110 milliseconds past 5pm, the transaction is picked up and executed by the sequencer, and packaged into the mini block at height 10011.
-Now, Bob invokes `eth_getBalance` on Alice's account with `latest` as the block tag; he gets a response of 9 Ether, because the transaction has been packaged into a mini block and is thus reflected in the Realtime API.
+At 110 milliseconds past 5pm, the transaction is picked up and executed by the sequencer, and packaged into the mini-block at height 10011.
+Now, Bob invokes `eth_getBalance` on Alice's account with `latest` as the block tag; he gets a response of 9 Ether, because the transaction has been packaged into a mini-block and is thus reflected in the Realtime API.
 However, Charlie, who makes the same query with `100` as the block tag, still sees 10 Ether, because the transaction has not been packaged into an EVM block, which will not happen until 1 second past 5pm.
 
 ## Querying Transactions
 
-The following methods are able to locate a transaction in the database and return results as soon as the transaction is packaged into a mini block.
+The following methods are able to locate a transaction in the database and return results as soon as the transaction is packaged into a mini-block.
 No special parameters are needed when invoking the methods.
 
 | Method |
@@ -75,11 +75,11 @@ No special parameters are needed when invoking the methods.
 
 Continuing the previous example, Alice invokes `eth_getTransactionReceipt` on her transaction at 110 milliseconds past 5pm.
 The API responds with the correct receipt, even though no EVM block has been produced since she sent her transaction.
-This is because her transaction is already packaged into the mini block at height 10011 and the Realtime API can thus see the transaction.
+This is because her transaction is already packaged into the mini-block at height 10011 and the Realtime API can thus see the transaction.
 
 ## `eth_subscribe` over WebSocket
 
-When invoked over WebSocket, `eth_subscribe` streams data as soon as the corresponding mini block is produced.
+When invoked over WebSocket, `eth_subscribe` streams data as soon as the corresponding mini-block is produced.
 This is the mechanism to get transaction preconfirmation and execution results with the minimum amount of latency.
 Please call `eth_unsubscribe` when a subscription is no longer needed.
 
@@ -91,7 +91,7 @@ Idle connections may be closed by the server.
 
 ### Logs
 
-When both `fromBlock` and `toBlock` are set to `pending`, the API returns logs as soon as transactions are packaged into mini blocks.
+When both `fromBlock` and `toBlock` are set to `pending`, the API returns logs as soon as transactions are packaged into mini-blocks.
 
 ```json
 {
@@ -131,7 +131,7 @@ The schema of each log entry is the same as in `eth_getLogs`.
 
 ### State Changes
 
-`stateChanges` is a new subscription type that streams state changes of an account as soon as the transactions making the changes are packaged into mini blocks.
+`stateChanges` is a new subscription type that streams state changes of an account as soon as the transactions making the changes are packaged into mini-blocks.
 It takes a list of account addresses to monitor as a parameter.
 
 ```json
@@ -174,9 +174,9 @@ Example response:
 }
 ```
 
-### Mini Blocks
+### Mini-Blocks
 
-`miniBlocks` is a new subscription type that streams mini blocks as they are produced.
+`miniBlocks` is a new subscription type that streams mini-blocks as they are produced.
 
 ```json
 {
@@ -189,7 +189,7 @@ Example response:
 }
 ```
 
-The returned mini blocks use the following schema:
+The returned mini-blocks use the following schema:
 
 ```json
 {
@@ -206,14 +206,14 @@ The returned mini blocks use the following schema:
 
 | Field | Description |
 | ----- | ----------- |
-| `block_number` | The block number of the EVM block that this mini block belongs to |
+| `block_number` | The block number of the EVM block that this mini-block belongs to |
 | `block_timestamp` | Timestamp of the EVM block |
-| `index` | Index of this mini block in the EVM block |
-| `mini_block_number` | The number of this mini block in blockchain history |
-| `mini_block_timestamp` | The timestamp when this mini block was created (Unix timestamp in microseconds) |
-| `gas_used` | Gas used inside this mini block |
-| `transactions` | Transactions included in this mini block (same schema as `eth_getTransactionByHash`) |
-| `receipts` | Receipts of the transactions in this mini block (same schema as `eth_getTransactionReceipt`) |
+| `index` | Index of this mini-block in the EVM block |
+| `mini_block_number` | The number of this mini-block in blockchain history |
+| `mini_block_timestamp` | The timestamp when this mini-block was created (Unix timestamp in microseconds) |
+| `gas_used` | Gas used inside this mini-block |
+| `transactions` | Transactions included in this mini-block (same schema as `eth_getTransactionByHash`) |
+| `receipts` | Receipts of the transactions in this mini-block (same schema as `eth_getTransactionReceipt`) |
 
 ## `realtime_sendRawTransaction`
 
@@ -476,5 +476,5 @@ When the server returns a response without a `cursor`, all matching logs have be
 
 ## Related Pages
 
-- [Mini Blocks](miniblocks.md) — understanding the two block types
+- [Mini-Blocks](miniblocks.md) — understanding the two block types
 - [RPC Reference](rpc/README.md) — full method availability table

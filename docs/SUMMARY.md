@@ -1,10 +1,13 @@
 # Table of contents
 
+* [Overview](README.md)
+
 ## User Guide
 
-* [Overview](README.md)
-* [Mainnet](user/mainnet.md)
-* [Testnet](user/testnet.md)
+* [Get Started](user/get-started.md)
+* [Connect to MegaETH](user/connect.md)
+* [Bridge](user/bridge.md)
+* [Key Contracts & Tokens](user/contracts.md)
 * [Faucet](user/faucet.md)
 * [User FAQ](user/faq.md)
 
@@ -15,7 +18,7 @@
 * [Gas Model](dev/gas-model.md)
 * [System Contracts](dev/system-contracts.md)
 * [Architecture](dev/architecture.md)
-* [Mini Blocks](dev/miniblocks.md)
+* [Mini-Blocks](dev/miniblocks.md)
 * [Realtime API](dev/realtime-api.md)
 * [RPC](dev/rpc/README.md)
   * [Error Codes](dev/rpc/error-codes.md)

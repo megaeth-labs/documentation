@@ -17,7 +17,7 @@ Use relative paths: `[Gas Model](gas-model.md)` or `[RPC Methods](rpc/README.md)
 
 ### Between layers
 
-Use relative paths from the current file: `[Mainnet](../user/mainnet.md)` or `[EVM Differences](../dev/evm-differences.md)`.
+Use relative paths from the current file: `[Connect](../user/connect.md)` or `[EVM Differences](../dev/evm-differences.md)`.
 
 ### To the EVM Specification
 

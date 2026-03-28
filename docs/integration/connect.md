@@ -15,7 +15,7 @@ description: MegaETH RPC endpoints, chain IDs, contract addresses, and connectio
 | **Native & Gas Token** | Ether (ETH), 18 decimals |
 | **RPC URL** | `https://mainnet.megaeth.com/rpc` |
 | **Block Explorer** | [megaeth.blockscout.com](https://megaeth.blockscout.com/) / [mega.etherscan.io](https://mega.etherscan.io) |
-| **Block Time** | Mini blocks: 10ms / EVM blocks: 1s |
+| **Block Time** | Mini-blocks: 10ms / EVM blocks: 1s |
 | **Block Gas Limit** | 10 billion (10¹⁰) gas per EVM block |
 | **Base Fee Per Gas** | 0.001 gwei (10⁶ wei) |
 | **EIP-1559** | Base fee adjustment is effectively disabled |
@@ -30,7 +30,7 @@ description: MegaETH RPC endpoints, chain IDs, contract addresses, and connectio
 | **RPC URL** | `https://carrot.megaeth.com/rpc` |
 | **WebSocket URL** | `wss://carrot.megaeth.com/wss` |
 | **Block Explorer** | [megaeth-testnet-v2.blockscout.com](https://megaeth-testnet-v2.blockscout.com/) |
-| **Block Time** | Mini blocks: 10ms / EVM blocks: 1s |
+| **Block Time** | Mini-blocks: 10ms / EVM blocks: 1s |
 | **Block Gas Limit** | 10 billion (10¹⁰) gas per EVM block |
 | **Base Fee Per Gas** | 0.001 gwei (10⁶ wei) |
 | **EIP-1559** | Base fee adjustment is effectively disabled |

@@ -4,6 +4,30 @@ spec: Rex3
 
 # Glossary
 
+## EVM block
+
+A standard Ethereum-compatible block produced roughly every second.
+
+EVM blocks contain the same header fields and follow the same structure as blocks on other EVM chains, ensuring compatibility with existing tools, wallets, indexers, and applications.
+
+Every transaction appears in exactly one EVM block.
+Block-level EVM opcodes (`NUMBER`, `TIMESTAMP`, `COINBASE`, etc.) return values associated with the EVM block, not the mini-block.
+
+Often shortened to "block" when the context is unambiguous.
+
+## Mini-block
+
+A lightweight, high-frequency block produced roughly every 10 milliseconds.
+
+Mini-blocks are the native unit of sequencer preconfirmation in MegaETH.
+Transactions are packaged into mini-blocks as soon as they are executed, giving applications access to execution results with minimal latency via the Realtime API.
+
+Every transaction appears in exactly one mini-block and one EVM block.
+Transactions in a mini-block never span multiple EVM blocks.
+
+Mini-blocks contain a different, more compact set of metadata fields compared to EVM blocks.
+The ratio of mini-blocks to EVM blocks is roughly 100:1, though the exact number is not guaranteed.
+
 ## Compute gas
 
 Standard EVM gas — identical to Ethereum (Optimism Isthmus / Ethereum Prague).

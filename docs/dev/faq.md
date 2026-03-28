@@ -1,5 +1,5 @@
 ---
-description: Frequently asked questions for MegaETH developers — EVM compatibility, gas, transactions, mini blocks, RPC, and tooling.
+description: Frequently asked questions for MegaETH developers — EVM compatibility, gas, transactions, mini-blocks, RPC, and tooling.
 ---
 
 # Developer FAQ
@@ -110,31 +110,31 @@ If there are more gaps, repeat the process until the queue is unblocked.
 {% endstep %}
 {% endstepper %}
 
-## Mini Blocks & Realtime API
+## Mini-Blocks & Realtime API
 
-### Does `block.timestamp` return the timestamp of the EVM block or the mini block?
+### Does `block.timestamp` return the timestamp of the EVM block or the mini-block?
 
 It returns the timestamp of the EVM block.
 
-### Can smart contracts access mini block metadata?
+### Can smart contracts access mini-block metadata?
 
 Not currently.
-Mini blocks are intentionally compact and do not include the same metadata fields as EVM blocks, so there is currently no way to access their metadata from within a smart contract.
+Mini-blocks are intentionally compact and do not include the same metadata fields as EVM blocks, so there is currently no way to access their metadata from within a smart contract.
 
-### Do mini blocks have the same guarantees as EVM blocks?
+### Do mini-blocks have the same guarantees as EVM blocks?
 
 Yes.
-Preconfirmation of mini blocks by the sequencer has the same level of guarantees as that of EVM blocks.
+Preconfirmation of mini-blocks by the sequencer has the same level of guarantees as that of EVM blocks.
 
-### Does the performance dashboard (uptime.megaeth.com) display the block height in mini blocks or EVM blocks?
+### Does the performance dashboard (uptime.megaeth.com) display the block height in mini-blocks or EVM blocks?
 
-Mini blocks.
+Mini-blocks.
 
 ### Why am I seeing `0xfff[...]fff` `blockHash` in a realtime transaction receipt, even though I get a valid `blockNumber`?
 
-In the realtime RPC, if a transaction receipt has a `null` `blockHash` but a valid `blockNumber`, it means the transaction was included in a mini block and is preconfirmed by the sequencer, but not yet part of an EVM block.
+In the realtime RPC, if a transaction receipt has a `null` `blockHash` but a valid `blockNumber`, it means the transaction was included in a mini-block and is preconfirmed by the sequencer, but not yet part of an EVM block.
 
-The presence or absence of `blockHash` does not affect the level of finality, as the sequencer guarantees inclusion from the moment it is included in a mini block.
+The presence or absence of `blockHash` does not affect the level of finality, as the sequencer guarantees inclusion from the moment it is included in a mini-block.
 
 Full finality still depends on the transaction being submitted and finalized on the L1.
 

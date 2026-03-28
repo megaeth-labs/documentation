@@ -17,7 +17,7 @@ They know Ethereum. They write code. They need to understand what's different.
 - Gas model guide (dual gas, storage gas, practical estimation)
 - System contract usage (Oracle, Timestamp, KeylessDeploy — with Solidity interfaces and examples)
 - Architecture overview (sequencer, full nodes, provers)
-- Mini blocks (what they are, how they affect dapps)
+- Mini-blocks (what they are, how they affect dapps)
 - Realtime API (WebSocket subscriptions, enhanced RPC methods)
 - RPC reference (method table, error codes)
 - Developer FAQ (gas estimation, contract deployment, debugging)

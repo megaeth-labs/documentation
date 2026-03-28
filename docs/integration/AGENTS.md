@@ -14,7 +14,7 @@ They build *for* MegaETH, not *on* MegaETH. They need configuration details and 
 
 - Network connection details (RPC URLs, chain IDs, WebSocket endpoints)
 - Wallet developer guide (gas estimation quirks, 98/100 forwarding rule, resource limits impact)
-- Indexer integration (how mini blocks affect indexing, subscription patterns, block finality)
+- Indexer integration (how mini-blocks affect indexing, subscription patterns, block finality)
 - Oracle provider integration (supported oracles, configuration)
 - Bridge integration (supported bridges, setup)
 - RPC provider considerations (realtime API support, custom methods)
@@ -39,7 +39,7 @@ They build *for* MegaETH, not *on* MegaETH. They need configuration details and 
 The integration FAQ (`integration/faq.md`) covers questions like:
 - "What chain ID does MegaETH use?"
 - "Does MegaETH support standard Ethereum JSON-RPC?"
-- "How do mini blocks affect my indexer?"
+- "How do mini-blocks affect my indexer?"
 - "Do I need to handle the 98/100 gas forwarding rule in my wallet?"
 - "Which oracles are available on MegaETH?"
 
