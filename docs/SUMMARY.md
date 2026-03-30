@@ -6,9 +6,9 @@
 
 * [Get Started](user/get-started.md)
 * [Connect to MegaETH](user/connect.md)
-* [Bridge](user/bridge.md)
+* [Bridge (Mainnet)](user/bridge.md)
+* [Faucet (Testnet)](user/faucet.md)
 * [Key Contracts & Tokens](user/contracts.md)
-* [Faucet](user/faucet.md)
 * [User FAQ](user/faq.md)
 
 ## Developer Docs
