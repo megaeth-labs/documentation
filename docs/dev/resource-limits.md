@@ -1,29 +1,60 @@
 ---
-description: MegaETH per-transaction and per-block resource limits — compute gas, data size, KV updates, and state growth ceilings.
+description: MegaETH resource limits — 7 per-transaction and per-block ceilings on gas, compute, data, KV updates, state growth, transaction size, and DA size.
 ---
 
 # Resource Limits
 
-In addition to the gas limit specified by the sender, MegaEVM enforces four additional resource limits on each transaction and block.
-These limits cap compute gas, data size, KV updates, and state growth independently, ensuring no single transaction or block monopolizes a particular resource.
+MegaETH enforces seven resource limits on transactions and blocks.
+Four are **protocol constants** defined in the EVM specification; three are **sequencer-configured** values that may change without a hardfork.
+
+## Resource Types
+
+- **Gas** — the total gas (compute + storage) a transaction may consume, as defined in the [Gas Model](gas-model.md).
+- **[Compute Gas](gas-model.md#compute-gas-costs)** — the computational component of gas, identical to Ethereum's gas definition.
+- **Data Size** — the total bytes that need to be transmitted and stored for a transaction, including calldata, event logs (topics and data), storage writes (40 bytes per write), account updates (40 bytes each), and deployed contract code.
+- **KV Updates** — the number of distinct state entries (accounts and storage slots) modified by a transaction. Repeated updates to the same entry count as one.
+- **State Growth** — the number of new state entries (accounts, storage slots, contracts) created by a transaction. Entries cleared before the transaction ends do not count.
+- **Transaction Encoded Size** — the byte size of the RLP-encoded transaction.
+- **DA Size** — the compressed size of the transaction's data for L1 data availability submission.
+
+For data size, KV updates, and state growth, block-level usage is the sum of usage across all transactions in the block.
 
 ## Limits
 
-| Resource Type | Per-Transaction Limit | Per-Block Limit |
-| ------------- | --------------------- | --------------- |
-| Compute Gas | 200,000,000 | N/A |
+### Pre-Execution Limits (Sequencer-Configured)
+
+These limits are checked before a transaction is executed.
+Transactions that exceed them are rejected by the transaction pool.
+The values below reflect the current mainnet sequencer configuration and may change without a hardfork.
+
+| Resource | Per-Transaction Limit | Per-Block Limit |
+| -------- | --------------------- | --------------- |
+| Gas | 2,000,000,000 (2B) | 10,000,000,000 (10B) |
+| Transaction Encoded Size | 131,072 (128 KB) | — |
+| DA Size | Sequencer-configured | — |
+
+### Runtime Limits (Protocol Constants)
+
+These limits are enforced during execution.
+They are protocol constants that can only change through a hardfork.
+
+| Resource | Per-Transaction Limit | Per-Block Limit |
+| -------- | --------------------- | --------------- |
+| Compute Gas | 200,000,000 | Unlimited (subject to block gas limit) |
 | Data Size | 12.5 MB | 12.5 MB |
 | KV Updates | 500,000 | 500,000 |
 | State Growth | 1,000 | 1,000 |
 
 ## Per-Transaction Limit Behavior
 
-When a transaction hits any of the per-transaction limits, the following happens:
+When a transaction hits any of the runtime per-transaction limits, the following happens:
 
 1. Execution halts immediately.
 2. Any remaining gas is preserved and refunded to the sender.
 3. The transaction is included in the block with status set to failed (status=0).
 4. No state changes from the transaction are applied.
+
+Pre-execution limit violations cause the transaction to be permanently rejected from the transaction pool — it is never included in a block.
 
 ## Per-Block Limit Enforcement
 
@@ -36,39 +67,6 @@ When building a block, these limits are enforced as follows:
 
 In other words, the last transaction in a block is allowed to push the block's resource usage beyond the per-block limit.
 This maximizes block utilization by avoiding the waste of a valid transaction whose resource consumption can only be known after execution.
-
-## Resource Type Definitions
-
-For all resource types, the usage incurred by a block is the sum of the usage incurred by each transaction in the block.
-For example, if a block contains two transactions — one using 300 KV updates and the other using 400 KV updates — then the block uses 700 KV updates.
-
-### Compute Gas
-
-The compute gas cost of a transaction, as defined in the [Gas Model](gas-model.md).
-
-### Data Size
-
-Data size measures the amount of data that needs to be transmitted and stored for each transaction.
-Both the transaction itself and its execution results are considered.
-It is the total size of the following items:
-
-- Transaction calldata
-- Event logs (topics and data)
-- Storage writes (40 bytes per write)
-- Account updates (40 bytes each)
-- Deployed contract code
-
-### KV Updates
-
-KV updates measure the total number of state entries (accounts and storage slots) updated by a transaction.
-Each update to a storage slot or an account counts as one update towards the limit.
-Repeated updates to the same storage slot or account count as only one update.
-
-### State Growth
-
-State growth measures the number of new state entries (accounts and storage slots) created by a transaction.
-Each new storage slot (created by a zero-to-nonzero `SSTORE`), account, or contract counts as one unit towards the limit.
-If a newly created storage slot or account is cleared before the transaction ends, thus occupying no storage space permanently, it does not count towards the limit.
 
 ## Related Pages
 
