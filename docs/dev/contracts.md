@@ -4,21 +4,22 @@ description: Key contract addresses and tokens on MegaETH and Ethereum Mainnet.
 
 # Key Contracts & Tokens
 
-## L2 (MegaETH)
+### Core
 
 {% tabs %}
 {% tab title="Mainnet" %}
-
-### Core
-
 | Token | Address | Description |
 | ----- | ------- | ----------- |
 | [MEGA](https://megaeth.com) | [`0x28B7E77f82B25B95953825F1E3eA0E36c1c29861`](https://megaeth.blockscout.com/address/0x28B7E77f82B25B95953825F1E3eA0E36c1c29861) | MegaETH's native protocol token. |
 | WETH | [`0x4200000000000000000000000000000000000006`](https://megaeth.blockscout.com/address/0x4200000000000000000000000000000000000006) | Wrapped Ether — an ERC-20 version of ETH for use in dApps. |
 | [Multicall3](https://multicall3.com) | [`0xcA11bde05977b3631167028862bE2a173976CA11`](https://megaeth.blockscout.com/address/0xcA11bde05977b3631167028862bE2a173976CA11) | Utility contract that batches multiple calls into one transaction. |
+{% endtab %}
+{% endtabs %}
 
 ### Stablecoins
 
+{% tabs %}
+{% tab title="Mainnet" %}
 | Token | Address | Description |
 | ----- | ------- | ----------- |
 | [CUSD](https://www.cap.app) | [`0xcCcc62962d17b8914c62D74FfB843d73B2a3cccC`](https://megaeth.blockscout.com/address/0xcCcc62962d17b8914c62D74FfB843d73B2a3cccC) | Dollar-pegged stablecoin by Cap Finance. |
@@ -28,9 +29,13 @@ description: Key contract addresses and tokens on MegaETH and Ethereum Mainnet.
 | [USDe](https://ethena.fi) | [`0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34`](https://megaeth.blockscout.com/address/0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34) | Synthetic dollar by Ethena Labs, backed by crypto assets and hedged with futures. |
 | [sUSDe](https://ethena.fi) | [`0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2`](https://megaeth.blockscout.com/address/0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2) | Staked USDe — grows in value over time as it earns Ethena protocol revenue. |
 | [USDT0](https://usdt0.to) | [`0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb`](https://megaeth.blockscout.com/address/0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb) | Cross-chain USDT by Tether and LayerZero, usable across 15+ blockchains. 6 decimals. |
+{% endtab %}
+{% endtabs %}
 
 ### ETH Liquid Staking & Restaking
 
+{% tabs %}
+{% tab title="Mainnet" %}
 | Token | Address | Description |
 | ----- | ------- | ----------- |
 | [ezETH](https://www.renzoprotocol.com) | [`0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57`](https://megaeth.blockscout.com/address/0x09601A65e7de7BC8A19813D263dD9E98bFdC3c57) | Renzo restaked ETH — earns staking and restaking rewards simultaneously. |
@@ -38,17 +43,25 @@ description: Key contract addresses and tokens on MegaETH and Ethereum Mainnet.
 | [rsETH](https://kelpdao.xyz) | [`0xc3eACf0612346366Db554C991D7858716db09f58`](https://megaeth.blockscout.com/address/0xc3eACf0612346366Db554C991D7858716db09f58) | Kelp DAO restaked ETH — earns restaking rewards on top of regular staking yields. |
 | [wrsETH](https://kelpdao.xyz) | [`0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F`](https://megaeth.blockscout.com/address/0x4Fc44BE15e9B6E30C1E774E2C87A21D3E8b5403F) | Wrapped rsETH — cross-chain version of rsETH by Kelp DAO. |
 | [wstETH](https://lido.fi) | [`0x601aC63637933D88285A025C685AC4e9a92a98dA`](https://megaeth.blockscout.com/address/0x601aC63637933D88285A025C685AC4e9a92a98dA) | Lido wrapped staked ETH — staking rewards accrue in the token's value. |
+{% endtab %}
+{% endtabs %}
 
 ### BTC
 
+{% tabs %}
+{% tab title="Mainnet" %}
 | Token | Address | Description |
 | ----- | ------- | ----------- |
 | BTC.b | [`0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072`](https://megaeth.blockscout.com/address/0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072) | Bridged Bitcoin — real BTC bridged onto EVM chains. 8 decimals. |
 | [LBTC](https://www.lombard.finance) | [`0xecAc9C5F704e954931349Da37F60E39f515c11c1`](https://megaeth.blockscout.com/address/0xecAc9C5F704e954931349Da37F60E39f515c11c1) | Lombard staked BTC — earns native Bitcoin yield while usable in DeFi. 8 decimals. |
 | [WBTC](https://wbtc.network) | [`0x32090fB1399a31cC095e6341a6353b7c09ba84FB`](https://megaeth.blockscout.com/address/0x32090fB1399a31cC095e6341a6353b7c09ba84FB) | Wrapped Bitcoin by BitGo — backed 1:1 by BTC held in custody. 8 decimals. |
+{% endtab %}
+{% endtabs %}
 
-### Other
+### Other Tokens
 
+{% tabs %}
+{% tab title="Mainnet" %}
 | Token | Address | Description |
 | ----- | ------- | ----------- |
 | CROWN | [`0xf7d2F0d0b0517CBDbf87C86910ce10FaAab3589D`](https://megaeth.blockscout.com/address/0xf7d2F0d0b0517CBDbf87C86910ce10FaAab3589D) | Crown Credits — a token native to MegaETH. |
@@ -60,8 +73,83 @@ This list is sourced from the [mega-tokenlist](https://github.com/megaeth-labs/m
 If a token you are looking for is not listed, check the registry for the latest additions.
 {% endhint %}
 
+#### Adding a token to the registry
+
+To get your token listed, submit a pull request to the [mega-tokenlist](https://github.com/megaeth-labs/mega-tokenlist) repository.
+
+{% stepper %}
+{% step %}
+### Create a token folder
+
+Create `data/YOUR_TOKEN/` in the repository.
+{% endstep %}
+{% step %}
+### Add token metadata
+
+Create a `data.json` file with your token's name, symbol, decimals, and per-chain addresses.
+
+```json
+{
+  "name": "My Token",
+  "symbol": "MTK",
+  "decimals": 18,
+  "tokens": {
+    "megaeth": {
+      "address": "0xYourTokenAddress",
+      "isOrigin": true,
+      "mechanism": "native"
+    }
+  }
+}
+```
+
+If the token is bridged from Ethereum, include both chains:
+
+```json
+{
+  "name": "My Token",
+  "symbol": "MTK",
+  "decimals": 18,
+  "tokens": {
+    "ethereum": {
+      "address": "0xEthereumAddress",
+      "isOrigin": true,
+      "mechanism": "lock",
+      "bridge": "0xBridgeOrLockboxAddress"
+    },
+    "megaeth": {
+      "address": "0xMegaETHAddress",
+      "isOrigin": false,
+      "mechanism": "mint",
+      "bridge": "0xMintEndpointAddress"
+    }
+  }
+}
+```
+{% endstep %}
+{% step %}
+### Add a logo
+
+Add a `logo.svg` or `logo.png` (256×256 recommended) to the same folder.
+{% endstep %}
+{% step %}
+### Submit a PR
+
+Open a pull request. Once merged, the token will appear in the generated tokenlist.
+{% endstep %}
+{% endstepper %}
+
+{% hint style="info" %}
+EVM addresses must be checksummed ([EIP-55](https://eips.ethereum.org/EIPS/eip-55)).
+For the full data schema and bridge mechanism types (`native`, `lock`, `mint`, `burn`), see the [mega-tokenlist README](https://github.com/megaeth-labs/mega-tokenlist#token-data-schema).
+{% endhint %}
+{% endtab %}
+{% endtabs %}
+
 ### OP Stack Predeploys
 
+{% tabs %}
+{% tab title="Mainnet" %}
 These contracts are predeployed at fixed addresses on all OP Stack chains, including MegaETH.
 
 | Contract | Address | Description |
@@ -77,8 +165,17 @@ These contracts are predeployed at fixed addresses on all OP Stack chains, inclu
 | [OptimismMintableERC721Factory](https://docs.optimism.io/op-stack/protocol/smart-contracts#optimismmintableerc721factory) | [`0x4200000000000000000000000000000000000017`](https://megaeth.blockscout.com/address/0x4200000000000000000000000000000000000017) | Create bridgeable ERC-721 tokens on L2. |
 | [GovernanceToken](https://docs.optimism.io/op-stack/protocol/smart-contracts#governancetoken) | [`0x4200000000000000000000000000000000000042`](https://megaeth.blockscout.com/address/0x4200000000000000000000000000000000000042) | OP governance token (EIP-2612 support). |
 
+{% hint style="info" %}
+WETH and Multicall3 are also OP Stack predeploys/preinstalls — they are listed under [Core](#core) above.
+For full details, see the OP Stack [predeploys](https://docs.optimism.io/op-stack/protocol/smart-contracts#layer-2-contracts-predeploys) documentation.
+{% endhint %}
+{% endtab %}
+{% endtabs %}
+
 ### OP Stack Preinstalls
 
+{% tabs %}
+{% tab title="Mainnet" %}
 These contracts come preinstalled on OP Stack chains at their standard addresses.
 
 | Contract | Address | Description |
@@ -98,13 +195,12 @@ These contracts come preinstalled on OP Stack chains at their standard addresses
 | [ERC-4337 SenderCreator v0.7](https://github.com/eth-infinitism/account-abstraction/tree/v0.7.0) | [`0xEFC2c1444eBCC4Db75e7613d20C6a62fF67A167C`](https://megaeth.blockscout.com/address/0xEFC2c1444eBCC4Db75e7613d20C6a62fF67A167C) | Creates sender contracts for ERC-4337 v0.7. |
 
 {% hint style="info" %}
-WETH and Multicall3 are also OP Stack predeploys/preinstalls — they are listed above under [Core](#core).
-For full details, see the OP Stack [predeploys](https://docs.optimism.io/op-stack/protocol/smart-contracts#layer-2-contracts-predeploys) and [preinstalls](https://docs.optimism.io/op-stack/features/preinstalls#contracts-and-deployed-addresses) documentation.
+For full details, see the OP Stack [preinstalls](https://docs.optimism.io/op-stack/features/preinstalls#contracts-and-deployed-addresses) documentation.
 {% endhint %}
 {% endtab %}
 {% endtabs %}
 
-## L1 (Ethereum)
+### L1 Contracts (Ethereum)
 
 {% tabs %}
 {% tab title="Mainnet" %}
@@ -112,9 +208,9 @@ These are the Ethereum-side contracts most relevant to end users.
 
 | Name | Address | Notes |
 | ---- | ------- | ----- |
-| Canonical Bridge | [`0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75`](https://etherscan.io/address/0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75) | Send ETH here to [bridge](bridge.md) from Ethereum to MegaETH |
+| Canonical Bridge | [`0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75`](https://etherscan.io/address/0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75) | Send ETH here to [bridge](../user/bridge.md) from Ethereum to MegaETH |
 | USDM | [`0xEc2AF1C8B110a61fD9C3Fa6a554a031Ca9943926`](https://etherscan.io/address/0xEc2AF1C8B110a61fD9C3Fa6a554a031Ca9943926) | |
 
-For the full list of L1 infrastructure contracts (DisputeGameFactory, OptimismPortal, SystemConfig, etc.), see the [Developer Docs](../dev/getting-started.md#l1-contracts-ethereum-mainnet).
+For the full list of L1 infrastructure contracts (DisputeGameFactory, OptimismPortal, SystemConfig, etc.), see [Getting Started](getting-started.md#l1-contracts-ethereum-mainnet).
 {% endtab %}
 {% endtabs %}

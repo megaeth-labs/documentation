@@ -6,14 +6,15 @@
 
 * [Get Started](user/get-started.md)
 * [Connect to MegaETH](user/connect.md)
-* [Bridge (Mainnet)](user/bridge.md)
-* [Faucet (Testnet)](user/faucet.md)
-* [Key Contracts & Tokens](user/contracts.md)
+* [Get Funds on Mainnet](user/bridge.md)
+* [Get ETH on Testnet](user/faucet.md)
+* [Featured Apps](user/apps.md)
 * [User FAQ](user/faq.md)
 
 ## Developer Docs
 
 * [Getting Started](dev/getting-started.md)
+* [Key Contracts & Tokens](dev/contracts.md)
 * [EVM Differences](dev/evm-differences.md)
 * [Gas Model](dev/gas-model.md)
 * [System Contracts](dev/system-contracts.md)

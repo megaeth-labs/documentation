@@ -1,18 +1,19 @@
 ---
-description: Bridge ETH and other assets from Ethereum to MegaETH.
+description: How to get ETH, stablecoins, and other assets on MegaETH Mainnet.
 ---
 
-# Bridge
+# Get Funds on Mainnet
 
-MegaETH is an Ethereum L2, so you need to bridge assets from Ethereum (or other chains) to start using it.
-The easiest way is through the official bridge at **Rabbithole**.
+There are several ways to get tokens on MegaETH Mainnet — bridge from Ethereum or other chains, swap cross-chain, or buy directly with a card.
 
 {% hint style="info" %}
-The bridge is for **mainnet only**.
+This page is for **mainnet only**.
 For testnet tokens, use the [faucet](faucet.md) instead.
 {% endhint %}
 
-## How to Bridge
+## Bridge via Rabbithole
+
+The easiest way to move assets to MegaETH is through **Rabbithole**, the official MegaETH portal.
 
 {% stepper %}
 {% step %}
@@ -52,16 +53,22 @@ Several third-party bridges also support MegaETH.
 You can find them listed at the bottom of the [Rabbithole bridge page](https://rabbithole.megaeth.com/bridge), including:
 
 - [**Bungee**](https://www.bungee.exchange/) — crosschain swap aggregator
-- [**Stargate**](https://stargate.finance/) — bridge USDT0 and USDm to MegaETH
-- [**deBridge**](https://debridge.finance/) — instant bridging from Solana and 25+ chains
+- [**Stargate**](https://stargate.finance/) — bridge USDT0 and USDm to MegaETH, powered by LayerZero
+- [**deBridge**](https://debridge.com/) — instant bridging from Solana and 25+ chains
+- [**Across**](https://across.to/) — fast and cheap cross-chain transfers
+- [**Portal (Wormhole)**](https://portalbridge.com/) — bridge USDC, ETH, SOL, and 100+ tokens across 30+ chains
+- [**Jumper**](https://jumper.xyz/) — multi-asset bridge and swap aggregator, powered by LI.FI
+- [**Relay**](https://relay.link/) — pay for any onchain action with any asset, across any chain
 
 {% hint style="info" %}
 For a full list of supported bridges, see [**fluffle.tools/bridge**](https://www.fluffle.tools/bridge).
 {% endhint %}
 
-## Buying with Fiat
+## Buy with a Card
 
-If you do not already hold crypto, you can buy ETH or stablecoins directly on MegaETH using the **Fund** tab at [rabbithole.megaeth.com/fund](https://rabbithole.megaeth.com/fund).
+If you do not already hold crypto, you can buy ETH or stablecoins directly on MegaETH using a debit card, credit card, or bank transfer.
+
+Go to the **Fund** tab at [**rabbithole.megaeth.com/fund**](https://rabbithole.megaeth.com/fund), connect your wallet, and follow the prompts from the fiat onramp provider.
 
 ## Advanced: Direct Contract Bridge
 

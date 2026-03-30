@@ -1,1 +1,1 @@
-20	<li><a href="/miniblocks.html">Mini Blocks</a></li>
+	<li><a href="/miniblocks.html">Mini Blocks</a></li>

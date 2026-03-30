@@ -1,8 +1,8 @@
-FILE_PAGES := $(wildcard docs/*.md)
-DIR_PAGES := $(wildcard docs/*/)
+FILE_PAGES := $(wildcard docs-legacy/*.md)
+DIR_PAGES := $(wildcard docs-legacy/*/)
 
-FILE_OUTPUTS := $(patsubst docs/%.md,public/%.html,$(FILE_PAGES))
-DIR_OUTPUTS := $(patsubst docs/%/,public/%.html,$(DIR_PAGES))
+FILE_OUTPUTS := $(patsubst docs-legacy/%.md,public/%.html,$(FILE_PAGES))
+DIR_OUTPUTS := $(patsubst docs-legacy/%/,public/%.html,$(DIR_PAGES))
 OUTPUTS := $(FILE_OUTPUTS) $(DIR_OUTPUTS)
 
 MANIFESTS := $(patsubst public/%.html,manifest/%.txt,$(OUTPUTS))
@@ -15,13 +15,13 @@ NAVBAR := manifest/navbar.html
 
 website: $(OUTPUTS) public/style.css
 
-public/%.html: docs/%.md $(TEMPLATE) $(NAVBAR)
+public/%.html: docs-legacy/%.md $(TEMPLATE) $(NAVBAR)
 	@mkdir -p public
 	pandoc $(PANDOC_OPTS) --template $(TEMPLATE) --include-before-body=$(NAVBAR) "$<" > $@
 
-public/%.html: docs/%/ $(wildcard docs/%/*.md) $(TEMPLATE) $(NAVBAR)
+public/%.html: docs-legacy/%/ $(wildcard docs-legacy/%/*.md) $(TEMPLATE) $(NAVBAR)
 	@mkdir -p public
-	pandoc $(PANDOC_OPTS) --template $(TEMPLATE) --include-before-body=$(NAVBAR) --file-scope docs/$*/*.md > $@
+	pandoc $(PANDOC_OPTS) --template $(TEMPLATE) --include-before-body=$(NAVBAR) --file-scope docs-legacy/$*/*.md > $@
 
 public/style.css: template/style.css
 	@mkdir -p public
@@ -33,13 +33,13 @@ $(NAVBAR): $(MANIFESTS)
 	cat manifest/*.txt | sort -k1 -n | cut -f2 >> $@
 	echo '</ul></nav>' >> $@
 
-manifest/%.txt: docs/%.md template/navitem.txt
+manifest/%.txt: docs-legacy/%.md template/navitem.txt
 	@mkdir -p manifest
 	pandoc --template=template/navitem.txt --metadata=filename:$* "$<" > $@
 
-manifest/%.txt: docs/%/ $(wildcard docs/%/*.md) template/navitem.txt
+manifest/%.txt: docs-legacy/%/ $(wildcard docs-legacy/%/*.md) template/navitem.txt
 	@mkdir -p manifest
-	pandoc --template=template/navitem.txt --metadata=filename:$* --file-scope docs/$*/*.md > $@
+	pandoc --template=template/navitem.txt --metadata=filename:$* --file-scope docs-legacy/$*/*.md > $@
 
 clean:
 	rm -rf public manifest

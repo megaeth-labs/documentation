@@ -9,7 +9,7 @@ Testnet ETH has no monetary value — it is only for testing.
 
 {% hint style="warning" %}
 The faucet is for **testnet only**.
-If you need ETH on MegaETH Mainnet, use the [bridge](bridge.md) to bridge ETH from Ethereum Mainnet instead.
+If you need ETH on MegaETH Mainnet, see [Get Funds on Mainnet](bridge.md) for bridging and other options.
 {% endhint %}
 
 ## How to Get Testnet ETH

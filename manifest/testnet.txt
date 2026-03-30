@@ -1,1 +1,1 @@
-2	<li><a href="/testnet.html">Testnet</a></li>
+	<li><a href="/testnet.html">Testnet</a></li>

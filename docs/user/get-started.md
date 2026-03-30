@@ -46,7 +46,7 @@ For more details, see [Connect to MegaETH](connect.md).
 {% tab title="Mainnet" %}
 Bridge ETH or other tokens from Ethereum using the official bridge at [**rabbithole.megaeth.com/bridge**](https://rabbithole.megaeth.com/bridge).
 Connect your wallet, choose a token and amount, and confirm the transaction.
-See the [Bridge](bridge.md) page for details and other supported bridges.
+See [Get Funds on Mainnet](bridge.md) for more options including third-party bridges and fiat onramps.
 {% endtab %}
 
 {% tab title="Testnet" %}
@@ -69,6 +69,6 @@ Track real-time network performance at [uptime.megaeth.com](https://uptime.megae
 
 - [Connect to MegaETH](connect.md) — full chain parameters, block explorers
 - [Bridge](bridge.md) — bridging ETH from Ethereum
-- [Key Contracts & Tokens](contracts.md) — important contract addresses
+- [Key Contracts & Tokens](../dev/contracts.md) — important contract addresses
 - [Faucet](faucet.md) — free testnet tokens
 - [User FAQ](faq.md) — common questions
