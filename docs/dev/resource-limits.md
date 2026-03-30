@@ -29,9 +29,9 @@ The values below reflect the current mainnet sequencer configuration and may cha
 
 | Resource | Per-Transaction Limit | Per-Block Limit |
 | -------- | --------------------- | --------------- |
-| Gas | 2,000,000,000 (2B) | 10,000,000,000 (10B) |
-| Transaction Encoded Size | 131,072 (128 KB) | — |
-| DA Size | Sequencer-configured | — |
+| Gas | 2,000,000,000 (2B) | 2,000,000,000 (2B) |
+| Transaction Encoded Size | 1,048,576 (1 MiB) | — |
+| DA Size | Dynamic (set via RPC) | Dynamic (set via RPC) |
 
 ### Runtime Limits (Protocol Constants)
 

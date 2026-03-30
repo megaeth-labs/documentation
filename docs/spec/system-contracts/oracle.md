@@ -77,13 +77,25 @@ If any delegated call fails, `multiCall` MUST revert and MUST bubble up the reve
 
 ### EVM-Level Interception
 
-A call to `sendHint(bytes32,bytes)` targeting `ORACLE_CONTRACT_ADDRESS` MUST be intercepted by the EVM and forwarded to the external oracle backend before ordinary contract execution proceeds.
+`sendHint` is the only Oracle function subject to [call interception](interception.md).
+All other Oracle functions (`getSlot`, `getSlots`, `setSlot`, `setSlots`, `emitLog`, `emitLogs`, `multiCall`) MUST execute via ordinary contract bytecode without interception.
 
-The Oracle contract's `sendHint` Solidity function body MUST remain a no-op.
-The observable protocol behavior is the combination of:
+When a `CALL` or `STATICCALL` targets `ORACLE_CONTRACT_ADDRESS` and the input matches the `sendHint(bytes32,bytes)` selector, the node MUST forward the decoded `topic` and `data` to the external oracle backend as a side effect.
 
-- EVM-level hint forwarding, and
-- normal contract execution of the no-op function body.
+After performing this side effect, the interceptor MUST fall through to normal frame initialization.
+The Oracle contract's deployed `sendHint` function body MUST then execute as ordinary bytecode.
+Because the Solidity implementation of `sendHint` is a no-op `view` function, the net observable behavior is the combination of:
+
+- EVM-level hint forwarding (side effect), and
+- normal bytecode execution of the no-op function body (which returns successfully with no output).
+
+Unlike other system-contract interceptors, `sendHint` interception MUST NOT short-circuit frame creation.
+A child EVM frame MUST be created and the on-chain bytecode MUST execute.
+
+Calls to `ORACLE_CONTRACT_ADDRESS` that do not match the `sendHint` selector MUST NOT trigger any interception side effect.
+They MUST proceed to normal bytecode execution unconditionally.
+
+`DELEGATECALL` and `CALLCODE` to `ORACLE_CONTRACT_ADDRESS` MUST NOT trigger `sendHint` interception, per the [call-scheme exclusion rule](interception.md#call-scheme-exclusion).
 
 ### Gas and Detention Semantics
 

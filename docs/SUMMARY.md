@@ -55,6 +55,7 @@
   * [Contract Limits](spec/evm/contract-limits.md)
   * [Precompiles](spec/evm/precompiles.md)
 * [System Contracts](spec/system-contracts/overview.md)
+  * [Call Interception](spec/system-contracts/interception.md)
   * [Mega System Transactions](spec/system-contracts/system-tx.md)
   * [Oracle](spec/system-contracts/oracle.md)
   * [Keyless Deployment](spec/system-contracts/keyless-deploy.md)

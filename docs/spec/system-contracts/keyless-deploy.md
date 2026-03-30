@@ -23,9 +23,20 @@ The KeylessDeploy system contract MUST exist at `KEYLESS_DEPLOY_ADDRESS`.
 
 ### Interception Scope
 
-`keylessDeploy(bytes,uint256)` MUST be intercepted only for direct top-level transaction calls.
-Calls at depth greater than zero MUST NOT be intercepted.
-Non-intercepted calls MUST fall through to contract bytecode and revert with `NotIntercepted()`.
+`keylessDeploy` is subject to [call interception](interception.md).
+The interceptor MUST short-circuit frame creation and execute the deployment logic described below instead of the on-chain bytecode.
+
+The following preconditions MUST all be true for interception to fire:
+
+- The call targets `KEYLESS_DEPLOY_ADDRESS`.
+- The input matches the `keylessDeploy(bytes,uint256)` selector.
+- The call is at depth zero (a direct top-level transaction call, not an internal call from another contract).
+
+If any precondition is not met, the interceptor MUST fall through.
+Non-intercepted calls MUST proceed to the on-chain bytecode, which MUST revert with `NotIntercepted()`.
+
+`DELEGATECALL` and `CALLCODE` to `KEYLESS_DEPLOY_ADDRESS` MUST NOT trigger interception, per the [call-scheme exclusion rule](interception.md#call-scheme-exclusion).
+These calls MUST fall through to the on-chain bytecode.
 
 ### Interface
 

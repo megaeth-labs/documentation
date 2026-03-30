@@ -8,7 +8,18 @@ spec: Rex3
 This page specifies the system-contract registry and the protocol-level rules that apply to system contracts in MegaETH.
 It defines the system-contract set.
 
-## Specifications
+## Specification
+
+### Distinction from Precompiles
+
+Both [precompiles](../evm/precompiles.md) and system contracts reside at fixed addresses and provide protocol-level functionality, but they differ in a fundamental way:
+
+- **Precompiles** are stateless and pure.
+  They perform a deterministic computation on their input and return output without reading or writing on-chain state.
+  The EVM handles precompile calls entirely outside normal bytecode execution.
+- **System contracts** are stateful.
+  They have deployed bytecode, maintain persistent storage, and participate in normal EVM state access (including `SLOAD`, `SSTORE`, and account balance).
+  Some of their functions are subject to [call interception](interception.md) for protocol-level side effects, but the contracts themselves exist as ordinary accounts with code and storage.
 
 ### Stable Registry
 
@@ -25,17 +36,15 @@ A node MUST recognize the following contracts as system contracts:
 System contracts MUST be available at their specified addresses when the corresponding spec is active.
 Their availability is gated by [spec](../hardfork-spec.md) activation.
 
-### Intercepted Methods
+### Call Interception
 
-Some system-contract methods are handled at the EVM level rather than exclusively by contract bytecode.
-The following interception rules apply:
+Some system-contract functions are handled at the EVM level rather than exclusively by contract bytecode.
+The generic interception mechanism — when it fires, how selectors are matched, how calls that do not match fall through to bytecode, and the gas and call-scheme rules — is specified on the [Call Interception](interception.md) page.
 
-- [`KeylessDeploy.keylessDeploy`](keyless-deploy.md) MUST be intercepted at transaction depth 0 only.
-- Unknown selectors sent to `KeylessDeploy`, or calls that are not intercepted, MUST fall through to contract bytecode and revert with `NotIntercepted()`.
-- [`Oracle.sendHint`](oracle.md) MUST be intercepted to forward hint data to the external oracle backend.
-- Other Oracle methods MUST execute via ordinary contract bytecode unless explicitly specified otherwise.
+Each system-contract page defines which of its functions are intercepted and what each interception does:
 
-`DELEGATECALL` and `CALLCODE` to system-contract addresses MUST NOT receive special interception semantics unless explicitly specified on the corresponding concept page.
+- [Oracle — `sendHint`](oracle.md#evm-level-interception): side-effect interception that forwards hint data to the oracle backend, then falls through to bytecode.
+- [KeylessDeploy — `keylessDeploy`](keyless-deploy.md#interception-scope): short-circuit interception at depth 0 that executes deployment in a sandbox.
 
 ### Backward Compatibility Rule
 
