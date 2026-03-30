@@ -74,15 +74,16 @@ Accessing multiple sources (e.g., both `block.timestamp` and oracle storage) doe
 
 ## Best Practices
 
-### Keep transactions under 20M compute gas
+<details>
+<summary>Pre-Rex4: Keep transactions under 20M compute gas</summary>
 
 Under the current absolute cap, the order of operations does not matter — reading volatile data early or late makes no difference because the 20M ceiling applies to total compute gas regardless.
 Design transactions that access volatile data to stay well within 20M compute gas total.
 
-{% hint style="danger" %}
 The following pattern will fail if the loop consumes more than 20M compute gas:
 
 ```solidity
+// Bad: Heavy computation with volatile data access
 function processWithTimestamp(uint256[] calldata items) external {
     uint256 currentTime = block.timestamp; // Triggers 20M cap
     // This loop might run out of gas!
@@ -91,11 +92,20 @@ function processWithTimestamp(uint256[] calldata items) external {
     }
 }
 ```
-{% endhint %}
 
-{% hint style="info" %}
-Under [Rex4 (unstable)](#volatile-data-access), the cap becomes relative, and reading volatile data **as late as possible** becomes a valid optimization.
-{% endhint %}
+Under [Rex4 (unstable)](#volatile-data-access), the cap becomes relative and reading volatile data **as late as possible** becomes a valid optimization:
+
+```solidity
+// Good under Rex4: heavy computation first, volatile read last
+function processAndCheckTime(uint256[] calldata items) external {
+    for (uint i = 0; i < items.length; i++) {
+        processItem(items[i]);
+    }
+    require(block.timestamp <= deadline, "Expired");
+}
+```
+
+</details>
 
 ### Split heavy transactions
 
