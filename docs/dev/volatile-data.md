@@ -14,6 +14,20 @@ To mitigate this, MegaEVM imposes an **absolute cap of 20,000,000 compute gas** 
 This is not 20M of _additional_ gas — it is a hard ceiling on total compute gas for the transaction.
 If the transaction has already consumed more than 20M compute gas before the access, execution halts immediately.
 
+<details>
+<summary>Rex4 (unstable): Relative detention</summary>
+
+Rex4 changes the cap from absolute to relative: accessing volatile data allows **20M more** compute gas from the point of access, regardless of how much was consumed before.
+
+For example, a transaction that uses 15M compute gas before reading `block.timestamp` would still have 20M of compute gas remaining (effective limit = 15M + 20M = 35M).
+Under the current absolute model, the same transaction would have only 5M remaining (absolute cap = 20M).
+
+This change removes the penalty for accessing volatile data late in a transaction's execution.
+Under relative detention, reading volatile data **as late as possible** becomes a valid optimization — see [Best Practices](#best-practices).
+For the formal definition, see [Gas Detention](../spec/evm/gas-detention.md).
+
+</details>
+
 ## What Triggers the Cap
 
 ### Block Environment Opcodes
@@ -79,28 +93,9 @@ function processWithTimestamp(uint256[] calldata items) external {
 ```
 {% endhint %}
 
-<details>
-<summary>Rex4 (unstable): Relative detention — read order matters</summary>
-
-Rex4 changes the cap from absolute to relative: accessing volatile data allows **20M more** compute gas from the point of access, regardless of how much was consumed before.
-
-Under relative detention, reading volatile data **as late as possible** becomes a valid optimization.
-A transaction that uses 15M compute gas before reading `block.timestamp` would still have 20M remaining (effective limit = 15M + 20M = 35M).
-Under the current absolute model, the same transaction has only 5M remaining.
-
-```solidity
-// Good under Rex4: heavy computation first, volatile read last
-function processAndCheckTime(uint256[] calldata items) external {
-    for (uint i = 0; i < items.length; i++) {
-        processItem(items[i]);
-    }
-    require(block.timestamp <= deadline, "Expired");
-}
-```
-
-For the formal definition, see [Gas Detention](../spec/evm/gas-detention.md).
-
-</details>
+{% hint style="info" %}
+Under [Rex4 (unstable)](#volatile-data-access), the cap becomes relative, and reading volatile data **as late as possible** becomes a valid optimization.
+{% endhint %}
 
 ### Split heavy transactions
 
