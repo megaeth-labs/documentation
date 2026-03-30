@@ -28,7 +28,7 @@ A node MUST recognize the following contracts as system contracts:
 | Contract | Address | Since | Purpose |
 | -------- | ------- | ----- | ------- |
 | [Oracle](oracle.md) | `ORACLE_CONTRACT_ADDRESS` | [MiniRex](../upgrades/minirex.md) | Off-chain data key-value storage |
-| [High-Precision Timestamp](../oracle-services/timestamp.md) | `HIGH_PRECISION_TIMESTAMP_ADDRESS` | [MiniRex](../upgrades/minirex.md) | Sub-second timestamp oracle service |
+| [High-Precision Timestamp](high-precision-timestamp.md) | `HIGH_PRECISION_TIMESTAMP_ADDRESS` | [MiniRex](../upgrades/minirex.md) | Sub-second timestamp oracle service |
 | [KeylessDeploy](keyless-deploy.md) | `KEYLESS_DEPLOY_ADDRESS` | [Rex2](../upgrades/rex2.md) | Deterministic cross-chain deployment |
 
 ### Deployment Semantics
@@ -43,8 +43,8 @@ The generic interception mechanism — when it fires, how selectors are matched,
 
 Each system-contract page defines which of its functions are intercepted and what each interception does:
 
-- [Oracle — `sendHint`](oracle.md#evm-level-interception): side-effect interception that forwards hint data to the oracle backend, then falls through to bytecode.
-- [KeylessDeploy — `keylessDeploy`](keyless-deploy.md#interception-scope): short-circuit interception at depth 0 that executes deployment in a sandbox.
+- [Oracle — `sendHint`](oracle.md#hint-forwarding): performs a side effect (hint forwarding), then falls through to bytecode.
+- [KeylessDeploy — `keylessDeploy`](keyless-deploy.md#interception-scope): intercepted at depth 0; executes deployment in a sandbox instead of on-chain bytecode.
 
 ### Backward Compatibility Rule
 

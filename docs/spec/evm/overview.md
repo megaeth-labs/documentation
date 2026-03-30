@@ -102,7 +102,7 @@ MegaETH predeploys the following stable system contracts:
 | Contract | Address | Since | Purpose |
 | -------- | ------- | ----- | ------- |
 | [Oracle](../system-contracts/oracle.md) | `0x6342000000000000000000000000000000000001` | [MiniRex](../upgrades/minirex.md) | Off-chain data key-value storage |
-| [High-Precision Timestamp](../oracle-services/timestamp.md) | `0x6342000000000000000000000000000000000002` | [MiniRex](../upgrades/minirex.md) | Sub-second timestamp oracle service |
+| [High-Precision Timestamp](../system-contracts/high-precision-timestamp.md) | `0x6342000000000000000000000000000000000002` | [MiniRex](../upgrades/minirex.md) | Sub-second timestamp oracle service |
 | [KeylessDeploy](../system-contracts/keyless-deploy.md) | `0x6342000000000000000000000000000000000003` | [Rex2](../upgrades/rex2.md) | Deterministic cross-chain deployment |
 
 For the full registry and behavioral semantics, see [System Contracts Overview](../system-contracts/overview.md).

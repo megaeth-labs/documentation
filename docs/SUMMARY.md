@@ -58,6 +58,7 @@
   * [Call Interception](spec/system-contracts/interception.md)
   * [Mega System Transactions](spec/system-contracts/system-tx.md)
   * [Oracle](spec/system-contracts/oracle.md)
+  * [High-Precision Timestamp](spec/system-contracts/high-precision-timestamp.md)
   * [Keyless Deployment](spec/system-contracts/keyless-deploy.md)
 * [Network Upgrades](spec/upgrades/overview.md)
   * [MiniRex](spec/upgrades/minirex.md)

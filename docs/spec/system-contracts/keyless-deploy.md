@@ -21,10 +21,20 @@ The protocol therefore needs a mechanism that preserves the original signer and 
 
 The KeylessDeploy system contract MUST exist at `KEYLESS_DEPLOY_ADDRESS`.
 
+### Bytecode
+
+A node MUST deploy the bytecode version corresponding to the active spec.
+
+Source: [`KeylessDeploy.sol`](https://github.com/megaeth-labs/mega-evm/blob/main/crates/system-contracts/contracts/KeylessDeploy.sol)
+
+| Version | Code Hash | Since |
+| ------- | --------- | ----- |
+| `1.0.0` | `0x55020d41649acf7a84add6e628b887f802218d9ac86f142ef0994da43ea5eeb6` | [Rex2](../upgrades/rex2.md) |
+
 ### Interception Scope
 
 `keylessDeploy` is subject to [call interception](interception.md).
-The interceptor MUST short-circuit frame creation and execute the deployment logic described below instead of the on-chain bytecode.
+The call MUST be intercepted: the deployment logic described below executes instead of the on-chain bytecode.
 
 The following preconditions MUST all be true for interception to fire:
 
@@ -34,9 +44,6 @@ The following preconditions MUST all be true for interception to fire:
 
 If any precondition is not met, the interceptor MUST fall through.
 Non-intercepted calls MUST proceed to the on-chain bytecode, which MUST revert with `NotIntercepted()`.
-
-`DELEGATECALL` and `CALLCODE` to `KEYLESS_DEPLOY_ADDRESS` MUST NOT trigger interception, per the [call-scheme exclusion rule](interception.md#call-scheme-exclusion).
-These calls MUST fall through to the on-chain bytecode.
 
 ### Interface
 
