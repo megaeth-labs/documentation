@@ -117,8 +117,8 @@ For contract deployments, note that code deposit costs **10,000 storage gas per 
 Accessing volatile data — `block.timestamp`, `block.number`, oracle storage — caps the transaction's compute gas to **20,000,000**.
 If the transaction performs heavy computation after reading volatile data, it may hit this cap and revert.
 
-**Fix:** Restructure the contract to perform heavy computation before reading volatile data, or split the work across multiple transactions.
-See [Access to Volatile Data](evm-differences.md#access-to-volatile-data) for details.
+**Fix:** Split the work across multiple transactions so that only lightweight transactions (under 20M compute gas) access volatile data.
+See [Volatile Data Access](volatile-data.md) for the full list of triggers and best practices.
 
 ### Resource limit exceeded
 

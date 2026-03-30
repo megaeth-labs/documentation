@@ -64,6 +64,7 @@ For the complete storage gas schedule, see the [formal specification](https://do
 - Use `{% hint style="success" %}` for practical tips and best practices.
 - Use tables for reference data (gas costs, resource limits, contract addresses).
 - Use `<details>` for optional deep-dives that most developers can skip.
+- Use `<details>` with a `<summary>` label like `"Rex4 (unstable): ..."` for upcoming behavior changes in unstable specs, mirroring the convention used in the [EVM specification](../spec/AGENTS.md). This keeps the main content focused on the current stable spec while giving developers early visibility into upcoming changes.
 
 ## FAQ
 

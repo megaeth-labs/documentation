@@ -201,9 +201,10 @@ See [Gas Estimation](gas-estimation.md) for how to avoid this with proper estima
 ### Out of Gas from Volatile Data Access
 
 Accessing `block.timestamp`, `block.number`, or oracle storage caps the transaction's compute gas to 20,000,000.
-If the trace shows execution halting after one of these reads, restructure the contract to perform heavy computation before reading volatile data.
+If the trace shows execution halting after one of these reads, the transaction exceeded the 20M total compute gas cap imposed by volatile data access.
+Split the work across multiple transactions so that only lightweight transactions access volatile data.
 
-See [Access to Volatile Data](evm-differences.md#access-to-volatile-data) for the full list of opcodes that trigger this cap.
+See [Volatile Data Access](volatile-data.md) for the full list of triggers and best practices.
 
 ## Related Pages
 
