@@ -60,7 +60,47 @@ This list is sourced from the [mega-tokenlist](https://github.com/megaeth-labs/m
 If a token you are looking for is not listed, check the registry for the latest additions.
 {% endhint %}
 
-For OP Stack predeployed and preinstalled contracts, see the [OP Stack L2 contracts](https://docs.optimism.io/op-stack/protocol/smart-contracts#layer-2-contracts-predeploys) and [preinstalls](https://docs.optimism.io/op-stack/features/preinstalls#contracts-and-deployed-addresses) documentation.
+### OP Stack Predeploys
+
+These contracts are predeployed at fixed addresses on all OP Stack chains, including MegaETH.
+
+| Contract | Address | Description |
+| -------- | ------- | ----------- |
+| [L2CrossDomainMessenger](https://docs.optimism.io/op-stack/protocol/smart-contracts#l2crossdomainmessenger) | [`0x4200000000000000000000000000000000000007`](https://megaeth.blockscout.com/address/0x4200000000000000000000000000000000000007) | Send and receive messages between L1 and L2. |
+| [L2StandardBridge](https://docs.optimism.io/op-stack/protocol/smart-contracts#l2standardbridge) | [`0x4200000000000000000000000000000000000010`](https://megaeth.blockscout.com/address/0x4200000000000000000000000000000000000010) | Bridge ETH and ERC-20 tokens between L1 and L2. |
+| [GasPriceOracle](https://docs.optimism.io/op-stack/protocol/smart-contracts#gaspriceoracle) | [`0x420000000000000000000000000000000000000F`](https://megaeth.blockscout.com/address/0x420000000000000000000000000000000000000F) | L1 fee estimation for transactions. |
+| [SequencerFeeVault](https://docs.optimism.io/op-stack/protocol/smart-contracts#sequencerfeevault) | [`0x4200000000000000000000000000000000000011`](https://megaeth.blockscout.com/address/0x4200000000000000000000000000000000000011) | Holds fees collected by the sequencer. |
+| [OptimismMintableERC20Factory](https://docs.optimism.io/op-stack/protocol/smart-contracts#optimismmintableerc20factory) | [`0x4200000000000000000000000000000000000012`](https://megaeth.blockscout.com/address/0x4200000000000000000000000000000000000012) | Create bridgeable ERC-20 tokens on L2. |
+| [L2ERC721Bridge](https://docs.optimism.io/op-stack/protocol/smart-contracts#l2erc721bridge) | [`0x4200000000000000000000000000000000000014`](https://megaeth.blockscout.com/address/0x4200000000000000000000000000000000000014) | Bridge ERC-721 (NFT) tokens between L1 and L2. |
+| [L1Block](https://docs.optimism.io/op-stack/protocol/smart-contracts#l1block) | [`0x4200000000000000000000000000000000000015`](https://megaeth.blockscout.com/address/0x4200000000000000000000000000000000000015) | Access the latest known L1 block info from L2. |
+| [L2ToL1MessagePasser](https://docs.optimism.io/op-stack/protocol/smart-contracts#l2tol1messagepasser) | [`0x4200000000000000000000000000000000000016`](https://megaeth.blockscout.com/address/0x4200000000000000000000000000000000000016) | Send messages from L2 to L1 (used by withdrawals). |
+| [OptimismMintableERC721Factory](https://docs.optimism.io/op-stack/protocol/smart-contracts#optimismmintableerc721factory) | [`0x4200000000000000000000000000000000000017`](https://megaeth.blockscout.com/address/0x4200000000000000000000000000000000000017) | Create bridgeable ERC-721 tokens on L2. |
+| [GovernanceToken](https://docs.optimism.io/op-stack/protocol/smart-contracts#governancetoken) | [`0x4200000000000000000000000000000000000042`](https://megaeth.blockscout.com/address/0x4200000000000000000000000000000000000042) | OP governance token (EIP-2612 support). |
+
+### OP Stack Preinstalls
+
+These contracts come preinstalled on OP Stack chains at their standard addresses.
+
+| Contract | Address | Description |
+| -------- | ------- | ----------- |
+| [Safe](https://github.com/safe-global/safe-smart-account) | [`0x69f4D1788e39c87893C980c06EdF4b7f686e2938`](https://megaeth.blockscout.com/address/0x69f4D1788e39c87893C980c06EdF4b7f686e2938) | Gnosis Safe multisig wallet. |
+| [SafeL2](https://github.com/safe-global/safe-smart-account) | [`0xfb1bffC9d739B8D520DaF37dF666da4C687191EA`](https://megaeth.blockscout.com/address/0xfb1bffC9d739B8D520DaF37dF666da4C687191EA) | Gnosis Safe optimized for L2. |
+| [MultiSend](https://github.com/safe-global/safe-smart-account) | [`0x998739BFdAAdde7C933B942a68053933098f9EDa`](https://megaeth.blockscout.com/address/0x998739BFdAAdde7C933B942a68053933098f9EDa) | Batch multiple Safe transactions. |
+| [MultiSendCallOnly](https://github.com/safe-global/safe-smart-account) | [`0xA1dabEF33b3B82c7814B6D82A79e50F4AC44102B`](https://megaeth.blockscout.com/address/0xA1dabEF33b3B82c7814B6D82A79e50F4AC44102B) | Batch multiple read-only calls via Safe. |
+| [Safe Singleton Factory](https://github.com/safe-global/safe-singleton-factory) | [`0x914d7Fec6aaC8cd542e72Bca78B30650d45643d7`](https://megaeth.blockscout.com/address/0x914d7Fec6aaC8cd542e72Bca78B30650d45643d7) | Deterministic deployment for Safe contracts. |
+| [create2Deployer](https://github.com/pcaversaccio/create2deployer) | [`0x13b0D85CcB8bf860b6b79AF3029fCA081AE9beF2`](https://megaeth.blockscout.com/address/0x13b0D85CcB8bf860b6b79AF3029fCA081AE9beF2) | Deploy contracts to deterministic addresses. |
+| [CreateX](https://github.com/pcaversaccio/createx) | [`0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed`](https://megaeth.blockscout.com/address/0xba5Ed099633D3B313e4D5F7bdc1305d3c28ba5Ed) | Advanced deterministic contract deployment. |
+| [Deterministic Deployment Proxy](https://github.com/Arachnid/deterministic-deployment-proxy) | [`0x4e59b44847b379578588920cA78FbF26c0B4956C`](https://megaeth.blockscout.com/address/0x4e59b44847b379578588920cA78FbF26c0B4956C) | Arachnid's CREATE2 factory. |
+| [Permit2](https://github.com/Uniswap/permit2) | [`0x000000000022D473030F116dDEE9F6B43aC78BA3`](https://megaeth.blockscout.com/address/0x000000000022D473030F116dDEE9F6B43aC78BA3) | Uniswap's universal token approval contract. |
+| [ERC-4337 EntryPoint v0.6](https://github.com/eth-infinitism/account-abstraction/tree/v0.6.0) | [`0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789`](https://megaeth.blockscout.com/address/0x5FF137D4b0FDCD49DcA30c7CF57E578a026d2789) | Account abstraction entry point (v0.6). |
+| [ERC-4337 SenderCreator v0.6](https://github.com/eth-infinitism/account-abstraction/tree/v0.6.0) | [`0x7fc98430eAEdbb6070B35B39D798725049088348`](https://megaeth.blockscout.com/address/0x7fc98430eAEdbb6070B35B39D798725049088348) | Creates sender contracts for ERC-4337 v0.6. |
+| [ERC-4337 EntryPoint v0.7](https://github.com/eth-infinitism/account-abstraction/tree/v0.7.0) | [`0x0000000071727De22E5E9d8BAf0edAc6f37da032`](https://megaeth.blockscout.com/address/0x0000000071727De22E5E9d8BAf0edAc6f37da032) | Account abstraction entry point (v0.7). |
+| [ERC-4337 SenderCreator v0.7](https://github.com/eth-infinitism/account-abstraction/tree/v0.7.0) | [`0xEFC2c1444eBCC4Db75e7613d20C6a62fF67A167C`](https://megaeth.blockscout.com/address/0xEFC2c1444eBCC4Db75e7613d20C6a62fF67A167C) | Creates sender contracts for ERC-4337 v0.7. |
+
+{% hint style="info" %}
+WETH and Multicall3 are also OP Stack predeploys/preinstalls — they are listed above under [Core](#core).
+For full details, see the OP Stack [predeploys](https://docs.optimism.io/op-stack/protocol/smart-contracts#layer-2-contracts-predeploys) and [preinstalls](https://docs.optimism.io/op-stack/features/preinstalls#contracts-and-deployed-addresses) documentation.
+{% endhint %}
 {% endtab %}
 {% endtabs %}
 
