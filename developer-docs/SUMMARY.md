@@ -1,12 +1,19 @@
 # Summary
 
-* [Overview](README.md)
+* [MegaETH RPC](README.md)
+* [Quickstart](QUICKSTART.md)
+* [Choose Network And Endpoint](guides/choose-an-endpoint.md)
+* [JSON-RPC Basics](json-rpc-basics.md)
+* [Error Reference](errors.md)
+* [Type Reference](types.md)
+* [Operations And Limits](operations/limits.md)
+* [Handle Rate Limits And Large Queries](guides/rate-limits.md)
 
 ## API Reference
 
 * [API Reference](api/README.md)
-  * [eth\_chainId](api/eth_chainId.md)
   * [eth\_blockNumber](api/eth_blockNumber.md)
+  * [eth\_chainId](api/eth_chainId.md)
   * [eth\_syncing](api/eth_syncing.md)
   * [eth\_accounts](api/eth_accounts.md)
   * [eth\_getBalance](api/eth_getBalance.md)
@@ -30,6 +37,5 @@
   * [eth\_gasPrice](api/eth_gasPrice.md)
   * [eth\_sendRawTransactionSync](api/eth_sendRawTransactionSync.md)
   * [eth\_getCodeByHash](api/eth_getCodeByHash.md)
-  * [eth\_unsubscribe](api/eth_unsubscribe.md)
   * [mega\_outputAtBlock](api/mega_outputAtBlock.md)
   * [debug\_getHistoryTransactionCount](api/debug_getHistoryTransactionCount.md)

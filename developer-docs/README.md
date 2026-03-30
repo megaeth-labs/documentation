@@ -1,3 +1,42 @@
-# MegaETH Developer Documentation
+# MegaETH RPC
 
-Developer documentation for MegaETH, including JSON-RPC API references and guides.
+Use these docs to make correct MegaETH RPC requests with as little guesswork as possible.
+
+## Endpoints
+
+| Network | HTTP | Use when |
+|---------|------|----------|
+| Mainnet | `https://mainnet.megaeth.com/rpc` | Production traffic |
+| Testnet | `https://testnet.megaeth.com/rpc` | Development and testing |
+
+If you are unsure which network you reached, verify it with [`eth_chainId`](api/eth_chainId.md).
+
+## First Request
+
+Use [Quickstart](QUICKSTART.md) to make your first read-only request, verify the connected chain, and confirm the basic response shapes before moving to heavier methods.
+
+## Start Here
+
+If you are new to MegaETH RPC, read these in roughly this order:
+
+1. [Quickstart](QUICKSTART.md)
+2. [Choose Network And Endpoint](guides/choose-an-endpoint.md)
+3. [JSON-RPC Basics](json-rpc-basics.md)
+4. [Error reference](errors.md)
+5. [API Reference](api/README.md)
+
+Keep these shared references nearby:
+
+- [Type reference](types.md)
+- [Operations and limits](operations/limits.md)
+- [Handle rate limits and large queries](guides/rate-limits.md)
+
+## Common Tasks
+
+- [Read an account balance](api/eth_getBalance.md)
+- [Read contract state](api/eth_call.md)
+- [Estimate a transaction](api/eth_estimateGas.md)
+- [Query logs safely](api/eth_getLogs.md)
+- [Send a signed transaction and wait for its receipt](api/eth_sendRawTransactionSync.md)
+- [Diagnose older-state failures](guides/choose-an-endpoint.md#2-when-older-state-reads-fail)
+- [Handle rate limits and large queries](guides/rate-limits.md)

@@ -1,137 +1,55 @@
 # debug_getHistoryTransactionCount
 
-## Summary
-Returns the total number of transactions recorded on chain at the end of the specified block.
+Returns the chain-wide cumulative transaction count at a selected block.
 
-This is a MegaETH-specific method and is not part of the standard Ethereum Execution API. It returns a chain-wide cumulative transaction count, not an account nonce, and must not be used as a substitute for `eth_getTransactionCount`.
+## Ethereum Standard
 
-## Parameters
-- `block` (required): `string`
+This method is not part of the standard Ethereum JSON-RPC method set.
 
-  Accepted values:
-  - hex block number as a `0x`-prefixed `QUANTITY`
-  - one of: `latest`, `safe`, `finalized`, `earliest`
+## MegaETH Differences
 
-  Notes:
-  - `pending` is not supported on the public MegaETH mainnet endpoint for this method.
-  - Block hashes are not accepted for this method.
-  - Numeric block numbers are stable and deterministic.
-  - Tag-based values such as `latest`, `safe`, and `finalized` resolve relative to the node's current view of chain state and may change over time.
+- This is a MegaETH-specific debug method.
+- The result is a global cumulative chain counter, not an account nonce.
+- Accepted selectors on the public MegaETH mainnet endpoint are hex block numbers and the tags `earliest`, `latest`, `safe`, and `finalized`.
+- `pending` is not supported for this method on the public MegaETH mainnet endpoint.
+- Block hashes are not accepted.
 
-## Returns
-- `result` (string)
+## Request
 
-  A `0x`-prefixed hex `QUANTITY` representing the total number of transactions recorded on chain at the end of the selected block.
+Send `params` as `[block]`.
 
-  Meaning:
-  - This is a global cumulative counter for the chain.
-  - It is not a per-account transaction count.
-  - It is not an account nonce.
+| Position | Type | Required | Notes |
+|---|---|---|---|
+| `0` | [`BlockReferenceString`](../types.md#blockreferencestring) | Yes | For this method, use a hex block number or one of `earliest`, `latest`, `safe`, `finalized` |
 
-  Notes:
-  - If the selected block contains no transactions, the returned value is unchanged from the previous block.
-  - If the selected block contains `N` transactions, the returned value increases by `N` relative to the previous block.
-  - At `earliest`, the result reflects the cumulative count at the genesis boundary.
+- Do not confuse with [eth_getTransactionCount](./eth_getTransactionCount.md) which returns per-account nonce.
 
-## Examples
+## Response
 
-### curl: by block number
+| Field | Type | Notes |
+|---|---|---|
+| `result` | [`Quantity`](../types.md#quantity) | Total number of transactions recorded on chain up to and including the selected block |
+
+- Chain-wide cumulative counter. An empty block can return the same value as the previous block.
+
+## Common Errors
+
+| Code | When it usually happens | What to do |
+|---|---|---|
+| `-32001` | The requested block selector cannot be resolved, or an unsupported tag such as `pending` was used | Check the selector before retrying |
+| `-32602` | The request uses the wrong parameter shape, such as a block hash | Fix the request before retrying |
+| `-32005` | The public endpoint rate-limited the request | Back off and retry later |
+
+See also [Error reference](../errors.md).
+
+## Example
+
 ```bash
 curl -sS https://mainnet.megaeth.com/rpc \
   -H 'content-type: application/json' \
   --data '{"jsonrpc":"2.0","id":1,"method":"debug_getHistoryTransactionCount","params":["0x12a05f"]}'
 ```
 
-### JSON-RPC request: by block number
-```json
-{"jsonrpc":"2.0","id":1,"method":"debug_getHistoryTransactionCount","params":["0x12a05f"]}
-```
-
-### Response: by block number
 ```json
 {"jsonrpc":"2.0","id":1,"result":"0x12cbab"}
 ```
-
-### JSON-RPC request: by tag
-```json
-{"jsonrpc":"2.0","id":1,"method":"debug_getHistoryTransactionCount","params":["latest"]}
-```
-
-### Response: by tag
-```json
-{"jsonrpc":"2.0","id":1,"result":"0x2ae78e320"}
-```
-
-### Interpretation example
-- If block `N` ends with a cumulative count of `0x64`, the chain has recorded 100 total transactions up to and including block `N`.
-- If block `N+1` is empty, the method still returns `0x64`.
-- If block `N+2` contains 2 transactions, the method returns `0x66`.
-
-### JSON-RPC request: unsupported tag
-```json
-{"jsonrpc":"2.0","id":1,"method":"debug_getHistoryTransactionCount","params":["pending"]}
-```
-
-### Error response: unsupported tag
-```json
-{"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"block not found: pending"}}
-```
-
-## MegaETH Behavior
-- This method is a MegaETH-specific extension and is not expected to exist on standard Ethereum providers.
-- On the public MegaETH mainnet endpoint, supported selectors are:
-  - hex block numbers
-  - `latest`
-  - `safe`
-  - `finalized`
-  - `earliest`
-- On the public MegaETH mainnet endpoint, `pending` is not supported for this method and returns `-32001`.
-- Block hashes are not accepted.
-- Public endpoints may enforce rate limits.
-
-## Errors
-- `-32001` Resource not found
-
-  When it happens: The specified block does not exist or the requested tag cannot be resolved.
-
-  Example:
-  ```json
-  {"jsonrpc":"2.0","id":1,"error":{"code":-32001,"message":"block not found: pending"}}
-  ```
-
-  Client handling: Treat this as an unresolved block selector. Retry only if you expect the referenced block or tag to become available.
-
-- `-32602` Invalid params
-
-  When it happens: The request uses an unsupported parameter form, such as a block hash, missing params, or an invalid params shape.
-
-  Example:
-  ```json
-  {"jsonrpc":"2.0","id":1,"error":{"code":-32602,"message":"invalid params"}}
-  ```
-
-  Client handling: Fix the request shape before retrying.
-
-- `-32005` Rate limited
-
-  When it happens: The request exceeds the applicable rate limit.
-
-  Example:
-  ```json
-  {"jsonrpc":"2.0","id":1,"error":{"code":-32005,"message":"rate limited"}}
-  ```
-
-  Client handling: Retry with backoff. MegaETH may also return HTTP `429`.
-
-## Best Practices
-- Do not use this method as a substitute for `eth_getTransactionCount`.
-- Use a specific block number when you need stable, repeatable results.
-- Use `finalized` when you want stronger consistency near head.
-- Use `latest` only if you accept head movement and reorg-related changes.
-- Do not send `pending` or block hashes for this method.
-- Treat the result as a chain-wide cumulative counter, not an account-level value.
-
-## Compatibility
-- This method is not part of the standard Ethereum Execution API.
-- Do not assume other providers implement it.
-- The accepted block selector set for this method is MegaETH-specific and narrower than some standard Ethereum methods.

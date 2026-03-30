@@ -1,110 +1,46 @@
 # eth_getBlockTransactionCountByHash
 
-## Summary
-Returns the number of transactions contained in the block identified by a block hash.
+Returns the number of transactions in a block selected by block hash.
 
-This method is part of the standard Ethereum JSON-RPC API.
+## Ethereum Standard
 
-## Parameters
-- `blockHash` (required): `string`
+`eth_getBlockTransactionCountByHash(blockHash) -> Quantity | null`
 
-  Accepted values:
-  - a `0x`-prefixed 32-byte block hash
-  - exactly 64 hex characters after the `0x` prefix
+## Request
 
-  Notes:
-  - Send exactly one positional parameter for portable behavior.
-  - Malformed hash strings and non-string values are rejected with `-32602`.
-  - Use lowercase hashes for consistency across providers.
+Send `params` as `[blockHash]`.
 
-## Returns
-- `result` (`string | null`)
+| Position | Type | Required | Notes |
+|---|---|---|---|
+| `0` | [`BlockHash`](../types.md#blockhash) | Yes | Target block hash |
 
-  A `0x`-prefixed hex `QUANTITY` representing the number of transactions in the specified block.
+- Block tags such as `latest` or `pending` do not apply here.
 
-  Notes:
-  - The value has no leading zeros, except `0x0`.
-  - Parse the value as an unsigned integer in client code.
-  - `0x0` means the block exists and contains zero transactions.
-  - `null` means the specified block hash could not be resolved.
+## Response
 
-## Examples
+| Field | Type | Notes |
+|---|---|---|
+| `result` | [`Quantity`](../types.md#quantity) or `null` | Transaction count for the selected block |
 
-### curl: by block hash
+- `0x0` means zero transactions; `null` means the block was not found. Treat them differently.
+
+## Common Errors
+
+| Code | When it usually happens | What to do |
+|---|---|---|
+| `-32602` | The block hash is missing or malformed | Fix the request before retrying |
+| `-32005` | The public endpoint rate-limited the request | Back off and retry later |
+
+See also [Error reference](../errors.md).
+
+## Example
+
 ```bash
 curl -sS https://mainnet.megaeth.com/rpc \
   -H 'content-type: application/json' \
   --data '{"jsonrpc":"2.0","id":3,"method":"eth_getBlockTransactionCountByHash","params":["0xa97b8563203de36f0c8430709734438fbf7f2444b6de9f307853fc46b230de3e"]}'
 ```
 
-### JSON-RPC request: by block hash
-```json
-{"jsonrpc":"2.0","id":3,"method":"eth_getBlockTransactionCountByHash","params":["0xa97b8563203de36f0c8430709734438fbf7f2444b6de9f307853fc46b230de3e"]}
-```
-
-### Response: by block hash
 ```json
 {"jsonrpc":"2.0","id":3,"result":"0x18"}
 ```
-
-### JSON-RPC request: unknown block hash
-```json
-{"jsonrpc":"2.0","id":4,"method":"eth_getBlockTransactionCountByHash","params":["0x0000000000000000000000000000000000000000000000000000000000000000"]}
-```
-
-### Response: unknown block hash
-```json
-{"jsonrpc":"2.0","id":4,"result":null}
-```
-
-### JSON-RPC request: missing block hash
-```json
-{"jsonrpc":"2.0","id":5,"method":"eth_getBlockTransactionCountByHash","params":[]}
-```
-
-### Error response: missing block hash
-```json
-{"jsonrpc":"2.0","id":5,"error":{"code":-32602,"message":"Invalid params"}}
-```
-
-### JSON-RPC request: malformed block hash
-```json
-{"jsonrpc":"2.0","id":6,"method":"eth_getBlockTransactionCountByHash","params":["0x1234"]}
-```
-
-### Error response: malformed block hash
-```json
-{"jsonrpc":"2.0","id":6,"error":{"code":-32602,"message":"Invalid params"}}
-```
-
-## MegaETH Behavior
-- Unknown block hashes return `null`.
-- Public endpoints may enforce rate limits.
-
-## Errors
-- `-32602` Invalid params
-
-  When it happens: The request is missing the required `blockHash`, uses a non-string parameter, or includes a malformed hash value.
-
-  Example:
-  ```json
-  {"jsonrpc":"2.0","id":6,"error":{"code":-32602,"message":"Invalid params"}}
-  ```
-
-  Client handling: Send exactly one `0x`-prefixed 32-byte block hash.
-
-- `-32005` Rate limited
-
-  When it happens: The request exceeds the applicable public-endpoint rate limit.
-
-  Client handling: Retry with backoff. MegaETH may also return HTTP `429`.
-
-## Best Practices
-- Validate the hash format client-side before sending the request.
-- Treat `null` differently from `0x0`.
-- Use response `id` values to correlate results in batch requests.
-- Send exactly one block hash parameter.
-
-## Compatibility
-- The method itself is standard Ethereum JSON-RPC.
-- Use a single block hash parameter for cross-provider compatibility.
