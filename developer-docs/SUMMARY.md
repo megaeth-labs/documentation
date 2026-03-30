@@ -3,15 +3,15 @@
 * [MegaETH RPC](README.md)
 * [Quickstart](QUICKSTART.md)
 * [Choose Network And Endpoint](guides/choose-an-endpoint.md)
-* [JSON-RPC Basics](json-rpc-basics.md)
-* [Error Reference](errors.md)
-* [Type Reference](types.md)
 * [Operations And Limits](operations/limits.md)
 * [Handle Rate Limits And Large Queries](guides/rate-limits.md)
 
 ## API Reference
 
 * [API Reference](api/README.md)
+  * [JSON-RPC Basics](json-rpc-basics.md)
+  * [Error Reference](errors.md)
+  * [Type Reference](types.md)
   * [eth\_blockNumber](api/eth_blockNumber.md)
   * [eth\_chainId](api/eth_chainId.md)
   * [eth\_syncing](api/eth_syncing.md)

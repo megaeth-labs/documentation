@@ -12,7 +12,7 @@ Use this guide before you wire a client to MegaETH, or when the same request beh
 | Network | HTTP | Use when |
 |---|---|---|
 | Mainnet | `https://mainnet.megaeth.com/rpc` | Production traffic on the live chain |
-| Testnet | `https://testnet.megaeth.com/rpc` | Development, testing, and first integrations |
+| Testnet | `https://carrot.megaeth.com/rpc` | Development, testing, and first integrations |
 
 Reader rules:
 
@@ -51,7 +51,7 @@ Reader rules:
 
 | If you are building... | Network | What to do next |
 |---|---|---|
-| First integration check | Testnet | Start with `https://testnet.megaeth.com/rpc` |
+| First integration check | Testnet | Start with `https://carrot.megaeth.com/rpc` |
 | Production read path | Mainnet | Start with `https://mainnet.megaeth.com/rpc` |
 | Historical balance or storage reader | Match your target network | Verify older-state support before depending on older-block results |
 | Historical backfill job | Match your target network | Page aggressively and verify older-state support first |

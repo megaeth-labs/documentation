@@ -7,7 +7,7 @@ Use these docs to make correct MegaETH RPC requests with as little guesswork as 
 | Network | HTTP | Use when |
 |---------|------|----------|
 | Mainnet | `https://mainnet.megaeth.com/rpc` | Production traffic |
-| Testnet | `https://testnet.megaeth.com/rpc` | Development and testing |
+| Testnet | `https://carrot.megaeth.com/rpc` | Development and testing |
 
 If you are unsure which network you reached, verify it with [`eth_chainId`](api/eth_chainId.md).
 

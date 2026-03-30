@@ -10,6 +10,11 @@ Returns the chain ID reported by the endpoint.
 |---|---|---|
 | `result` | [`Quantity`](../types.md#quantity) | Chain ID for the connected network |
 
+| Network | Chain ID (hex) | Chain ID (decimal) |
+|---|---|---|
+| Mainnet | `0x10e6` | 4326 |
+| Testnet | `0x18c7` | 6343 |
+
 For error handling, see [Error reference](../errors.md).
 
 ## Example

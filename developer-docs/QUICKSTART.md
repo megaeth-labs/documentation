@@ -11,7 +11,7 @@ For request-envelope, batch, notification, and shared response rules, use [JSON-
 Use one endpoint:
 
 - Mainnet: `https://mainnet.megaeth.com/rpc`
-- Testnet: `https://testnet.megaeth.com/rpc`
+- Testnet: `https://carrot.megaeth.com/rpc`
 
 If you are testing new code, prefer testnet first.
 
@@ -45,7 +45,7 @@ curl -sS https://mainnet.megaeth.com/rpc \
 {"jsonrpc":"2.0","id":2,"result":"0x10e6"}
 ```
 
-`0x10e6` (4326) is MegaETH mainnet. If you see a different value, check your endpoint URL.
+`0x10e6` (4326) is MegaETH mainnet. `0x18c7` (6343) is MegaETH testnet. If you see a different value, check your endpoint URL.
 
 ## 3. Read Account State
 
@@ -81,4 +81,5 @@ Pick the next page based on what you are building:
 - Send transactions: [eth_sendRawTransactionSync](api/eth_sendRawTransactionSync.md)
 - Choose the right network and endpoint: [Choose Network And Endpoint](guides/choose-an-endpoint.md)
 - Handle rate limits and large queries: [Handle Rate Limits And Large Queries](guides/rate-limits.md)
+- Browse all available methods: [API Reference](api/README.md)
 - Debug failures: [Error reference](errors.md)
