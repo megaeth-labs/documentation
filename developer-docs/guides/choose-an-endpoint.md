@@ -9,16 +9,22 @@ Use this guide before you wire a client to MegaETH, or when the same request beh
 
 ## 1. Choose The Network
 
-| Network | HTTP | Use when |
-|---|---|---|
-| Mainnet | `https://mainnet.megaeth.com/rpc` | Production traffic on the live chain |
-| Testnet | `https://carrot.megaeth.com/rpc` | Development, testing, and first integrations |
+| Network | HTTP | WebSocket | Use when |
+|---|---|---|---|
+| Mainnet | `https://mainnet.megaeth.com/rpc` | `wss://mainnet.megaeth.com/ws` | Production traffic on the live chain |
+| Testnet | `https://carrot.megaeth.com/rpc` | `wss://carrot.megaeth.com/ws` | Development, testing, and first integrations |
 
 Reader rules:
 
-- Mainnet and testnet are the published public HTTP endpoints in this docs set.
+- Mainnet and testnet are the published public HTTP and WebSocket endpoints in this docs set.
 - If you are still validating a client, prefer testnet first unless you specifically need mainnet state.
 - Verify the connected chain with [`eth_chainId`](../api/eth_chainId.md) instead of assuming the URL tells the whole story.
+
+### WebSocket
+
+WebSocket connections support only [`eth_subscribe`](../api/eth_subscribe.md), [`eth_unsubscribe`](../api/eth_unsubscribe.md), [`eth_sendRawTransaction`](../api/eth_sendRawTransaction.md), [`eth_sendRawTransactionSync`](../api/eth_sendRawTransactionSync.md), and [`eth_chainId`](../api/eth_chainId.md). Use HTTP for all other methods.
+
+Per-IP connection limit is 5. Each connection supports up to 5 concurrent subscriptions and idles out after 60 seconds without activity. See [`eth_subscribe`](../api/eth_subscribe.md) for full details.
 
 ## 2. When Older-State Reads Fail
 

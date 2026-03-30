@@ -8,10 +8,19 @@ For request-envelope, batch, notification, and shared response rules, use [JSON-
 
 ## Before You Start
 
-Use one endpoint:
+HTTP (for most methods):
 
 - Mainnet: `https://mainnet.megaeth.com/rpc`
 - Testnet: `https://carrot.megaeth.com/rpc`
+
+WebSocket (for subscriptions):
+
+- Mainnet: `wss://mainnet.megaeth.com/ws`
+- Testnet: `wss://carrot.megaeth.com/ws`
+
+WebSocket supports only `eth_subscribe`, `eth_unsubscribe`, `eth_sendRawTransaction`, `eth_sendRawTransactionSync`, and `eth_chainId`. Use HTTP for all other methods.
+
+The published public HTTP endpoint currently accepts anonymous JSON-RPC POST requests with no API key or `Authorization` header.
 
 If you are testing new code, prefer testnet first.
 

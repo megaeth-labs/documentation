@@ -6,8 +6,6 @@ These limits matter because a method can be standard at the protocol level and s
 
 Use the method pages for request and response contracts. Use [Handle Rate Limits And Large Queries](../guides/rate-limits.md) when you need recovery steps instead of just the current numbers.
 
-Last verified for this docs set: March 30, 2026.
-
 If you depend on exact public-gateway numbers in production, re-check this page before hardcoding them into client limits or alert thresholds.
 
 ## HTTP Request Limits

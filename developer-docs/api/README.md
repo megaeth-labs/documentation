@@ -38,6 +38,7 @@ These cover most first integrations:
 - [eth_syncing](./eth_syncing.md)
 - [eth_getBlockByHash](./eth_getBlockByHash.md)
 - [eth_getBlockByNumber](./eth_getBlockByNumber.md)
+- [eth_getBlockReceipts](./eth_getBlockReceipts.md)
 - [eth_getBlockTransactionCountByHash](./eth_getBlockTransactionCountByHash.md)
 - [eth_getBlockTransactionCountByNumber](./eth_getBlockTransactionCountByNumber.md)
 - [eth_getTransactionByHash](./eth_getTransactionByHash.md)
@@ -56,11 +57,34 @@ These cover most first integrations:
 
 - [eth_getLogs](./eth_getLogs.md)
 
+## Send Transactions
+
+- [eth_sendRawTransaction](./eth_sendRawTransaction.md)
+- [eth_sendRawTransactionSync](./eth_sendRawTransactionSync.md)
+
+## Subscriptions (WebSocket)
+
+- [eth_subscribe](./eth_subscribe.md)
+- [eth_unsubscribe](./eth_unsubscribe.md)
+
+## Withdrawal Proofs
+
+- [mega_getWithdrawalProof](./mega_getWithdrawalProof.md)
+- [eth_getWithdrawalProof](./eth_getWithdrawalProof.md)
+
 ## MegaETH-Specific Methods
 
-- [eth_sendRawTransactionSync](./eth_sendRawTransactionSync.md)
 - [eth_getHeaderByHash](./eth_getHeaderByHash.md)
 - [eth_getHeaderByNumber](./eth_getHeaderByNumber.md)
 - [eth_getCodeByHash](./eth_getCodeByHash.md)
 - [mega_outputAtBlock](./mega_outputAtBlock.md)
+- [optimism_outputAtBlock](./optimism_outputAtBlock.md)
+- [mega_getBlockWitness](./mega_getBlockWitness.md)
 - [debug_getHistoryTransactionCount](./debug_getHistoryTransactionCount.md)
+
+## Network Info
+
+- [net_version](./net_version.md)
+- [net_listening](./net_listening.md)
+- [net_peerCount](./net_peerCount.md)
+- [web3_clientVersion](./web3_clientVersion.md)

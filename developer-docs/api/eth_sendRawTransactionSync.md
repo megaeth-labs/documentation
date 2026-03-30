@@ -53,16 +53,18 @@ See also [Error reference](../errors.md).
 
 ## Example
 
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 91,
-  "method": "eth_sendRawTransactionSync",
-  "params": [
-    "0xf86480830f424082ea6094000000000000000000000000000000000000000080808231b1a050e782f95780eaaf16dfaa0c1294c6705ada7a97b525f119c924f35dd14e0165a05c57cf60cd5c818445d3b5c4f25488540a8af6b3214cf82758794933df5aa108",
-    3000
-  ]
-}
+```bash
+curl -sS https://mainnet.megaeth.com/rpc \
+  -H 'content-type: application/json' \
+  --data '{
+    "jsonrpc": "2.0",
+    "id": 91,
+    "method": "eth_sendRawTransactionSync",
+    "params": [
+      "0xf86480830f424082ea6094cc4b43ab7230cc5913801a746c1834aa06c4e7e780808231b2a0b8126d2c41a6c7dbd0a9e219233497057bb391e7ee1d628370f9c1456f82b054a06663fde9daa2fae784c3dac1c9a5a973d538e3a12ec9c0e4d3cee9c70ba2b239",
+      3000
+    ]
+  }'
 ```
 
 ```json
@@ -70,12 +72,26 @@ See also [Error reference](../errors.md).
   "jsonrpc": "2.0",
   "id": 91,
   "result": {
-    "transactionHash": "0xb7cb129026cdb9dc9f590386e5cb5ae469872acb188939d641491f123031f442",
-    "blockHash": "0x6388332c56f0e05a6b68986bebaa5512ccea02a90b46698078d31d809712b95b",
-    "blockNumber": "0x100",
+    "type": "0x0",
     "status": "0x1",
-    "gasUsed": "0x5208",
-    "logs": []
+    "transactionHash": "0x8d3b1e22e7a9026c8658b5d922293d59e4de7c3382bb832d6890e6ab23ad7ec7",
+    "transactionIndex": "0x5",
+    "blockHash": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "blockNumber": "0xe7133c",
+    "from": "0xcc4b43ab7230cc5913801a746c1834aa06c4e7e7",
+    "to": "0xcc4b43ab7230cc5913801a746c1834aa06c4e7e7",
+    "gasUsed": "0xea60",
+    "effectiveGasPrice": "0xf4240",
+    "cumulativeGasUsed": "0x143043",
+    "contractAddress": null,
+    "logs": [],
+    "logsBloom": "0x000...000",
+    "l1GasPrice": "0x3216",
+    "l1GasUsed": "0x640",
+    "l1Fee": "0x6da0",
+    "l1BaseFeeScalar": "0x558",
+    "l1BlobBaseFee": "0x1",
+    "l1BlobBaseFeeScalar": "0x0"
   }
 }
 ```

@@ -1,0 +1,29 @@
+# net_peerCount
+
+Returns the number of peers currently connected to the node.
+
+## Ethereum Standard
+
+`net_peerCount() -> Quantity`
+
+## Request
+
+No parameters.
+
+## Response
+
+| Field | Type | Notes |
+|---|---|---|
+| `result` | [`Quantity`](../types.md#quantity) | Number of connected peers |
+
+## Example
+
+```bash
+curl -sS https://mainnet.megaeth.com/rpc \
+  -H 'content-type: application/json' \
+  --data '{"jsonrpc":"2.0","id":1,"method":"net_peerCount","params":[]}'
+```
+
+```json
+{"jsonrpc":"2.0","id":1,"result":"0x4"}
+```

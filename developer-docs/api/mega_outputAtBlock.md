@@ -9,7 +9,7 @@ This method is not part of the standard Ethereum JSON-RPC method set.
 ## MegaETH Differences
 
 - This is a MegaETH-specific method.
-- `optimism_outputAtBlock` currently behaves as an alias.
+- `optimism_outputAtBlock` is an alias for this method with identical behavior.
 - The request requires a concrete hex block number. Block tags such as `latest` are not accepted.
 - Numeric members inside `blockRef` and observed `syncStatus` fields are JSON numbers, not Ethereum [`Quantity`](../types.md#quantity) strings.
 
