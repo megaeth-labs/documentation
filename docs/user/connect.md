@@ -11,12 +11,12 @@ description: Connect your wallet to MegaETH — chain parameters, RPC endpoints,
 | Parameter | Value |
 | --------- | ----- |
 | **Network Name** | MegaETH |
-| **Chain ID** | 4326 (0x10e6) |
+| **Chain ID** | <code class="expression">space.vars.mainnet_chain_id</code> (<code class="expression">space.vars.mainnet_chain_id_hex</code>) |
 | **Native & Gas Token** | Ether (ETH), 18 decimals |
-| **RPC URL** | `https://mainnet.megaeth.com/rpc` |
-| **Block Time** | Mini-blocks: 10ms / EVM blocks: 1s |
-| **Block Gas Limit** | 10 billion (10¹⁰) gas per EVM block |
-| **Base Fee Per Gas** | 0.001 gwei (10⁶ wei) |
+| **RPC URL** | <code class="expression">space.vars.mainnet_rpc</code> |
+| **Block Time** | Mini-blocks: <code class="expression">space.vars.miniblock_time</code> / EVM blocks: <code class="expression">space.vars.evm_block_time</code> |
+| **Block Gas Limit** | <code class="expression">space.vars.block_gas_limit</code> gas per EVM block |
+| **Base Fee Per Gas** | <code class="expression">space.vars.base_fee_per_gas</code> |
 | **EIP-1559** | Base fee adjustment is effectively disabled |
 {% endtab %}
 
@@ -24,13 +24,13 @@ description: Connect your wallet to MegaETH — chain parameters, RPC endpoints,
 | Parameter | Value |
 | --------- | ----- |
 | **Network Name** | MegaETH Testnet |
-| **Chain ID** | 6343 (0x18c7) |
+| **Chain ID** | <code class="expression">space.vars.testnet_chain_id</code> (<code class="expression">space.vars.testnet_chain_id_hex</code>) |
 | **Native & Gas Token** | Ether (ETH), 18 decimals |
-| **RPC URL** | `https://carrot.megaeth.com/rpc` |
+| **RPC URL** | <code class="expression">space.vars.testnet_rpc</code> |
 | **Managed RPC** | [Alchemy](https://www.alchemy.com/) sells managed endpoints for higher rate limits |
-| **Block Time** | Mini-blocks: 10ms / EVM blocks: 1s |
-| **Block Gas Limit** | 10 billion (10¹⁰) gas per EVM block |
-| **Base Fee Per Gas** | 0.001 gwei (10⁶ wei) |
+| **Block Time** | Mini-blocks: <code class="expression">space.vars.miniblock_time</code> / EVM blocks: <code class="expression">space.vars.evm_block_time</code> |
+| **Block Gas Limit** | <code class="expression">space.vars.block_gas_limit</code> gas per EVM block |
+| **Base Fee Per Gas** | <code class="expression">space.vars.base_fee_per_gas</code> |
 | **EIP-1559** | Base fee adjustment is effectively disabled |
 
 {% hint style="warning" %}
@@ -69,20 +69,20 @@ In MetaMask, Rabby, or any Ethereum-compatible wallet, go to **Settings → Netw
 | Field | Value |
 | ----- | ----- |
 | Network Name | MegaETH |
-| RPC URL | `https://mainnet.megaeth.com/rpc` |
-| Chain ID | 4326 |
+| RPC URL | <code class="expression">space.vars.mainnet_rpc</code> |
+| Chain ID | <code class="expression">space.vars.mainnet_chain_id</code> |
 | Currency Symbol | ETH |
-| Block Explorer | `https://mega.etherscan.io` |
+| Block Explorer | <code class="expression">space.vars.mainnet_etherscan</code> |
 {% endtab %}
 
 {% tab title="Testnet" %}
 | Field | Value |
 | ----- | ----- |
 | Network Name | MegaETH Testnet |
-| RPC URL | `https://carrot.megaeth.com/rpc` |
-| Chain ID | 6343 |
+| RPC URL | <code class="expression">space.vars.testnet_rpc</code> |
+| Chain ID | <code class="expression">space.vars.testnet_chain_id</code> |
 | Currency Symbol | ETH |
-| Block Explorer | `https://megaeth-testnet-v2.blockscout.com` |
+| Block Explorer | <code class="expression">space.vars.testnet_blockscout</code> |
 {% endtab %}
 {% endtabs %}
 {% endstep %}

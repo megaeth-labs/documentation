@@ -134,7 +134,7 @@ These are the Ethereum-side contracts most relevant to end users.
 | Canonical Bridge | [`0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75`](https://etherscan.io/address/0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75) | Send ETH here to [bridge](../user/bridge.md) from Ethereum to MegaETH |
 | USDM | [`0xEc2AF1C8B110a61fD9C3Fa6a554a031Ca9943926`](https://etherscan.io/address/0xEc2AF1C8B110a61fD9C3Fa6a554a031Ca9943926) | |
 
-For the full list of L1 infrastructure contracts (DisputeGameFactory, OptimismPortal, SystemConfig, etc.), see [Getting Started](getting-started.md#l1-contracts-ethereum-mainnet).
+For the full list of L1 infrastructure contracts (DisputeGameFactory, OptimismPortal, SystemConfig, etc.), see the [Overview](overview.md#l1-contracts-ethereum-mainnet).
 {% endtab %}
 {% endtabs %}
 

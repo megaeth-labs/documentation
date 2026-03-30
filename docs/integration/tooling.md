@@ -65,7 +65,7 @@ Many tooling and infrastructure integrations are still being finalized.
 
 | Provider | Protocol | Get Started | Endpoint | Testnet (Carrot) | Mainnet |
 | -------- | -------- | ----------- | -------- | ---------------- | ------- |
-| **MegaETH** | HTTP | [Docs](https://docs.megaeth.com/rpc) | `https://carrot.megaeth.com/rpc` | Supported | Planned |
+| **MegaETH** | HTTP | [Docs](https://docs.megaeth.com/rpc) | <code class="expression">space.vars.testnet_rpc</code> | Supported | Planned |
 | **MegaETH** | WebSocket | [Docs](https://docs.megaeth.com/realtime-api) | `wss://carrot.megaeth.com/wss` | In Progress | Planned |
 | **Alchemy** | HTTP | [Docs](https://www.alchemy.com/docs/reference/chain-apis-overview) | — | — | Planned |
 | **Alchemy** | WebSocket | [Docs](https://www.alchemy.com/docs/reference/subscription-api) | — | — | Planned |

@@ -18,20 +18,20 @@ In MetaMask, Rabby, or any Ethereum-compatible wallet, go to **Settings → Netw
 | Field | Value |
 | ----- | ----- |
 | **Network Name** | MegaETH |
-| **RPC URL** | `https://mainnet.megaeth.com/rpc` |
-| **Chain ID** | 4326 |
+| **RPC URL** | <code class="expression">space.vars.mainnet_rpc</code> |
+| **Chain ID** | <code class="expression">space.vars.mainnet_chain_id</code> |
 | **Currency Symbol** | ETH |
-| **Block Explorer** | `https://mega.etherscan.io` |
+| **Block Explorer** | <code class="expression">space.vars.mainnet_etherscan</code> |
 {% endtab %}
 
 {% tab title="Testnet" %}
 | Field | Value |
 | ----- | ----- |
 | **Network Name** | MegaETH Testnet |
-| **RPC URL** | `https://carrot.megaeth.com/rpc` |
-| **Chain ID** | 6343 |
+| **RPC URL** | <code class="expression">space.vars.testnet_rpc</code> |
+| **Chain ID** | <code class="expression">space.vars.testnet_chain_id</code> |
 | **Currency Symbol** | ETH |
-| **Block Explorer** | `https://megaeth-testnet-v2.blockscout.com` |
+| **Block Explorer** | <code class="expression">space.vars.testnet_blockscout</code> |
 {% endtab %}
 {% endtabs %}
 
