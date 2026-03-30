@@ -1,4 +1,5 @@
 ---
+description: MegaETH gas detention specification — compute gas caps triggered by volatile data access (block environment, oracle SLOAD).
 spec: Rex3
 ---
 

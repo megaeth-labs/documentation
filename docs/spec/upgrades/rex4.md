@@ -1,5 +1,5 @@
 ---
-description: Rex4 adds per-call-frame resource budgets, a storage gas stipend for value transfers, relative gas detention, two new system contracts for access control and limit queries, and keyless deploy sandbox improvements.
+description: Rex4 network upgrade (unstable) — per-call-frame resource budgets, relative gas detention, and new system contracts.
 ---
 
 # Rex4 Network Upgrade

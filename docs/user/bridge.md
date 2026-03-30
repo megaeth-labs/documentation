@@ -1,5 +1,5 @@
 ---
-description: How to get ETH, stablecoins, and other assets on MegaETH Mainnet.
+description: Bridge assets to MegaETH — supported bridges, cross-chain swaps, and fiat on-ramps.
 ---
 
 # Get Funds on Mainnet

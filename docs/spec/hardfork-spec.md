@@ -1,4 +1,5 @@
 ---
+description: MegaETH hardfork and spec versioning — how behavioral changes are versioned, activated, and tracked across network upgrades.
 spec: Rex3
 ---
 

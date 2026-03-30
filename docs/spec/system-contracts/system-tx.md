@@ -1,5 +1,5 @@
 ---
-description: Mega system transaction identification and execution semantics.
+description: Mega system transactions — sender/recipient identification rules, whitelisted contracts, and execution bypass semantics.
 spec: Rex3
 ---
 

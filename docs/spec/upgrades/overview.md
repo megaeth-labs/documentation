@@ -1,3 +1,7 @@
+---
+description: MegaETH network upgrade history — hardfork timeline from MiniRex through Rex4 with activation dates and behavioral deltas.
+---
+
 # Overview
 
 This section documents each MegaETH network upgrade, describing what changed, why, and what developers need to know.

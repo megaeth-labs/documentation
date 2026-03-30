@@ -1,5 +1,5 @@
 ---
-description: How to debug transactions on MegaETH — debug RPC methods, mega-evme tracing, and common failure patterns.
+description: Debug failing transactions on MegaETH — trace with debug_traceTransaction, replay with mega-evme, and diagnose gas errors.
 ---
 
 # Debugging Transactions

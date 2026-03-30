@@ -1,5 +1,5 @@
 ---
-description: Get free testnet ETH from the MegaETH faucet.
+description: MegaETH testnet faucet — request limits, eligibility, and how to get testnet ETH.
 ---
 
 # Faucet

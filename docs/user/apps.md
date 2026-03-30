@@ -1,5 +1,5 @@
 ---
-description: Explore featured apps and the growing ecosystem on MegaETH.
+description: Featured apps on MegaETH — DeFi, gaming, NFTs, and the Rabbithole portal.
 ---
 
 # Featured Apps

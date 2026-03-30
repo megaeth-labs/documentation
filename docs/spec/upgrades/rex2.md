@@ -1,5 +1,5 @@
 ---
-description: Rex2 re-enables SELFDESTRUCT with EIP-6780 semantics and introduces the KeylessDeploy system contract for deterministic cross-chain deployment.
+description: Rex2 network upgrade — SELFDESTRUCT restored with EIP-6780, KeylessDeploy system contract added.
 ---
 
 # Rex2 Network Upgrade

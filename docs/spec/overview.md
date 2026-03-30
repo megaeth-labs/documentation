@@ -1,4 +1,5 @@
 ---
+description: MegaETH formal specification — normative behavioral definitions for EVM execution, system contracts, oracle services, and protocol upgrades.
 spec: Rex3
 ---
 

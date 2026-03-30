@@ -1,5 +1,5 @@
 ---
-description: How MegaETH enables or disables SELFDESTRUCT across specs and defines the current stable semantics.
+description: SELFDESTRUCT opcode on MegaETH — EIP-6780 semantics, same-transaction destruction, and spec history from MiniRex to Rex2.
 spec: Rex3
 ---
 

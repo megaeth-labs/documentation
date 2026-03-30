@@ -1,5 +1,5 @@
 ---
-description: MiniRex introduces the dual gas model, multidimensional resource limits, gas detention for parallel execution, modified gas forwarding, and MegaETH's first system contracts.
+description: MiniRex network upgrade — the foundational MegaEVM spec built on Optimism Isthmus (Ethereum Prague).
 ---
 
 # MiniRex Network Upgrade

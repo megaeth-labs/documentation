@@ -1,5 +1,5 @@
 ---
-description: Oracle system contract semantics, interface, write restrictions, and interception behavior.
+description: MegaETH Oracle system contract — address, storage layout, EVM interception mechanics, gas detention trigger, and high-precision timestamp wrapper.
 spec: Rex3
 ---
 

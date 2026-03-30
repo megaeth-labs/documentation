@@ -61,7 +61,15 @@ Any Ethereum SDK (ethers.js, viem, alloy, web3.py, etc.) works the same way — 
 This is separate from the on-chain transaction gas limit of 1,000,000,000.
 
 If your transaction requires more than 10M gas to simulate, the RPC call will fail.
-In that case, use the `--gas-limit` flag (see [Toolchain Configuration](#toolchain-configuration) below) to set a manual gas limit and skip estimation.
+There are two workarounds:
+
+1. **Set a manual gas limit.**
+   Use the `--gas-limit` flag (see [Toolchain Configuration](#toolchain-configuration) below) to skip estimation entirely and submit the transaction with a known gas value.
+   You can determine the right value by simulating the transaction locally with [`mega-evme`](debugging.md#using-mega-evme), which has no gas cap and fully implements MegaETH's gas model.
+2. **Use a third-party RPC provider with a higher cap.**
+   Managed RPC providers typically allow much more gas for `eth_call` and `eth_estimateGas` than the default 10M.
+   For reference, standard Ethereum node software (geth, reth) defaults to 50M, and providers like Alchemy support up to 550M.
+   See the [RPC Providers](../integration/tooling.md#rpc-providers) table for providers that support MegaETH.
 
 ## Toolchain Configuration
 

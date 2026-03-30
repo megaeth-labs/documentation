@@ -1,5 +1,5 @@
 ---
-description: Summary of the current stable MegaEVM behavior and links to the normative concept pages.
+description: MegaEVM specification index — dual gas model, resource limits, gas detention, system contracts, and per-spec behavioral history.
 spec: Rex3
 ---
 

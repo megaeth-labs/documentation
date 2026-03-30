@@ -1,5 +1,5 @@
 ---
-description: How MegaETH enforces transaction-level and block-level resource limits during execution and block construction.
+description: MegaETH per-transaction and per-block resource limits — compute gas, data size, KV updates, and state growth ceilings with enforcement semantics.
 spec: Rex3
 ---
 

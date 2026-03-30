@@ -1,5 +1,5 @@
 ---
-description: Registry and protocol-level semantics of MegaETH system contracts.
+description: MegaETH system contract registry — addresses, whitelisting rules, and protocol-level execution constraints.
 spec: Rex3
 ---
 

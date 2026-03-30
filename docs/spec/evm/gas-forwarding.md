@@ -1,5 +1,5 @@
 ---
-description: How MegaETH caps forwarded gas for CALL-like opcodes and contract creation.
+description: MegaETH 98/100 gas forwarding rule — CALL, DELEGATECALL, STATICCALL, CALLCODE, and CREATE/CREATE2 forwarding semantics.
 spec: Rex3
 ---
 

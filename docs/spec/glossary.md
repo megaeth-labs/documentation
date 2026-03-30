@@ -1,4 +1,5 @@
 ---
+description: MegaETH glossary — definitions of protocol terms including EVM blocks, mini-blocks, compute gas, storage gas, and gas detention.
 spec: Rex3
 ---
 

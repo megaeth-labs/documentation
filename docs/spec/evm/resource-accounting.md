@@ -1,5 +1,5 @@
 ---
-description: How MegaETH tracks compute gas, data size, KV updates, and state growth during execution.
+description: MegaETH resource accounting specification — counter semantics, revert behavior, and per-opcode metering for compute gas, data size, KV updates, and state growth.
 spec: Rex3
 ---
 

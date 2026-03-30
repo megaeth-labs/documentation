@@ -40,7 +40,7 @@ For the full gas model details, see [Gas Model](gas-model.md).
 ## Access to Volatile Data
 
 MegaEVM provides APIs for transactions to access _volatile data_ — data that changes frequently and expires quickly after being accessed.
-This includes metadata of the current block (block number, timestamp, coinbase), states of the block beneficiary, and data available through the native oracle interface.
+This includes metadata of the current block (block number, timestamp, coinbase), states of the block beneficiary, and data available through the [native oracle interface](system-contracts.md#native-oracle).
 
 When a transaction accesses volatile data, a dependency forms between the transaction and other transactions or operations that attempt to update the data.
 Such dependency harms performance.

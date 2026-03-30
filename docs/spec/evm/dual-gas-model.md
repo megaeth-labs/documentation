@@ -1,4 +1,5 @@
 ---
+description: MegaETH dual gas model specification — compute gas, storage gas, SALT bucket multiplier, and per-operation storage gas schedule.
 spec: Rex3
 ---
 
