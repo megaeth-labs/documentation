@@ -126,7 +126,7 @@ MegaETH enforces per-transaction limits beyond gas: Data Size (12.5 MB), KV Upda
 A transaction that stays within its gas budget can still fail if it exceeds one of these limits.
 
 **Fix:** Reduce the number of state operations per transaction.
-See [Multidimensional Resource Limits](gas-model.md#multidimensional-resource-limits) for the full table.
+See [Resource Limits](resource-limits.md) for the full table.
 
 ## Interpreting Gas in Receipts
 

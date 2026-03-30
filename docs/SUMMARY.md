@@ -17,6 +17,7 @@
 * [Contracts & Tokens](dev/contracts.md)
 * [EVM Differences](dev/evm-differences.md)
 * [Gas Model](dev/gas-model.md)
+* [Resource Limits](dev/resource-limits.md)
 * [Gas Estimation](dev/gas-estimation.md)
 * [Volatile Data Access](dev/volatile-data.md)
 * [Debugging Transactions](dev/debugging.md)
