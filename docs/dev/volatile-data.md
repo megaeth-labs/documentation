@@ -74,26 +74,19 @@ Accessing multiple sources (e.g., both `block.timestamp` and oracle storage) doe
 
 ## Best Practices
 
+### Split volatile reads and heavy computation into separate transactions
+
+If your contract needs both volatile data and heavy computation, split the work across two transactions:
+
+1. A lightweight transaction that reads volatile data and stores the result on-chain.
+2. A separate transaction that reads the stored result and performs heavy computation — no cap applies because it never accesses volatile data.
+
+
 <details>
-<summary>Pre-Rex4: Keep transactions under 20M compute gas</summary>
+<summary>Rex4 (unstable): Read volatile data as late as possible</summary>
 
-Under the current absolute cap, the order of operations does not matter — reading volatile data early or late makes no difference because the 20M ceiling applies to total compute gas regardless.
-Design transactions that access volatile data to stay well within 20M compute gas total.
-
-The following pattern will fail if the loop consumes more than 20M compute gas:
-
-```solidity
-// Bad: Heavy computation with volatile data access
-function processWithTimestamp(uint256[] calldata items) external {
-    uint256 currentTime = block.timestamp; // Triggers 20M cap
-    // This loop might run out of gas!
-    for (uint i = 0; i < items.length; i++) {
-        heavyComputation(items[i], currentTime);
-    }
-}
-```
-
-Under [Rex4 (unstable)](#volatile-data-access), the cap becomes relative and reading volatile data **as late as possible** becomes a valid optimization:
+Rex4 changes the cap from absolute to relative: accessing volatile data allows **20M more** compute gas from the point of access, regardless of how much was consumed before.
+This means deferring the volatile data read to the end of the transaction maximizes the computation you can perform.
 
 ```solidity
 // Good under Rex4: heavy computation first, volatile read last
@@ -101,29 +94,26 @@ function processAndCheckTime(uint256[] calldata items) external {
     for (uint i = 0; i < items.length; i++) {
         processItem(items[i]);
     }
+    // Cap starts here — but the heavy work is already done
     require(block.timestamp <= deadline, "Expired");
 }
 ```
 
+```solidity
+// Bad under Rex4: reading volatile data first wastes the budget
+function processWithTimestamp(uint256[] calldata items) external {
+    uint256 currentTime = block.timestamp; // Cap starts immediately
+    for (uint i = 0; i < items.length; i++) {
+        processItem(items[i]);  // Competing with the 20M budget
+    }
+}
+```
+
+Under the current absolute cap, read order makes no difference — the 20M ceiling applies to total compute gas regardless.
+For the formal definition, see [Gas Detention](../spec/evm/gas-detention.md).
+
 </details>
 
-### Split heavy transactions
-
-If your contract needs both volatile data and heavy computation, split the work across two transactions:
-
-1. A lightweight transaction that reads volatile data and stores the result.
-2. A separate transaction that reads the stored result and performs heavy computation — no cap applies.
-
-### Use DELEGATECALL for oracle reads
-
-`DELEGATECALL` to the oracle contract does **not** trigger the compute gas cap.
-If your contract calls a helper that reads oracle data via DELEGATECALL, the cap is not applied.
-Use this pattern when you need oracle data in a sub-call without constraining the parent transaction.
-
-### Keep gas-sensitive logic separate
-
-If a function has both a gas-sensitive path (large loops, recursive calls) and a volatile data read, refactor them into separate functions.
-Callers can then invoke the gas-heavy function first and the lightweight volatile-data function second.
 
 ## Related Pages
 
