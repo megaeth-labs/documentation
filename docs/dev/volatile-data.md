@@ -45,7 +45,7 @@ Accessing the block beneficiary (coinbase) account in any way also triggers the 
 | Transaction recipient is beneficiary | When call target is `block.coinbase` |
 | `DELEGATECALL` to beneficiary | Delegated context accessing beneficiary |
 
-### Native Oracle Interface
+### Native Oracle Service
 
 Reading oracle data via `SLOAD` from the oracle contract storage triggers the cap.
 
@@ -60,39 +60,47 @@ Accessing multiple sources (e.g., both `block.timestamp` and oracle storage) doe
 
 ## Best Practices
 
-### Read volatile data as late as possible
+### Keep transactions under 20M compute gas
 
-The cap limits _total_ compute gas, not gas consumed _after_ the access.
-Any computation done before the read counts against the same 20M budget.
-Deferring the read to the end of the transaction maximizes the computation you can perform.
+Under the current absolute cap, the order of operations does not matter — reading volatile data early or late makes no difference because the 20M ceiling applies to total compute gas regardless.
+Design transactions that access volatile data to stay well within 20M compute gas total.
 
-{% tabs %}
-{% tab title="Good" %}
+{% hint style="danger" %}
+The following pattern will fail if the loop consumes more than 20M compute gas:
+
 ```solidity
+function processWithTimestamp(uint256[] calldata items) external {
+    uint256 currentTime = block.timestamp; // Triggers 20M cap
+    // This loop might run out of gas!
+    for (uint i = 0; i < items.length; i++) {
+        heavyComputation(items[i], currentTime);
+    }
+}
+```
+{% endhint %}
+
+<details>
+<summary>Rex4 (unstable): Relative detention — read order matters</summary>
+
+Rex4 changes the cap from absolute to relative: accessing volatile data allows **20M more** compute gas from the point of access, regardless of how much was consumed before.
+
+Under relative detention, reading volatile data **as late as possible** becomes a valid optimization.
+A transaction that uses 15M compute gas before reading `block.timestamp` would still have 20M remaining (effective limit = 15M + 20M = 35M).
+Under the current absolute model, the same transaction has only 5M remaining.
+
+```solidity
+// Good under Rex4: heavy computation first, volatile read last
 function processAndCheckTime(uint256[] calldata items) external {
-    // Heavy computation first — no cap in effect yet
     for (uint i = 0; i < items.length; i++) {
         processItem(items[i]);
     }
-
-    // Read timestamp last — cap applies but work is already done
     require(block.timestamp <= deadline, "Expired");
 }
 ```
-{% endtab %}
 
-{% tab title="Bad" %}
-```solidity
-function processWithTimestamp(uint256[] calldata items) external {
-    uint256 currentTime = block.timestamp; // Triggers 20M cap immediately
-    // This loop might run out of gas!
-    for (uint i = 0; i < items.length; i++) {
-        processItem(items[i]);
-    }
-}
-```
-{% endtab %}
-{% endtabs %}
+For the formal definition, see [Gas Detention](../spec/evm/gas-detention.md).
+
+</details>
 
 ### Split heavy transactions
 
@@ -111,20 +119,6 @@ Use this pattern when you need oracle data in a sub-call without constraining th
 
 If a function has both a gas-sensitive path (large loops, recursive calls) and a volatile data read, refactor them into separate functions.
 Callers can then invoke the gas-heavy function first and the lightweight volatile-data function second.
-
-<details>
-<summary>Rex4 (unstable): Relative detention</summary>
-
-Rex4 changes the compute gas cap from an absolute limit to a relative one.
-Under relative detention, accessing volatile data allows **20M more** compute gas from the point of access, regardless of how much was consumed before.
-
-For example, a transaction that uses 15M compute gas before reading `block.timestamp` would still have 20M of compute gas remaining (effective limit = 15M + 20M = 35M).
-Under the current absolute model, the same transaction would have only 5M remaining (absolute cap = 20M).
-
-This change removes the penalty for accessing volatile data late in a transaction's execution.
-For the formal definition, see [Gas Detention](../spec/evm/gas-detention.md).
-
-</details>
 
 ## Related Pages
 
