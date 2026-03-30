@@ -5,7 +5,12 @@ description: Get free testnet ETH from the MegaETH faucet.
 # Faucet
 
 The MegaETH faucet gives you free testnet ETH so you can try out the network without spending real money.
-Testnet ETH has no monetary value — it's only for testing.
+Testnet ETH has no monetary value — it is only for testing.
+
+{% hint style="warning" %}
+The faucet is for **testnet only**.
+If you need ETH on MegaETH Mainnet, use the [bridge](bridge.md) to bridge ETH from Ethereum Mainnet instead.
+{% endhint %}
 
 ## How to Get Testnet ETH
 

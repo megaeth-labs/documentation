@@ -44,12 +44,9 @@ For more details, see [Connect to MegaETH](connect.md).
 
 {% tabs %}
 {% tab title="Mainnet" %}
-Send ETH to the bridge contract on Ethereum Mainnet:
-
-`0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75`
-
-Your ETH (minus Ethereum gas fees) will appear on MegaETH after the transaction finalizes.
-See the [Bridge](bridge.md) page for details.
+Bridge ETH or other tokens from Ethereum using the official bridge at [**rabbithole.megaeth.com/bridge**](https://rabbithole.megaeth.com/bridge).
+Connect your wallet, choose a token and amount, and confirm the transaction.
+See the [Bridge](bridge.md) page for details and other supported bridges.
 {% endtab %}
 
 {% tab title="Testnet" %}
