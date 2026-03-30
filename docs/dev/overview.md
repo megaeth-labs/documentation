@@ -1,22 +1,13 @@
 ---
-description: Start building smart contracts and dapps on MegaETH.
+description: Overview of developing on MegaETH — EVM compatibility, gas estimation, debugging, and bridging.
 ---
 
-# Getting Started
+# Overview
 
 MegaETH is fully compatible with Ethereum smart contracts.
 Standard Solidity toolchains (Foundry, Hardhat, Remix) work out of the box.
 
-## Connect to MegaETH
-
-| Parameter | Mainnet | Testnet |
-| --------- | ------- | ------- |
-| **Chain ID** | 4326 (0x10e6) | 6343 (0x18c7) |
-| **RPC URL** | `https://mainnet.megaeth.com/rpc` | `https://carrot.megaeth.com/rpc` |
-| **Currency** | ETH | ETH |
-| **Block Explorer** | [megaeth.blockscout.com](https://megaeth.blockscout.com/) | [megaeth-testnet-v2.blockscout.com](https://megaeth-testnet-v2.blockscout.com/) |
-
-A second block explorer is also available for mainnet: [Etherscan](https://mega.etherscan.io).
+For network parameters (chain ID, RPC URLs, block explorers), see [Connect to MegaETH](../user/connect.md).
 
 ## EVM Compatibility
 
@@ -28,36 +19,14 @@ The MegaEVM implementation is open source and can be found on [GitHub](https://g
 
 ## Gas Estimation
 
-{% hint style="warning" %}
-Toolchains not yet customized for MegaETH might incorrectly estimate the amount of gas a transaction needs if they use their own EVM implementations, as opposed to MegaEVM, to locally simulate the transaction.
-Sometimes, this issue causes the RPC to throw "intrinsic gas too low" errors or the transaction to run out of gas and revert.
-{% endhint %}
-
-**Two solutions:**
-
-{% tabs %}
-{% tab title="Use MegaETH RPC for estimation" %}
-Point your toolchain at a MegaETH RPC endpoint and let it call `eth_estimateGas` remotely.
-This is the recommended approach — it uses MegaEVM and gives accurate results.
-{% endtab %}
-
-{% tab title="Skip local simulation (Foundry)" %}
-For `forge script`, bypass local estimation with a hardcoded gas limit:
-
-```bash
-forge script MyScript --gas-limit 30000000 --skip-simulation --rpc-url https://mainnet.megaeth.com/rpc
-```
-
-Use `--gas-limit` with a sufficiently large number plus `--skip-simulation`.
-{% endtab %}
-{% endtabs %}
+MegaETH's dual gas model means standard Ethereum toolchains may underestimate gas.
+Always use a MegaETH RPC endpoint for gas estimation, or bypass local simulation entirely.
+See [Gas Estimation](gas-estimation.md) for code examples, toolchain configuration, and common pitfalls.
 
 ## Debugging Transactions
 
-The best tool for debugging MegaETH transactions is **`mega-evme`**.
-It uses the open-source MegaEVM implementation and can thus perfectly simulate any transaction's behavior on MegaETH.
-
-Instructions on building and using `mega-evme` are available in the [mega-evme README](https://github.com/megaeth-labs/mega-evm/blob/main/bin/mega-evme/README.md).
+MegaETH supports `debug_traceTransaction` and other debug RPC methods (via managed RPC providers), and provides `mega-evme` for local transaction replay and simulation.
+See [Debugging Transactions](debugging.md) for usage examples and common debugging scenarios.
 
 ## Using the Canonical Bridge
 

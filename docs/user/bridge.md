@@ -83,4 +83,4 @@ You can send ETH directly to the bridge contract on Ethereum Mainnet:
 `0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75`
 
 The same amount of ETH (minus Ethereum gas fees) will appear at your address on MegaETH after the Ethereum transaction is finalized.
-For developer details on the bridge contract, see the [Developer Docs](../dev/getting-started.md).
+For developer details on the bridge contract, see the [Developer Docs](../dev/overview.md).

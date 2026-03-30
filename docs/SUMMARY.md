@@ -1,6 +1,6 @@
 # Table of contents
 
-* [Overview](README.md)
+* [Home](README.md)
 
 ## User Guide
 
@@ -13,10 +13,12 @@
 
 ## Developer Docs
 
-* [Getting Started](dev/getting-started.md)
-* [Key Contracts & Tokens](dev/contracts.md)
+* [Overview](dev/overview.md)
+* [Contracts & Tokens](dev/contracts.md)
 * [EVM Differences](dev/evm-differences.md)
 * [Gas Model](dev/gas-model.md)
+* [Gas Estimation](dev/gas-estimation.md)
+* [Debugging Transactions](dev/debugging.md)
 * [System Contracts](dev/system-contracts.md)
 * [Architecture](dev/architecture.md)
 * [Mini-Blocks](dev/miniblocks.md)

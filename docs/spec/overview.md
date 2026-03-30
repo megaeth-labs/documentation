@@ -39,7 +39,7 @@ Start with [Hardforks and Specs](hardfork-spec.md) to understand how behavior is
 For the current stable behavior as a single reference, see the [MegaEVM Overview](evm/overview.md).
 
 {% hint style="info" %}
-If you are building smart contracts or dApps on MegaETH, the [Developer Docs](../dev/getting-started.md) provide practical guidance with code examples.
+If you are building smart contracts or dApps on MegaETH, the [Developer Docs](../dev/overview.md) provide practical guidance with code examples.
 This specification is the normative reference that the developer docs summarize.
 {% endhint %}
 

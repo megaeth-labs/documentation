@@ -113,8 +113,8 @@ Do not attempt to compute gas costs manually — the dynamic multiplier depends 
 
 {% hint style="success" %}
 **Use MegaETH's native gas estimation APIs.**
-Tools not explicitly modified for MegaEVM do not account for storage gas and will report overly small numbers.
-For example, when running `forge script`, use `--skip-simulation` to avoid its built-in EVM and use `--gas-limit` to manually specify a sufficiently high gas limit.
+Tools not explicitly modified for MegaEVM do not account for storage gas and will underestimate.
+See [Gas Estimation](gas-estimation.md) for code examples, toolchain configuration, and common pitfalls.
 {% endhint %}
 
 {% hint style="info" %}
