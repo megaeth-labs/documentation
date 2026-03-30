@@ -83,7 +83,7 @@ When invoked over WebSocket, `eth_subscribe` streams data as soon as the corresp
 This is the mechanism to get transaction preconfirmation and execution results with the minimum amount of latency.
 Please call `eth_unsubscribe` when a subscription is no longer needed.
 
-{% hint style="warning" %}
+{% hint style="info" %}
 WebSocket connections require periodic client activity to remain open.
 Clients should send `eth_chainId` at least once every 30 seconds to keep the WebSocket connection alive.
 Idle connections may be closed by the server.

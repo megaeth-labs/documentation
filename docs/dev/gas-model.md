@@ -18,7 +18,7 @@ Both compute gas and storage gas are deducted from this single budget.
 In addition, MegaEVM enforces a separate compute gas ceiling of 200,000,000 that caps only the compute portion.
 A transaction can be halted by either ceiling: the total `gas_limit` or the compute gas cap.
 
-{% hint style="success" %}
+{% hint style="info" %}
 **In practice:**
 
 - **`gas_limit`:** Set this to cover your expected total gas (compute + storage). `eth_estimateGas` on a MegaETH endpoint accounts for both.
@@ -117,7 +117,7 @@ Tools not explicitly modified for MegaEVM do not account for storage gas and wil
 See [Gas Estimation](gas-estimation.md) for code examples, toolchain configuration, and common pitfalls.
 {% endhint %}
 
-{% hint style="info" %}
+{% hint style="warning" %}
 **Account for storage gas.**
 An Ether transfer costs 60,000 gas (21,000 compute gas plus 39,000 storage gas).
 This is the minimum gas cost (intrinsic gas) for any transaction.

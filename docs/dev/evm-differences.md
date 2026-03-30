@@ -59,7 +59,7 @@ In all other cases, `SELFDESTRUCT` behaves as a simple Ether transfer without de
 On Ethereum, resetting a storage slot to its original value within the same transaction refunds part of the gas.
 On MegaETH, storage gas is **not refunded** when a slot is set back to its original value — the full storage gas cost is still charged.
 
-{% hint style="info" %}
+{% hint style="success" %}
 Use transient storage ([EIP-1153](https://eips.ethereum.org/EIPS/eip-1153) `TSTORE`/`TLOAD`) for scratch data that only needs to persist within a transaction.
 This avoids storage gas costs entirely.
 {% endhint %}

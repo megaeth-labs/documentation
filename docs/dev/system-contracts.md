@@ -112,9 +112,10 @@ Across transactions in the same block, the value is non-decreasing and may incre
 
 The timestamp is capped above by `block.timestamp × 1_000_000`, so it never exceeds the block timestamp converted to microseconds.
 
-{% hint style="success" %}
-Read the timestamp as late as possible in your execution flow.
-The value is updated per transaction, so reading it early and then doing heavy computation means you're holding a slightly stale value while also burning through the 20M compute gas cap.
+{% hint style="warning" %}
+Reading the high-precision timestamp accesses volatile data and caps the transaction's compute gas to 20M.
+Avoid reading it in transactions that perform heavy computation.
+See [Volatile Data Access](volatile-data.md) for details and best practices.
 {% endhint %}
 
 ### Trust Assumption
@@ -131,7 +132,7 @@ Therefore, obtaining high-precision timestamps accesses volatile data and is sub
 Specifically, calling this oracle caps the transaction's global compute gas to **20,000,000**.
 Avoid calling this oracle in transactions that perform heavy computation.
 
-{% hint style="warning" %}
+{% hint style="info" %}
 `DELEGATECALL` to the oracle contract does **not** trigger the volatile data compute gas limit.
 Only direct `SLOAD` from the oracle contract storage triggers the limit.
 {% endhint %}
@@ -173,7 +174,7 @@ bytes memory originalTx = hex"f8a58085174876e800830186a08080b853604580600e...";
 | CREATE2 Factory | `0x4e59b44847b379578588920ca78fbf26c0b4956c` |
 | EIP-1820 Registry | `0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24` |
 
-{% hint style="danger" %}
+{% hint style="warning" %}
 **Code deposit storage gas is significant.**
 Deploying bytecode costs 10,000 storage gas per byte.
 A 24 KB contract costs roughly 240,000,000 storage gas.
