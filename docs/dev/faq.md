@@ -42,6 +42,7 @@ Write error handling for rollbacks of preconfirmed blocks.
 ### What is the contract size limit?
 
 512 KB, rather than Ethereum's 24 KB.
+See the [Contract Limits specification](../spec/evm/contract-limits.md) for details.
 
 ## Transaction Lifecycle & Txpool
 

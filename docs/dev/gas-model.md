@@ -206,4 +206,6 @@ If a newly created storage slot or account is cleared before the transaction end
 ## Related Pages
 
 - [EVM Differences](evm-differences.md) — full list of behavioral differences from Ethereum
-- [EVM Specification](https://docs.megaeth.com/evm-spec/evm/dual-gas-model) — formal normative specification of the dual gas model
+- [Dual Gas Model (spec)](../spec/evm/dual-gas-model.md) — formal specification of compute gas and storage gas
+- [Resource Accounting (spec)](../spec/evm/resource-accounting.md) — how counters are tracked per opcode
+- [Resource Limits (spec)](../spec/evm/resource-limits.md) — per-transaction and per-block limit enforcement

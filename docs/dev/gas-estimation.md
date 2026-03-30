@@ -142,3 +142,5 @@ If you need to debug which dimension caused a failure, see [Debugging Transactio
 - [EVM Differences](evm-differences.md) — volatile data caps, SSTORE refund changes, 98/100 forwarding
 - [RPC Reference](rpc/README.md) — method availability and restrictions
 - [Developer FAQ](faq.md) — `eth_estimateGas` gas cap, block gas limit
+- [Dual Gas Model (spec)](../spec/evm/dual-gas-model.md) — formal specification of compute gas and storage gas
+- [Resource Limits (spec)](../spec/evm/resource-limits.md) — per-transaction and per-block limit enforcement

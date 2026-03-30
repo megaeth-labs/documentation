@@ -194,6 +194,10 @@ Addresses and interfaces are subject to change before release.
 
 </details>
 
-{% hint style="info" %}
-For the formal specification of system contracts, see the [EVM Specification](https://docs.megaeth.com/evm-spec/system-contracts/overview).
-{% endhint %}
+## Related Pages
+
+- [System Contracts (spec)](../spec/system-contracts/overview.md) — formal specification of the system contract registry
+- [Oracle (spec)](../spec/system-contracts/oracle.md) — oracle contract address, storage layout, and interception semantics
+- [KeylessDeploy (spec)](../spec/system-contracts/keyless-deploy.md) — keyless deployment sandbox and validation rules
+- [System Transactions (spec)](../spec/system-contracts/system-tx.md) — system transaction identification and execution
+- [Gas Detention (spec)](../spec/evm/gas-detention.md) — compute gas cap triggered by volatile data access
