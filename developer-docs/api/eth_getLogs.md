@@ -1,48 +1,42 @@
 # eth_getLogs
 
-Returns log entries that match a filter.
+Returns event logs emitted by smart contracts, filtered by block range, contract address, and/or topics.
 
-## Ethereum Standard
+## Parameters
 
-`eth_getLogs(filter) -> Log[]`
+Pass a single [`LogFilter`](../types.md#logfilter) object as `params[0]`.
 
-## MegaETH Differences
-
-- Matching log objects can include an optional `blockTimestamp`.
-- MegaETH can accept positional `[]` topic wildcards, but portable clients should prefer `null`.
-
-## Request
-
-Send `params` as `[filter]`.
-
-| Position | Type | Required | Notes |
+| Field | Type | Required | Notes |
 |---|---|---|---|
-| `0` | [`LogFilter`](../types.md#logfilter) | Yes | Range filter or single-block filter |
+| `fromBlock` | [`BlockTag`](../types.md#blocktag) | No | Start of range (inclusive) |
+| `toBlock` | [`BlockTag`](../types.md#blocktag) | No | End of range (inclusive) |
+| `blockHash` | `Data` (32 bytes) | No | Single block to query. Cannot be combined with `fromBlock` / `toBlock` |
+| `address` | `Data` \| `Data[]` | No | Contract address(es) to match |
+| `topics` | `Data[]` | No | Position-sensitive topic filter. Use `null` as a wildcard. MegaETH also accepts `[]`, but portable clients should prefer `null` |
 
-Reader notes:
+## Returns
 
-- Use either `blockHash` or `fromBlock` / `toBlock`, never both.
-- Block ranges are inclusive of both endpoints.
-- `address` can be a single address or an array of addresses.
-- Topic matching is position-sensitive. Use `null` as a wildcard.
-- On public endpoints, keep ranges explicit and small.
-
-## Response
+An array of [`Log`](../types.md#log) objects. Each object contains:
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Log`](../types.md#log)`[]` | Matching log objects |
+| `address` | `Data` (20 bytes) | Contract that emitted the log |
+| `topics` | `Data[]` | Indexed event parameters (0–4 entries) |
+| `data` | `Data` | ABI-encoded non-indexed event parameters |
+| `blockNumber` | `Quantity` | Block containing the log |
+| `transactionHash` | `Data` (32 bytes) | Transaction that emitted the log |
+| `transactionIndex` | `Quantity` | Transaction position in the block |
+| `logIndex` | `Quantity` | Log position in the block |
+| `removed` | `Boolean` | `true` if removed during a reorg |
+| `blockTimestamp` | `Quantity` | Block timestamp. MegaETH extension — not present on other networks |
 
-- `blockTimestamp` is a MegaETH extension; not present on other providers.
+## Errors
 
-## Common Errors
-
-| Code | When it usually happens | What to do |
+| Code | Cause | Fix |
 |---|---|---|
-| `-32602` | The filter is malformed or combines `blockHash` with `fromBlock` or `toBlock` | Fix the filter before retrying |
-| `-32001` | The provided `blockHash` cannot be resolved | Check the block hash and retry only if you expect it to become available |
-| `-32000` | The query is too large for the endpoint | Reduce the range, narrow the filter, and paginate |
-| `-32005` | The public endpoint rate-limited the request | Back off and retry later |
+| `-32602` | Malformed filter, or `blockHash` combined with `fromBlock` / `toBlock` | Fix the filter |
+| `-32001` | `blockHash` cannot be resolved | Verify the block hash |
+| `-32000` | Query too large for the endpoint | Narrow the filter or reduce the range |
 
 See also [Error reference](../errors.md) and [Handle Rate Limits And Large Queries](../guides/rate-limits.md).
 

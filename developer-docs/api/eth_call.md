@@ -1,56 +1,69 @@
 # eth_call
 
-Executes a read-only message call against the state of a selected block.
+Simulates a transaction against a given block's state and returns the result without creating an on-chain transaction.
 
-## Ethereum Standard
+## Parameters
 
-`eth_call(transaction, block?) -> Data`
+Pass `params` as `[transaction, block, stateOverride, blockOverrides]`. Only `transaction` is required.
 
-## MegaETH Differences
+### `transaction`
 
-- MegaETH currently accepts both `input` and `data` as calldata field names.
-- The public MegaETH endpoint currently accepts an omitted `block` parameter.
-- The public MegaETH endpoint also accepts optional [`StateOverride`](../types.md#stateoverride) and [`BlockOverrides`](../types.md#blockoverrides) parameters for simulation-only overrides.
-- Those override parameters are MegaETH-specific and not portable Ethereum JSON-RPC behavior.
+Describes the simulated transaction.
 
-## Request
-
-Portable clients should send `params` as `[transaction, block]`.
-
-| Position | Type | Required | Notes |
+| Field | Type | Required | Notes |
 |---|---|---|---|
-| `0` | [`TransactionCall`](../types.md#transactioncall) | Yes | Call object with fields such as `to`, `from`, `value`, `input`, `gas`, and fee fields |
-| `1` | [`BlockReferenceString`](../types.md#blockreferencestring) | Yes for portable clients | Execution context |
-| `2` | [`StateOverride`](../types.md#stateoverride) | No, MegaETH only | Temporary per-account overrides for this simulation |
-| `3` | [`BlockOverrides`](../types.md#blockoverrides) | No, MegaETH only | Temporary block-environment overrides for this simulation |
+| `to` | `Data` (20 bytes) | Yes | Target contract address |
+| `from` | `Data` (20 bytes) | No | Sender address. Set explicitly when `msg.sender` matters |
+| `input` | `Data` | No | Calldata. MegaETH also accepts `data`, but prefer `input` for portability |
+| `value` | `Quantity` | No | Wei to send with the call |
+| `gas` | `Quantity` | No | Gas limit for the simulation |
+| `gasPrice` | `Quantity` | No | Legacy gas price. Cannot be combined with EIP-1559 fee fields |
+| `maxFeePerGas` | `Quantity` | No | EIP-1559 max fee. Cannot be combined with `gasPrice` |
+| `maxPriorityFeePerGas` | `Quantity` | No | EIP-1559 priority fee. Cannot be combined with `gasPrice` |
 
-Reader notes:
+See the [types reference](../types.md#transactioncall) for the complete field list.
 
-- Prefer `input` for portable client behavior.
-- If both `input` and `data` are present, they must be identical or the request is rejected.
-- Use either `gasPrice` or EIP-1559 fee fields, not both.
-- Set `from` explicitly when `msg.sender` matters to the simulation.
-- Use a fixed block number, block hash, `safe`, or `finalized` when deterministic results matter.
+### `block`
 
-## Response
+Block state to simulate against. Accepts a hex block number or one of: `"earliest"`, `"latest"`, `"pending"`, `"safe"`, `"finalized"`. Default: `"latest"`.
+
+### `stateOverride`
+
+Temporary account-level overrides applied only for this simulation. Keyed by address.
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Data`](../types.md#data) | Raw return bytes from the call |
+| `balance` | `Quantity` | Override the account balance |
+| `nonce` | `Quantity` | Override the account nonce |
+| `code` | `Data` | Override the account bytecode |
+| `state` | `Object` | Replace the entire storage (slot → value mapping). Cannot be combined with `stateDiff` |
+| `stateDiff` | `Object` | Patch individual storage slots without replacing the full state. Cannot be combined with `state` |
 
-Reader notes:
+### `blockOverrides`
 
-- `0x` is a valid successful result; calls to non-contract addresses can return `0x`.
-- Reverts surface as top-level JSON-RPC errors, not as a normal `result`.
+Temporary block-environment overrides applied only for this simulation.
 
-## Common Errors
-
-| Code | When it usually happens | What to do |
+| Field | Type | Notes |
 |---|---|---|
-| `-32602` | The call object, block selector, or override object is malformed, or `input` and `data` disagree | Fix the request before retrying |
-| `3` | The simulated execution reverted | Decode `error.data` when present and fix the call conditions |
-| `-32000` | The simulation failed or hit a provider-side execution limit | Inspect `error.message`, adjust gas or call shape, and retry only after fixing the cause |
-| `-32005` | The public endpoint rate-limited the request | Back off and retry later |
+| `number` | `Quantity` | Override `block.number` |
+| `time` | `Quantity` | Override `block.timestamp` |
+| `gasLimit` | `Quantity` | Override `block.gasLimit` |
+| `feeRecipient` | `Data` (20 bytes) | Override `block.coinbase` |
+| `baseFeePerGas` | `Quantity` | Override `block.baseFee` |
+
+## Returns
+
+| Field | Type | Notes |
+|---|---|---|
+| `result` | [`Data`](../types.md#data) | Raw return bytes from the call. `0x` is a valid result (e.g., calls to non-contract addresses). Reverts surface as JSON-RPC errors, not as a normal `result` |
+
+## Errors
+
+| Code | Cause | Fix |
+|---|---|---|
+| `-32602` | Malformed call object, block selector, or override object, or `input` and `data` disagree | Fix the request |
+| `3` | Simulated execution reverted | Decode `error.data` and fix the call conditions |
+| `-32000` | Simulation failed or hit an execution limit | Inspect `error.message` and adjust gas or call shape |
 
 See also [Error reference](../errors.md).
 
