@@ -63,7 +63,7 @@ To avoid leaving transactions stuck in the pool, send transactions with nonces t
 
 MegaETH does not exercise a per-account transaction rate limit, but there are two main constraints:
 
-1. **Block gas limit.** Each EVM block has a maximum gas limit of 2 Giga (2,000,000,000) gas. Given that the minimum gas cost per transaction is 21,000 gas, the theoretical maximum number of transactions per block is 2,000,000,000 / 21,000 = 95,238.
+1. **Block gas limit.** Each EVM block has a maximum gas limit of 10 billion (10,000,000,000) gas. Given that the minimum gas cost per transaction is 60,000 gas (21,000 compute gas + 39,000 storage gas), the theoretical maximum number of transactions per block is 10,000,000,000 / 60,000 = 166,666.
 2. **Execution throughput.** The practical limit also depends on the number of transactions the EVM can process per second. For native ETH transfers, this number is estimated to be around 100,000 transactions per second under ideal conditions.
 
 ### How do I check how many transactions are in the txpool?
