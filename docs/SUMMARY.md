@@ -23,7 +23,8 @@
   * [Debugging Transactions](dev/send-tx/debugging.md)
 * [Read from MegaETH](dev/read/overview.md)
   * [Realtime API](dev/read/realtime-api.md)
-  * [eth\_subscribe](dev/read/rpc/eth_subscribe.md)
+  * [RPC Reference]
+    * [eth\_subscribe](dev/read/rpc/eth_subscribe.md)
     * [eth\_callAfter](dev/read/rpc/eth_callAfter.md)
     * [eth\_getLogsWithCursor](dev/read/rpc/eth_getLogsWithCursor.md)
     * [realtime\_sendRawTransaction](dev/read/rpc/realtime_sendRawTransaction.md)
