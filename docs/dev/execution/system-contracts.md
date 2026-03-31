@@ -137,6 +137,6 @@ Addresses and interfaces are subject to change before release.
 ## Related Pages
 
 - [Volatile Data Access](volatile-data.md) — compute gas cap, best practices for reading volatile data
-- [System Contracts (spec)](../spec/system-contracts/overview.md) — formal specification of the system contract registry
-- [Oracle (spec)](../spec/system-contracts/oracle.md) — underlying oracle contract that powers the High-Precision Timestamp and other services
-- [KeylessDeploy (spec)](../spec/system-contracts/keyless-deploy.md) — keyless deployment sandbox and validation rules
+- [System Contracts (spec)](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/system-contracts/overview) — formal specification of the system contract registry
+- [Oracle (spec)](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/system-contracts/oracle) — underlying oracle contract that powers the High-Precision Timestamp and other services
+- [KeylessDeploy (spec)](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/system-contracts/keyless-deploy) — keyless deployment sandbox and validation rules

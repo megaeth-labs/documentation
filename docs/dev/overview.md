@@ -12,7 +12,7 @@ For network parameters (chain ID, RPC URLs, block explorers), see [Connect to Me
 ## EVM Compatibility
 
 MegaETH's execution environment is called **MegaEVM**.
-It is fully compatible with Ethereum smart contracts but introduces a few differences compared to Ethereum's EVM, especially around the [dual gas model](../spec/evm/dual-gas-model.md).
+It is fully compatible with Ethereum smart contracts but introduces a few differences compared to Ethereum's EVM, especially around the [dual gas model](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/dual-gas-model).
 See [EVM Differences](execution/overview.md) for a complete list.
 
 The MegaEVM implementation is open source and can be found on [GitHub](https://github.com/megaeth-labs/mega-evm).

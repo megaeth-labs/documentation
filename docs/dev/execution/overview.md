@@ -43,19 +43,19 @@ Reading volatile data — `block.timestamp`, `block.number`, oracle storage, or 
 This ensures transactions with external dependencies yield quickly and don't block parallel execution.
 
 For the full list of triggers, best practices for structuring contracts around this cap, and Solidity examples, see [Volatile Data Access](volatile-data.md).
-For the formal specification, see [Gas Detention](../spec/evm/gas-detention.md).
+For the formal specification, see [Gas Detention](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/gas-detention).
 
 ## Increased Contract Size Limit
 
 MegaETH supports contracts up to **512 KB** in size, increased from 24 KB in Ethereum.
-For the formal specification, see [Contract Limits](../spec/evm/contract-limits.md).
+For the formal specification, see [Contract Limits](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/contract-limits).
 
 ## `SELFDESTRUCT` with EIP-6780 Semantics
 
 The `SELFDESTRUCT` opcode follows [EIP-6780](https://eips.ethereum.org/EIPS/eip-6780) semantics.
 It only destroys a contract when called within the same transaction that created the contract.
 In all other cases, `SELFDESTRUCT` behaves as a simple Ether transfer without destroying the contract or clearing its storage.
-For the formal specification, see [SELFDESTRUCT](../spec/evm/selfdestruct.md).
+For the formal specification, see [SELFDESTRUCT](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/selfdestruct).
 
 ## No Storage Gas Refund for SSTORE Resets
 
@@ -78,7 +78,7 @@ The parent call frame retains 2% instead of ~1.6%, so subcalls receive slightly 
 Review any patterns that rely on precise gas forwarding calculations.
 {% endhint %}
 
-For the formal specification, see [Gas Forwarding](../spec/evm/gas-forwarding.md).
+For the formal specification, see [Gas Forwarding](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/gas-forwarding).
 
 ## Precompile Gas Overrides
 
@@ -90,11 +90,11 @@ Two precompiles have adjusted gas costs:
 | KZG Point Evaluation | `0x0A` | 100,000 gas (2× the standard Prague cost of 50,000) |
 | ModExp | `0x05` | [EIP-7883](https://eips.ethereum.org/EIPS/eip-7883) gas schedule (raises the cost floor for large-exponent calls) |
 
-For the formal specification, see [Precompiles](../spec/evm/precompiles.md).
+For the formal specification, see [Precompiles](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/precompiles).
 
 ## Related Pages
 
 - [Gas Model](gas-model.md) — full dual gas model and resource limits
 - [System Contracts](system-contracts.md) — native oracle interface and high-precision timestamp
 - [Volatile Data Access](volatile-data.md) — compute gas cap on volatile data reads
-- [EVM Specification](../spec/evm/overview.md) — formal normative specification
+- [EVM Specification](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/overview) — formal normative specification

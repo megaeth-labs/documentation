@@ -100,13 +100,14 @@ Use relative paths from the current file: `[Connect](../user/connect.md)` or `[E
 
 ### To the EVM Specification
 
-The EVM spec is in `docs/spec/`. Use relative paths:
-`[Dual Gas Model](../spec/evm/dual-gas-model.md)`.
+The EVM spec is maintained in the [mega-evm repo](https://github.com/megaeth-labs/mega-evm) and synced into a separate GitBook space.
+Use absolute URLs:
+`[Dual Gas Model](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/dual-gas-model)`.
 
 ### Direction rule
 
 - **User docs → Developer docs**: "For technical details, see [Developer Docs](../dev/...)."
-- **Developer docs → EVM Spec**: "For the formal specification, see [Dual Gas Model](../spec/evm/dual-gas-model.md)."
+- **Developer docs → EVM Spec**: "For the formal specification, see [Dual Gas Model](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/dual-gas-model)."
 - **EVM Spec → nothing**: The spec is self-contained. It never links to user or developer docs.
 
 ## Content Reuse

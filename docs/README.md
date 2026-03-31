@@ -28,5 +28,5 @@ Welcome to the MegaETH documentation. MegaETH is a high-performance Ethereum L2 
 
 ## Learn How MegaETH Works
 
-* [Architecture](architecture.md) — how transactions flow from submission through execution, streaming, and L1 settlement.
-* [Mini-Blocks](mini-block.md) — the two block types and why MegaETH redesigned the block format for real-time performance.
+- [Architecture](architecture.md) — how transactions flow from submission through execution, streaming, and L1 settlement.
+- [Mini-Blocks](mini-block.md) — the two block types and why MegaETH redesigned the block format for real-time performance.
