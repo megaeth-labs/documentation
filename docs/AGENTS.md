@@ -1,6 +1,20 @@
 # Documentation Conventions
 
-These rules apply to all documentation layers (user, dev, integration).
+These rules apply across the documentation site.
+
+## Tone by Level
+
+The documentation has two tonal registers depending on where a page lives:
+
+- **Top-level pages** (`docs/architecture.md`, `docs/mini-block.md`, `docs/README.md`) use a **narrative, explanatory tone**.
+  Build an argument. Walk the reader through reasoning. Explain *why* things are the way they are.
+  These pages read like a well-written technical blog post — engaging, flowing prose that tells a story.
+
+- **Layer pages** (`user/`, `dev/`, `integration/`, `spec/`) use a **terse, reference tone**.
+  Short declarative sentences. Sentence fragments in table cells. Facts first, explanation second.
+  Optimized for scanning and quick lookup. Each layer's `AGENTS.md` has additional tone rules.
+
+When in doubt: top-level pages prioritize readability, layer pages prioritize density.
 
 ## Writing Principles
 
@@ -10,7 +24,7 @@ These rules apply to all documentation layers (user, dev, integration).
 - **Information where the reader needs it.**
   Don't accumulate notes in a separate section at the bottom.
   Put each note next to the field, parameter, or concept it describes — inside a table cell, parenthetical, or inline clause.
-- **Terse over verbose.**
+- **Terse over verbose** (layer pages).
   Use sentence fragments in table cells.
   Cut filler words: "When it usually happens" → "Cause"; "Fix the request before retrying" → "Fix the request".
 - **MegaETH-first.**
