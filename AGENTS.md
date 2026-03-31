@@ -11,13 +11,12 @@ https://raw.githubusercontent.com/GitbookIO/public-docs/refs/heads/main/skill.md
 
 ## Documentation Architecture
 
-The site is organized into four layers, each targeting a different audience:
+The site is organized into three layers, each targeting a different audience:
 
 | Layer | Directory | Audience | Tone |
 |-------|-----------|----------|------|
 | **User Guide** | `docs/user/` | End users (wallets, DeFi users) | Plain language, no code |
 | **Developer Docs** | `docs/dev/` | Dapp/contract builders | Practical guidance, code examples |
-| **Integration Guide** | `docs/integration/` | Infra/ecosystem partners (wallets, indexers, bridges, oracles) | Integration-focused, config-heavy |
 | **Specification** | `docs/spec/` | Protocol implementers, auditors | Normative (MUST/SHALL), exhaustive |
 
 Each layer has its own `AGENTS.md` with layer-specific writing rules.
@@ -40,9 +39,6 @@ The spec content is mirrored from `mega-evm/docs/` in the [mega-evm repository](
 │   ├── dev/                   # Developer Docs layer
 │   │   ├── AGENTS.md          # Developer layer writing rules
 │   │   ├── rpc/               # RPC reference subsection
-│   │   └── *.md
-│   ├── integration/           # Integration Guide layer
-│   │   ├── AGENTS.md          # Integration layer writing rules
 │   │   └── *.md
 │   └── spec/                  # Specification layer (mirrored from mega-evm/docs)
 │       ├── AGENTS.md          # Spec layer writing rules
@@ -82,7 +78,7 @@ Example: `william/doc/add-gas-model-guide`, `alice/fix/broken-internal-link`.
 
 ### Adding a new page
 
-1. Create the `.md` file in the appropriate layer directory (`user/`, `dev/`, or `integration/`).
+1. Create the `.md` file in the appropriate layer directory (`user/`, `dev/`, or `spec/`).
 2. Add a `description` field in YAML frontmatter for SEO.
 3. Add the page to `docs/SUMMARY.md` in the correct section.
 4. Commit.

@@ -16,31 +16,38 @@
 ## Developer Docs
 
 * [Overview](dev/overview.md)
-* [Contracts & Tokens](dev/contracts.md)
-* [EVM Differences](dev/evm-differences.md)
-* [Gas Model](dev/gas-model.md)
-* [Gas Estimation](dev/gas-estimation.md)
-* [Resource Limits](dev/resource-limits.md)
-* [Volatile Data Access](dev/volatile-data.md)
-* [Debugging Transactions](dev/debugging.md)
-* [System Contracts](dev/system-contracts.md)
 
-* [Realtime API](dev/realtime-api.md)
-* [RPC](dev/rpc/README.md)
-  * [Error Codes](dev/rpc/error-codes.md)
+### Send Transaction
+
+* [Contracts & Tokens](dev/send-tx/contracts.md)
+* [Gas Estimation](dev/send-tx/gas-estimation.md)
+* [Debugging Transactions](dev/send-tx/debugging.md)
+
+### Read from MegaETH
+
+* [RPC](dev/read/rpc/overview.md)
+  * [eth\_subscribe](dev/read/rpc/eth_subscribe.md)
+  * [eth\_callAfter](dev/read/rpc/eth_callAfter.md)
+  * [eth\_getLogsWithCursor](dev/read/rpc/eth_getLogsWithCursor.md)
+  * [realtime\_sendRawTransaction](dev/read/rpc/realtime_sendRawTransaction.md)
+  * [Error Codes](dev/read/rpc/error-codes.md)
+
+### Low Latency
+
+* [Realtime API](dev/low-latency/realtime-api.md)
+
+### Transaction Execution
+
+* [EVM Differences](dev/execution/evm-differences.md)
+* [Gas Model](dev/execution/gas-model.md)
+* [Resource Limits](dev/execution/resource-limits.md)
+* [Volatile Data Access](dev/execution/volatile-data.md)
+* [System Contracts](dev/execution/system-contracts.md)
+
+### Resources
+
 * [Developer FAQ](dev/faq.md)
-
-## Integration Guide
-
-* [Overview](integration/overview.md)
-* [Connect to the Network](integration/connect.md)
-* [Wallet Developers](integration/wallets.md)
-* [Indexer Integration](integration/indexers.md)
-* [Oracle Providers](integration/oracles.md)
-* [Bridge Integration](integration/bridges.md)
-* [RPC Providers](integration/rpc-providers.md)
-* [Tooling & Infrastructure](integration/tooling.md)
-* [Integration FAQ](integration/faq.md)
+* [Tooling & Infrastructure](dev/tooling.md)
 
 ## Specification
 

@@ -25,7 +25,7 @@ They know Ethereum. They write code. They need to understand what's different.
 ## What Does NOT Belong Here
 
 - End-user wallet setup, faucet instructions → `docs/user/`
-- RPC provider setup, indexer integration → `docs/integration/`
+- RPC provider setup, indexer integration → `docs/dev/tooling.md`
 - Normative specifications with MUST/SHALL language → `mega-evm/docs/`
 - Full storage gas cost derivation formulas → `mega-evm/docs/` (summarize here, link there)
 
@@ -112,9 +112,10 @@ Be specific and concrete.
 - For **no-param methods**: just write `None.`
 - For **simple methods** (1–2 params): use a positional table `| Position | Type | Required | Notes |`.
 - For **complex methods** (e.g., `eth_call` with multiple object params): open with a one-liner like `Pass params as [transaction, block]. Only transaction is required.`, then use H3 subsections per parameter object (e.g., `### transaction`, `### block`), each with its own field table.
-- **Inline the key fields** of complex types (e.g., `TransactionCall`, `LogFilter`) directly on the page.
-  Don't make the reader click through to a type reference for basic understanding.
-  End the field list with a link: `See the [types reference](../types.md#...) for the complete field list.`
+- **Inline all fields** of parameter and return types directly on the page.
+  Never make the reader click through to another page to understand the request or response schema.
+  If a type is small enough to fit in a table (and most RPC types are), show every field inline — do not summarize or link out.
+  Only link to a type reference for truly large types (20+ fields) after listing the key fields inline.
 - State **defaults explicitly** in the Notes column — e.g., `Default: "latest"`, `Default: false`.
 
 ### Returns section

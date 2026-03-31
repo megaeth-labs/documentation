@@ -61,5 +61,5 @@ For the full list of L1 contract addresses (bridge, DisputeGameFactory, Optimism
 - [EVM Differences](evm-differences.md) — what's different from Ethereum
 - [Gas Model](gas-model.md) — how MegaETH's dual gas model works
 - [System Contracts](system-contracts.md) — oracle, timestamp, and other system contracts
-- [RPC Reference](rpc/README.md) — JSON-RPC methods and error codes
+- [RPC Reference](rpc/overview.md) — JSON-RPC methods and error codes
 - [Realtime API](realtime-api.md) — WebSocket and real-time RPC extensions

@@ -207,6 +207,6 @@ See [Volatile Data Access](volatile-data.md) for the full list of triggers and b
 - [Gas Estimation](gas-estimation.md) — estimate gas correctly and avoid common errors
 - [EVM Differences](evm-differences.md) — volatile data caps, SSTORE refund changes, 98/100 forwarding
 - [Gas Model](gas-model.md) — how compute gas and storage gas work
-- [RPC Reference](rpc/README.md) — method availability and restrictions
+- [RPC Reference](rpc/overview.md) — method availability and restrictions
 - [Dual Gas Model (spec)](../spec/evm/dual-gas-model.md) — formal specification of compute gas and storage gas
 - [Gas Detention (spec)](../spec/evm/gas-detention.md) — compute gas cap triggered by volatile data access

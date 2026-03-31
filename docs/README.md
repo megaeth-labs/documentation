@@ -36,11 +36,6 @@ MegaETH is a high-performance Ethereum L2 with sub-millisecond block times and r
             <td><a href="dev/overview.md">Developer Docs</a></td>
         </tr>
         <tr>
-            <td><strong>Integration Guide</strong></td>
-            <td>Integrate your wallet, indexer, oracle, or bridge with MegaETH.</td>
-            <td><a href="integration/overview.md">Integration Guide</a></td>
-        </tr>
-        <tr>
             <td><strong>Specification</strong></td>
             <td>Formal protocol spec — EVM behavior, gas model, system contracts, and upgrade history.</td>
             <td><a href="spec/overview.md">Specification</a></td>

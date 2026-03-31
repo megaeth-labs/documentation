@@ -238,7 +238,7 @@ Links to the implementation repo, related EIPs, or other specs.
 - Developer tips or best practices → `docs/dev/`
 - Code examples showing how to use a feature → `docs/dev/`
 - User-facing explanations → `docs/user/`
-- Integration configuration → `docs/integration/`
+- Integration configuration → `docs/dev/tooling.md`
 - "Why should I care about this?" framing → `docs/dev/`
 - Implementation-specific code patterns or API references → `docs/dev/`
 - Recommendations ("Use X instead of Y") → `docs/dev/`

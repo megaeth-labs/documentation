@@ -97,7 +97,18 @@ All available methods are subject to rate limiting based on two criteria:
 
 User limits are dynamically updated in response to individual behavior.
 
+## MegaETH Extensions
+
+These methods extend standard Ethereum JSON-RPC with real-time capabilities:
+
+- [`eth_subscribe`](eth_subscribe.md) — WebSocket subscriptions for logs, state changes, mini-blocks, and block headers
+- [`eth_callAfter`](eth_callAfter.md) — execute `eth_call` after waiting for an account's nonce to reach a target value
+- [`eth_getLogsWithCursor`](eth_getLogsWithCursor.md) — paginated log queries using a cursor
+- [`realtime_sendRawTransaction`](realtime_sendRawTransaction.md) — submit a transaction and receive the receipt in a single call
+
+For a conceptual overview of MegaETH's real-time data model, see [Realtime API](../realtime-api.md).
+
 ## Related Pages
 
 - [Error Codes](error-codes.md) — HTTP and RPC error codes with mitigations
-- [Realtime API](../realtime-api.md) — extended methods for low-latency access
+- [Realtime API](../realtime-api.md) — conceptual overview of real-time querying and subscriptions

@@ -22,7 +22,7 @@ They are not developers. They do not read code.
 
 - Code examples, Solidity, TypeScript, or CLI commands → `docs/dev/`
 - EVM differences, gas model details, resource limits → `docs/dev/`
-- RPC provider setup, indexer configuration → `docs/integration/`
+- RPC provider setup, indexer configuration → `docs/dev/tooling.md`
 - Normative spec language (MUST, SHALL) → `mega-evm/docs/`
 
 ## Formatting Preferences

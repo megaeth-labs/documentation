@@ -69,7 +69,7 @@ There are two workarounds:
 2. **Use a third-party RPC provider with a higher cap.**
    Managed RPC providers typically allow much more gas for `eth_call` and `eth_estimateGas` than the default 10M.
    For reference, standard Ethereum node software (geth, reth) defaults to 50M, and providers like Alchemy support up to 550M.
-   See the [RPC Providers](../integration/tooling.md#rpc-providers) table for providers that support MegaETH.
+   See the [RPC Providers](tooling.md#rpc-providers) table for providers that support MegaETH.
 
 ## Toolchain Configuration
 
@@ -140,7 +140,7 @@ If you need to debug which dimension caused a failure, see [Debugging Transactio
 
 - [Gas Model](gas-model.md) — how compute gas, storage gas, and the bucket multiplier work
 - [EVM Differences](evm-differences.md) — volatile data caps, SSTORE refund changes, 98/100 forwarding
-- [RPC Reference](rpc/README.md) — method availability and restrictions
+- [RPC Reference](rpc/overview.md) — method availability and restrictions
 - [Developer FAQ](faq.md) — `eth_estimateGas` gas cap, block gas limit
 - [Dual Gas Model (spec)](../spec/evm/dual-gas-model.md) — formal specification of compute gas and storage gas
 - [Resource Limits (spec)](../spec/evm/resource-limits.md) — per-transaction and per-block limit enforcement

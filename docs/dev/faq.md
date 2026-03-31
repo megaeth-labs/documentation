@@ -13,7 +13,7 @@ description: Frequently asked questions for MegaETH developers — EVM compatibi
 | **EIP-55** | Mixed-case checksum address encoding | Not enforced | Addresses may appear in lowercase, especially in logs and WebSocket responses. |
 | **EIP-170** | Contract code size limit | Not enforced | MegaETH raises the contract size limit to **512 KB** to support larger deployments. |
 | **EIP-1559** | Fee market change for ETH 1.0 chain | Supported | MegaETH uses a dynamically adjusting base fee model with a different set of parameters. |
-| **EIP-7702** | Account abstraction via temporary smart contract accounts | Supported | EOAs can be delegated to smart contracts and behave like smart contract wallets. See compatible tools on the [tooling page](../integration/tooling.md). |
+| **EIP-7702** | Account abstraction via temporary smart contract accounts | Supported | EOAs can be delegated to smart contracts and behave like smart contract wallets. See compatible tools on the [tooling page](tooling.md). |
 
 ### What versions of Solidity does MegaETH support?
 
@@ -155,7 +155,7 @@ These restrictions will be lifted soon.
 
 Not yet.
 Currently, all RPC endpoints are operated by the MegaETH team and support for externally hosted or self-run nodes is not available.
-Keep an eye on the [tooling page](../integration/tooling.md) for updates.
+Keep an eye on the [tooling page](tooling.md) for updates.
 
 ### Where are the RPC endpoints located?
 
