@@ -4,7 +4,7 @@ description: How to estimate gas on MegaETH — code examples, toolchain configu
 
 # Gas Estimation
 
-MegaETH's [dual gas model](gas-model.md) charges both compute gas and storage gas.
+MegaETH's [dual gas model](../execution/gas-model.md) charges both compute gas and storage gas.
 Standard Ethereum toolchains are unaware of storage gas and will underestimate the gas a transaction needs.
 This page explains how to estimate gas correctly and avoid common errors.
 
@@ -69,7 +69,7 @@ There are two workarounds:
 2. **Use a third-party RPC provider with a higher cap.**
    Managed RPC providers typically allow much more gas for `eth_call` and `eth_estimateGas` than the default 10M.
    For reference, standard Ethereum node software (geth, reth) defaults to 50M, and providers like Alchemy support up to 550M.
-   See the [RPC Providers](tooling.md#rpc-providers) table for providers that support MegaETH.
+   See the [RPC Providers](../tooling.md#rpc-providers) table for providers that support MegaETH.
 
 ## Toolchain Configuration
 
@@ -118,7 +118,7 @@ Accessing volatile data — `block.timestamp`, `block.number`, oracle storage �
 If the transaction performs heavy computation after reading volatile data, it may hit this cap and revert.
 
 **Fix:** Split the work across multiple transactions so that only lightweight transactions (under 20M compute gas) access volatile data.
-See [Volatile Data Access](volatile-data.md) for the full list of triggers and best practices.
+See [Volatile Data Access](../execution/volatile-data.md) for the full list of triggers and best practices.
 
 ### Resource limit exceeded
 
@@ -126,7 +126,7 @@ MegaETH enforces per-transaction limits beyond gas: Data Size (12.5 MB), KV Upda
 A transaction that stays within its gas budget can still fail if it exceeds one of these limits.
 
 **Fix:** Reduce the number of state operations per transaction.
-See [Resource Limits](resource-limits.md) for the full table.
+See [Resource Limits](../execution/resource-limits.md) for the full table.
 
 ## Interpreting Gas in Receipts
 
@@ -138,9 +138,9 @@ If you need to debug which dimension caused a failure, see [Debugging Transactio
 
 ## Related Pages
 
-- [Gas Model](gas-model.md) — how compute gas, storage gas, and the bucket multiplier work
-- [EVM Differences](evm-differences.md) — volatile data caps, SSTORE refund changes, 98/100 forwarding
-- [RPC Reference](rpc/overview.md) — method availability and restrictions
-- [Developer FAQ](faq.md) — `eth_estimateGas` gas cap, block gas limit
+- [Gas Model](../execution/gas-model.md) — how compute gas, storage gas, and the bucket multiplier work
+- [EVM Differences](../execution/evm-differences.md) — volatile data caps, SSTORE refund changes, 98/100 forwarding
+- [RPC Reference](../read/rpc/overview.md) — method availability and restrictions
+- [Developer FAQ](../faq.md) — `eth_estimateGas` gas cap, block gas limit
 - [Dual Gas Model (spec)](../spec/evm/dual-gas-model.md) — formal specification of compute gas and storage gas
 - [Resource Limits (spec)](../spec/evm/resource-limits.md) — per-transaction and per-block limit enforcement

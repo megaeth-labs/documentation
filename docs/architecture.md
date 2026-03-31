@@ -47,7 +47,7 @@ The sequencer streams each mini-block to RPC nodes distributed across multiple r
 As soon as an RPC node receives a mini-block, its contents — transaction receipts, event logs, and state updates — become immediately queryable.
 This is how a wallet can show a confirmed transaction within milliseconds: the RPC node it connects to has already received the mini-block containing the result.
 
-Applications that need the lowest possible latency can subscribe to mini-blocks directly via the [Realtime API](dev/realtime-api.md).
+Applications that need the lowest possible latency can subscribe to mini-blocks directly via the [Realtime API](dev/read/realtime-api.md).
 
 ### 4. L1 Settlement
 
@@ -100,4 +100,4 @@ Instead of the multi-round interactive bisection used by standard OP Stack, Kail
 - [Connect to MegaETH](user/connect.md) — chain IDs, RPC endpoints, and network parameters
 - [Mini-Blocks](mini-block.md) — the two block types and how they enable sub-second latency
 - [Overview](dev/overview.md) — developer quickstart with RPC endpoints and chain configuration
-- [Realtime API](dev/realtime-api.md) — subscribe to mini-blocks and get results in real time
+- [Realtime API](dev/read/realtime-api.md) — subscribe to mini-blocks and get results in real time

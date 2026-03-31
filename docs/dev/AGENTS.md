@@ -139,8 +139,8 @@ Fold MegaETH-specific notes **inline** where they are relevant:
 Use a three-column table: `| Code | Cause | Fix |`.
 
 - **Cause** and **Fix** should be terse — sentence fragments, not full prose.
-- Omit generic rate-limit errors (`-32005`) — those are covered by the [Error reference](rpc/error-codes.md).
-- End with: `See also [Error reference](rpc/error-codes.md).`
+- Omit generic rate-limit errors (`-32005`) — those are covered by the [Error reference](read/rpc/error-codes.md).
+- End with: `See also [Error reference](read/rpc/error-codes.md).`
 
 ### Examples
 

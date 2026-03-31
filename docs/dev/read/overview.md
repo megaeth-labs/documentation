@@ -1,15 +1,34 @@
 ---
-description: MegaETH JSON-RPC method availability table and rate limiting policy.
+description: How to query state and data from MegaETH — JSON-RPC methods, rate limiting, subscriptions, and real-time queries.
 ---
 
-# RPC Reference
+# Read from MegaETH
+
+## Realtime API
+
+Standard Ethereum JSON-RPC was designed for chains with multi-second block times.
+On those chains, a one-second delay between execution and queryability is normal — you poll `eth_getTransactionReceipt`, wait for the next block, and eventually get your result.
+
+MegaETH produces [mini-blocks](../../mini-block.md) every ~10 milliseconds.
+If the read API still operated on one-second EVM blocks, applications would wait 100× longer than necessary to see their results.
+The Realtime API closes this gap: it queries against the most recent mini-block so that balances, receipts, logs, and state changes are visible within milliseconds of execution — not seconds.
+
+Standard methods like `eth_getBalance`, `eth_call`, and `eth_getTransactionReceipt` already reflect mini-block state automatically when called with `latest` or `pending`.
+On top of that, MegaETH introduces four extension methods for even lower-latency workflows:
+
+- [`realtime_sendRawTransaction`](rpc/realtime_sendRawTransaction.md) — submit a transaction and get the receipt back in one call, no polling
+- [`eth_subscribe`](rpc/eth_subscribe.md) — stream logs, state changes, mini-blocks, and block headers over WebSocket as they happen
+- [`eth_callAfter`](rpc/eth_callAfter.md) — simulate a transaction after a prior one confirms (nonce-gated)
+- [`eth_getLogsWithCursor`](rpc/eth_getLogsWithCursor.md) — paginated log queries for large result sets
+
+For use-case-oriented guidance (which method to use for what), see the [Realtime API](realtime-api.md) page.
 
 ## Available Methods
 
 {% hint style="info" %}
 The table below reflects the **public MegaETH RPC endpoint**.
 Debug and trace methods (`debug_*`, `trace_*`) are available through managed RPC providers such as [Alchemy](https://www.alchemy.com/).
-See [Debugging Transactions](../debugging.md) for usage.
+See [Debugging Transactions](../send-tx/debugging.md) for usage.
 {% endhint %}
 
 | Method | Availability | Additional Restrictions |
@@ -92,23 +111,12 @@ See [Debugging Transactions](../debugging.md) for usage.
 
 All available methods are subject to rate limiting based on two criteria:
 
-- **Compute Unit (CU) Limiting**: Limits the computational cost of requests based on their complexity.
-- **Network Bandwidth Limiting**: Limits the network traffic based on response sizes.
+- **Compute Unit (CU) Limiting** — limits the computational cost of requests based on their complexity.
+- **Network Bandwidth Limiting** — limits the network traffic based on response sizes.
 
 User limits are dynamically updated in response to individual behavior.
 
-## MegaETH Extensions
-
-These methods extend standard Ethereum JSON-RPC with real-time capabilities:
-
-- [`eth_subscribe`](eth_subscribe.md) — WebSocket subscriptions for logs, state changes, mini-blocks, and block headers
-- [`eth_callAfter`](eth_callAfter.md) — execute `eth_call` after waiting for an account's nonce to reach a target value
-- [`eth_getLogsWithCursor`](eth_getLogsWithCursor.md) — paginated log queries using a cursor
-- [`realtime_sendRawTransaction`](realtime_sendRawTransaction.md) — submit a transaction and receive the receipt in a single call
-
-For a conceptual overview of MegaETH's real-time data model, see [Realtime API](../realtime-api.md).
-
 ## Related Pages
 
-- [Error Codes](error-codes.md) — HTTP and RPC error codes with mitigations
-- [Realtime API](../realtime-api.md) — conceptual overview of real-time querying and subscriptions
+- [Realtime API](realtime-api.md) — use-case guide for streaming data and instant receipts
+- [Error Codes](rpc/error-codes.md) — HTTP and RPC error codes with mitigations

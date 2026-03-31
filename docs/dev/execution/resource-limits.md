@@ -74,7 +74,7 @@ Since Compute Gas is a component of total gas, and each transaction's total gas 
 ## Related Pages
 
 - [Gas Model](gas-model.md) — compute gas, storage gas, and the bucket multiplier
-- [Gas Estimation](gas-estimation.md) — estimate gas correctly and avoid common errors
+- [Gas Estimation](../send-tx/gas-estimation.md) — estimate gas correctly and avoid common errors
 - [EVM Differences](evm-differences.md) — full list of behavioral differences from Ethereum
 - [Resource Limits (spec)](../spec/evm/resource-limits.md) — formal specification of limit enforcement
 - [Resource Accounting (spec)](../spec/evm/resource-accounting.md) — how counters are tracked per opcode

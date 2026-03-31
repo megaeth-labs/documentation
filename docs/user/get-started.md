@@ -69,6 +69,6 @@ Track real-time network performance at [uptime.megaeth.com](https://uptime.megae
 
 - [Connect to MegaETH](connect.md) — full chain parameters, block explorers
 - [Bridge](bridge.md) — bridging ETH from Ethereum
-- [Key Contracts & Tokens](../dev/contracts.md) — important contract addresses
+- [Key Contracts & Tokens](../dev/send-tx/contracts.md) — important contract addresses
 - [Faucet](faucet.md) — free testnet tokens
 - [User FAQ](faq.md) — common questions

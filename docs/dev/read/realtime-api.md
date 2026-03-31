@@ -8,7 +8,7 @@ MegaETH executes transactions as soon as they arrive at the sequencer and emits 
 The Realtime API exposes these results through extensions to Ethereum JSON-RPC, so your application can react to on-chain events with minimal latency.
 
 On a standard EVM chain, query methods like `eth_getBalance` or `eth_getTransactionReceipt` reflect state as of the most recent block — produced every few seconds.
-On MegaETH, these same methods reflect state as of the most recent [mini-block](../mini-block.md) — produced every ~10ms.
+On MegaETH, these same methods reflect state as of the most recent [mini-block](../../mini-block.md) — produced every ~10ms.
 No special parameters are needed; using `latest` or `pending` as the block tag automatically queries against the most recent mini-block.
 
 {% hint style="info" %}
@@ -96,5 +96,5 @@ At T+100ms, she sends 1 ETH to Bob — the transaction is packaged into a mini-b
 
 ## Related Pages
 
-- [Mini-Blocks](../mini-block.md) — understanding the two block types
+- [Mini-Blocks](../../mini-block.md) — understanding the two block types
 - [RPC Reference](rpc/overview.md) — full method availability table and rate limiting

@@ -117,7 +117,7 @@ Below are examples of storage gas costs at different bucket multiplier values.
 **Gas estimation:** Use `eth_estimateGas` on a MegaETH RPC endpoint for accurate gas estimates.
 The endpoint accounts for SALT multipliers, storage gas, and all resource dimensions.
 Do not attempt to compute gas costs manually — the dynamic multiplier depends on on-chain SALT bucket state.
-See [Gas Estimation](gas-estimation.md) for code examples, toolchain configuration, and common pitfalls.
+See [Gas Estimation](../send-tx/gas-estimation.md) for code examples, toolchain configuration, and common pitfalls.
 {% endhint %}
 
 ## Multidimensional Resource Limits

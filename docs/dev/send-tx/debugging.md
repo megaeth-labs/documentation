@@ -200,13 +200,13 @@ Accessing `block.timestamp`, `block.number`, or oracle storage caps the transact
 If the trace shows execution halting after one of these reads, the transaction exceeded the 20M total compute gas cap imposed by volatile data access.
 Split the work across multiple transactions so that only lightweight transactions access volatile data.
 
-See [Volatile Data Access](volatile-data.md) for the full list of triggers and best practices.
+See [Volatile Data Access](../execution/volatile-data.md) for the full list of triggers and best practices.
 
 ## Related Pages
 
 - [Gas Estimation](gas-estimation.md) — estimate gas correctly and avoid common errors
-- [EVM Differences](evm-differences.md) — volatile data caps, SSTORE refund changes, 98/100 forwarding
-- [Gas Model](gas-model.md) — how compute gas and storage gas work
-- [RPC Reference](rpc/overview.md) — method availability and restrictions
+- [EVM Differences](../execution/overview.md) — volatile data caps, SSTORE refund changes, 98/100 forwarding
+- [Gas Model](../execution/gas-model.md) — how compute gas and storage gas work
+- [RPC Reference](../read/rpc/overview.md) — method availability and restrictions
 - [Dual Gas Model (spec)](../spec/evm/dual-gas-model.md) — formal specification of compute gas and storage gas
 - [Gas Detention (spec)](../spec/evm/gas-detention.md) — compute gas cap triggered by volatile data access

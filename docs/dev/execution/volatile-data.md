@@ -118,6 +118,6 @@ For the formal definition, see [Gas Detention](../spec/evm/gas-detention.md).
 ## Related Pages
 
 - [EVM Differences](evm-differences.md) — full list of MegaEVM behavioral differences
-- [Gas Estimation](gas-estimation.md) — estimate gas correctly on MegaETH
-- [Debugging Transactions](debugging.md) — trace gas consumption with mega-evme
+- [Gas Estimation](../send-tx/gas-estimation.md) — estimate gas correctly on MegaETH
+- [Debugging Transactions](../send-tx/debugging.md) — trace gas consumption with mega-evme
 - [Gas Detention (spec)](../spec/evm/gas-detention.md) — formal specification of the gas detention mechanism

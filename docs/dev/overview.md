@@ -13,7 +13,7 @@ For network parameters (chain ID, RPC URLs, block explorers), see [Connect to Me
 
 MegaETH's execution environment is called **MegaEVM**.
 It is fully compatible with Ethereum smart contracts but introduces a few differences compared to Ethereum's EVM, especially around the [dual gas model](../spec/evm/dual-gas-model.md).
-See [EVM Differences](evm-differences.md) for a complete list.
+See [EVM Differences](execution/overview.md) for a complete list.
 
 The MegaEVM implementation is open source and can be found on [GitHub](https://github.com/megaeth-labs/mega-evm).
 
@@ -21,12 +21,12 @@ The MegaEVM implementation is open source and can be found on [GitHub](https://g
 
 MegaETH's dual gas model means standard Ethereum toolchains may underestimate gas.
 Always use a MegaETH RPC endpoint for gas estimation, or bypass local simulation entirely.
-See [Gas Estimation](gas-estimation.md) for code examples, toolchain configuration, and common pitfalls.
+See [Gas Estimation](send-tx/gas-estimation.md) for code examples, toolchain configuration, and common pitfalls.
 
 ## Debugging Transactions
 
 MegaETH supports `debug_traceTransaction` and other debug RPC methods (via managed RPC providers), and provides `mega-evme` for local transaction replay and simulation.
-See [Debugging Transactions](debugging.md) for usage examples and common debugging scenarios.
+See [Debugging Transactions](send-tx/debugging.md) for usage examples and common debugging scenarios.
 
 ## Using the Canonical Bridge
 
@@ -54,12 +54,12 @@ cast send 0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75 \
 
 ## L1 Contracts (Ethereum Mainnet)
 
-For the full list of L1 contract addresses (bridge, DisputeGameFactory, OptimismPortal, SystemConfig, etc.), see [Contracts & Tokens](contracts.md#l1-contracts-ethereum).
+For the full list of L1 contract addresses (bridge, DisputeGameFactory, OptimismPortal, SystemConfig, etc.), see [Contracts & Tokens](send-tx/contracts.md#l1-contracts-ethereum).
 
 ## Next Steps
 
-- [EVM Differences](evm-differences.md) — what's different from Ethereum
-- [Gas Model](gas-model.md) — how MegaETH's dual gas model works
-- [System Contracts](system-contracts.md) — oracle, timestamp, and other system contracts
-- [RPC Reference](rpc/overview.md) — JSON-RPC methods and error codes
-- [Realtime API](realtime-api.md) — WebSocket and real-time RPC extensions
+- [EVM Differences](execution/overview.md) — what's different from Ethereum
+- [Gas Model](execution/gas-model.md) — how MegaETH's dual gas model works
+- [System Contracts](execution/system-contracts.md) — oracle, timestamp, and other system contracts
+- [RPC Reference](read/rpc/overview.md) — JSON-RPC methods and error codes
+- [Realtime API](read/realtime-api.md) — WebSocket and real-time RPC extensions

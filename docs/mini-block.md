@@ -35,7 +35,7 @@ No code changes are needed.
 
 Where mini-blocks matter is latency.
 A transaction is confirmed in ~10 milliseconds, not 1 second.
-Wallets and applications that subscribe to mini-blocks via the [Realtime API](dev/realtime-api.md) can show results almost instantly — useful for trading, gaming, real-time feeds, and anything where milliseconds count.
+Wallets and applications that subscribe to mini-blocks via the [Realtime API](dev/read/realtime-api.md) can show results almost instantly — useful for trading, gaming, real-time feeds, and anything where milliseconds count.
 
 ## How Mini-Blocks Work
 
@@ -66,8 +66,8 @@ Where they differ from EVM blocks:
 | -------- | --------- | ---------- |
 | Production interval | ~1 second | ~10 milliseconds |
 | Header size | ~500+ bytes | Compact (no Merkle roots, no bloom filter) |
-| Timestamp resolution | 1 second | Microsecond (via [High-Precision Timestamp](dev/system-contracts.md#high-precision-timestamp)) |
-| Compatible with standard tools | Yes | Requires [Realtime API](dev/realtime-api.md) |
+| Timestamp resolution | 1 second | Microsecond (via [High-Precision Timestamp](dev/execution/system-contracts.md#high-precision-timestamp)) |
+| Compatible with standard tools | Yes | Requires [Realtime API](dev/read/realtime-api.md) |
 | Contains state root | Yes | No |
 
 ## Relationship to EVM Blocks
@@ -85,7 +85,7 @@ To get the precise number, use the `miniBlockCount` field in the `newHeads` subs
 
 ## Subscribing to Mini-Blocks
 
-To take advantage of mini-block latency, subscribe over WebSocket using the [Realtime API](dev/realtime-api.md):
+To take advantage of mini-block latency, subscribe over WebSocket using the [Realtime API](dev/read/realtime-api.md):
 
 ```json
 {"jsonrpc":"2.0","id":1,"method":"eth_subscribe","params":["miniBlocks"]}
@@ -96,5 +96,5 @@ Each notification delivers the mini-block's transactions, receipts, and state ch
 ## Related Pages
 
 - [Architecture](architecture.md) — how transactions flow through the MegaETH network
-- [Realtime API](dev/realtime-api.md) — subscribe to mini-blocks and get execution results with minimum latency
-- [High-Precision Timestamp](dev/system-contracts.md#high-precision-timestamp) — microsecond timestamps available within mini-blocks
+- [Realtime API](dev/read/realtime-api.md) — subscribe to mini-blocks and get execution results with minimum latency
+- [High-Precision Timestamp](dev/execution/system-contracts.md#high-precision-timestamp) — microsecond timestamps available within mini-blocks
