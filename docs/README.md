@@ -19,9 +19,9 @@ MegaETH is a high-performance Ethereum L2 with sub-millisecond block times and r
 <table data-view="cards">
     <thead>
         <tr>
-            <th>Title</th>
-            <th>Description</th>
-            <th data-card-target data-type="content-ref">Target</th>
+            <th></th>
+            <th></th>
+            <th data-card-target data-type="content-ref"></th>
         </tr>
     </thead>
     <tbody>
