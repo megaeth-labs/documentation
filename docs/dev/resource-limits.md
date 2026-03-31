@@ -9,12 +9,14 @@ MegaETH enforces seven resource limits on transactions and blocks.
 | Resource | Per-Transaction | Per-Block | How it changes |
 | -------- | --------------- | --------- | -------------- |
 | **Gas** | 2,000,000,000 | 2,000,000,000 | Sequencer-configured |
-| **Compute Gas** | 200,000,000 | Block gas limit | Protocol constant |
+| **Compute Gas** | 200,000,000 | Unlimited | Protocol constant |
 | **Data Size** | 12.5 MB | 12.5 MB | Protocol constant |
 | **KV Updates** | 500,000 | 500,000 | Protocol constant |
 | **State Growth** | 1,000 | 1,000 | Protocol constant |
 | **Transaction Encoded Size** | 1 MB | Unlimited | Sequencer-configured |
 | **DA Size** | Adaptive | Adaptive | Adaptive |
+
+Note: "Unlimited" means no dedicated per-block limit exists for that resource, but it is still implicitly bounded by other per-block limits such as block gas limit and DA size.
 
 - **Protocol constants** can only change through a hardfork.
 - **Sequencer-configured** values reflect the current mainnet configuration and may change without a hardfork.
@@ -30,7 +32,7 @@ MegaETH enforces seven resource limits on transactions and blocks.
 - **Transaction Encoded Size** — the byte size of the RLP-encoded transaction.
 - **DA Size** — the compressed size of the transaction's data for L1 data availability submission.
 
-For data size, KV updates, and state growth, block-level usage is the sum of usage across all transactions in the block.
+For Data Size, KV Updates, and State Growth, block-level usage is the sum of usage across all transactions in the block.
 
 For formal definitions of resource limits and accounting, see [Resource Limits (spec)](../spec/evm/resource-limits.md) and [Resource Accounting (spec)](../spec/evm/resource-accounting.md).
 
@@ -40,15 +42,15 @@ The seven limits are enforced at two different stages, which determines what hap
 
 ### Before execution
 
-**Gas**, **transaction encoded size**, and **DA size** are checked before a transaction enters a block.
+**Gas**, **Transaction Encoded Size**, and **DA Size** are checked before a transaction enters a block.
 A transaction that exceeds any of these per-transaction limits is **rejected by the transaction pool** and never included in a block.
 
-**Gas** and **DA size** also have per-block limits.
+**Gas** and **DA Size** also have per-block limits.
 The block builder stops adding transactions once the block's cumulative gas or DA size reaches the limit.
 
 ### During execution
 
-**Compute gas**, **data size**, **KV updates**, and **state growth** are enforced while the transaction runs (see [formal spec](../spec/evm/resource-limits.md)).
+**Compute Gas**, **Data Size**, **KV Updates**, and **State Growth** are enforced while the transaction runs (see [formal spec](../spec/evm/resource-limits.md)).
 
 **Per-transaction**: when a transaction exceeds any of these four limits:
 
@@ -57,7 +59,7 @@ The block builder stops adding transactions once the block's cumulative gas or D
 3. The transaction is included in the block with status set to failed (status=0).
 4. No state changes from the transaction are applied.
 
-**Data size**, **KV updates**, and **state growth** also have per-block limits, enforced during block building:
+**Data Size**, **KV Updates**, and **State Growth** also have per-block limits, enforced during block building:
 
 1. Before executing a transaction, the block builder checks whether any previous transaction has already caused the block to exceed a per-block limit. If so, the block is sealed and no more transactions are added.
 2. Otherwise, the transaction is executed. If its execution causes the block to exceed a per-block limit, the transaction is still included — it is not reverted or discarded. Per-transaction limits still apply.
@@ -66,8 +68,8 @@ The block builder stops adding transactions once the block's cumulative gas or D
 The last transaction in a block is allowed to push the block's resource usage beyond the per-block limit.
 This maximizes block utilization by avoiding the waste of a valid transaction whose resource consumption can only be known after execution.
 
-**Compute gas** has no separate per-block limit.
-Since compute gas is a component of total gas, and each transaction's total gas counts towards the block gas limit, the cumulative compute gas in a block is implicitly bounded by the block gas limit.
+**Compute Gas** has no separate per-block limit.
+Since Compute Gas is a component of total gas, and each transaction's total gas counts towards the block gas limit, the cumulative Compute Gas in a block is implicitly bounded by the block gas limit.
 
 ## Related Pages
 
