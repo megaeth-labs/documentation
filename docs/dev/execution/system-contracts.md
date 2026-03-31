@@ -106,7 +106,7 @@ Code deposit costs 10,000 storage gas per byte on MegaETH.
 A 24 KB contract costs roughly 240M storage gas.
 If `gasLimitOverride` is too low for this cost, the inner deployment will fail (out of gas) but the outer call still succeeds — check `errorData` and `deployedAddress`.
 Simulate the transaction with [`mega-evme`](../send-tx/debugging.md#simulating-a-new-transaction) to find the required gas — it has no gas cap and fully implements MegaETH's gas model.
-Alternatively, use `eth_estimateGas` on a MegaETH endpoint (subject to the [10M RPC gas cap](../send-tx/gas-estimation.md#the-10m-rpc-gas-cap)).
+Alternatively, use `eth_estimateGas` on a MegaETH endpoint (subject to the [RPC compute gas cap](../send-tx/gas-estimation.md#the-rpc-compute-gas-cap)).
 {% endhint %}
 
 {% hint style="info" %}

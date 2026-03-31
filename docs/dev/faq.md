@@ -48,10 +48,11 @@ See the [Contract Limits specification](../spec/evm/contract-limits.md) for deta
 
 ### What is the gas limit of `eth_call` / `eth_estimateGas`?
 
-10,000,000 (increased on 28/03/2025 from 5,000,000).
+60,000,000 compute gas on the public RPC endpoint.
 
-Note that this gas limit is _different_ from the limit for on-chain transactions, which is 1,000,000,000.
-It applies only to RPC calls.
+Note that this limit is _different_ from the on-chain transaction gas limit of 1,000,000,000.
+It applies only to RPC simulation calls.
+Managed RPC providers may allow higher limits.
 
 ### What is the maximum number of transactions I can have in the txpool?
 
@@ -146,10 +147,18 @@ You will receive the error when trying it over HTTP because HTTP transport does 
 
 ## RPC and WebSocket Behavior
 
-### Which WebSocket methods are unavailable or rate-limited?
+### Which methods are available over WebSocket?
 
-Currently all WebSocket methods other than `eth_chainId` (rate-limited at 5 reqs/s) are unavailable.
-These restrictions will be lifted soon.
+The public WebSocket endpoint supports the following methods:
+
+- `eth_subscribe`
+- `eth_unsubscribe`
+- `eth_sendRawTransaction`
+- `realtime_sendRawTransaction`
+- `eth_chainId`
+
+WebSocket connections are rate-limited to 5 messages per second per connection.
+Send `eth_chainId` at least once every 30 seconds to keep the connection alive — idle connections may be closed by the server.
 
 ### Can I set up my own RPC node?
 
@@ -174,11 +183,10 @@ On the community-run [wiki](https://megaeth-1.gitbook.io/untitled).
 
 ### How do I wrap the native (gas) token?
 
-To wrap the native token (ETH), use the canonical WETH contract deployed at: `0x4eB2Bd7beE16F38B1F4a0A5796Fffd028b6040e9`
+To wrap the native token (ETH), use the WETH contract at [`0x4200000000000000000000000000000000000006`](https://megaeth.blockscout.com/address/0x4200000000000000000000000000000000000006) (OP Stack predeploy).
 
-This contract uses the standard WETH interface, with the `deposit()` function wrapping native ETH into WETH.
-Simply send ETH to the contract, and you'll receive an equivalent amount of WETH.
-While the deposit function appears to take no parameters, it accepts a `msg.value` parameter implicitly, and the explorer may not fully display its signature.
+Call `deposit()` and send ETH as `msg.value` — you'll receive an equivalent amount of WETH.
+See [Contracts & Tokens](send-tx/contracts.md#core) for the full list of core contract addresses.
 
 ### How can I get my contract verified on the MegaExplorer?
 

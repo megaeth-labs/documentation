@@ -19,9 +19,9 @@ Default (no arguments): evaluate all pages.
 
 1. **Read the writing rules.** Before evaluating any page, load the applicable rules:
    - Always read `docs/AGENTS.md` (cross-layer conventions).
-   - Read the layer-specific `AGENTS.md` for the page being evaluated (`docs/user/AGENTS.md`, `docs/dev/AGENTS.md`, `docs/integration/AGENTS.md`, or `docs/spec/AGENTS.md`).
+   - Read the layer-specific `AGENTS.md` for the page being evaluated (`docs/user/AGENTS.md`, `docs/dev/AGENTS.md`, or `docs/spec/AGENTS.md`).
 2. **Read `docs/SUMMARY.md`** to understand the full page inventory and navigation structure.
-3. **Detect each page's layer** from its path prefix (`docs/user/`, `docs/dev/`, `docs/integration/`, `docs/spec/`).
+3. **Detect each page's layer** from its path prefix (`docs/user/`, `docs/dev/`, `docs/spec/`). Top-level pages in `docs/` (e.g., `docs/architecture.md`, `docs/mini-block.md`) follow the narrative tone rules in `docs/AGENTS.md`.
 
 ## Evaluation Checklist
 
@@ -64,18 +64,18 @@ For each page, run through these checks in order. Not every check applies to eve
 
 ## Layer Matrix
 
-| Check | User | Dev | Integration | Spec |
-|---|---|---|---|---|
-| Code blocks | Forbidden | Required for features with usage patterns | Required for configs | Pseudocode only |
-| "you" / second person | Encouraged | OK | OK | Forbidden in Specification sections |
-| MUST/SHALL/SHOULD | Inappropriate | Avoid unless quoting spec | Avoid | Required for behavioral rules |
-| Stepper blocks | Required for multi-step | Optional | Optional | Not used |
-| Summarize + link to spec | N/A | Required when referencing spec behavior | Optional | N/A |
-| Copy-pasteable values | N/A | Nice-to-have | Required (chain IDs, URLs, addresses) | N/A |
-| `{% hint style="success" %}` | OK (tips) | OK (best practices) | OK | Forbidden |
-| `{% hint style="danger" %}` | OK (warnings) | OK (breaking changes) | OK | Deprecation notices only |
-| Glossary first-use linking | Not required | Not required | Not required | Required |
-| Page length | Flag >500 words, consider splitting | No hard limit | No hard limit | No hard limit |
+| Check | User | Dev | Spec |
+|---|---|---|---|
+| Code blocks | Forbidden | Required for features with usage patterns | Pseudocode only |
+| "you" / second person | Encouraged | OK | Forbidden in Specification sections |
+| MUST/SHALL/SHOULD | Inappropriate | Avoid unless quoting spec | Required for behavioral rules |
+| Stepper blocks | Required for multi-step | Optional | Not used |
+| Summarize + link to spec | N/A | Required when referencing spec behavior | N/A |
+| Copy-pasteable values | N/A | Nice-to-have | N/A |
+| `{% hint style="success" %}` | OK (tips) | OK (best practices) | Forbidden |
+| `{% hint style="danger" %}` | OK (warnings) | OK (breaking changes) | Deprecation notices only |
+| Glossary first-use linking | Not required | Not required | Required |
+| Page length | Flag >500 words, consider splitting | No hard limit | No hard limit |
 
 ## Output Format
 
@@ -94,7 +94,6 @@ Produce a Markdown report with this structure:
 |---|---|---|---|---|
 | User | N | N | N | N |
 | Dev | N | N | N | N |
-| Integration | N | N | N | N |
 | Spec | N | N | N | N |
 
 ## Findings

@@ -42,7 +42,7 @@ curl -s https://mainnet.megaeth.com/rpc \
 {% endtabs %}
 
 {% hint style="warning" %}
-The public RPC caps `eth_estimateGas` at **10M gas**.
+The public RPC caps `eth_estimateGas` at **60M compute gas**.
 If your transaction needs more (e.g., deploying a large contract), either set a manual gas limit or use a [managed RPC provider](../tooling.md#rpc-providers) with a higher cap.
 You can determine the exact gas needed by simulating locally with [`mega-evme`](debugging.md#simulating-a-new-transaction).
 {% endhint %}

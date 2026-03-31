@@ -54,7 +54,7 @@ cast send 0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75 \
 
 ## L1 Contracts (Ethereum Mainnet)
 
-For the full list of L1 contract addresses (bridge, DisputeGameFactory, OptimismPortal, SystemConfig, etc.), see [Contracts & Tokens](send-tx/contracts.md#l1-contracts-ethereum).
+See [Contracts & Tokens](send-tx/contracts.md#l1-contracts-ethereum) for all L1 contract addresses (bridge, DisputeGameFactory, OptimismPortal, SystemConfig, etc.).
 
 ## Next Steps
 

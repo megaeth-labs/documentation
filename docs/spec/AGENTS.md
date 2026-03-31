@@ -40,12 +40,18 @@ Design decisions: why this specific solution over alternatives.
 Each decision is a named paragraph explaining the trade-off.
 This section explains WHY specific choices were made.
 
+## Security Considerations
+What could go wrong if this spec is implemented incorrectly or incompletely.
+Concrete attack vectors, economic risks, or safety invariants that implementers must preserve.
+
 ## Spec History
 Links to upgrade pages showing how this behavior evolved across specs.
 ```
 
 **Sections may be omitted** when they genuinely don't apply (e.g., a glossary page has no Constants or Motivation).
 But for any page that defines behavioral rules, the full structure SHOULD be followed.
+Security Considerations SHOULD be included on any page that defines gas accounting, resource limits, state mutation, or economic rules.
+It MAY be omitted for pages that are purely structural (e.g., glossary, overview indexes).
 
 ### Spec History Format
 
@@ -116,9 +122,15 @@ Optional, if it helps orient readers.
 
 ### Normative Language
 
+- **Uppercase only.**
+  Per RFC 8174, only UPPERCASE keywords (MUST, SHOULD, MAY, etc.) carry normative weight.
+  Lowercase "must", "should", "may" are plain English with no special meaning.
+  The formal BCP 14 boilerplate lives on the [Specification overview page](overview.md) — individual spec pages do not repeat it.
 - Use "A node MUST..." for required behavior.
 - Use "A node MUST NOT..." for prohibited behavior.
 - Use "SHOULD" only when non-compliance is acceptable in defined circumstances.
+- Do not use normative keywords outside the Specification and Security Considerations sections.
+  Motivation, Rationale, and Spec History use plain English.
 - Descriptive prose (background, context) does not require normative keywords.
 
 ### Constants
@@ -169,6 +181,21 @@ Optional, if it helps orient readers.
 - Each design decision is a **named paragraph** starting with bold text (e.g., "**Why `base × (multiplier − 1)` instead of `base × multiplier`?**").
 - Explain the trade-off: what was considered, what was rejected, and why.
 - Reference historical changes where applicable (e.g., "MiniRex used X, Rex changed to Y because...").
+
+## Security Considerations Section Rules
+
+This section exists because EIP-1 makes Security Considerations a blocking requirement for any Ethereum specification, and RFC 2119 §7 warns that "the effects on security of not implementing a MUST or SHOULD may be very subtle."
+
+- Describe **concrete** risks, not generic warnings.
+  State what goes wrong: underpriced operations, denial-of-service vectors, state corruption, economic exploits.
+- Frame each risk as a consequence of incorrect implementation.
+  "If a node fails to charge storage gas on contract creation, an attacker can exhaust state storage at compute-gas cost only."
+- Do not repeat the Specification section.
+  The Specification says what MUST happen; Security Considerations says what breaks if it does not.
+- Name the invariants that the spec preserves.
+  "This spec preserves the invariant that total detained gas never exceeds the block gas limit."
+- If no security considerations apply, state so explicitly: "This page has no security considerations."
+  Do not silently omit the section — that is ambiguous (forgot vs. none).
 
 ## Upgrade Page Rules
 

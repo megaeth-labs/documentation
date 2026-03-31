@@ -23,10 +23,11 @@ These are the repos whose changes may require documentation updates.
 |---|---|---|
 | mega-evm | `megaeth-labs/mega-evm` | New spec, gas constant changes, new/modified system contracts, opcode behavior changes, new resource limits |
 | mega-reth | `megaeth-labs/mega-reth` | New RPC methods, changed RPC behavior, new config flags, block execution changes, new node features |
-| mega-rpc | `megaeth-labs/mega-rpc` | New routes, changed caching/routing behavior, new error codes, rate limit changes, WebSocket changes |
+| mega-rpc | `megaeth-labs/mega-rpc` | New routes, changed caching/routing behavior, new error codes, rate limit changes, WebSocket changes. **Note**: mega-rpc implements the MegaETH public endpoint only. Method availability and restrictions found here may not apply to managed RPC providers (e.g., Alchemy), which have their own configurations. When reporting gaps, distinguish between "unavailable on public endpoint" and "unsupported by MegaETH entirely." |
 | devops-ansible-inventory | `megaeth-labs/devops-ansible-inventory` | Network parameter changes (chain IDs, RPC URLs, explorer URLs), new network deployments, config changes |
 | mega-op-contracts | `megaeth-labs/mega-op-contracts` | Bridge contract changes, L1/L2 interface changes, system config changes, new dispute game types |
 | mega-optimism | `megaeth-labs/mega-optimism` | Sequencer behavior changes, payload building changes, L1 settlement changes |
+| dist-docs | `megaeth-labs/dist-docs` | Release tags — determines which mega-reth changes are live and doc-worthy. Not scanned for PRs; used only to identify the latest released version. |
 
 ## Workflow
 
@@ -49,6 +50,20 @@ For each PR, record:
 - Merge date
 - Labels (if any)
 - A one-line summary of what changed (from PR title or body)
+
+### Phase 1.5: Determine Latest Released Version (mega-reth)
+
+For mega-reth, only changes included in the **latest released version** should be considered for new behavior or behavior changes.
+PRs merged after the latest release are unreleased and should not drive documentation updates yet.
+
+1. **Check the dist-docs repo** for the latest release tag:
+   ```bash
+   gh release list --repo megaeth-labs/dist-docs --limit 5
+   ```
+2. **Identify the release date and tag** (e.g., `v0.6.0`, `2026-03-20`).
+3. **Filter mega-reth PRs**: only include PRs merged on or before the release date. PRs merged after the latest release should be excluded from the doc-worthy triage and noted as "Unreleased — pending next release" in the report.
+
+This does not apply to mega-rpc (deployed continuously) or mega-evm (spec changes are doc-worthy regardless of release).
 
 ### Phase 2: Triage — Doc-Worthy vs Internal
 

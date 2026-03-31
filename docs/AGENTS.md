@@ -36,13 +36,57 @@ When in doubt: top-level pages prioritize readability, layer pages prioritize de
 - **Every section earns its place.**
   Don't add structural sections (e.g., "Standard", "Differences", "Reader notes") unless they carry information the reader can't get from the rest of the page.
   If a section just restates what's already in the tables, delete it.
+- **Active voice.**
+  Make clear who performs the action.
+  "The node charges storage gas" not "Storage gas is charged by the node."
+- **Present tense.**
+  Describe current behavior in present tense.
+  "The node reverts the transaction" not "The node will revert the transaction."
+  Use past tense only for historical events (e.g., Spec History sections).
+- **No marketing language.**
+  State facts. No superlatives, no hype, no exclamation marks.
+  "MegaETH processes transactions in under 10ms" not "MegaETH is the fastest blockchain ever built!"
+- **Conditions before instructions.**
+  Put the condition or purpose first, then the action.
+  "To estimate gas, call `eth_estimateGas`" not "Call `eth_estimateGas` to estimate gas."
+  "If the transaction exceeds 10M gas, use a managed provider" not "Use a managed provider if the transaction exceeds 10M gas."
+- **Descriptive link text.**
+  Links must describe the destination.
+  "[Gas Model](gas-model.md)" not "[click here](gas-model.md)" or "[this page](gas-model.md)."
+  Never use "here", "this link", "this page", or "read more" as link text.
+
+## Terminology
+
+Use these exact forms consistently. Do not alternate between variants.
+
+| Term | Correct | Incorrect |
+|------|---------|-----------|
+| Project name | MegaETH | megaETH, Mega ETH, megaeth, MEGAETH |
+| EVM implementation | MegaEVM | MegaEvm, mega-evm, Mega EVM |
+| Mainnet (proper noun) | MegaETH Mainnet | MegaETH mainnet, main net, main-net |
+| Testnet (proper noun) | MegaETH Testnet | MegaETH testnet, test net, test-net |
+| Currency ticker | ETH | eth, Eth |
+| Currency name | ether | Ether, ETH (when referring to the currency, not the ticker) |
+| Block type | mini-block | miniblock, mini block, MiniBlock |
+| Onchain / offchain | onchain, offchain | on-chain, off-chain, on chain |
+| Smart contract | smart contract | Smart Contract, smartcontract |
+| Gas dimensions | compute gas, storage gas | Compute Gas, Storage Gas, Compute gas |
+| Spec names | MiniRex, Rex, Rex1, Rex2, Rex3, Rex4 | minirex, MINIREX, mini-rex, rex-3 |
+| State trie | SALT | Salt, salt |
+
+**Capitalization rules:**
+- Spec names are proper nouns — always capitalized as shown.
+- Gas dimension names are common nouns — always lowercase in running text.
+- "Mainnet" and "Testnet" are capitalized when referring to MegaETH's specific networks (proper nouns), lowercase when used generically ("run a testnet").
+- Acronyms: spell out on first use with the acronym in parentheses, then use the acronym consistently. Example: "Remote Procedure Call (RPC)" — then "RPC" throughout.
 
 ## Formatting
 
 - **GitBook Markdown**: Use GitBook-flavored Markdown with custom blocks. See `/skill.md` for full syntax reference.
 - **One sentence, one line**: Each sentence goes on its own line for better diffs.
 - **Frontmatter**: Every page must have YAML frontmatter with at least `description` for SEO.
-- **Headings**: Use `#` for the page title (H1), `##` for sections (H2), `###` for subsections (H3). One H1 per page.
+- **Headings**: Use `#` for the page title (H1), `##` for sections (H2), `###` for subsections (H3). One H1 per page. Use sentence case: "Gas forwarding rules" not "Gas Forwarding Rules." Capitalize only proper nouns (MegaETH, Ethereum, Rex3).
+- **Serial commas**: Use serial (Oxford) commas in lists of three or more: "compute gas, storage gas, and detention gas."
 
 ## Cross-Linking
 

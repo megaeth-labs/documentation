@@ -71,13 +71,20 @@ If the active node goes down, a standby takes over within seconds, and software 
 ### RPC Nodes
 
 RPC nodes are the network's public interface.
-They serve read requests (account balances, contract calls, event logs), accept transaction submissions, and maintain a full replica of the chain state, synced from the sequencer via a streaming protocol.
+They serve read requests (account balances, contract calls, event logs), accept transaction submissions, and maintain a replica of the chain state synced from the sequencer.
+Depending on how a node maintains state, there are two types:
+
+- **Replica nodes** receive blocks and execution results from the sequencer and apply them to a local replica of the chain's state and history without re-execution.
+  This is the default mode — it is lightweight and optimized for serving read requests at scale.
+- **Full nodes** receive blocks and locally re-execute them, independently validating every state transition.
+  Full nodes do not need to trust the sequencer's execution results.
 
 MegaETH operates RPC nodes across multiple geographic regions so that users worldwide connect to a nearby node with low latency.
 There are two ways to access them (see [Connect to MegaETH](user/connect.md) for endpoints):
 
 - **Public RPC endpoint** — available to everyone, rate-limited.
 - **Managed RPC providers** — [Alchemy](https://www.alchemy.com/) and others offer higher throughput and debug methods (`debug_*`, `trace_*`).
+
 
 ### Data Availability
 
@@ -93,6 +100,11 @@ Block proposals are submitted to L1 and can be challenged within a dispute windo
 
 For dispute resolution, MegaETH uses **Kailua** — a ZK fraud proof system built on RISC-Zero.
 Instead of the multi-round interactive bisection used by standard OP Stack, Kailua generates a single zero-knowledge proof to resolve disputes, making challenges faster and cheaper.
+
+### Provers
+
+Provers re-execute blocks and generate cryptographic proofs that attest to the correctness of the sequencer's execution results.
+These proofs are used in the [fault proof](#fault-proof) process: if a block proposal on L1 is challenged, a prover can produce a proof to resolve the dispute.
 
 ## Related Pages
 

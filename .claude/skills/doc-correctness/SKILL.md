@@ -10,7 +10,7 @@ Verify factual claims in the documentation against implementation sources: $ARGU
 Parse the arguments to determine scope. Accepted inputs:
 - A single page path (e.g., `docs/spec/evm/dual-gas-model.md`) — verify claims on that page.
 - A layer directory (e.g., `docs/spec/`) — verify all pages in that layer.
-- A claim family (e.g., `gas`, `system-contracts`, `rpc`, `network`, `upgrades`) — verify all claims of that type across all pages.
+- A claim family (e.g., `gas`, `system-contracts`, `rpc`, `network`, `upgrades`, `security`) — verify all claims of that type across all pages.
 - `all` — verify every page listed in `docs/SUMMARY.md`.
 
 Default (no arguments): verify all pages.
@@ -30,9 +30,10 @@ Every verifiable claim in the docs falls into one of these families. Each family
 |---|---|---|---|
 | Gas | Gas costs, limits, compute gas caps, storage gas bases, detention caps, refund rules | mega-evm | `crates/mega-evm/src/constants.rs`, gas schedule code in `evm/` |
 | System Contracts | Addresses, Solidity interfaces, execution semantics, deployment specs | mega-evm | `crates/system-contracts/contracts/`, Rust bindings, address constants |
-| RPC | Method parameters, return fields, error codes, behavioral differences from Ethereum | mega-rpc, mega-reth | mega-rpc Workers routes (`src/`), mega-reth RPC handlers (`crates/megaeth/rpc/`) |
+| RPC | Method parameters, return fields, error codes, behavioral differences from Ethereum | mega-rpc, mega-reth | mega-rpc Workers routes (`src/`), mega-reth RPC handlers (`crates/megaeth/rpc/`). **Note**: mega-rpc is the implementation of MegaETH's official public RPC endpoint only. Methods unavailable on the public endpoint may still be available through managed RPC providers (e.g., Alchemy). When verifying RPC method availability, distinguish between "unavailable on public endpoint" and "unsupported by MegaETH entirely." |
 | Network | Chain IDs, RPC URLs, block times, currency symbols, explorer URLs | devops-ansible-inventory | Inventory files and deployment configs |
 | Upgrades | Spec progression, per-upgrade behavioral deltas, activation order, backward compatibility | mega-evm | `crates/mega-evm/src/evm/spec.rs`, `block/hardfork.rs`, `docs/upgrades/` |
+| Security | Security Considerations sections: claimed attack vectors, invariants, risk consequences | mega-evm, mega-reth | Same as the claim's primary family (Gas → gas sources, RPC → rpc sources, etc.) |
 
 ## Verification Workflow
 
@@ -45,11 +46,12 @@ Read the target page(s) and extract every verifiable claim. A claim is any state
 - **Interface definitions**: function signatures, event signatures, error codes, parameter names.
 - **Relationships**: "Spec X introduced feature Y", "Contract Z is available since Rex2".
 - **Configuration values**: RPC URLs, block times, currency symbols.
+- **Security claims**: Attack vectors, invariants, and risk consequences stated in Security Considerations sections (e.g., "if a node fails to charge X, an attacker can Y").
 
 For each claim, record:
 - The exact text from the doc.
 - The page path and section.
-- The claim family (Gas / System Contracts / RPC / Network / Upgrades).
+- The claim family (Gas / System Contracts / RPC / Network / Upgrades / Security).
 
 ### Phase 2: Source Resolution
 
@@ -153,6 +155,7 @@ Knowledge docs used:
 - Do NOT fix the issues yourself unless the user explicitly asks. This skill produces a report, not edits.
 - If the knowledge base INDEX does not cover a claim's domain, note it as a gap in the Source Resolution Trace.
 - When verifying gas constants, check both the constant definition AND its usage context (is it per-transaction? per-opcode? per-block?).
+- When verifying Security Considerations claims, confirm that the stated attack vector or invariant is real — check that the code actually enforces the invariant or that violating the stated rule would indeed cause the described consequence.
 
 ## Related Skills
 

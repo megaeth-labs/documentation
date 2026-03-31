@@ -57,6 +57,22 @@ Do not attempt to compute gas costs manually.
 For the complete storage gas schedule, see the [formal specification](https://docs.megaeth.com/evm-spec/evm/dual-gas-model).
 ```
 
+## Code Sample Rules
+
+- **Runnable by default.**
+  Code samples MUST be copy-paste-runnable against a MegaETH RPC endpoint unless explicitly marked as pseudocode.
+  If a sample requires setup (imports, provider config, contract deployment), show it or link to a complete working example.
+- **Introduce every code block with prose.**
+  Always precede a code block with a sentence or paragraph explaining what it does.
+  Never drop a code block with no preceding text.
+- **Keep samples short.**
+  Aim for under 50 lines per code block.
+  For longer examples, show the essential fragment and link to a full example in a repository.
+- **Annotate with inline comments.**
+  Include comments explaining each non-obvious step, decoded values, or MegaETH-specific behavior.
+- **Language identifier required.**
+  Every fenced code block MUST have a language identifier (e.g., `` ```solidity ``, `` ```typescript ``, `` ```bash ``).
+
 ## Formatting Preferences
 
 - Use `{% tabs %}` for multi-language code (Solidity / TypeScript / cast).
@@ -142,9 +158,15 @@ Use a three-column table: `| Code | Cause | Fix |`.
 - Omit generic rate-limit errors (`-32005`) — those are covered by the [Error reference](read/rpc/error-codes.md).
 - End with: `See also [Error reference](read/rpc/error-codes.md).`
 
+### Hex-encoded quantities
+
+All Ethereum quantity fields (block numbers, gas values, balances, wei amounts) are hex-encoded, `0x`-prefixed strings.
+State this in type columns as `QUANTITY` (not `string` or `number`).
+Decode hex values in example responses with inline comments: `"result": "0xf4240"  // 1,000,000 wei`.
+
 ### Examples
 
-- One `curl` example with the MegaETH mainnet RPC endpoint.
+- One `curl` example with the MegaETH Mainnet RPC endpoint.
 - One JSON response block.
 - Add **inline comments** to decode hex values: `"result":"0xf4240"  // 1,000,000 wei = 0.001 gwei`.
 

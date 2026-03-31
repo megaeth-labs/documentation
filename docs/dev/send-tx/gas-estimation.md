@@ -55,19 +55,19 @@ cast estimate 0xContractAddress \
 
 Any Ethereum SDK (ethers.js, viem, alloy, web3.py, etc.) works the same way — just point it at a MegaETH RPC endpoint and call `estimateGas` as usual.
 
-### The 10M RPC Gas Cap
+### The RPC Compute Gas Cap
 
-`eth_estimateGas` (and `eth_call`) enforce a gas limit of **10,000,000** on the RPC side.
+`eth_estimateGas` (and `eth_call`) enforce a compute gas limit of **60,000,000** on the public RPC endpoint.
 This is separate from the on-chain transaction gas limit of 1,000,000,000.
 
-If your transaction requires more than 10M gas to simulate, the RPC call will fail.
+If your transaction requires more than 60M compute gas to simulate, the RPC call will fail.
 There are two workarounds:
 
 1. **Set a manual gas limit.**
    Use the `--gas-limit` flag (see [Toolchain Configuration](#toolchain-configuration) below) to skip estimation entirely and submit the transaction with a known gas value.
    You can determine the right value by simulating the transaction locally with [`mega-evme`](debugging.md#using-mega-evme), which has no gas cap and fully implements MegaETH's gas model.
-2. **Use a third-party RPC provider with a higher cap.**
-   Managed RPC providers typically allow much more gas for `eth_call` and `eth_estimateGas` than the default 10M.
+2. **Use a managed RPC provider with a higher cap.**
+   Managed RPC providers typically allow much more gas for `eth_call` and `eth_estimateGas` than the public endpoint.
    For reference, standard Ethereum node software (geth, reth) defaults to 50M, and providers like Alchemy support up to 550M.
    See the [RPC Providers](../tooling.md#rpc-providers) table for providers that support MegaETH.
 

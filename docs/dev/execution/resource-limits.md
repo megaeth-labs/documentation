@@ -8,7 +8,7 @@ MegaETH enforces seven resource limits on transactions and blocks.
 
 | Resource | Per-Transaction | Per-Block | How it changes |
 | -------- | --------------- | --------- | -------------- |
-| **Gas** | 2,000,000,000 | 2,000,000,000 | Sequencer-configured |
+| **Gas** | 10,000,000,000 | 10,000,000,000 | Sequencer-configured |
 | **Compute Gas** | 200,000,000 | Unlimited | Protocol constant |
 | **Data Size** | 12.5 MB | 12.5 MB | Protocol constant |
 | **KV Updates** | 500,000 | 500,000 | Protocol constant |
