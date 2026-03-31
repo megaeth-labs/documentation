@@ -34,6 +34,7 @@
   * [Resource Limits](dev/execution/resource-limits.md)
   * [Volatile Data Access](dev/execution/volatile-data.md)
   * [System Contracts](dev/execution/system-contracts.md)
+* [Build with AI](dev/build-with-ai.md)
 * [Tooling & Infrastructure](dev/tooling.md)
 * [Developer FAQ](dev/faq.md)
 
