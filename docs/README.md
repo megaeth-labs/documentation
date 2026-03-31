@@ -14,6 +14,11 @@ layout:
 Welcome to the MegaETH documentation.
 MegaETH is a high-performance Ethereum L2 with sub-millisecond block times and real-time transaction processing.
 
+## Learn How MegaETH Works
+
+- [Architecture](architecture.md) — how transactions flow from submission through execution, streaming, and L1 settlement.
+- [Mini-Blocks](mini-block.md) — the two block types and why MegaETH redesigned the block format for real-time performance.
+
 ## Choose Your Path
 
 <table data-view="cards">
@@ -39,6 +44,11 @@ MegaETH is a high-performance Ethereum L2 with sub-millisecond block times and r
             <td><strong>Integration Guide</strong></td>
             <td>Integrate your wallet, indexer, oracle, or bridge with MegaETH.</td>
             <td><a href="integration/overview.md">Integration Guide</a></td>
+        </tr>
+        <tr>
+            <td><strong>Specification</strong></td>
+            <td>Formal protocol spec — EVM behavior, gas model, system contracts, and upgrade history.</td>
+            <td><a href="spec/overview.md">Specification</a></td>
         </tr>
     </tbody>
 </table>

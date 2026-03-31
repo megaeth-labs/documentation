@@ -1,6 +1,8 @@
 # Table of contents
 
 * [Home](README.md)
+* [Architecture](architecture.md)
+* [Mini-Blocks](mini-block.md)
 
 ## User Guide
 
@@ -22,8 +24,7 @@
 * [Volatile Data Access](dev/volatile-data.md)
 * [Debugging Transactions](dev/debugging.md)
 * [System Contracts](dev/system-contracts.md)
-* [Architecture](dev/architecture.md)
-* [Mini-Blocks](dev/miniblocks.md)
+
 * [Realtime API](dev/realtime-api.md)
 * [RPC](dev/rpc/README.md)
   * [Error Codes](dev/rpc/error-codes.md)

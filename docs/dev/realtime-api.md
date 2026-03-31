@@ -476,5 +476,5 @@ When the server returns a response without a `cursor`, all matching logs have be
 
 ## Related Pages
 
-- [Mini-Blocks](miniblocks.md) — understanding the two block types
+- [Mini-Blocks](../mini-block.md) — understanding the two block types
 - [RPC Reference](rpc/README.md) — full method availability table
