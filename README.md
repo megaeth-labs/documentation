@@ -13,11 +13,10 @@ docs/                  Documentation source
 ├── architecture.md    Architecture overview
 ├── mini-block.md      Mini-block design
 ├── user/              User Guide (wallets, bridging, getting started)
-├── dev/               Developer Docs (gas model, RPC, debugging)
-│   ├── send-tx/       Submitting transactions
-│   ├── read/          Reading from MegaETH (RPC, realtime API)
-│   └── execution/     EVM differences, gas model, resource limits
-└── spec/              Specification (EVM spec, system contracts, upgrades)
+└── dev/               Developer Docs (gas model, RPC, debugging)
+    ├── send-tx/       Submitting transactions
+    ├── read/          Reading from MegaETH (RPC, realtime API)
+    └── execution/     EVM differences, gas model, resource limits
 ```
 
 ## Contributing

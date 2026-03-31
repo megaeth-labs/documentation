@@ -11,16 +11,17 @@ https://raw.githubusercontent.com/GitbookIO/public-docs/refs/heads/main/skill.md
 
 ## Documentation Architecture
 
-The site is organized into three layers, each targeting a different audience:
+The site is organized into layers, each targeting a different audience:
 
 | Layer | Directory | Audience | Tone |
 |-------|-----------|----------|------|
 | **User Guide** | `docs/user/` | End users (wallets, DeFi users) | Plain language, no code |
 | **Developer Docs** | `docs/dev/` | Dapp/contract builders | Practical guidance, code examples |
-| **Specification** | `docs/spec/` | Protocol implementers, auditors | Normative (MUST/SHALL), exhaustive |
+| **Specification** | [mega-evm repo](https://github.com/megaeth-labs/mega-evm) | Protocol implementers, auditors | Normative (MUST/SHALL), exhaustive |
 
 Each layer has its own `AGENTS.md` with layer-specific writing rules.
-The spec content is mirrored from `mega-evm/docs/` in the [mega-evm repository](https://github.com/megaeth-labs/mega-evm).
+The Specification layer is maintained in the [mega-evm repository](https://github.com/megaeth-labs/mega-evm) and synced into the same GitBook site via Git Sync.
+It does not live in this repo — do not create or edit `docs/spec/` files here.
 
 ## Project Structure
 
@@ -36,17 +37,12 @@ The spec content is mirrored from `mega-evm/docs/` in the [mega-evm repository](
 │   ├── user/                  # User Guide layer
 │   │   ├── AGENTS.md          # User layer writing rules
 │   │   └── *.md
-│   ├── dev/                   # Developer Docs layer
-│   │   ├── AGENTS.md          # Developer layer writing rules
-│   │   ├── rpc/               # RPC reference subsection
-│   │   └── *.md
-│   └── spec/                  # Specification layer (mirrored from mega-evm/docs)
-│       ├── AGENTS.md          # Spec layer writing rules
-│       ├── evm/               # EVM behavioral spec
-│       ├── system-contracts/  # System contract specs
-│       ├── oracle-services/   # Oracle service specs
-│       └── upgrades/          # Per-upgrade behavioral deltas
-├── docs-legacy/               # Previous Pandoc-based docs (archived)
+│   └── dev/                   # Developer Docs layer
+│       ├── AGENTS.md          # Developer layer writing rules
+│       ├── send-tx/           # Submitting transactions
+│       ├── read/              # Reading from MegaETH (RPC, realtime API)
+│       │   └── rpc/           # RPC method reference pages
+│       └── execution/         # EVM differences, gas model, resource limits
 ├── .sisyphus/plans/           # Restructure planning docs
 └── .github/workflows/
     └── claude.yml             # Claude Code Action: PR review, interactive assistance
