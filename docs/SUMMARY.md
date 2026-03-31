@@ -16,14 +16,13 @@
 ## Developer Docs
 
 * [Overview](dev/overview.md)
-
 * [Send Transaction](dev/send-tx/overview.md)
   * [Contracts & Tokens](dev/send-tx/contracts.md)
   * [Gas Estimation](dev/send-tx/gas-estimation.md)
   * [Debugging Transactions](dev/send-tx/debugging.md)
 * [Read from MegaETH](dev/read/overview.md)
   * [Realtime API](dev/read/realtime-api.md)
-  * RPC Reference
+  * [RPC Reference](developer-docs/overview-2/rpc-reference/README.md)
     * [eth\_subscribe](dev/read/rpc/eth_subscribe.md)
     * [eth\_callAfter](dev/read/rpc/eth_callAfter.md)
     * [eth\_getLogsWithCursor](dev/read/rpc/eth_getLogsWithCursor.md)
@@ -37,4 +36,3 @@
 * [Build with AI](dev/build-with-ai.md)
 * [Tooling & Infrastructure](dev/tooling.md)
 * [Developer FAQ](dev/faq.md)
-

@@ -1,26 +1,15 @@
-# Chain parameters
-mainnet_chain_id: "4326"
-mainnet_chain_id_hex: "0x10e6"
-testnet_chain_id: "6343"
-testnet_chain_id_hex: "0x18c7"
-
-# RPC endpoints
-mainnet_rpc: "https://mainnet.megaeth.com/rpc"
-testnet_rpc: "https://carrot.megaeth.com/rpc"
-
-# Block explorers
-mainnet_blockscout: "https://megaeth.blockscout.com"
-mainnet_etherscan: "https://mega.etherscan.io"
-testnet_blockscout: "https://megaeth-testnet-v2.blockscout.com"
-
-# Network status
-network_status: "https://uptime.megaeth.com"
-
-# Bridge
-mainnet_bridge: "0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75"
-
-# Gas parameters
-block_gas_limit: "10,000,000,000"
-base_fee_per_gas: "0.001 gwei"
-miniblock_time: "10ms"
-evm_block_time: "1s"
+mainnet_chain_id: '4326'
+mainnet_chain_id_hex: '0x10e6'
+testnet_chain_id: '6343'
+testnet_chain_id_hex: '0x18c7'
+mainnet_rpc: https://mainnet.megaeth.com/rpc
+testnet_rpc: https://carrot.megaeth.com/rpc
+mainnet_blockscout: https://megaeth.blockscout.com
+mainnet_etherscan: https://mega.etherscan.io
+testnet_blockscout: https://megaeth-testnet-v2.blockscout.com
+network_status: https://uptime.megaeth.com
+mainnet_bridge: '0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75'
+block_gas_limit: 10,000,000,000
+base_fee_per_gas: 0.001 gwei
+miniblock_time: 10ms
+evm_block_time: 1s
