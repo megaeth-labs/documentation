@@ -124,19 +124,6 @@ Data for this oracle is supplied solely by the sequencer based on its local cloc
 This implies that the sequencer must be trusted to publish accurate data.
 Avoid using this oracle if such a trust assumption is too strong for your use case.
 
-### Volatile Data and Compute Gas Limit
-
-This oracle internally reads the core oracle contract at `0x6342000000000000000000000000000000000001`.
-Therefore, obtaining high-precision timestamps accesses volatile data and is subject to the compute gas limits detailed in [EVM Differences](evm-differences.md#accessing-the-native-oracle-interface).
-
-Specifically, calling this oracle caps the transaction's global compute gas to **20,000,000**.
-Avoid calling this oracle in transactions that perform heavy computation.
-
-{% hint style="info" %}
-`DELEGATECALL` to the oracle contract does **not** trigger the volatile data compute gas limit.
-Only direct `SLOAD` from the oracle contract storage triggers the limit.
-{% endhint %}
-
 ## Keyless Deployment (Nick's Method)
 
 **Address:** `0x6342000000000000000000000000000000000003`

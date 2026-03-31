@@ -5,7 +5,7 @@ description: Volatile data access on MegaETH — what triggers the 20M compute g
 # Volatile Data Access
 
 MegaETH provides APIs for transactions to access _volatile data_ — data that changes frequently and expires quickly after being accessed.
-This includes the current block metadata (block number, timestamp, coinbase), the beneficiary account state, and data from the [native oracle interface](system-contracts.md#native-oracle).
+This includes the current block metadata (block number, timestamp, coinbase), the beneficiary account state, and data from the [native oracle interface](system-contracts.md#reading-oracle-data).
 
 When a transaction reads volatile data, a dependency forms between it and other transactions that modify the same data.
 This harms parallel execution performance — for example, reading `block.number` prevents the sequencer from producing the next block until the reading transaction finishes.

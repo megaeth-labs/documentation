@@ -6,6 +6,12 @@ description: MegaETH JSON-RPC method availability table and rate limiting policy
 
 ## Available Methods
 
+{% hint style="info" %}
+The table below reflects the **public MegaETH RPC endpoint**.
+Debug and trace methods (`debug_*`, `trace_*`) are available through managed RPC providers such as [Alchemy](https://www.alchemy.com/).
+See [Debugging Transactions](../debugging.md) for usage.
+{% endhint %}
+
 | Method | Availability | Additional Restrictions |
 | ------ | ------------ | ----------------------- |
 | `debug_getRawBlock` | Unavailable | |

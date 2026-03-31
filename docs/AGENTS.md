@@ -2,6 +2,27 @@
 
 These rules apply to all documentation layers (user, dev, integration).
 
+## Writing Principles
+
+- **Self-contained pages.**
+  The reader should understand the page without clicking away.
+  Inline the key information (fields, values, behavior) on the page itself; link to type definitions or specs only for completeness.
+- **Information where the reader needs it.**
+  Don't accumulate notes in a separate section at the bottom.
+  Put each note next to the field, parameter, or concept it describes — inside a table cell, parenthetical, or inline clause.
+- **Terse over verbose.**
+  Use sentence fragments in table cells.
+  Cut filler words: "When it usually happens" → "Cause"; "Fix the request before retrying" → "Fix the request".
+- **MegaETH-first.**
+  Describe what MegaETH does, not what Ethereum does plus a list of deltas.
+  If behavior differs from Ethereum, note it inline where relevant — don't create separate "Differences" sections.
+- **Kill indirection.**
+  Show the thing, don't point to the thing.
+  If a type has 5 key fields, list them in a table on the page rather than writing "see `TransactionCall`".
+- **Every section earns its place.**
+  Don't add structural sections (e.g., "Standard", "Differences", "Reader notes") unless they carry information the reader can't get from the rest of the page.
+  If a section just restates what's already in the tables, delete it.
+
 ## Formatting
 
 - **GitBook Markdown**: Use GitBook-flavored Markdown with custom blocks. See `/skill.md` for full syntax reference.
