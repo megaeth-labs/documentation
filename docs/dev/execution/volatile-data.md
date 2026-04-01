@@ -24,7 +24,7 @@ Under the current absolute model, the same transaction would have only 5M remain
 
 This change removes the penalty for accessing volatile data late in a transaction's execution.
 Under relative detention, reading volatile data **as late as possible** becomes a valid optimization — see [Best Practices](#best-practices).
-For the formal definition, see [Gas Detention](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/gas-detention).
+For the formal definition, see [Gas Detention](https://docs.megaeth.com/spec/megaevm/gas-detention).
 
 </details>
 
@@ -109,7 +109,7 @@ function processWithTimestamp(uint256[] calldata items) external {
 ```
 
 Under the current absolute cap, read order makes no difference — the 20M ceiling applies to total compute gas regardless.
-For the formal definition, see [Gas Detention](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/gas-detention).
+For the formal definition, see [Gas Detention](https://docs.megaeth.com/spec/megaevm/gas-detention).
 
 </details>
 
@@ -118,4 +118,4 @@ For the formal definition, see [Gas Detention](https://app.gitbook.com/o/iBzILuN
 - [EVM Differences](overview.md) — full list of MegaEVM behavioral differences
 - [Gas Estimation](../send-tx/gas-estimation.md) — estimate gas correctly on MegaETH
 - [Debugging Transactions](../send-tx/debugging.md) — trace gas consumption with mega-evme
-- [Gas Detention (spec)](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/gas-detention) — formal specification of the gas detention mechanism
+- [Gas Detention (spec)](https://docs.megaeth.com/spec/megaevm/gas-detention) — formal specification of the gas detention mechanism

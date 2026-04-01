@@ -38,7 +38,7 @@ For method parameters, tracer configuration options, and response formats, see t
 
 ## Using mega-evme
 
-`mega-evme` is a local CLI tool that uses the open-source [MegaEVM](https://github.com/megaeth-labs/mega-evm) implementation.
+[`mega-evme`](https://docs.megaeth.com/mega-evme) is a local CLI tool that uses the open-source [MegaEVM](https://github.com/megaeth-labs/mega-evm) implementation.
 It can perfectly simulate any transaction's behavior on MegaETH, including storage gas, compute gas caps, and resource limits.
 
 Use `mega-evme` when you want full local control over tracing, or when you don't have access to a managed RPC endpoint with debug methods.
@@ -208,5 +208,6 @@ See [Volatile Data Access](../execution/volatile-data.md) for the full list of t
 - [EVM Differences](../execution/overview.md) — volatile data caps, SSTORE refund changes, 98/100 forwarding
 - [Gas Model](../execution/gas-model.md) — how compute gas and storage gas work
 - [RPC Reference](../read/overview.md) — method availability and restrictions
-- [Dual Gas Model (spec)](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/dual-gas-model) — formal specification of compute gas and storage gas
-- [Gas Detention (spec)](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/gas-detention) — compute gas cap triggered by volatile data access
+- [Dual Gas Model (spec)](https://docs.megaeth.com/spec/megaevm/dual-gas-model) — formal specification of compute gas and storage gas
+- [Gas Detention (spec)](https://docs.megaeth.com/spec/megaevm/gas-detention) — compute gas cap triggered by volatile data access
+- [mega-evme](https://docs.megaeth.com/mega-evme) — full command reference, configuration, and cookbook

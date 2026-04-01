@@ -38,7 +38,7 @@ MegaETH is a high-performance Ethereum L2 with ~10ms block times and real-time t
         <tr>
             <td><strong>Specification</strong></td>
             <td>Formal protocol spec — EVM behavior, gas model, system contracts, and upgrade history.</td>
-            <td><a href="https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/">Specification</a></td>
+            <td><a href="https://docs.megaeth.com/spec/">Specification</a></td>
         </tr>
     </tbody>
 </table>

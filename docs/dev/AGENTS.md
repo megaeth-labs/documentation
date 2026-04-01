@@ -36,7 +36,7 @@ For every concept that has a formal spec in `mega-evm/docs/`:
 1. **Summarize** the practical implications (1-3 paragraphs)
 2. **Include** a key values table if applicable
 3. **Add** code examples showing how to work with it
-4. **Link** to the spec: "For the formal specification, see [Dual Gas Model](https://docs.megaeth.com/evm-spec/evm/dual-gas-model)."
+4. **Link** to the spec: "For the formal specification, see [Dual Gas Model](https://docs.megaeth.com/spec/megaevm/dual-gas-model)."
 
 Example pattern:
 
@@ -55,7 +55,7 @@ Use `eth_estimateGas` on a MegaETH RPC endpoint for accurate gas estimates.
 Do not attempt to compute gas costs manually.
 {% endhint %}
 
-For the complete storage gas schedule, see the [formal specification](https://docs.megaeth.com/evm-spec/evm/dual-gas-model).
+For the complete storage gas schedule, see the [formal specification](https://docs.megaeth.com/spec/megaevm/dual-gas-model).
 ```
 
 ## Code Sample Rules

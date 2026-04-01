@@ -106,8 +106,9 @@ When a PR creation is requested, the agent should:
 - **One sentence, one line.**
   When writing Markdown files, put each sentence on a separate line.
   This improves diff readability and makes reviews easier.
-- **Cross-link to the EVM spec with absolute GitBook URLs.**
+- **Cross-link to the EVM spec with absolute URLs.**
   The EVM spec is maintained in the mega-evm repo and synced into a separate GitBook space — it does not exist as a file in this repo.
-  Use absolute URLs: `[Dual Gas Model](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/dual-gas-model)`.
+  Use absolute URLs with the base `https://docs.megaeth.com/spec/`: `[Dual Gas Model](https://docs.megaeth.com/spec/megaevm/dual-gas-model)`.
+  EVM pages use the `megaevm/` prefix (not `evm/`), system contracts use `system-contracts/`.
 - **Keep commit messages simple.**
   No co-author information or "generated with" footers.
