@@ -1,29 +1,28 @@
 # eth_getBlockByNumber
 
-Returns a block by block number or tag.
+Returns a block by its block number or block tag, or `null` if the block is not available.
 
 ## Parameters
 
-| Position | Type | Required | Notes |
-|---|---|---|---|
-| `0` | [`BlockNumberOrTag`](../types.md#blocknumberortag) | Yes | `earliest`, `latest`, `pending`, `safe`, `finalized`, or a hex block number |
-| `1` | `Boolean` | No | `false` returns transaction hashes; `true` returns full transaction objects. Default: `false` |
+| Position | Name | Type | Required | Notes |
+|---|---|---|---|---|
+| `0` | `block` | [`BlockNumberOrTag`](../types.md#blocknumberortag) | Yes | Hex block number or tag: `earliest`, `latest`, `pending`, `safe`, `finalized` |
+| `1` | `fullTransactions` | `boolean` | No | `false` (default) returns transaction hashes; `true` returns full transaction objects |
 
 ## Returns
 
-A [`Block`](../types.md#block) object, or `null` if the block does not exist or has not been produced yet. The object contains:
+`Block | null` — `null` when the requested block does not exist or is not yet available.
 
 | Field | Type | Notes |
 |---|---|---|
-| `hash` | `Data` (32 bytes) | Block hash |
 | `number` | `Quantity` | Block number |
-| `parentHash` | `Data` (32 bytes) | Parent block hash |
-| `timestamp` | `Quantity` | Unix timestamp |
-| `gasLimit` | `Quantity` | Gas limit for the block |
-| `gasUsed` | `Quantity` | Total gas used by all transactions |
-| `miner` | `Data` (20 bytes) | Block producer address |
-| `transactions` | `Data[]` \| [`Transaction`](../types.md#transaction)`[]` | Transaction hashes when `fullTransactions = false`; full transaction objects when `true` |
-| `logsBloom` | `Data` (256 bytes) | Bloom filter for log lookups |
+| `hash` | `BlockHash` | Block hash |
+| `parentHash` | `BlockHash` | Parent block hash |
+| `timestamp` | `Quantity` | Block timestamp |
+| `miner` | `Address` | Fee recipient / coinbase |
+| `gasLimit` | `Quantity` | Block gas limit |
+| `gasUsed` | `Quantity` | Gas consumed by the block |
+| `transactions` | `TransactionHash[] \| Transaction[]` | Hashes when `fullTransactions = false`; full objects when `true` |
 | ... | | See [`Block`](../types.md#block) for the complete field list |
 
 ## Errors

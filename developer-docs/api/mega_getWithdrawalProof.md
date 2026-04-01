@@ -1,57 +1,37 @@
 # mega_getWithdrawalProof
 
-Returns the Merkle proof for the L2-to-L1 message passer contract at a given block.
+Returns a Merkle proof for the L2ToL1MessagePasser contract at a given block, used to prove withdrawal state to L1. `eth_getWithdrawalProof` is an alias with identical behavior.
 
-## Ethereum Standard
+## Parameters
 
-This method is not part of the standard Ethereum JSON-RPC method set.
+| Position | Name | Type | Required | Notes |
+|---|---|---|---|---|
+| `0` | `address` | [`Address`](../types.md#address) | Yes | Must be `0x4200000000000000000000000000000000000016` (L2ToL1MessagePasser) |
+| `1` | `storageKeys` | `Bytes32[]` | Yes | Storage keys to prove; empty array is valid |
+| `2` | `block` | [`BlockNumberOrTag`](../types.md#blocknumberortag) | No | Defaults to `"latest"` |
 
-## MegaETH Differences
-
-- This is a MegaETH L2 method used to prove withdrawal state to L1.
-- The `address` parameter should be `0x4200000000000000000000000000000000000016` (the L2ToL1MessagePasser contract). The proof is only meaningful for this contract.
-- `eth_getWithdrawalProof` is an alias for this method with identical behavior.
-
-## Request
-
-Send `params` as `[address, storageKeys, block]`.
-
-| Position | Type | Required | Notes |
-|---|---|---|---|
-| `0` | [`Data`](../types.md#data) | Yes | L2ToL1MessagePasser address: `0x4200000000000000000000000000000000000016` |
-| `1` | `Data[]` | Yes | Storage keys to prove; each must be a `0x`-prefixed 32-byte hex string. Empty array is valid. |
-| `2` | [`BlockReferenceString`](../types.md#blockreferencestring) | No | Block to query; defaults to `"latest"` |
-
-## Response
+## Returns
 
 | Field | Type | Notes |
 |---|---|---|
-| `result.address` | [`Data`](../types.md#data) | The queried contract address |
-| `result.accountProof` | `Data[]` | Merkle proof nodes for the account in the state trie |
-| `result.balance` | [`Quantity`](../types.md#quantity) | Account balance |
-| `result.codeHash` | [`Data`](../types.md#data) | Keccak256 hash of the account bytecode |
-| `result.nonce` | [`Quantity`](../types.md#quantity) | Account nonce |
-| `result.storageHash` | [`Data`](../types.md#data) | Root hash of the account storage trie |
-| `result.storageProof` | `Object[]` | One entry per requested storage key |
-| `result.storageProof[].key` | [`Data`](../types.md#data) | Storage key |
-| `result.storageProof[].value` | [`Quantity`](../types.md#quantity) | Value at the storage slot |
-| `result.storageProof[].proof` | `Data[]` | Merkle proof nodes for this storage slot |
+| `address` | `Address` | Proved address |
+| `accountProof` | `Data[]` | Account trie proof nodes |
+| `balance` | `Quantity` | Account balance |
+| `codeHash` | `Hash32` | Account code hash |
+| `nonce` | `Quantity` | Account nonce |
+| `storageHash` | `Hash32` | Storage trie root |
+| `storageProof` | `object[]` | Per-key storage proofs; each entry has `key` (`Bytes32`), `value` (`Bytes32`), `proof` (`Data[]`) |
 
-## Common Errors
+## Errors
 
-| Code | When it usually happens | What to do |
+| Code | Cause | Fix |
 |---|---|---|
-| `-32602` | A storage key is not a valid 32-byte hex string, or required parameters are missing | Fix the request before retrying |
-| `-32000` | The requested block cannot be resolved | Check the block selector and retry |
-| `-32005` | The public endpoint rate-limited the request | Back off and retry later |
+| `-32602` | A storage key is not a valid 32-byte hex string, or required parameters are missing | Fix the request |
+| `-32000` | The requested block cannot be resolved | Verify the block reference |
 
 See also [Error reference](../errors.md).
 
 ## Example
-
-Reader notes:
-
-- The example uses an empty `storageKeys` array and `"latest"`, so `accountProof` and `storageProof` are empty. Pass specific storage keys and a finalized block number to receive populated Merkle proof nodes.
 
 ```bash
 curl -sS https://mainnet.megaeth.com/rpc \
@@ -65,12 +45,12 @@ curl -sS https://mainnet.megaeth.com/rpc \
   "id": 1,
   "result": {
     "address": "0x4200000000000000000000000000000000000016",
-    "balance": "0x0",
-    "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",
-    "nonce": "0x0",
+    "balance": "0x0",                // (0 ETH)
+    "codeHash": "0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470",  // (keccak256 of empty bytes — no contract code)
+    "nonce": "0x0",                  // (0)
     "storageHash": "0xddd6dcaf75eeb81fb4701c2a39b3132bd60bf9602e2fcbe5852f5d07e14c8084",
-    "accountProof": [],
-    "storageProof": []
+    "accountProof": [],              // (empty — no proof nodes returned for this query)
+    "storageProof": []               // (empty — no storage keys were requested)
   }
 }
 ```

@@ -1,42 +1,31 @@
 # eth_unsubscribe
 
-Cancels an active subscription created by [`eth_subscribe`](./eth_subscribe.md).
+Cancels an active subscription created by [`eth_subscribe`](./eth_subscribe.md). Returns `true` if the subscription was found and cancelled. Requires a WebSocket connection.
 
-## Ethereum Standard
+## Parameters
 
-`eth_unsubscribe(subscriptionId) -> bool`
+| Position | Name | Type | Required | Notes |
+|---|---|---|---|---|
+| `0` | `subscriptionId` | [`Data`](../types.md#data) | Yes | Subscription ID returned by `eth_subscribe` |
 
-This method requires a persistent WebSocket connection. It is not available over HTTP.
+## Returns
 
-## Request
+`boolean` — `true` if the subscription was found and cancelled; `false` if the ID was not active.
 
-Send `params` as `[subscriptionId]`.
+## Errors
 
-| Position | Type | Required | Notes |
-|---|---|---|---|
-| `0` | [`Data`](../types.md#data) | Yes | Subscription ID returned by `eth_subscribe` |
-
-## Response
-
-| Field | Type | Notes |
+| Code | Cause | Fix |
 |---|---|---|
-| `result` | `bool` | `true` if the subscription was found and cancelled; `false` if the ID was not active |
-
-## Common Errors
-
-| Code | When it usually happens | What to do |
-|---|---|---|
-| `-32602` | The subscription ID parameter is missing | Provide the subscription ID returned by `eth_subscribe` |
-| `-32600` | The subscription ID exists but was created by a different connection | Only the connection that created the subscription can cancel it |
+| `-32602` | Subscription ID parameter is missing | Provide the subscription ID returned by `eth_subscribe` |
+| `-32600` | Subscription was created by a different connection | Cancel from the connection that created the subscription |
 
 See also [Error reference](../errors.md).
 
 ## Example
 
 ```bash
-wscat -c wss://mainnet.megaeth.com/ws \
-# wait for connection
-{"jsonrpc":"2.0","id":1,"method":"eth_unsubscribe","params":["0xaec58cfc2dc41f873fc37d6c871230c1"]}
+wscat -c wss://mainnet.megaeth.com/ws
+> {"jsonrpc":"2.0","id":1,"method":"eth_unsubscribe","params":["0xaec58cfc2dc41f873fc37d6c871230c1"]}
 ```
 
 ```json

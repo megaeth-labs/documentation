@@ -1,44 +1,28 @@
 # eth_sendRawTransaction
 
-Submits a signed transaction to the network and returns its hash.
+Submits a signed transaction to the network and returns its transaction hash. EIP-155 replay protection is required — transactions with a legacy `v` of `27` or `28` are rejected.
 
-## Ethereum Standard
+## Parameters
 
-`eth_sendRawTransaction(rawTx) -> Data`
+| Position | Name | Type | Required | Notes |
+|---|---|---|---|---|
+| `0` | `rawTx` | [`Data`](../types.md#data) | Yes | Signed, RLP-encoded transaction bytes. Supported envelope types: legacy, EIP-2930 (`0x01`), EIP-1559 (`0x02`), EIP-4844 (`0x03`), EIP-7702 (`0x04`) |
 
-## MegaETH Differences
+## Returns
 
-- EIP-155 replay protection is required. Transactions with a legacy `v` of `27` or `28` are rejected at the gateway before reaching the pool.
-- Nonce gaps are rate-controlled. A gap of more than 5 above the current account nonce requires the sender to hold at least 0.1 ETH; smaller gaps are always accepted.
+| Type | Notes |
+|---|---|
+| [`Data`](../types.md#data) | 32-byte transaction hash |
 
-## Request
+## Errors
 
-Send `params` as `[rawTx]`.
-
-| Position | Type | Required | Notes |
-|---|---|---|---|
-| `0` | [`Data`](../types.md#data) | Yes | Fully signed transaction bytes as a `0x`-prefixed hex string |
-
-Reader notes:
-
-- Supported envelope types: legacy (`0x0`), EIP-2930 access list (`0x01`), EIP-1559 dynamic fee (`0x02`), EIP-4844 blob (`0x03`), EIP-7702 authorization (`0x04`).
-
-## Response
-
-| Field | Type | Notes |
+| Code | Cause | Fix |
 |---|---|---|
-| `result` | [`Data`](../types.md#data) | 32-byte transaction hash |
+| `-32602` | Parameter missing, hex malformed, or bytes cannot be decoded as a signed transaction | Fix the transaction |
+| `-32000` | Pool or gateway rule violation: wrong chain ID, missing EIP-155, nonce too low, nonce gap too large (gaps > 5 require ≥ 0.1 ETH sender balance), gas limit below intrinsic, gas price below minimum, or insufficient fee bump. `already known` means the transaction is already pending | Fix the field identified in the error message; ignore `already known` |
+| `-32003` | Insufficient sender funds, pool at capacity, or unsupported transaction type | Fund the sender or wait for pool capacity |
 
-## Common Errors
-
-| Code | When it usually happens | What to do |
-|---|---|---|
-| `-32602` | The parameter is missing, the hex string is malformed, or the bytes cannot be decoded as a signed transaction | Re-encode or re-sign the transaction before retrying |
-| `-32000` | The transaction fails a pool or gateway rule: wrong chain ID, EIP-155 required, nonce too low, nonce gap too large, gas limit below intrinsic, gas price below minimum, or replacement fee bump insufficient. `already known` means the transaction is already pending — no action needed. | Read the error message and correct the specific field before retrying; ignore `already known` |
-| `-32003` | The node rejects the transaction outright: insufficient sender funds, pool at capacity, or unsupported transaction type for this network | Fund the sender, wait before retrying if the pool is full, or switch to a supported transaction type |
-| `-32005` | The public endpoint rate-limited the request | Back off and retry later |
-
-See also [Error reference](../errors.md) and [`eth_sendRawTransactionSync`](./eth_sendRawTransactionSync.md) if you need to wait for the receipt in a single call.
+See also [Error reference](../errors.md).
 
 ## Example
 

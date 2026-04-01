@@ -1,41 +1,26 @@
+
+
 # eth_getCodeByHash
 
-Returns runtime bytecode for a code hash.
+Returns runtime bytecode for a given code hash. This is a MegaETH-specific method; if you start from an address and block selector, use [eth_getCode](./eth_getCode.md) instead.
 
-## Ethereum Standard
+## Parameters
 
-This method is not part of the standard Ethereum JSON-RPC method set.
+| Position | Name | Type | Required | Notes |
+|---|---|---|---|---|
+| `0` | `codeHash` | [`CodeHash`](../types.md#codehash) | Yes | Target runtime code hash |
 
-## MegaETH Differences
-
-- This is a MegaETH-specific extension.
-- Use it when your workflow already has a code hash.
-- If you start from an address and block selector, use [eth_getCode](./eth_getCode.md) instead.
-
-## Request
-
-Send `params` as `[codeHash]`.
-
-| Position | Type | Required | Notes |
-|---|---|---|---|
-| `0` | [`CodeHash`](../types.md#codehash) | Yes | Target runtime code hash |
-
-
-## Response
+## Returns
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Data`](../types.md#data) | Runtime bytecode for the requested code hash |
+| `result` | [`Data`](../types.md#data) | Runtime bytecode; `0x` when no bytecode is stored for that hash |
 
-- `0x` means no bytecode is stored for that hash.
-- Non-empty results are runtime bytecode, not creation bytecode.
+## Errors
 
-## Common Errors
-
-| Code | When it usually happens | What to do |
+| Code | Cause | Fix |
 |---|---|---|
-| `-32602` | The code hash is missing or malformed | Fix the request before retrying |
-| `-32005` | The public endpoint rate-limited the request | Back off and retry later |
+| `-32602` | Code hash is missing or malformed | Fix the request |
 
 See also [Error reference](../errors.md).
 

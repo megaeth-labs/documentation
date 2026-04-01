@@ -1,25 +1,20 @@
 # net_version
 
-Returns the network ID as a decimal string.
+Returns the current network ID as a decimal string. On MegaETH mainnet the result is `"4326"`; on testnet, `"6343"`. The value is a decimal string, not a hex `Quantity` — use [`eth_chainId`](./eth_chainId.md) when you need the chain ID for transaction signing.
 
-## Ethereum Standard
+## Parameters
 
-`net_version() -> string`
+None.
 
-## MegaETH Differences
-
-- Returns `"4326"` on mainnet and `"6343"` on testnet.
-- The return value is a decimal string, not a hex `Quantity`. Use [`eth_chainId`](./eth_chainId.md) when you need the chain ID for transaction signing.
-
-## Request
-
-No parameters.
-
-## Response
+## Returns
 
 | Field | Type | Notes |
 |---|---|---|
 | `result` | `string` | Network ID as a decimal integer string |
+
+## Errors
+
+Standard JSON-RPC errors only. See [Error reference](../errors.md).
 
 ## Example
 

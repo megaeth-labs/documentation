@@ -4,24 +4,26 @@ Simulates a transaction against a given block's state and returns the result wit
 
 ## Parameters
 
-Pass `params` as `[transaction, block, stateOverride, blockOverrides]`. Only `transaction` is required.
+| Position | Name | Type | Required | Notes |
+|---|---|---|---|---|
+| `0` | `transaction` | `object` | Yes | Call parameters |
+| `1` | `block` | `string` | No | Execution context |
+| `2` | `stateOverride` | `object` | No | Per-account overrides |
+| `3` | `blockOverrides` | `object` | No | Block-environment overrides |
 
 ### `transaction`
 
-Describes the simulated transaction.
-
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| `to` | `Data` (20 bytes) | Yes | Target contract address |
-| `from` | `Data` (20 bytes) | No | Sender address. Set explicitly when `msg.sender` matters |
-| `input` | `Data` | No | Calldata. MegaETH also accepts `data`, but prefer `input` for portability |
-| `value` | `Quantity` | No | Wei to send with the call |
-| `gas` | `Quantity` | No | Gas limit for the simulation |
-| `gasPrice` | `Quantity` | No | Legacy gas price. Cannot be combined with EIP-1559 fee fields |
-| `maxFeePerGas` | `Quantity` | No | EIP-1559 max fee. Cannot be combined with `gasPrice` |
-| `maxPriorityFeePerGas` | `Quantity` | No | EIP-1559 priority fee. Cannot be combined with `gasPrice` |
-
-See the [types reference](../types.md#transactioncall) for the complete field list.
+| `from` | `Address` | No | Caller; set explicitly when `msg.sender` matters |
+| `to` | `Address \| null` | No | Target; `null` for create simulation |
+| `value` | `Quantity` | No | Native value sent |
+| `input` | `Data` | No | Calldata; `data` is also accepted but `input` is preferred. If both are present they must be identical |
+| `gas` | `Quantity` | No | Gas cap |
+| `gasPrice` | `Quantity` | No | Legacy fee; do not mix with EIP-1559 fields |
+| `maxFeePerGas` | `Quantity` | No | EIP-1559 max fee |
+| `maxPriorityFeePerGas` | `Quantity` | No | EIP-1559 tip cap |
+| ... | | | See [`TransactionCall`](../types.md#transactioncall) for the complete field list |
 
 ### `block`
 
@@ -29,15 +31,16 @@ Block state to simulate against. Accepts a hex block number or one of: `"earlies
 
 ### `stateOverride`
 
-Temporary account-level overrides applied only for this simulation. Keyed by address.
+Temporary account-level overrides applied only for this simulation. Object keyed by address; each value contains:
 
 | Field | Type | Notes |
 |---|---|---|
 | `balance` | `Quantity` | Override the account balance |
 | `nonce` | `Quantity` | Override the account nonce |
 | `code` | `Data` | Override the account bytecode |
-| `state` | `Object` | Replace the entire storage (slot → value mapping). Cannot be combined with `stateDiff` |
-| `stateDiff` | `Object` | Patch individual storage slots without replacing the full state. Cannot be combined with `state` |
+| `state` | `Object` | Replace the account's full storage (slot → value mapping); mutually exclusive with `stateDiff` |
+| `stateDiff` | `Object` | Patch individual storage slots; mutually exclusive with `state` |
+| `movePrecompileToAddress` | `Address` | Move a precompile to the specified address before `code` is applied |
 
 ### `blockOverrides`
 
@@ -48,14 +51,17 @@ Temporary block-environment overrides applied only for this simulation.
 | `number` | `Quantity` | Override `block.number` |
 | `time` | `Quantity` | Override `block.timestamp` |
 | `gasLimit` | `Quantity` | Override `block.gasLimit` |
-| `feeRecipient` | `Data` (20 bytes) | Override `block.coinbase` |
+| `feeRecipient` | `Address` | Override `block.coinbase` |
+| `prevRandao` | `Quantity` | Override randomness |
 | `baseFeePerGas` | `Quantity` | Override `block.baseFee` |
+| `withdrawals` | `Withdrawal[]` | Override withdrawals |
+| `blobBaseFee` | `Quantity` | Override blob base fee |
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | [`Data`](../types.md#data) | Raw return bytes from the call. `0x` is a valid result (e.g., calls to non-contract addresses). Reverts surface as JSON-RPC errors, not as a normal `result` |
+| Type | Notes |
+|---|---|
+| `Data` | Raw return bytes from the call. `0x` is valid for successful calls to non-contract addresses. Reverts surface as JSON-RPC errors, not as a normal result |
 
 ## Errors
 

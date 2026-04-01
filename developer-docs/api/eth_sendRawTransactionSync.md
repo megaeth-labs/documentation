@@ -1,53 +1,36 @@
 # eth_sendRawTransactionSync
 
-Submits a signed transaction and waits until the endpoint can return a receipt.
+Submits a signed transaction and returns a [`Receipt`](../types.md#receipt) once the transaction is included in a canonical block. Defined by draft EIP-7966; a returned receipt reflects inclusion at response time, not finality.
 
-## Ethereum Standard
+## Parameters
 
-`eth_sendRawTransactionSync(rawTx[, timeoutMs]) -> Receipt`
+| Position | Name | Type | Required | Notes |
+|---|---|---|---|---|
+| `0` | `data` | [`Data`](../types.md#data) | Yes | Signed raw transaction bytes |
+| `1` | `timeoutMs` | `number` | No | Positive client wait budget in milliseconds |
 
-This method is defined by draft EIP-7966. It is not part of the standard Ethereum execution-apis method set. The result is a [`Receipt`](../types.md#receipt), not a transaction hash.
-
-## MegaETH Differences
-
-- MegaETH supports this method as an extension.
-- Success means the transaction has a receipt in a canonical block at response time, not that it is finalized.
-- Invalid `timeoutMs` values currently return `-32602`.
-- On timeout, MegaETH currently returns `-32000` with a timeout message instead of an EIP-specific timeout code.
-
-## Request
-
-Send `params` as `[rawTx]` or `[rawTx, timeoutMs]`.
-
-| Position | Type | Required | Notes |
-|---|---|---|---|
-| `0` | [`Data`](../types.md#data) | Yes | Signed raw transaction bytes as a `0x`-prefixed hex string |
-| `1` | `number` | No | Positive client wait budget in milliseconds |
-
-Reader notes:
-
-- `rawTx` must already be fully signed for the target chain.
-- Precompute and store the transaction hash before sending the request.
-- `timeoutMs` only limits how long the call waits for inclusion feedback.
-
-## Response
+## Returns
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Receipt`](../types.md#receipt) | Receipt for the included transaction |
+| `transactionHash` | `TransactionHash` | Transaction hash |
+| `status` | `Quantity` | `0x1` success; `0x0` failure (the transaction reverted but was included on-chain) |
+| `blockHash` | `BlockHash` | Containing block hash |
+| `blockNumber` | `Quantity` | Containing block number |
+| `from` | `Address` | Sender |
+| `to` | `Address \| null` | Recipient; `null` for contract creation |
+| `gasUsed` | `Quantity` | Gas consumed by this transaction |
+| `effectiveGasPrice` | `Quantity` | Effective gas price |
+| `contractAddress` | `Address \| null` | Created contract address when applicable |
+| `logs` | [`Log[]`](../types.md#log) | Emitted log entries |
+| ... | | See [`Receipt`](../types.md#receipt) for the complete field list |
 
-Reader notes:
+## Errors
 
-- `status: 0x0` still means the JSON-RPC call succeeded and the transaction reached chain execution; the transaction itself reverted.
-- A returned receipt reflects canonical inclusion at response time, not finality.
-- A timeout error is inconclusive. The transaction can still be included later.
-
-## Common Errors
-
-| Code | When it usually happens | What to do |
+| Code | Cause | Fix |
 |---|---|---|
-| `-32602` | The raw transaction is malformed, undecodable, or `timeoutMs` is invalid | Fix the request before retrying |
-| `-32000` | The receipt was not available before the wait window expired, or the node rejected the signed transaction | Treat timeout as inconclusive; otherwise inspect the error message and fix or replace the transaction |
+| `-32602` | Raw transaction is malformed, undecodable, or `timeoutMs` is invalid | Fix the request |
+| `-32000` | Receipt not available before the wait window expired, or the node rejected the transaction | Treat as inconclusive — the transaction may still land; inspect the error message |
 
 See also [Error reference](../errors.md).
 
@@ -73,25 +56,25 @@ curl -sS https://mainnet.megaeth.com/rpc \
   "id": 91,
   "result": {
     "type": "0x0",
-    "status": "0x1",
+    "status": "0x1",                    // (success)
     "transactionHash": "0x8d3b1e22e7a9026c8658b5d922293d59e4de7c3382bb832d6890e6ab23ad7ec7",
-    "transactionIndex": "0x5",
+    "transactionIndex": "0x5",          // (5)
     "blockHash": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-    "blockNumber": "0xe7133c",
+    "blockNumber": "0xe7133c",          // (15,143,740)
     "from": "0xcc4b43ab7230cc5913801a746c1834aa06c4e7e7",
     "to": "0xcc4b43ab7230cc5913801a746c1834aa06c4e7e7",
-    "gasUsed": "0xea60",
-    "effectiveGasPrice": "0xf4240",
-    "cumulativeGasUsed": "0x143043",
+    "gasUsed": "0xea60",                // (60,000)
+    "effectiveGasPrice": "0xf4240",     // (1,000,000 wei)
+    "cumulativeGasUsed": "0x143043",    // (1,323,075)
     "contractAddress": null,
     "logs": [],
     "logsBloom": "0x000...000",
-    "l1GasPrice": "0x3216",
-    "l1GasUsed": "0x640",
-    "l1Fee": "0x6da0",
-    "l1BaseFeeScalar": "0x558",
-    "l1BlobBaseFee": "0x1",
-    "l1BlobBaseFeeScalar": "0x0"
+    "l1GasPrice": "0x3216",             // (12,822 wei)
+    "l1GasUsed": "0x640",              // (1,600)
+    "l1Fee": "0x6da0",                 // (28,064 wei)
+    "l1BaseFeeScalar": "0x558",        // (1,368)
+    "l1BlobBaseFee": "0x1",            // (1)
+    "l1BlobBaseFeeScalar": "0x0"       // (0)
   }
 }
 ```

@@ -1,71 +1,45 @@
 # mega_outputAtBlock
 
-Returns output data for a specific MegaETH block.
+Returns the L2 output commitment for a given block, including the output root, state root, and current sync status. Used by bridges and verifiers to construct withdrawal proofs on L1. `optimism_outputAtBlock` is an alias with identical behavior.
 
-## Ethereum Standard
+## Parameters
 
-This method is not part of the standard Ethereum JSON-RPC method set.
+| Position | Name | Type | Required | Notes |
+|---|---|---|---|---|
+| `0` | `blockNumber` | [`Quantity`](../types.md#quantity) | Yes | Concrete hex block number; block tags such as `latest` are not accepted |
 
-## MegaETH Differences
-
-- This is a MegaETH-specific method.
-- `optimism_outputAtBlock` is an alias for this method with identical behavior.
-- The request requires a concrete hex block number. Block tags such as `latest` are not accepted.
-- Numeric members inside `blockRef` and observed `syncStatus` fields are JSON numbers, not Ethereum [`Quantity`](../types.md#quantity) strings.
-
-## Request
-
-Send `params` as `[blockNumber]`.
-
-| Position | Type | Required | Notes |
-|---|---|---|---|
-| `0` | [`Quantity`](../types.md#quantity) | Yes | Concrete hex block number only |
-
-
-## Response
+## Returns
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`OutputAtBlockResult`](../types.md#outputatblockresult) | Output object for the requested block |
+| `version` | `Data (32 bytes)` | Output version; may be omitted on cache-hit paths |
+| `outputRoot` | `Data (32 bytes)` | Output commitment |
+| `blockRef` | `object` | Block reference; see fields below |
+| `withdrawalStorageRoot` | `Data (32 bytes)` | Withdrawal storage root |
+| `stateRoot` | `Data (32 bytes)` | State root |
+| `syncStatus` | `object` | Backend sync-status snapshot |
 
-Reader notes:
+**`blockRef` fields:**
 
-- `version` can be omitted on cache-hit paths.
-- `blockRef.number` and `blockRef.timestamp` are JSON numbers, not `Quantity` strings.
-- `syncStatus` is always present. It is a live backend snapshot and can change between repeated calls for the same block.
-
-### `syncStatus` Shape
-
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| `current_l1` | `L1BlockRef` | Yes | Current L1 head tracked by the backend |
-| `current_l1_finalized` | `L1BlockRef` | Yes | Current L1 finalized block |
-| `head_l1` | `L1BlockRef` | Yes | Head L1 block |
-| `safe_l1` | `L1BlockRef` | Yes | Safe L1 block |
-| `finalized_l1` | `L1BlockRef` | Yes | Finalized L1 block |
-| `unsafe_l2` | `L2BlockRef` | Yes | Unsafe L2 block |
-| `safe_l2` | `L2BlockRef` | Yes | Safe L2 block |
-| `finalized_l2` | `L2BlockRef` | Yes | Finalized L2 block |
-| `pending_safe_l2` | `L2BlockRef` | No | Pending safe L2 block when present |
-| `queued_unsafe_l2` | `L2BlockRef` | No | Queued unsafe L2 block when present |
-
-`L1BlockRef`: `{ hash, number, parentHash, timestamp }` — all numeric fields are JSON numbers, not `Quantity` strings. Field names use `snake_case`.
-
-`L2BlockRef`: `{ hash, number, parentHash, timestamp, l1origin: { hash, number }, sequenceNumber }` — same encoding rules as `L1BlockRef`.
-
-## Common Errors
-
-| Code | When it usually happens | What to do |
+| Field | Type | Notes |
 |---|---|---|
-| `-32602` | The request is missing the block number, uses the wrong parameter count, or sends a block tag instead of a hex block number | Fix the request before retrying |
-| `-32603` | The backend cannot produce output data for that request | Retry transient failures and inspect the message for backend details |
-| `-32005` | The public endpoint rate-limited the request | Back off and retry later |
+| `hash` | `Data (32 bytes)` | Block hash |
+| `number` | `number` | Block number (JSON number) |
+| `parentHash` | `Data (32 bytes)` | Parent block hash |
+| `timestamp` | `number` | Block timestamp (JSON number) |
+| `l1origin` | `object` | L1 origin with `hash` and `number` |
+| `sequenceNumber` | `number` | Sequence number |
+
+## Errors
+
+| Code | Cause | Fix |
+|---|---|---|
+| `-32602` | Missing block number, wrong parameter count, or block tag instead of hex block number | Fix the request parameters |
+| `-32603` | Backend cannot produce output data for the requested block | Retry transient failures; inspect the error message for details |
 
 See also [Error reference](../errors.md).
 
-## Examples
-
-### Successful response
+## Example
 
 ```bash
 curl -sS https://mainnet.megaeth.com/rpc \
@@ -152,4 +126,3 @@ curl -sS https://mainnet.megaeth.com/rpc \
   }
 }
 ```
-

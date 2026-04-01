@@ -1,20 +1,20 @@
 # web3_clientVersion
 
-Returns the current client version string.
+Returns the current client version string, including the client name, version number, and build target.
 
-## Ethereum Standard
+## Parameters
 
-`web3_clientVersion() -> string`
+None.
 
-## Request
-
-No parameters.
-
-## Response
+## Returns
 
 | Field | Type | Notes |
 |---|---|---|
 | `result` | `string` | Client name, version, and build target |
+
+## Errors
+
+Standard JSON-RPC errors only. See [Error reference](../errors.md).
 
 ## Example
 

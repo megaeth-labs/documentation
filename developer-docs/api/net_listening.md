@@ -1,24 +1,22 @@
+
+
 # net_listening
 
 Returns whether the node is accepting incoming connections.
 
-## Ethereum Standard
+## Parameters
 
-`net_listening() -> bool`
+None.
 
-## MegaETH Differences
-
-- Always returns `true` on the public endpoint regardless of actual peer connectivity.
-
-## Request
-
-No parameters.
-
-## Response
+## Returns
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | `bool` | Fixed value `true` |
+| `result` | `boolean` | Always `true` |
+
+## Errors
+
+Standard JSON-RPC errors only. See [Error reference](../errors.md).
 
 ## Example
 

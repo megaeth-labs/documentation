@@ -1,37 +1,37 @@
 # eth_getTransactionByHash
 
-Returns a transaction selected by transaction hash.
+Returns the transaction with the given hash, or `null` if no matching transaction is found.
 
-## Ethereum Standard
+## Parameters
 
-`eth_getTransactionByHash(transactionHash) -> Transaction | null`
+| Position | Name | Type | Required | Notes |
+|---|---|---|---|---|
+| `0` | `transactionHash` | [`TransactionHash`](../types.md#transactionhash) | Yes | Target transaction hash |
 
-## Request
+## Returns
 
-Send `params` as `[transactionHash]`.
-
-| Position | Type | Required | Notes |
-|---|---|---|---|
-| `0` | [`TransactionHash`](../types.md#transactionhash) | Yes | Target transaction hash |
-
-- Some non-canonical short hashes have returned `null` on public MegaETH endpoints; do not rely on server-side validation alone.
-
-## Response
+`Transaction | null` — `null` when the transaction cannot be found.
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Transaction`](../types.md#transaction) or `null` | Selected transaction object |
+| `hash` | `TransactionHash` | Transaction hash |
+| `type` | `Quantity` | Transaction type identifier |
+| `from` | `Address` | Sender |
+| `to` | `Address \| null` | Recipient; `null` for contract creation |
+| `value` | `Quantity` | Transfer value in wei |
+| `nonce` | `Quantity` | Sender nonce |
+| `gas` | `Quantity` | Gas limit |
+| `input` | `Data` | Calldata |
+| `blockHash` | `BlockHash \| null` | `null` for pending transactions |
+| `blockNumber` | `Quantity \| null` | `null` for pending transactions |
+| `transactionIndex` | `Quantity \| null` | `null` for pending transactions |
+| ... | | See [`Transaction`](../types.md#transaction) for the complete field list |
 
-- `result: null` when the transaction cannot be found.
-- For pending transactions, `blockHash`, `blockNumber`, and `transactionIndex` can be `null`.
-- `to` is `null` for contract-creation transactions.
+## Errors
 
-## Common Errors
-
-| Code | When it usually happens | What to do |
+| Code | Cause | Fix |
 |---|---|---|
-| `-32602` | The transaction hash is missing or malformed | Fix the request before retrying |
-| `-32005` | The public endpoint rate-limited the request | Back off and retry later |
+| `-32602` | Transaction hash is missing or malformed | Fix the request |
 
 See also [Error reference](../errors.md).
 

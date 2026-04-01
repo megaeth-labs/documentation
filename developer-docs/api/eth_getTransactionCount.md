@@ -1,44 +1,27 @@
 # eth_getTransactionCount
 
-Returns the account nonce at a selected block.
+Returns the account nonce for a given address at a specified block.
 
-## Ethereum Standard
+## Parameters
 
-`eth_getTransactionCount(address, block) -> Quantity`
+| Position | Name | Type | Required | Notes |
+|---|---|---|---|---|
+| `0` | `address` | [`Address`](../types.md#address) | Yes | Target account address |
+| `1` | `block` | [`BlockNumberOrTag`](../types.md#blocknumberortag) | No | Default: `latest` |
 
-## MegaETH Differences
+## Returns
 
-- The public MegaETH endpoint currently accepts an omitted `block` parameter and treats it as `latest`.
-- That omitted-`block` behavior is a MegaETH convenience, not portable Ethereum JSON-RPC behavior.
-- On MegaETH, `pending` currently behaves the same as `latest` for this method.
+| Type | Notes |
+|---|---|
+| [`Quantity`](../types.md#quantity) | Account nonce at the requested block. Returns `0x0` for both unknown accounts and zero-nonce accounts. |
 
-## Request
+## Errors
 
-Send `params` as `[address, block]`.
-
-| Position | Type | Required | Notes |
-|---|---|---|---|
-| `0` | [`Address`](../types.md#address) | Yes | Target account address |
-| `1` | [`BlockReferenceString`](../types.md#blockreferencestring) | Yes for portable clients | Accepts `earliest`, `latest`, `pending`, `safe`, `finalized`, a hex block number, or a block hash string |
-
-- This is the account nonce stored in state, not a count of externally observed transactions.
-
-## Response
-
-| Field | Type | Notes |
+| Code | Cause | Fix |
 |---|---|---|
-| `result` | [`Quantity`](../types.md#quantity) | Account nonce at the selected block |
-
-- Unknown accounts and zero-nonce accounts both return `0x0`.
-
-## Common Errors
-
-| Code | When it usually happens | What to do |
-|---|---|---|
-| `-32602` | The address or block selector is malformed | Fix the request before retrying |
-| `-32001` | The block selector cannot be resolved | Check the block number, block hash, or network |
-| `4444` | The endpoint cannot serve the requested historical state | Keep the request unchanged and verify historical-state availability for that endpoint |
-| `-32005` | The public endpoint rate-limited the request | Back off and retry later |
+| `-32602` | Malformed address or block selector | Fix the request |
+| `-32001` | Block selector cannot be resolved | Verify the block number or hash |
+| `4444` | Requested historical state is unavailable | Verify historical-state availability for the endpoint |
 
 See also [Error reference](../errors.md).
 
@@ -50,6 +33,6 @@ curl -sS https://mainnet.megaeth.com/rpc \
   --data '{"jsonrpc":"2.0","id":91,"method":"eth_getTransactionCount","params":["0xa344fb2d117501ee379d2ea9c0c016959ad94f1e","0xb120c6"]}'
 ```
 
-```json
-{"jsonrpc":"2.0","id":91,"result":"0xfa8c"}
+```jsonc
+{"jsonrpc":"2.0","id":91,"result":"0xfa8c"}  // nonce 64,140 (block 11,608,262)
 ```

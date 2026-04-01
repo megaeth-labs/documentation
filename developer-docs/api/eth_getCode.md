@@ -1,42 +1,27 @@
 # eth_getCode
 
-Returns the runtime bytecode stored at an address at a selected block.
+Returns the runtime bytecode stored at an address at a given block.
 
-## Ethereum Standard
+## Parameters
 
-`eth_getCode(address, block) -> Data`
+| Position | Name | Type | Required | Notes |
+|---|---|---|---|---|
+| `0` | `address` | [`Address`](../types.md#address) | Yes | Target account or contract address |
+| `1` | `block` | [`BlockReferenceString`](../types.md#blockreferencestring) | No | Block selector (`earliest`, `latest`, `pending`, `safe`, `finalized`, hex block number, or block hash). Default: `latest` |
 
-## MegaETH Differences
-
-- The public MegaETH endpoint currently accepts an omitted `block` parameter and treats it as `latest`.
-- That omitted-`block` behavior is a MegaETH convenience, not portable Ethereum JSON-RPC behavior.
-
-## Request
-
-Send `params` as `[address, block]`.
-
-| Position | Type | Required | Notes |
-|---|---|---|---|
-| `0` | [`Address`](../types.md#address) | Yes | Target account or contract address |
-| `1` | [`BlockReferenceString`](../types.md#blockreferencestring) | Yes for portable clients | Accepts `earliest`, `latest`, `pending`, `safe`, `finalized`, a hex block number, or a block hash string |
-
-## Response
+## Returns
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Data`](../types.md#data) | Runtime bytecode at the selected address and block |
+| `result` | [`Data`](../types.md#data) | Runtime bytecode (not creation bytecode) at the address; `0x` when no code is deployed |
 
-- `0x` means the address has no deployed runtime bytecode at the selected block.
-- Non-empty results are runtime bytecode, not creation bytecode.
+## Errors
 
-## Common Errors
-
-| Code | When it usually happens | What to do |
+| Code | Cause | Fix |
 |---|---|---|
-| `-32602` | The address or block selector is malformed | Fix the request before retrying |
-| `-32001` | The block selector cannot be resolved | Check the block number, block hash, or network |
-| `4444` | The endpoint cannot serve the requested historical state | Keep the request unchanged and verify historical-state availability for that endpoint |
-| `-32005` | The public endpoint rate-limited the request | Back off and retry later |
+| `-32602` | Malformed address or block selector | Fix the request |
+| `-32001` | Block selector cannot be resolved | Verify the block number or hash |
+| `4444` | Requested historical state is unavailable | Verify historical-state availability for the endpoint |
 
 See also [Error reference](../errors.md).
 

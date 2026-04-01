@@ -1,57 +1,51 @@
 # eth_createAccessList
 
-Simulates a transaction and returns the accessed addresses and storage keys.
+Simulates a transaction and returns the EIP-2930 access list of addresses and storage keys touched during execution, along with the gas estimate.
 
-## Ethereum Standard
+## Parameters
 
-`eth_createAccessList(transaction, block?) -> CreateAccessListResult`
+| Position | Name | Type | Required | Notes |
+|---|---|---|---|---|
+| `0` | `transaction` | `object` | Yes | Transaction to simulate |
+| `1` | `block` | `string` | No | Execution context |
 
-## MegaETH Differences
+### `transaction`
 
-- MegaETH currently accepts both `input` and `data` as calldata field names.
-- The public MegaETH endpoint currently accepts an omitted `block` parameter.
-- If you provide an `accessList`, MegaETH uses it as a seed and augments it with any additional addresses and storage slots discovered during simulation.
-- MegaETH can report some execution failures inside `result.error` while still returning `accessList` and `gasUsed`.
-
-## Request
-
-Portable clients should send `params` as `[transaction, block]`.
-
-| Position | Type | Required | Notes |
+| Field | Type | Required | Notes |
 |---|---|---|---|
-| `0` | [`TransactionCall`](../types.md#transactioncall) | Yes | Simulation transaction object |
-| `1` | [`BlockReferenceString`](../types.md#blockreferencestring) | No | Execution context |
+| `from` | `Address` | No | Caller |
+| `to` | `Address \| null` | No | Target; `null` for create simulation |
+| `value` | `Quantity` | No | Native value sent |
+| `input` | `Data` | No | Calldata; prefer over `data` |
+| `gas` | `Quantity` | No | Gas cap |
+| `gasPrice` | `Quantity` | No | Legacy fee; do not mix with EIP-1559 fields |
+| `maxFeePerGas` | `Quantity` | No | EIP-1559 max fee |
+| `maxPriorityFeePerGas` | `Quantity` | No | EIP-1559 tip cap |
+| ... | | | See [`TransactionCall`](../types.md#transactioncall) for the complete field list |
 
-Reader notes:
+### `block`
 
-- Prefer `input` for portable client behavior.
-- Use either `gasPrice` or EIP-1559 fee fields, not both.
-- For contract creation, omit `to` and place init code in `input`.
-- Do not set `gas` unless you intentionally want to cap the simulation.
-- Use an explicit block selector when you need portable or reproducible behavior.
+Execution context. Accepts a hex block number or one of: `"earliest"`, `"latest"`, `"pending"`, `"safe"`, `"finalized"`. Default: `"latest"`.
 
-## Response
+## Returns
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`CreateAccessListResult`](../types.md#createaccesslistresult) | Generated access list, gas used, and possibly `error` |
+| `accessList` | [`AccessListEntry[]`](../types.md#accesslistentry) | Generated EIP-2930 access list |
+| `gasUsed` | `Quantity` | Gas with the generated access list applied |
+| `error` | `string` | Execution error when the call reverts; may coexist with `accessList` and `gasUsed` |
 
-- Check both top-level JSON-RPC errors and `result.error`. Not all failures use the same channel.
+## Errors
 
-## Common Errors
-
-| Code | When it usually happens | What to do |
+| Code | Cause | Fix |
 |---|---|---|
-| `-32602` | The transaction object or block selector is malformed | Fix the request before retrying |
-| `-32000` | A pre-execution check failed, such as intrinsic gas being too low | Raise or remove the gas cap and retry only after fixing the request |
-| `-32003` | The sender cannot cover gas and value in the selected state | Fund the sender or lower the value or fee requirements |
-| `-32005` | The public endpoint rate-limited the request | Back off and retry later |
+| `-32602` | Malformed transaction object or block selector | Fix the request |
+| `-32000` | Pre-execution check failed (e.g. intrinsic gas too low) | Raise or remove the gas cap |
+| `-32003` | Sender cannot cover gas and value in the selected state | Fund the sender or lower the value/fee |
 
 See also [Error reference](../errors.md).
 
-## Examples
-
-### Successful simulation
+## Example
 
 ```bash
 curl -sS https://mainnet.megaeth.com/rpc \
@@ -60,27 +54,12 @@ curl -sS https://mainnet.megaeth.com/rpc \
 ```
 
 ```json
-{"jsonrpc":"2.0","id":7,"result":{"accessList":[],"gasUsed":"0xea60"}}
-```
-
-### Execution failure carried inside `result.error`
-
-Some simulations still return a normal top-level `result` object even when execution halts after it starts:
-
-```json
 {
   "jsonrpc": "2.0",
-  "id": 8,
+  "id": 7,
   "result": {
-    "accessList": [
-      {
-        "address": "0x1111111111111111111111111111111111111111",
-        "storageKeys": []
-      }
-    ],
-    "gasUsed": "0x186a0",
-    "error": "execution reverted"
+    "accessList": [],
+    "gasUsed": "0xea60"
   }
 }
 ```
-

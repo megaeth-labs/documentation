@@ -1,18 +1,20 @@
 # eth_blockNumber
 
-Returns the current head block number known to the endpoint.
+Returns the number of the most recent block known to the node.
 
-`eth_blockNumber() -> Quantity` — no parameters.
+## Parameters
 
-## Response
+None.
+
+## Returns
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Quantity`](../types.md#quantity) | Current head block number |
+| `result` | [`Quantity`](../types.md#quantity) | Current head block number; advances with each new block |
 
-- The value is a moving head, not a finality signal.
+## Errors
 
-For error handling, see [Error reference](../errors.md).
+Standard JSON-RPC errors only. See [Error reference](../errors.md).
 
 ## Example
 
@@ -22,6 +24,6 @@ curl -sS https://mainnet.megaeth.com/rpc \
   --data '{"jsonrpc":"2.0","id":21,"method":"eth_blockNumber","params":[]}'
 ```
 
-```json
-{"jsonrpc":"2.0","id":21,"result":"0xaeb3d6"}
+```jsonc
+{"jsonrpc":"2.0","id":21,"result":"0xaeb3d6"}  // block 11,449,302
 ```

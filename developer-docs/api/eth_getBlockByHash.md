@@ -1,51 +1,36 @@
 # eth_getBlockByHash
 
-Returns a block selected by block hash.
+Returns the block with the given hash, or `null` if no block matches.
 
-## Ethereum Standard
+## Parameters
 
-`eth_getBlockByHash(blockHash, fullTransactions) -> Block | null`
+| Position | Name | Type | Required | Notes |
+|---|---|---|---|---|
+| `0` | `blockHash` | [`BlockHash`](../types.md#blockhash) | Yes | Target block hash |
+| `1` | `fullTransactions` | `boolean` | No | `false` (default) returns transaction hashes; `true` returns full transaction objects |
 
-## MegaETH Differences
+## Returns
 
-- The public MegaETH endpoint currently accepts an omitted `fullTransactions` parameter and treats it as `false`.
-- That omitted-boolean behavior is a MegaETH convenience, not portable Ethereum JSON-RPC behavior.
-- If you only need header fields, prefer [`eth_getHeaderByHash`](./eth_getHeaderByHash.md).
-
-## Request
-
-Send `params` as `[blockHash, fullTransactions]`.
-
-| Position | Type | Required | Notes |
-|---|---|---|---|
-| `0` | [`BlockHash`](../types.md#blockhash) | Yes | Target block hash |
-| `1` | `boolean` | Yes for portable clients | `false` returns transaction hashes; `true` returns full transaction objects |
-
-Reader notes:
-
-- Send `fullTransactions` explicitly if you want portable client behavior.
-- Block tags such as `latest` or `pending` do not apply here.
-- Keep `fullTransactions = false` unless you actually need full transaction objects.
-
-## Response
+`Block | null` — `null` when the hash is well-formed but does not match any block.
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Block`](../types.md#block) or `null` | Selected block object |
+| `number` | `Quantity` | Block number |
+| `hash` | `BlockHash` | Block hash |
+| `parentHash` | `BlockHash` | Parent block hash |
+| `timestamp` | `Quantity` | Block timestamp |
+| `miner` | `Address` | Fee recipient / coinbase |
+| `gasLimit` | `Quantity` | Block gas limit |
+| `gasUsed` | `Quantity` | Gas consumed by the block |
+| `transactions` | `TransactionHash[] \| Transaction[]` | Hashes when `fullTransactions = false`; full objects when `true` |
+| ... | | See [`Block`](../types.md#block) for the complete field list |
 
-Reader notes:
+## Errors
 
-- With `fullTransactions = false`, `result.transactions` is an array of [`TransactionHash`](../types.md#transactionhash) values.
-- With `fullTransactions = true`, `result.transactions` is an array of [`Transaction`](../types.md#transaction) objects.
-- `result: null` is a normal outcome when the hash is well-formed but does not resolve to a block.
-
-## Common Errors
-
-| Code | When it usually happens | What to do |
+| Code | Cause | Fix |
 |---|---|---|
-| `-32602` | The block hash is malformed or `fullTransactions` is not a boolean | Fix the request before retrying |
-| `4444` | The endpoint cannot serve the requested historical block data | Keep the request unchanged and verify historical-state availability for that endpoint |
-| `-32005` | The public endpoint rate-limited the request | Back off and retry later |
+| `-32602` | Block hash is malformed or `fullTransactions` is not a boolean | Fix the request |
+| `4444` | Requested historical block is not available on this endpoint | Verify historical-state availability for the endpoint |
 
 See also [Error reference](../errors.md).
 

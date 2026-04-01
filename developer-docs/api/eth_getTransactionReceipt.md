@@ -1,37 +1,36 @@
 # eth_getTransactionReceipt
 
-Returns the receipt for a transaction after it has been included in a block.
+Returns the receipt for a transaction that has been included in a block, or `null` if the transaction is unknown or pending.
 
-## Ethereum Standard
+## Parameters
 
-`eth_getTransactionReceipt(transactionHash) -> Receipt | null`
+| Position | Name | Type | Required | Notes |
+|---|---|---|---|---|
+| `0` | `transactionHash` | [`TransactionHash`](../types.md#transactionhash) | Yes | Hash of the target transaction |
 
-## Request
+## Returns
 
-Send `params` as `[transactionHash]`.
-
-| Position | Type | Required | Notes |
-|---|---|---|---|
-| `0` | [`TransactionHash`](../types.md#transactionhash) | Yes | Target transaction hash |
-
-- Some non-canonical short hashes have returned `null` on public MegaETH endpoints; do not rely on server-side validation alone.
-
-## Response
+`Receipt | null` — `null` when the transaction is unknown or not yet mined.
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Receipt`](../types.md#receipt) or `null` | Receipt for the selected transaction |
+| `transactionHash` | `TransactionHash` | Transaction hash |
+| `status` | `Quantity` | `0x1` success; `0x0` failure |
+| `blockHash` | `BlockHash` | Containing block hash |
+| `blockNumber` | `Quantity` | Containing block number |
+| `from` | `Address` | Sender |
+| `to` | `Address \| null` | Recipient; `null` for contract creation |
+| `gasUsed` | `Quantity` | Gas consumed by this transaction |
+| `effectiveGasPrice` | `Quantity` | Effective gas price |
+| `contractAddress` | `Address \| null` | Created contract address when applicable |
+| `logs` | [`Log[]`](../types.md#log) | Emitted log entries |
+| ... | | See [`Receipt`](../types.md#receipt) for the complete field list |
 
-- `result: null` when the transaction is unknown or not yet mined.
-- `to` is `null` for contract-creation transactions; `contractAddress` is non-`null` only for contract-creation transactions.
-- MegaETH receipts include L2 fee-accounting fields such as `l1Fee`.
+## Errors
 
-## Common Errors
-
-| Code | When it usually happens | What to do |
+| Code | Cause | Fix |
 |---|---|---|
-| `-32602` | The transaction hash is missing or malformed | Fix the request before retrying |
-| `-32005` | The public endpoint rate-limited the request | Back off and retry later |
+| `-32602` | Transaction hash is missing or malformed | Fix the request |
 
 See also [Error reference](../errors.md).
 

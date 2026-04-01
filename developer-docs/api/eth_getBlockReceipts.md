@@ -1,69 +1,43 @@
 # eth_getBlockReceipts
 
-Returns all receipts for a selected block.
+Returns all transaction receipts for a given block, or `null` if the block is not found.
 
-## Ethereum Standard
+## Parameters
 
-`eth_getBlockReceipts(block) -> Receipt[] | null`
+| Position | Name | Type | Required | Notes |
+|---|---|---|---|---|
+| `0` | `block` | [`BlockNumberOrTagOrHash`](../types.md#blocknumberortagorhash) | Yes | Block number, tag (`earliest`, `latest`, `safe`, `finalized`, `pending`), block hash, or `{"blockHash":"0x…"}` selector object |
 
-## MegaETH Differences
+## Returns
 
-- The public MegaETH endpoint currently accepts the standard string selector forms plus an EIP-1898-style [`BlockHashSelector`](../types.md#blockhashselector) object such as `{"blockHash":"0x..."}`.
-- On the public MegaETH endpoint, `pending` currently returns `null`.
-- This method is `io_heavy` on public MegaETH gateways. Large blocks can still hit response-size and rate-limit constraints. See [Operations and limits](../operations/limits.md).
+`Receipt[] | null` — receipts for every transaction in the block. Returns `null` when the block is not found. Returns `[]` when the block exists but contains no transactions.
 
-## Request
-
-Send `params` as `[block]`.
-
-| Position | Type | Required | Notes |
-|---|---|---|---|
-| `0` | [`BlockNumberOrTagOrHash`](../types.md#blocknumberortagorhash) | Yes | Accepts `earliest`, `latest`, `pending`, `safe`, `finalized`, a hex block number, a 32-byte block hash string, or a MegaETH-supported `{blockHash}` selector object |
-
-Reader notes:
-
-- Use a fixed block number or block hash when you need deterministic results.
-- Portable clients should prefer the standard string forms first.
-- `pending` is not a portable way to fetch speculative receipts; on the public MegaETH endpoint it currently returns `null`.
-
-## Response
+Each array element contains:
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Receipt`](../types.md#receipt)`[]` or `null` | Receipts for every transaction in the selected block |
+| `transactionHash` | `TransactionHash` | Transaction hash |
+| `status` | `Quantity` | `0x1` success; `0x0` failure |
+| `blockHash` | `BlockHash` | Containing block hash |
+| `blockNumber` | `Quantity` | Containing block number |
+| `from` | `Address` | Sender |
+| `to` | `Address \| null` | Recipient; `null` for contract creation |
+| `gasUsed` | `Quantity` | Gas consumed by this transaction |
+| `effectiveGasPrice` | `Quantity` | Effective gas price |
+| `contractAddress` | `Address \| null` | Created contract address when applicable |
+| `logs` | [`Log[]`](../types.md#log) | Emitted log entries |
+| ... | | See [`Receipt`](../types.md#receipt) for the complete field list |
 
-Reader notes:
+## Errors
 
-- `result: []` is a normal success when the selected block exists but contains no transactions. `0x0` and `earliest` can return `[]`.
-- `result: null` is a normal success when the selector is well-formed but does not resolve to an available block. On public MegaETH this includes `pending`, future block numbers, and unknown block hashes.
-- Each array item is a full receipt object. Receipt fields can include MegaETH fee-accounting extensions such as `l1GasPrice` and `l1Fee`.
-- Nested log objects can include MegaETH `blockTimestamp` fields when exposed by the serving layer.
-
-## Common Errors
-
-| Code | When it usually happens | What to do |
+| Code | Cause | Fix |
 |---|---|---|
-| `-32602` | The block selector is malformed, missing, or uses an unsupported object shape | Fix the selector before retrying |
-| `4444` | The endpoint cannot serve the requested historical block data | Keep the request unchanged and verify historical-state availability for that endpoint |
-| `-32005` | The public endpoint rate-limited the request | Back off and retry later |
+| `-32602` | Malformed or unsupported block selector | Fix the request |
+| `4444` | Historical block data unavailable on this endpoint | Verify historical-state availability for the endpoint |
 
-See also [Error reference](../errors.md) and [Operations and limits](../operations/limits.md).
+See also [Error reference](../errors.md).
 
-## Examples
-
-### Empty block by number
-
-```bash
-curl -sS https://mainnet.megaeth.com/rpc \
-  -H 'content-type: application/json' \
-  --data '{"jsonrpc":"2.0","id":12,"method":"eth_getBlockReceipts","params":["0x0"]}'
-```
-
-```json
-{"jsonrpc":"2.0","id":12,"result":[]}
-```
-
-### By block hash selector object
+## Example
 
 ```bash
 curl -sS https://mainnet.megaeth.com/rpc \
@@ -71,7 +45,7 @@ curl -sS https://mainnet.megaeth.com/rpc \
   --data '{"jsonrpc":"2.0","id":16,"method":"eth_getBlockReceipts","params":[{"blockHash":"0x57804c21b747137075b29ce153b4f559345a3624273660c87e81bd57e7cbbc3d"}]}'
 ```
 
-```json
+```jsonc
 {
   "jsonrpc": "2.0",
   "id": 16,
@@ -83,22 +57,22 @@ curl -sS https://mainnet.megaeth.com/rpc \
       "logs": [],
       "depositNonce": "0x0",
       "depositReceiptVersion": "0x1",
-      "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "logsBloom": "0x0000...0000",
       "transactionHash": "0xecc262f36652019b75f4cb7315ff19f430fc92efd5a8048948400407d55fd904",
       "transactionIndex": "0x0",
       "blockHash": "0x57804c21b747137075b29ce153b4f559345a3624273660c87e81bd57e7cbbc3d",
       "blockNumber": "0x1",
-      "gasUsed": "0xb9d56c",
-      "effectiveGasPrice": "0x0",
+      "gasUsed": "0xb9d56c",                // 12,211,564
+      "effectiveGasPrice": "0x0",            // 0 — deposit transaction
       "from": "0xdeaddeaddeaddeaddeaddeaddeaddeaddead0001",
       "to": "0x4200000000000000000000000000000000000015",
       "contractAddress": null,
-      "l1GasPrice": "0x22ba611d",
-      "l1GasUsed": "0x6e7",
+      "l1GasPrice": "0x22ba611d",            // 582,418,717 wei
+      "l1GasUsed": "0x6e7",                 // 1,767
       "l1Fee": "0x0",
-      "l1BaseFeeScalar": "0x558",
-      "l1BlobBaseFee": "0x7",
-      "l1BlobBaseFeeScalar": "0xc5fc5"
+      "l1BaseFeeScalar": "0x558",            // 1,368
+      "l1BlobBaseFee": "0x7",               // 7
+      "l1BlobBaseFeeScalar": "0xc5fc5"      // 810,949
     }
   ]
 }

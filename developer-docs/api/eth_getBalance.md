@@ -1,42 +1,26 @@
 # eth_getBalance
 
-Returns the ETH balance of an account, in wei, at a selected block.
+Returns the ETH balance of an account in wei at a given block.
 
-## Ethereum Standard
+## Parameters
 
-`eth_getBalance(address, block) -> Quantity`
+| Position | Name | Type | Required | Notes |
+|---|---|---|---|---|
+| `0` | `address` | [`Address`](../types.md#address) | Yes | Target account or contract address |
+| `1` | `block` | [`BlockNumberOrTag`](../types.md#blocknumberortag) | No | Block selector. Default: `latest` |
 
-## MegaETH Differences
+## Returns
 
-- The public MegaETH endpoint currently accepts an omitted `block` parameter and treats it as `latest`.
-- That omitted-`block` behavior is a MegaETH convenience, not portable Ethereum JSON-RPC behavior.
-- On MegaETH, `pending` currently behaves the same as `latest` for this method.
+| Type | Notes |
+|---|---|
+| [`Quantity`](../types.md#quantity) | Balance in wei. Returns `0x0` for unknown accounts and zero-balance accounts alike. |
 
-## Request
+## Errors
 
-Send `params` as `[address, block]`.
-
-| Position | Type | Required | Notes |
-|---|---|---|---|
-| `0` | [`Address`](../types.md#address) | Yes | Target account or contract address |
-| `1` | [`BlockReferenceString`](../types.md#blockreferencestring) | Yes for portable clients | Accepts `earliest`, `latest`, `pending`, `safe`, `finalized`, a hex block number, or a block hash string |
-
-## Response
-
-| Field | Type | Notes |
+| Code | Cause | Fix |
 |---|---|---|
-| `result` | [`Quantity`](../types.md#quantity) | Account balance in wei at the selected block |
-
-- Unknown accounts and zero-balance accounts both return `0x0`.
-
-## Common Errors
-
-| Code | When it usually happens | What to do |
-|---|---|---|
-| `-32602` | The address or block selector is malformed | Fix the request before retrying |
-| `-32001` | The block selector cannot be resolved | Check the block number, block hash, or network |
-| `4444` | The endpoint cannot serve the requested historical state | Keep the request unchanged and verify historical-state availability for that endpoint |
-| `-32005` | The public endpoint rate-limited the request | Back off and retry later |
+| `-32001` | Block selector cannot be resolved | Verify the block number or hash |
+| `4444` | Requested historical state is not available | Verify historical-state availability for the endpoint |
 
 See also [Error reference](../errors.md).
 
@@ -48,6 +32,6 @@ curl -sS https://mainnet.megaeth.com/rpc \
   --data '{"jsonrpc":"2.0","id":1,"method":"eth_getBalance","params":["0x0000000000000000000000000000000000000000","latest"]}'
 ```
 
-```json
-{"jsonrpc":"2.0","id":1,"result":"0xe7bc7211178"}
+```jsonc
+{"jsonrpc":"2.0","id":1,"result":"0xe7bc7211178"}  // 15,924,784,399,416 wei
 ```

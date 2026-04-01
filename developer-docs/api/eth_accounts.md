@@ -1,20 +1,22 @@
+
+
 # eth_accounts
 
-Returns the accounts controlled by the RPC node.
+Returns a list of addresses controlled by the RPC node. On public MegaETH endpoints, this always returns an empty list.
 
-`eth_accounts() -> Address[]` — no parameters.
+## Parameters
 
-## MegaETH Differences
+None.
 
-- On public MegaETH endpoints, this always returns `[]`.
+## Returns
 
-## Response
+| Type | Notes |
+|---|---|
+| `Address[]` | Accounts controlled by the RPC node; always empty on public endpoints |
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | [`Address`](../types.md#address)`[]` | Accounts controlled by the RPC node |
+## Errors
 
-For error handling, see [Error reference](../errors.md).
+Standard JSON-RPC errors only. See [Error reference](../errors.md).
 
 ## Example
 

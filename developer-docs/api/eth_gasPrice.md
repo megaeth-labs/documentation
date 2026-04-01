@@ -8,13 +8,13 @@ None.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | [`Quantity`](../types.md#quantity) | Gas price in wei |
+| Type | Notes |
+|---|---|
+| [`Quantity`](../types.md#quantity) | Gas price in wei |
 
 ## Errors
 
-Standard JSON-RPC errors only. See [Error reference](../errors.md) for details.
+Standard JSON-RPC errors only. See [Error reference](../errors.md).
 
 ## Example
 
@@ -24,6 +24,6 @@ curl -sS https://mainnet.megaeth.com/rpc \
   --data '{"jsonrpc":"2.0","id":1,"method":"eth_gasPrice","params":[]}'
 ```
 
-```json
+```jsonc
 {"jsonrpc":"2.0","id":1,"result":"0xf4240"}  // 1,000,000 wei = 0.001 gwei
 ```

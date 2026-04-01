@@ -1,21 +1,33 @@
+
+
 # eth_syncing
 
-Returns whether the endpoint is still syncing.
+Returns whether the node is currently syncing. Returns `false` when fully synced, or a `SyncProgress` object with sync details.
 
-`eth_syncing() -> false | SyncProgress` — no parameters.
+## Parameters
 
-## Response
+None.
 
-| Shape | Meaning |
+## Returns
+
+| Value | Condition |
 |---|---|
-| `false` | The endpoint is not currently syncing |
-| [`SyncProgress`](../types.md#syncprogress) | Sync progress with `startingBlock`, `currentBlock`, and `highestBlock` |
+| `false` | Node is fully synced |
+| `SyncProgress` object | Node is still syncing |
 
-For error handling, see [Error reference](../errors.md).
+When syncing, the result contains:
 
-## Examples
+| Field | Type | Notes |
+|---|---|---|
+| `startingBlock` | `Quantity` | Sync start point |
+| `currentBlock` | `Quantity` | Current progress |
+| `highestBlock` | `Quantity` | Target block |
 
-### Not syncing
+## Errors
+
+Standard JSON-RPC errors only. See [Error reference](../errors.md).
+
+## Example
 
 ```bash
 curl -sS https://mainnet.megaeth.com/rpc \
@@ -24,10 +36,14 @@ curl -sS https://mainnet.megaeth.com/rpc \
 ```
 
 ```json
-{"jsonrpc":"2.0","id":1,"result":false}
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": false
+}
 ```
 
-### Syncing
+When syncing:
 
 ```json
 {

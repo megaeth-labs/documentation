@@ -1,44 +1,25 @@
 # debug_getHistoryTransactionCount
 
-Returns the chain-wide cumulative transaction count at a selected block.
+Returns the chain-wide cumulative transaction count up to and including a given block. This is a MegaETH-specific method — not to be confused with [eth_getTransactionCount](./eth_getTransactionCount.md), which returns a per-account nonce.
 
-## Ethereum Standard
+## Parameters
 
-This method is not part of the standard Ethereum JSON-RPC method set.
+| Position | Name | Type | Required | Notes |
+|---|---|---|---|---|
+| `0` | `block` | [`BlockNumberOrTag`](../types.md#blocknumberortag) | Yes | Hex block number or tag (`earliest`, `latest`, `safe`, `finalized`). `pending` and block hashes are not supported. |
 
-## MegaETH Differences
+## Returns
 
-- This is a MegaETH-specific debug method.
-- The result is a global cumulative chain counter, not an account nonce.
-- Accepted selectors on the public MegaETH mainnet endpoint are hex block numbers and the tags `earliest`, `latest`, `safe`, and `finalized`.
-- `pending` is not supported for this method on the public MegaETH mainnet endpoint.
-- Block hashes are not accepted.
+| Type | Notes |
+|---|---|
+| [`Quantity`](../types.md#quantity) | Cumulative transaction count across all blocks up to the selected block. Consecutive blocks with no transactions return the same value. |
 
-## Request
+## Errors
 
-Send `params` as `[block]`.
-
-| Position | Type | Required | Notes |
-|---|---|---|---|
-| `0` | [`BlockReferenceString`](../types.md#blockreferencestring) | Yes | For this method, use a hex block number or one of `earliest`, `latest`, `safe`, `finalized` |
-
-- Do not confuse with [eth_getTransactionCount](./eth_getTransactionCount.md) which returns per-account nonce.
-
-## Response
-
-| Field | Type | Notes |
+| Code | Cause | Fix |
 |---|---|---|
-| `result` | [`Quantity`](../types.md#quantity) | Total number of transactions recorded on chain up to and including the selected block |
-
-- Chain-wide cumulative counter. An empty block can return the same value as the previous block.
-
-## Common Errors
-
-| Code | When it usually happens | What to do |
-|---|---|---|
-| `-32001` | The requested block selector cannot be resolved, or an unsupported tag such as `pending` was used | Check the selector before retrying |
-| `-32602` | The request uses the wrong parameter shape, such as a block hash | Fix the request before retrying |
-| `-32005` | The public endpoint rate-limited the request | Back off and retry later |
+| `-32001` | Block selector cannot be resolved or unsupported tag such as `pending` was used | Fix the request |
+| `-32602` | Invalid parameter shape, such as passing a block hash | Fix the request |
 
 See also [Error reference](../errors.md).
 
@@ -50,6 +31,6 @@ curl -sS https://mainnet.megaeth.com/rpc \
   --data '{"jsonrpc":"2.0","id":1,"method":"debug_getHistoryTransactionCount","params":["0x12a05f"]}'
 ```
 
-```json
-{"jsonrpc":"2.0","id":1,"result":"0x12cbab"}
+```jsonc
+{"jsonrpc":"2.0","id":1,"result":"0x12cbab"}  // 1,231,787 total transactions through block 1,220,703
 ```

@@ -1,20 +1,22 @@
+
+
 # net_peerCount
 
 Returns the number of peers currently connected to the node.
 
-## Ethereum Standard
+## Parameters
 
-`net_peerCount() -> Quantity`
+None.
 
-## Request
+## Returns
 
-No parameters.
+| Type | Notes |
+|---|---|
+| [`Quantity`](../types.md#quantity) | Number of connected peers |
 
-## Response
+## Errors
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | [`Quantity`](../types.md#quantity) | Number of connected peers |
+Standard JSON-RPC errors only. See [Error reference](../errors.md).
 
 ## Example
 

@@ -1,21 +1,23 @@
 # eth_chainId
 
-Returns the chain ID reported by the endpoint.
+Returns the chain ID of the connected network as a hex-encoded integer.
 
-`eth_chainId() -> Quantity` — no parameters.
+## Parameters
 
-## Response
+None.
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | [`Quantity`](../types.md#quantity) | Chain ID for the connected network |
+## Returns
+
+`Quantity` — the chain ID for the connected network.
 
 | Network | Chain ID (hex) | Chain ID (decimal) |
 |---|---|---|
 | Mainnet | `0x10e6` | 4326 |
 | Testnet | `0x18c7` | 6343 |
 
-For error handling, see [Error reference](../errors.md).
+## Errors
+
+Standard JSON-RPC errors only. See [Error reference](../errors.md).
 
 ## Example
 
@@ -25,6 +27,6 @@ curl -sS https://mainnet.megaeth.com/rpc \
   --data '{"jsonrpc":"2.0","id":31,"method":"eth_chainId","params":[]}'
 ```
 
-```json
-{"jsonrpc":"2.0","id":31,"result":"0x10e6"}
+```jsonc
+{"jsonrpc":"2.0","id":31,"result":"0x10e6"}  // 4326 (Mainnet)
 ```

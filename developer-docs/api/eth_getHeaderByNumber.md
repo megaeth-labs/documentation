@@ -1,47 +1,33 @@
 # eth_getHeaderByNumber
 
-Returns a header-only view of a block selected by block number or canonical block tag.
+Returns a header-only view of a block by number or block tag. This is a MegaETH-specific method; for wider provider compatibility, use [`eth_getBlockByNumber`](./eth_getBlockByNumber.md).
 
-## Ethereum Standard
+## Parameters
 
-This method is not part of the standard Ethereum JSON-RPC method set.
+| Position | Name | Type | Required | Notes |
+|---|---|---|---|---|
+| `0` | `block` | [`BlockNumberOrTag`](../types.md#blocknumberortag) | Yes | Hex block number or tag (`earliest`, `latest`, `pending`, `safe`, `finalized`) |
 
-## MegaETH Differences
+## Returns
 
-- `eth_getHeaderByNumber(block) -> Header | null`
-- This is a MegaETH-specific header method.
-- The response omits `transactions`, `uncles`, and `size`.
-- On the public MegaETH endpoint, `pending` can return `null`.
-- If you need wider provider compatibility, use [`eth_getBlockByNumber`](./eth_getBlockByNumber.md) and read header fields from the block object.
-
-## Request
-
-Send `params` as `[block]`.
-
-| Position | Type | Required | Notes |
-|---|---|---|---|
-| `0` | [`BlockNumberOrTag`](../types.md#blocknumberortag) | Yes | Accepts `earliest`, `latest`, `pending`, `safe`, `finalized`, or a hex block number |
-
-Reader notes:
-
-- Use a fixed block number when you need deterministic results.
-- Decimal strings such as `"12345"` are invalid; block numbers must be hex [`Quantity`](../types.md#quantity) strings.
-- EIP-1898-style block selector objects are not accepted here.
-
-## Response
+[`Header`](../types.md#header) or `null` when the block is not found.
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Header`](../types.md#header) or `null` | Header-only block data |
+| `number` | `Quantity` | Block number |
+| `hash` | `BlockHash` | Block hash |
+| `parentHash` | `BlockHash` | Parent block hash |
+| `timestamp` | `Quantity` | Block timestamp |
+| `miner` | `Address` | Fee recipient / coinbase |
+| `gasLimit` | `Quantity` | Block gas limit |
+| `gasUsed` | `Quantity` | Gas consumed |
+| ... | | See [`Header`](../types.md#header) for the complete field list |
 
-- `result: null` when the block cannot be resolved or is not available.
+## Errors
 
-## Common Errors
-
-| Code | When it usually happens | What to do |
+| Code | Cause | Fix |
 |---|---|---|
-| `-32602` | The selector is malformed, uses a decimal string, or uses an unsupported object form | Fix the request before retrying |
-| `-32005` | The public endpoint rate-limited the request | Back off and retry later |
+| `-32602` | Malformed selector, decimal string, or unsupported object form | Fix the request |
 
 See also [Error reference](../errors.md).
 
@@ -53,7 +39,7 @@ curl -sS https://mainnet.megaeth.com/rpc \
   --data '{"jsonrpc":"2.0","id":27,"method":"eth_getHeaderByNumber","params":["0xb11048"]}'
 ```
 
-```json
+```jsonc
 {
   "jsonrpc": "2.0",
   "id": 27,
@@ -61,9 +47,9 @@ curl -sS https://mainnet.megaeth.com/rpc \
     "hash": "0x235d80b5e91125a1a1d6da6776c6a9ee087d1818c494f71736b09bed61b1411e",
     "parentHash": "0x6fc0412abfba89bbfab17b2d8bd36cb1c214c1d53ed213fa8958439d0c4f9c18",
     "stateRoot": "0x301d7b77a74893451bd76e5d1672aaaa493cd78c06d59e885218d48917a35c03",
-    "number": "0xb11048",
-    "timestamp": "0x69c3361b",
-    "baseFeePerGas": "0xf4240"
+    "number": "0xb11048",        // 11,604,040
+    "timestamp": "0x69c3361b",   // 1,774,634,523
+    "baseFeePerGas": "0xf4240"   // 1,000,000 wei
   }
 }
 ```
