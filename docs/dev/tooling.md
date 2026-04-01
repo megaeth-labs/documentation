@@ -26,33 +26,33 @@ Many tooling and infrastructure integrations are still being finalized.
 
 ## Analytics
 
-| Tool                                           | Notes                        | Testnet (Carrot) | Mainnet   |
-| ---------------------------------------------- | ---------------------------- | ---------------- | -------   |
-| [Uptime Dashboard](https://uptime.megaeth.com) | Native performance dashboard | Supported        | Supported |
-| [Dune Dashboard](https://dune.com)             |                              | —                | Supported |
-| [Growthepie](https://www.growthepie.com/chains/megaeth) |                      | —              | Supported |
-| [Miniblocks](https://miniblocks.io/)           | Real-time miniblock explorer  | —              | Supported |
-| [DefiLlama](https://defillama.com/chain/megaeth) |                            | —              | Supported |
+| Tool                                                    | Notes                        | Testnet (Carrot) | Mainnet   |
+| ------------------------------------------------------- | ---------------------------- | ---------------- | --------- |
+| [Uptime Dashboard](https://uptime.megaeth.com)          | Native performance dashboard | Supported        | Supported |
+| [Dune Dashboard](https://dune.com)                      |                              | —                | Supported |
+| [Growthepie](https://www.growthepie.com/chains/megaeth) |                              | —                | Supported |
+| [Miniblocks](https://miniblocks.io/)                    | Real-time miniblock explorer | —                | Supported |
+| [DefiLlama](https://defillama.com/chain/megaeth)        |                              | —                | Supported |
 
 ## Block Explorers
 
-| Tool                                                              | Notes                         | Testnet (Carrot) | Mainnet          |
-| ----------------------------------------------------------------- | ----------------------------- | ---------------- | ---------------- |
-| [Etherscan](https://mega.etherscan.io)                            |                               | Supported        | Supported        |
-| [Blockscout](https://megaeth-testnet.blockscout.com)              |                               | —                | Supported        |
+| Tool                                                 | Notes | Testnet (Carrot) | Mainnet   |
+| ---------------------------------------------------- | ----- | ---------------- | --------- |
+| [Etherscan](https://mega.etherscan.io)               |       | Supported        | Supported |
+| [Blockscout](https://megaeth-testnet.blockscout.com) |       | —                | Supported |
 
 ## Oracles
 
-| Provider                                  | Get Started                                             | Contract Addresses                           | Supported Feeds                                                                                                                         | Testnet (Carrot) | Mainnet |
-| ----------------------------------------- | ------------------------------------------------------- | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ------- |
+| Provider                                  | Get Started                                             | Contract Addresses                           | Supported Feeds                                                                                                                         | Testnet (Carrot) | Mainnet   |
+| ----------------------------------------- | ------------------------------------------------------- | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | --------- |
 | [Redstone](https://www.redstone.finance/) | [Docs](https://docs.redstone.finance/docs/introduction) | `0xbEb886F1A51803d7e9FD4514a91E89b81F4fdE58` | [Push Model (on-chain Feeds)](https://app.redstone.finance/app/feeds/?networks=6342&page=1&sortBy=popularity&sortDesc=false&perPage=32) | Supported        | Supported |
 | [Chainlink](https://chain.link)           | [Docs](https://docs.chain.link/)                        | `0xfBFff08fE4169853F7B1b5Ac67eC10dc8806801d` | [Data Streams](https://docs.chain.link/data-streams/crypto-streams?page=1)                                                              | Supported        | Supported |
 | [Pyth](https://www.pyth.network/)         | [Docs](https://docs.pyth.network/price-feeds)           | `0x2880aB155794e7179c9eE2e38200202908C17B43` | [Price Feeds](https://docs.pyth.network/price-feeds/contract-addresses/evm)                                                             | Supported        | Supported |
 
 ## Indexers
 
-| Indexer                                      | Get Started                                                               | Supported Services                                                                                                                                                                                             | Testnet (Carrot) | Mainnet |
-| -------------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | ------- |
+| Indexer                                      | Get Started                                                               | Supported Services                                                                                                                                                                                             | Testnet (Carrot) | Mainnet   |
+| -------------------------------------------- | ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- | --------- |
 | [Goldsky](https://goldsky.com)               | [Docs](https://docs.goldsky.com/chains/megaeth)                           | [Subgraphs](https://docs.goldsky.com/chains/megaeth#subgraphs), [Mirror (Data Pipelines)](https://docs.goldsky.com/chains/megaeth#mirror)                                                                      | Supported        | Supported |
 | [Envio](https://envio.dev/)                  | [Docs](https://docs.envio.dev/docs/HyperIndex/contract-import)            | [HyperIndex (Subgraphs)](https://docs.envio.dev/blog/how-to-index-megaeth-data-using-envio#hyperindex), [HyperSync (Data Access)](https://docs.envio.dev/blog/how-to-index-megaeth-data-using-envio#hypersync) | Supported        | Supported |
 | [Mobula](https://mobula.io)                  | [Docs](https://docs.mobula.io/)                                           | [Subgraphs](https://docs.mobula.io/indexing-stream/introduction)                                                                                                                                               | Supported        | Supported |
@@ -63,11 +63,11 @@ Many tooling and infrastructure integrations are still being finalized.
 
 ## RPC Providers
 
-| Provider              | Protocol         | Get Started                                                                | Endpoint                                    | Testnet (Carrot) | Mainnet |
-| --------------------- | ---------------- | -------------------------------------------------------------------------- | ------------------------------------------- | ---------------- | ------- |
-| **MegaETH**           | HTTP             | [Docs](https://docs.megaeth.com)                                           | `https://carrot.megaeth.com/rpc`,`https://mainnet.megaeth.com/rpc`            | Supported        | Supported |
-| **MegaETH**           | WebSocket        | [Docs](https://docs.megaeth.com)                                           | `wss://carrot.megaeth.com/wss`,`wss://mainnet.megaeth.com/wss`              | Supported        | Supported |
-| **Alchemy**           | HTTP             | [Docs](https://www.alchemy.com/docs/reference/chain-apis-overview)         | —                                           | —                | Supported |
-| **Alchemy**           | WebSocket        | [Docs](https://www.alchemy.com/docs/reference/subscription-api)            | —                                           | —                | Supported |
-| **Thirdweb RPC Edge** | HTTP             | [Docs](https://portal.thirdweb.com/references/typescript/v5/functions#rpc) | —                                           | Supported        | Supported |
-| **Envio HyperRPC**    | HTTP (Read-only) | [Docs](https://docs.envio.dev/docs/HyperRPC/overview-hyperrpc)             | —                                           | Supported        | Supported |
+| Provider              | Protocol         | Get Started                                                                | Endpoint                                                           | Testnet (Carrot) | Mainnet   |
+| --------------------- | ---------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------ | ---------------- | --------- |
+| **MegaETH**           | HTTP             | [Docs](https://docs.megaeth.com)                                           | `https://carrot.megaeth.com/rpc`,`https://mainnet.megaeth.com/rpc` | Supported        | Supported |
+| **MegaETH**           | WebSocket        | [Docs](https://docs.megaeth.com)                                           | `wss://carrot.megaeth.com/wss`,`wss://mainnet.megaeth.com/wss`     | Supported        | Supported |
+| **Alchemy**           | HTTP             | [Docs](https://www.alchemy.com/docs/reference/chain-apis-overview)         | —                                                                  | —                | Supported |
+| **Alchemy**           | WebSocket        | [Docs](https://www.alchemy.com/docs/reference/subscription-api)            | —                                                                  | —                | Supported |
+| **Thirdweb RPC Edge** | HTTP             | [Docs](https://portal.thirdweb.com/references/typescript/v5/functions#rpc) | —                                                                  | Supported        | Supported |
+| **Envio HyperRPC**    | HTTP (Read-only) | [Docs](https://docs.envio.dev/docs/HyperRPC/overview-hyperrpc)             | —                                                                  | Supported        | Supported |
