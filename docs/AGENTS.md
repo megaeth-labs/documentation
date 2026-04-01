@@ -102,13 +102,20 @@ Use relative paths from the current file: `[Connect](../user/connect.md)` or `[E
 ### To the EVM Specification
 
 The EVM spec is maintained in the [mega-evm repo](https://github.com/megaeth-labs/mega-evm) and synced into a separate GitBook space.
-Use absolute URLs:
-`[Dual Gas Model](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/dual-gas-model)`.
+Use absolute URLs with the base `https://docs.megaeth.com/spec/`:
+`[Dual Gas Model](https://docs.megaeth.com/spec/megaevm/dual-gas-model)`.
+EVM pages use the `megaevm/` prefix (not `evm/`), system contracts use `system-contracts/`.
+
+### To the mega-evme Documentation
+
+The mega-evme tool docs are hosted at `https://docs.megaeth.com/mega-evme`.
+Use absolute URLs: `[mega-evme](https://docs.megaeth.com/mega-evme)`.
 
 ### Direction rule
 
 - **User docs → Developer docs**: "For technical details, see [Developer Docs](dev/overview.md)."
-- **Developer docs → EVM Spec**: "For the formal specification, see [Dual Gas Model](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/dual-gas-model)."
+- **Developer docs → EVM Spec**: "For the formal specification, see [Dual Gas Model](https://docs.megaeth.com/spec/megaevm/dual-gas-model)."
+- **Developer docs → mega-evme**: "For the full command reference, see [mega-evme](https://docs.megaeth.com/mega-evme)."
 - **EVM Spec → nothing**: The spec is self-contained. It never links to user or developer docs.
 
 ## Content Reuse

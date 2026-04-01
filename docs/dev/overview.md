@@ -12,7 +12,7 @@ For network parameters (chain ID, RPC URLs, block explorers), see [Connect to Me
 ## EVM Compatibility
 
 MegaETH's execution environment is called **MegaEVM**.
-It is fully compatible with Ethereum smart contracts but introduces a few differences compared to Ethereum's EVM, especially around the [dual gas model](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/dual-gas-model).
+It is fully compatible with Ethereum smart contracts but introduces a few differences compared to Ethereum's EVM, especially around the [dual gas model](https://docs.megaeth.com/spec/megaevm/dual-gas-model).
 See [EVM Differences](execution/overview.md) for a complete list.
 
 The MegaEVM implementation is open source and can be found on [GitHub](https://github.com/megaeth-labs/mega-evm).
@@ -25,7 +25,7 @@ See [Gas Estimation](send-tx/gas-estimation.md) for code examples, toolchain con
 
 ## Debugging Transactions
 
-MegaETH supports `debug_traceTransaction` and other debug RPC methods (via managed RPC providers), and provides `mega-evme` for local transaction replay and simulation.
+MegaETH supports `debug_traceTransaction` and other debug RPC methods (via managed RPC providers), and provides [`mega-evme`](https://docs.megaeth.com/mega-evme) for local transaction replay and simulation.
 See [Debugging Transactions](send-tx/debugging.md) for usage examples and common debugging scenarios.
 
 ## Using the Canonical Bridge

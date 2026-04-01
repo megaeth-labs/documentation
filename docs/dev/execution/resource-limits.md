@@ -34,7 +34,7 @@ Note: "Unlimited" means no dedicated per-block limit exists for that resource, b
 
 For Data Size, KV Updates, and State Growth, block-level usage is the sum of usage across all transactions in the block.
 
-For formal definitions of resource limits and accounting, see [Resource Limits (spec)](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/resource-limits) and [Resource Accounting (spec)](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/resource-accounting).
+For formal definitions of resource limits and accounting, see [Resource Limits (spec)](https://docs.megaeth.com/spec/megaevm/resource-limits) and [Resource Accounting (spec)](https://docs.megaeth.com/spec/megaevm/resource-accounting).
 
 ## Enforcement
 
@@ -50,7 +50,7 @@ The block builder stops adding transactions once the block's cumulative gas or D
 
 ### During execution
 
-**Compute Gas**, **Data Size**, **KV Updates**, and **State Growth** are enforced while the transaction runs (see [formal spec](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/resource-limits)).
+**Compute Gas**, **Data Size**, **KV Updates**, and **State Growth** are enforced while the transaction runs (see [formal spec](https://docs.megaeth.com/spec/megaevm/resource-limits)).
 
 **Per-transaction**: when a transaction exceeds any of these four limits:
 
@@ -76,5 +76,5 @@ Since Compute Gas is a component of total gas, and each transaction's total gas 
 - [Gas Model](gas-model.md) — compute gas, storage gas, and the bucket multiplier
 - [Gas Estimation](../send-tx/gas-estimation.md) — estimate gas correctly and avoid common errors
 - [EVM Differences](overview.md) — full list of behavioral differences from Ethereum
-- [Resource Limits (spec)](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/resource-limits) — formal specification of limit enforcement
-- [Resource Accounting (spec)](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/resource-accounting) — how counters are tracked per opcode
+- [Resource Limits (spec)](https://docs.megaeth.com/spec/megaevm/resource-limits) — formal specification of limit enforcement
+- [Resource Accounting (spec)](https://docs.megaeth.com/spec/megaevm/resource-accounting) — how counters are tracked per opcode
