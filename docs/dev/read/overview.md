@@ -37,7 +37,7 @@ See [Debugging Transactions](../send-tx/debugging.md) for usage of debug methods
 | `debug_getRawHeader` | Managed only | |
 | `debug_getRawReceipts` | Managed only | |
 | `debug_getRawTransaction` | Managed only | |
-| `debug_replyBlock` | Managed only | |
+| `debug_replayBlock` | Managed only | |
 | `debug_traceBlock` | Managed only | |
 | `debug_traceBlockByHash` | Available | |
 | `debug_traceBlockByNumber` | Available | |
@@ -64,7 +64,7 @@ See [Debugging Transactions](../send-tx/debugging.md) for usage of debug methods
 | `eth_getFilterChanges` | Unavailable | |
 | `eth_getFilterLogs` | Unavailable | |
 | `eth_getLogs` | Available | |
-| `eth_getLogsWithCursor` | Unavailable | |
+| `eth_getLogsWithCursor` | Managed only | |
 | `eth_getStorageAt` | Available | |
 | `eth_getTransactionByBlockHashAndIndex` | Available | |
 | `eth_getTransactionByBlockNumberAndIndex` | Available | |

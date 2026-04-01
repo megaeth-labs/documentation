@@ -207,6 +207,6 @@ See [Volatile Data Access](../execution/volatile-data.md) for the full list of t
 - [Gas Estimation](gas-estimation.md) — estimate gas correctly and avoid common errors
 - [EVM Differences](../execution/overview.md) — volatile data caps, SSTORE refund changes, 98/100 forwarding
 - [Gas Model](../execution/gas-model.md) — how compute gas and storage gas work
-- [RPC Reference](../read/rpc/overview.md) — method availability and restrictions
+- [RPC Reference](../read/overview.md) — method availability and restrictions
 - [Dual Gas Model (spec)](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/dual-gas-model) — formal specification of compute gas and storage gas
 - [Gas Detention (spec)](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/gas-detention) — compute gas cap triggered by volatile data access

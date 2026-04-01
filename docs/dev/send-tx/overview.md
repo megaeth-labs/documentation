@@ -71,7 +71,6 @@ forge script script/Deploy.s.sol \
   --broadcast
 ```
 {% endtab %}
-{% endtab %}
 {% tab title="cast" %}
 ```bash
 # Send a simple ETH transfer
@@ -170,4 +169,4 @@ The key concepts:
 - **Volatile data access** — reading `block.timestamp`, `block.number`, or oracle data caps compute gas to 20M. See [Volatile Data Access](../execution/volatile-data.md).
 - **System contracts** — oracle, high-precision timestamp, and keyless deployment at fixed addresses. See [System Contracts](../execution/system-contracts.md).
 
-For the complete list of behavioral differences, see [EVM Differences](../execution/evm-differences.md).
+For the complete list of behavioral differences, see [EVM Differences](../execution/overview.md).

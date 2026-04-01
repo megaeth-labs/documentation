@@ -16,4 +16,4 @@ description: MegaETH JSON-RPC error codes — HTTP status codes, RPC error codes
 
 ## Related Pages
 
-- [RPC Reference](overview.md) — full method availability table
+- [RPC Reference](../overview.md) — full method availability table

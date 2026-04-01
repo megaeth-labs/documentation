@@ -129,6 +129,6 @@ See [Resource Limits](resource-limits.md) for the full limits table, enforcement
 ## Related Pages
 
 - [Resource Limits](resource-limits.md) — per-transaction and per-block resource ceilings
-- [EVM Differences](evm-differences.md) — full list of behavioral differences from Ethereum
+- [EVM Differences](overview.md) — full list of behavioral differences from Ethereum
 - [Dual Gas Model (spec)](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/dual-gas-model) — formal specification of compute gas and storage gas
 - [Resource Accounting (spec)](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/resource-accounting) — how counters are tracked per opcode

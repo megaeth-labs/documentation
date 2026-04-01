@@ -110,4 +110,4 @@ At T+100ms, she sends 1 ETH to Bob — the transaction is packaged into a mini-b
 ## Related Pages
 
 - [Mini-Blocks](../../mini-block.md) — understanding the two block types
-- [RPC Reference](rpc/overview.md) — full method availability table and rate limiting
+- [RPC Reference](overview.md) — full method availability table and rate limiting
