@@ -59,9 +59,9 @@ Temporary block-environment overrides applied only for this simulation.
 
 ## Returns
 
-| Type | Notes |
-|---|---|
-| `Data` | Raw return bytes from the call. `0x` is valid for successful calls to non-contract addresses. Reverts surface as JSON-RPC errors, not as a normal result |
+| Field | Type | Notes |
+|---|---|---|
+| `result` | `Data` | Raw return bytes from the call. `0x` is valid for successful calls to non-contract addresses. Reverts surface as JSON-RPC errors, not as a normal result |
 
 ## Errors
 

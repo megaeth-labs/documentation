@@ -10,9 +10,9 @@ None.
 
 ## Returns
 
-| Type | Notes |
-|---|---|
-| `Address[]` | Accounts controlled by the RPC node; always empty on public endpoints |
+| Field | Type | Notes |
+|---|---|---|
+| `result` | `Address[]` | Accounts controlled by the RPC node; always empty on public endpoints |
 
 ## Errors
 

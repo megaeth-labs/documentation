@@ -10,9 +10,9 @@ None.
 
 ## Returns
 
-| Type | Notes |
-|---|---|
-| [`Quantity`](../types.md#quantity) | Suggested max priority fee per gas in wei |
+| Field | Type | Notes |
+|---|---|---|
+| `result` | [`Quantity`](../types.md#quantity) | Suggested max priority fee per gas in wei |
 
 ## Errors
 

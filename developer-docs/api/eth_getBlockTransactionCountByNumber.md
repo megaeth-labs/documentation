@@ -10,9 +10,9 @@ Returns the number of transactions in a block identified by block number or tag.
 
 ## Returns
 
-| Type | Notes |
-|---|---|
-| [`Quantity`](../types.md#quantity) \| `null` | Transaction count; `null` when the block is not found |
+| Field | Type | Notes |
+|---|---|---|
+| `result` | [`Quantity`](../types.md#quantity) \| `null` | Transaction count; `null` when the block is not found |
 
 ## Errors
 

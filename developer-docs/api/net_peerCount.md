@@ -10,9 +10,9 @@ None.
 
 ## Returns
 
-| Type | Notes |
-|---|---|
-| [`Quantity`](../types.md#quantity) | Number of connected peers |
+| Field | Type | Notes |
+|---|---|---|
+| `result` | [`Quantity`](../types.md#quantity) | Number of connected peers |
 
 ## Errors
 

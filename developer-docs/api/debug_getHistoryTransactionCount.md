@@ -10,9 +10,9 @@ Returns the chain-wide cumulative transaction count up to and including a given 
 
 ## Returns
 
-| Type | Notes |
-|---|---|
-| [`Quantity`](../types.md#quantity) | Cumulative transaction count across all blocks up to the selected block. Consecutive blocks with no transactions return the same value. |
+| Field | Type | Notes |
+|---|---|---|
+| `result` | [`Quantity`](../types.md#quantity) | Cumulative transaction count across all blocks up to the selected block. Consecutive blocks with no transactions return the same value. |
 
 ## Errors
 

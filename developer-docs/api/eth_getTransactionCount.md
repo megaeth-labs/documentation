@@ -11,9 +11,9 @@ Returns the account nonce for a given address at a specified block.
 
 ## Returns
 
-| Type | Notes |
-|---|---|
-| [`Quantity`](../types.md#quantity) | Account nonce at the requested block. Returns `0x0` for both unknown accounts and zero-nonce accounts. |
+| Field | Type | Notes |
+|---|---|---|
+| `result` | [`Quantity`](../types.md#quantity) | Account nonce at the requested block. Returns `0x0` for both unknown accounts and zero-nonce accounts. |
 
 ## Errors
 

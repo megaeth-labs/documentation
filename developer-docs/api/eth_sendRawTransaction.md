@@ -10,9 +10,9 @@ Submits a signed transaction to the network and returns its transaction hash. EI
 
 ## Returns
 
-| Type | Notes |
-|---|---|
-| [`Data`](../types.md#data) | 32-byte transaction hash |
+| Field | Type | Notes |
+|---|---|---|
+| `result` | [`Data`](../types.md#data) | 32-byte transaction hash |
 
 ## Errors
 

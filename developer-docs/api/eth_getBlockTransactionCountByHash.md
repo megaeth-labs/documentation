@@ -10,9 +10,9 @@ Returns the number of transactions in the block matching the given hash.
 
 ## Returns
 
-| Type | Notes |
-|---|---|
-| [`Quantity`](../types.md#quantity) \| `null` | Transaction count; `null` when the block is not found |
+| Field | Type | Notes |
+|---|---|---|
+| `result` | [`Quantity`](../types.md#quantity) \| `null` | Transaction count; `null` when the block is not found |
 
 ## Errors
 

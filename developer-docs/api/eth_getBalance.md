@@ -11,9 +11,9 @@ Returns the ETH balance of an account in wei at a given block.
 
 ## Returns
 
-| Type | Notes |
-|---|---|
-| [`Quantity`](../types.md#quantity) | Balance in wei. Returns `0x0` for unknown accounts and zero-balance accounts alike. |
+| Field | Type | Notes |
+|---|---|---|
+| `result` | [`Quantity`](../types.md#quantity) | Balance in wei. Returns `0x0` for unknown accounts and zero-balance accounts alike. |
 
 ## Errors
 

@@ -8,9 +8,9 @@ None.
 
 ## Returns
 
-| Type | Notes |
-|---|---|
-| [`Quantity`](../types.md#quantity) | Gas price in wei |
+| Field | Type | Notes |
+|---|---|---|
+| `result` | [`Quantity`](../types.md#quantity) | Gas price in wei |
 
 ## Errors
 
