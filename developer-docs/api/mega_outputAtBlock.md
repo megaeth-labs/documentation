@@ -6,26 +6,26 @@ Returns the L2 output commitment for a given block, including the output root, s
 
 | Position | Name | Type | Required | Notes |
 |---|---|---|---|---|
-| `0` | `blockNumber` | [`Quantity`](../types.md#quantity) | Yes | Concrete hex block number; block tags such as `latest` are not accepted |
+| `0` | `blockNumber` | `Quantity` | Yes | Concrete hex block number; block tags such as `latest` are not accepted |
 
 ## Returns
 
 | Field | Type | Notes |
 |---|---|---|
-| `version` | `Data (32 bytes)` | Output version; may be omitted on cache-hit paths |
-| `outputRoot` | `Data (32 bytes)` | Output commitment |
+| `version` | `Hash32` | Output version |
+| `outputRoot` | `Hash32` | Output commitment |
 | `blockRef` | `object` | Block reference; see fields below |
-| `withdrawalStorageRoot` | `Data (32 bytes)` | Withdrawal storage root |
-| `stateRoot` | `Data (32 bytes)` | State root |
+| `withdrawalStorageRoot` | `Hash32` | Withdrawal storage root |
+| `stateRoot` | `Hash32` | State root |
 | `syncStatus` | `object` | Backend sync-status snapshot |
 
 **`blockRef` fields:**
 
 | Field | Type | Notes |
 |---|---|---|
-| `hash` | `Data (32 bytes)` | Block hash |
+| `hash` | `Hash32` | Block hash |
 | `number` | `number` | Block number (JSON number) |
-| `parentHash` | `Data (32 bytes)` | Parent block hash |
+| `parentHash` | `Hash32` | Parent block hash |
 | `timestamp` | `number` | Block timestamp (JSON number) |
 | `l1origin` | `object` | L1 origin with `hash` and `number` |
 | `sequenceNumber` | `number` | Sequence number |
@@ -66,60 +66,10 @@ curl -sS https://mainnet.megaeth.com/rpc \
       "sequenceNumber": 0
     },
     "syncStatus": {
-      "current_l1": {
-        "hash": "0xaabbccdd00112233445566778899aabbccddeeff00112233445566778899aabb",
-        "number": 24732192,
-        "parentHash": "0x1122334455667788990011223344556677889900aabbccddeeff00112233aabb",
-        "timestamp": 1774413083
-      },
-      "current_l1_finalized": {
-        "hash": "0x2233445566778899aabbccddeeff001122334455667788990011223344556677",
-        "number": 24732100,
-        "parentHash": "0x3344556677889900aabbccddeeff00112233445566778899001122334455aabb",
-        "timestamp": 1774411979
-      },
-      "head_l1": {
-        "hash": "0xaabbccdd00112233445566778899aabbccddeeff00112233445566778899aabb",
-        "number": 24732192,
-        "parentHash": "0x1122334455667788990011223344556677889900aabbccddeeff00112233aabb",
-        "timestamp": 1774413083
-      },
-      "safe_l1": {
-        "hash": "0x4455667788990011223344556677889900aabbccddeeff001122334455667788",
-        "number": 24732150,
-        "parentHash": "0x5566778899001122334455667788990011223344aabbccddeeff001122334455",
-        "timestamp": 1774412579
-      },
-      "finalized_l1": {
-        "hash": "0x2233445566778899aabbccddeeff001122334455667788990011223344556677",
-        "number": 24732100,
-        "parentHash": "0x3344556677889900aabbccddeeff00112233445566778899001122334455aabb",
-        "timestamp": 1774411979
-      },
-      "unsafe_l2": {
-        "hash": "0x8899aabbccddeeff00112233445566778899001122334455667788990011aabb",
-        "number": 11615881,
-        "parentHash": "0x9900aabbccddeeff001122334455667788990011223344556677889900112233",
-        "timestamp": 1774412892,
-        "l1origin": { "hash": "0xaabbccdd00112233445566778899aabbccddeeff00112233445566778899aabb", "number": 24732192 },
-        "sequenceNumber": 0
-      },
-      "safe_l2": {
-        "hash": "0x8899aabbccddeeff00112233445566778899001122334455667788990011aabb",
-        "number": 11615881,
-        "parentHash": "0x9900aabbccddeeff001122334455667788990011223344556677889900112233",
-        "timestamp": 1774412892,
-        "l1origin": { "hash": "0xaabbccdd00112233445566778899aabbccddeeff00112233445566778899aabb", "number": 24732192 },
-        "sequenceNumber": 0
-      },
-      "finalized_l2": {
-        "hash": "0x7788990011223344556677889900aabbccddeeff00112233445566778899aabb",
-        "number": 11615800,
-        "parentHash": "0x8899001122334455667788990011223344556677aabbccddeeff001122334455",
-        "timestamp": 1774412082,
-        "l1origin": { "hash": "0x2233445566778899aabbccddeeff001122334455667788990011223344556677", "number": 24732100 },
-        "sequenceNumber": 0
-      }
+      "current_l1": { "hash": "0xaabb…", "number": 24732192 },
+      "unsafe_l2": { "hash": "0x8899…", "number": 11615881 },
+      "safe_l2": { "hash": "0x8899…", "number": 11615881 },
+      "finalized_l2": { "hash": "0x7788…", "number": 11615800 }
     },
     "withdrawalStorageRoot": "0x8ed4baae3a927be3dea54996b4d5899f8c01e7594bf50b17dc1e741388ce3d12",
     "stateRoot": "0xf5e1d1c08df99fabc86c73c2f88f137f63a880e9776315964f0c8ac77ae86305"

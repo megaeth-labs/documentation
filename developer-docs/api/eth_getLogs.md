@@ -6,17 +6,17 @@ Returns event logs emitted by smart contracts, filtered by block range, contract
 
 | Position | Name | Type | Required | Notes |
 |---|---|---|---|---|
-| `0` | `filter` | `object` | Yes | Log filter |
+| `0` | `filter` | `object` | Yes | Log filter; see fields below |
 
-**`filter` fields:**
+### `filter`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| `fromBlock` | `BlockNumberOrTag` | No | Inclusive start. Default: `latest` |
-| `toBlock` | `BlockNumberOrTag` | No | Inclusive end. Default: `latest` |
-| `blockHash` | `BlockHash` | No | Single-block mode; mutually exclusive with `fromBlock`/`toBlock` |
+| `fromBlock` | `string` | No | Inclusive start; hex block number or tag. Default: `latest` |
+| `toBlock` | `string` | No | Inclusive end; hex block number or tag. Default: `latest` |
+| `blockHash` | `Hash32` | No | Single-block mode; mutually exclusive with `fromBlock`/`toBlock` |
 | `address` | `Address \| Address[]` | No | Filter by emitting address(es) |
-| `topics` | `(Hash32 \| Hash32[] \| null)[]` | No | Positional topic filter; positions are AND, values within a position are OR. Use `null` for wildcards |
+| `topics` | `array` | No | Positional topic filter; positions are AND, values within a position are OR. Use `null` for wildcards |
 
 ## Returns
 
@@ -28,7 +28,7 @@ Returns event logs emitted by smart contracts, filtered by block range, contract
 | `topics` | `Hash32[]` | Indexed topics |
 | `data` | `Data` | Unindexed payload |
 | `blockNumber` | `Quantity \| null` | Containing block number |
-| `transactionHash` | `TransactionHash \| null` | Containing transaction hash |
+| `transactionHash` | `Hash32 \| null` | Containing transaction hash |
 | `transactionIndex` | `Quantity \| null` | Transaction position in block |
 | `logIndex` | `Quantity \| null` | Log position in block |
 | `removed` | `boolean` | `true` if removed during reorg |

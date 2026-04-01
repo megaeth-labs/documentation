@@ -1,5 +1,3 @@
-
-
 # eth_accounts
 
 Returns a list of addresses controlled by the RPC node.

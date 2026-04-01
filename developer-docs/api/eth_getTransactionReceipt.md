@@ -6,7 +6,7 @@ Returns the receipt for a transaction that has been included in a block, or `nul
 
 | Position | Name | Type | Required | Notes |
 |---|---|---|---|---|
-| `0` | `transactionHash` | [`TransactionHash`](../types.md#transactionhash) | Yes | Hash of the target transaction |
+| `0` | `transactionHash` | `Hash32` | Yes | Hash of the target transaction |
 
 ## Returns
 
@@ -14,17 +14,18 @@ Returns the receipt for a transaction that has been included in a block, or `nul
 
 | Field | Type | Notes |
 |---|---|---|
-| `transactionHash` | `TransactionHash` | Transaction hash |
+| `transactionHash` | `Hash32` | Transaction hash |
 | `status` | `Quantity` | `0x1` success; `0x0` failure |
-| `blockHash` | `BlockHash` | Containing block hash |
+| `blockHash` | `Hash32` | Containing block hash |
 | `blockNumber` | `Quantity` | Containing block number |
 | `from` | `Address` | Sender |
 | `to` | `Address \| null` | Recipient; `null` for contract creation |
 | `gasUsed` | `Quantity` | Gas consumed by this transaction |
 | `effectiveGasPrice` | `Quantity` | Effective gas price |
 | `contractAddress` | `Address \| null` | Created contract address when applicable |
-| `logs` | [`Log[]`](../types.md#log) | Emitted log entries |
-| ... | | See [`Receipt`](../types.md#receipt) for the complete field list |
+| `logs` | `Log[]` | Emitted log entries |
+
+Additional fields include `cumulativeGasUsed`, `logsBloom`, `type`, and L1 fee fields (`l1Fee`, `l1GasPrice`, `l1GasUsed`, etc.).
 
 ## Errors
 

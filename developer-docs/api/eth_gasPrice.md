@@ -1,6 +1,6 @@
 # eth_gasPrice
 
-Returns the current gas price in wei. MegaETH has a stable base fee, so this method always returns `0xf4240` (1,000,000 wei = 0.001 gwei).
+Returns the current gas price in wei. Always `0xf4240` (1,000,000 wei).
 
 ## Parameters
 
@@ -10,7 +10,7 @@ None.
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Quantity`](../types.md#quantity) | Gas price in wei |
+| `result` | `Quantity` | Gas price in wei |
 
 ## Errors
 
@@ -25,5 +25,5 @@ curl -sS https://mainnet.megaeth.com/rpc \
 ```
 
 ```jsonc
-{"jsonrpc":"2.0","id":1,"result":"0xf4240"}  // 1,000,000 wei = 0.001 gwei
+{"jsonrpc":"2.0","id":1,"result":"0xf4240"}  // 1,000,000 wei
 ```

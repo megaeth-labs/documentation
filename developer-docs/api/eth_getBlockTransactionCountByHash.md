@@ -6,13 +6,13 @@ Returns the number of transactions in the block matching the given hash.
 
 | Position | Name | Type | Required | Notes |
 |---|---|---|---|---|
-| `0` | `blockHash` | [`BlockHash`](../types.md#blockhash) | Yes | Target block hash |
+| `0` | `blockHash` | `Hash32` | Yes | Target block hash |
 
 ## Returns
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Quantity`](../types.md#quantity) \| `null` | Transaction count; `null` when the block is not found |
+| `result` | `Quantity \| null` | Transaction count; `null` when the block is not found |
 
 ## Errors
 

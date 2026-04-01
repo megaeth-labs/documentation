@@ -1,19 +1,19 @@
 # eth_getTransactionCount
 
-Returns the account nonce for a given address at a specified block.
+Returns the number of transactions sent from an address at a given block.
 
 ## Parameters
 
 | Position | Name | Type | Required | Notes |
 |---|---|---|---|---|
-| `0` | `address` | [`Address`](../types.md#address) | Yes | Target account address |
-| `1` | `block` | [`BlockNumberOrTag`](../types.md#blocknumberortag) | No | Default: `latest` |
+| `0` | `address` | `Address` | Yes | Target account address |
+| `1` | `block` | `string` | No | Hex block number or tag (`latest`, `safe`, `finalized`, `earliest`, `pending`). Default: `"latest"` |
 
 ## Returns
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Quantity`](../types.md#quantity) | Account nonce at the requested block. Returns `0x0` for both unknown accounts and zero-nonce accounts. |
+| `result` | `Quantity` | Transaction count at the requested block. Returns `0x0` for both unknown accounts and accounts with zero transactions |
 
 ## Errors
 
@@ -34,5 +34,5 @@ curl -sS https://mainnet.megaeth.com/rpc \
 ```
 
 ```jsonc
-{"jsonrpc":"2.0","id":91,"result":"0xfa8c"}  // nonce 64,140 (block 11,608,262)
+{"jsonrpc":"2.0","id":91,"result":"0xfa8c"}  // 64,140 transactions (block 11,608,262)
 ```

@@ -6,7 +6,7 @@ Cancels an active subscription created by [`eth_subscribe`](./eth_subscribe.md).
 
 | Position | Name | Type | Required | Notes |
 |---|---|---|---|---|
-| `0` | `subscriptionId` | [`Data`](../types.md#data) | Yes | Subscription ID returned by `eth_subscribe` |
+| `0` | `subscriptionId` | `Data` | Yes | Subscription ID returned by `eth_subscribe` |
 
 ## Returns
 

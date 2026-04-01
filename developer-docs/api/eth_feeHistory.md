@@ -6,8 +6,8 @@ Returns historical fee data for a range of recent blocks, including base fees, g
 
 | Position | Name | Type | Required | Notes |
 |---|---|---|---|---|
-| `0` | `blockCount` | [`Quantity`](../types.md#quantity) | Yes | Number of blocks to include; MegaETH limits this to `1`–`256` |
-| `1` | `newestBlock` | [`BlockNumberOrTag`](../types.md#blocknumberortag) | Yes | Inclusive upper bound of the returned range |
+| `0` | `blockCount` | `Quantity` | Yes | Number of blocks (`1`–`256`) |
+| `1` | `newestBlock` | `string` | Yes | Hex block number or tag: `latest`, `safe`, `finalized`, `earliest`, `pending` |
 | `2` | `rewardPercentiles` | `number[]` | No | Monotonically increasing values from `0` to `100`; omit to exclude `reward` from the result |
 
 ## Returns

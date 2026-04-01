@@ -6,19 +6,19 @@ Returns the number of transactions in a block identified by block number or tag.
 
 | Position | Name | Type | Required | Notes |
 |---|---|---|---|---|
-| `0` | `block` | [`BlockNumberOrTag`](../types.md#blocknumberortag) | Yes | Hex block number or tag (`earliest`, `latest`, `pending`, `safe`, `finalized`) |
+| `0` | `block` | `string` | Yes | Hex block number or tag: `latest`, `safe`, `finalized`, `earliest`, `pending` |
 
 ## Returns
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Quantity`](../types.md#quantity) \| `null` | Transaction count; `null` when the block is not found |
+| `result` | `Quantity \| null` | Transaction count; `null` when the block is not found |
 
 ## Errors
 
 | Code | Cause | Fix |
 |---|---|---|
-| `-32602` | Block selector is malformed, uses a decimal string, or uses an unsupported object form | Fix the request |
+| `-32602` | Block selector is malformed | Fix the request |
 
 See also [Error reference](../errors.md).
 

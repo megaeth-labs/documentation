@@ -10,7 +10,7 @@ None.
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Quantity`](../types.md#quantity) | Current head block number; advances with each new block |
+| `result` | `Quantity` | Current head block number; advances with each new block |
 
 ## Errors
 

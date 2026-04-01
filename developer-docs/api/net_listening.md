@@ -1,5 +1,3 @@
-
-
 # net_listening
 
 Returns whether the node is accepting incoming connections.

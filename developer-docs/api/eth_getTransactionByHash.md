@@ -6,7 +6,7 @@ Returns the transaction with the given hash, or `null` if no matching transactio
 
 | Position | Name | Type | Required | Notes |
 |---|---|---|---|---|
-| `0` | `transactionHash` | [`TransactionHash`](../types.md#transactionhash) | Yes | Target transaction hash |
+| `0` | `transactionHash` | `Hash32` | Yes | Target transaction hash |
 
 ## Returns
 
@@ -14,7 +14,7 @@ Returns the transaction with the given hash, or `null` if no matching transactio
 
 | Field | Type | Notes |
 |---|---|---|
-| `hash` | `TransactionHash` | Transaction hash |
+| `hash` | `Hash32` | Transaction hash |
 | `type` | `Quantity` | Transaction type identifier |
 | `from` | `Address` | Sender |
 | `to` | `Address \| null` | Recipient; `null` for contract creation |
@@ -22,10 +22,11 @@ Returns the transaction with the given hash, or `null` if no matching transactio
 | `nonce` | `Quantity` | Sender nonce |
 | `gas` | `Quantity` | Gas limit |
 | `input` | `Data` | Calldata |
-| `blockHash` | `BlockHash \| null` | `null` for pending transactions |
+| `blockHash` | `Hash32 \| null` | `null` for pending transactions |
 | `blockNumber` | `Quantity \| null` | `null` for pending transactions |
 | `transactionIndex` | `Quantity \| null` | `null` for pending transactions |
-| ... | | See [`Transaction`](../types.md#transaction) for the complete field list |
+
+Additional fields vary by transaction type (`gasPrice`, `maxFeePerGas`, `accessList`, `chainId`, `v`, `r`, `s`, etc.).
 
 ## Errors
 

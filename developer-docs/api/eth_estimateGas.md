@@ -6,32 +6,29 @@ Estimates the gas required to execute a transaction.
 
 | Position | Name | Type | Required | Notes |
 |---|---|---|---|---|
-| `0` | `transaction` | `object` | Yes | Transaction to simulate |
-| `1` | `block` | [`BlockNumberOrTag`](../types.md#blocknumberortag) | No | Default: `"latest"` |
+| `0` | `transaction` | `object` | Yes | Transaction to simulate; see fields below |
+| `1` | `block` | `string` | No | Hex block number or tag (`latest`, `safe`, `finalized`, `earliest`, `pending`). Default: `"latest"` |
 
 ### `transaction`
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | `from` | `Address` | No | Caller |
-| `to` | `Address \| null` | No | Target; `null` for create simulation |
-| `value` | `Quantity` | No | Native value sent |
+| `to` | `Address` | No | Target; `null` for contract-creation simulation |
+| `value` | `Quantity` | No | Wei value sent |
 | `input` | `Data` | No | Calldata; prefer over `data` |
 | `gas` | `Quantity` | No | Gas cap |
-| `gasPrice` | `Quantity` | No | Legacy fee; do not mix with EIP-1559 fields |
+| `gasPrice` | `Quantity` | No | Legacy gas price; do not combine with EIP-1559 fields |
 | `maxFeePerGas` | `Quantity` | No | EIP-1559 max fee |
-| `maxPriorityFeePerGas` | `Quantity` | No | EIP-1559 tip cap |
-| ... | | | See [`TransactionCall`](../types.md#transactioncall) for the complete field list |
-
-### `block`
-
-Execution context. Accepts a hex block number or one of: `"earliest"`, `"latest"`, `"pending"`, `"safe"`, `"finalized"`. Default: `"latest"`.
+| `maxPriorityFeePerGas` | `Quantity` | No | EIP-1559 priority fee |
+| `nonce` | `Quantity` | No | Caller nonce override |
+| `accessList` | `array` | No | EIP-2930 access list; each entry: `{ "address": Address, "storageKeys": [Bytes32] }` |
 
 ## Returns
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Quantity`](../types.md#quantity) | Estimated execution gas |
+| `result` | `Quantity` | Estimated execution gas |
 
 ## Errors
 

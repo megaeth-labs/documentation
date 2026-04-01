@@ -6,14 +6,14 @@ Returns the runtime bytecode stored at an address at a given block.
 
 | Position | Name | Type | Required | Notes |
 |---|---|---|---|---|
-| `0` | `address` | [`Address`](../types.md#address) | Yes | Target account or contract address |
-| `1` | `block` | [`BlockReferenceString`](../types.md#blockreferencestring) | No | Default: `"latest"` |
+| `0` | `address` | `Address` | Yes | Target account or contract address |
+| `1` | `block` | `string` | No | Hex block number, block hash, or tag (`latest`, `safe`, `finalized`, …). Default: `"latest"` |
 
 ## Returns
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Data`](../types.md#data) | Runtime bytecode (not creation bytecode) at the address; `0x` when no code is deployed |
+| `result` | `Data` | Runtime bytecode (not creation bytecode) at the address; `0x` when no code is deployed |
 
 ## Errors
 
@@ -33,6 +33,6 @@ curl -sS https://mainnet.megaeth.com/rpc \
   --data '{"jsonrpc":"2.0","id":2,"method":"eth_getCode","params":["0x4200000000000000000000000000000000000011","latest"]}'
 ```
 
-```json
-{"jsonrpc":"2.0","id":2,"result":"0x60806040526004361061005e57..."}
+```jsonc
+{"jsonrpc":"2.0","id":2,"result":"0x6080604052…"}  // bytecode truncated
 ```

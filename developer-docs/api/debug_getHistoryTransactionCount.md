@@ -6,20 +6,20 @@ Returns the chain-wide cumulative transaction count up to and including a given 
 
 | Position | Name | Type | Required | Notes |
 |---|---|---|---|---|
-| `0` | `block` | [`BlockNumberOrTag`](../types.md#blocknumberortag) | Yes | Hex block number or tag (`earliest`, `latest`, `safe`, `finalized`). `pending` and block hashes are not supported. |
+| `0` | `block` | `string` | Yes | Hex block number or tag (`earliest`, `latest`, `safe`, `finalized`). `pending` is not supported |
 
 ## Returns
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Quantity`](../types.md#quantity) | Cumulative transaction count across all blocks up to the selected block. Consecutive blocks with no transactions return the same value. |
+| `result` | `Quantity` | Cumulative transaction count across all blocks up to the selected block. Consecutive blocks with no transactions return the same value |
 
 ## Errors
 
 | Code | Cause | Fix |
 |---|---|---|
 | `-32001` | Block selector cannot be resolved or unsupported tag such as `pending` was used | Fix the request |
-| `-32602` | Invalid parameter shape, such as passing a block hash | Fix the request |
+| `-32602` | Invalid parameter shape | Fix the request |
 
 See also [Error reference](../errors.md).
 

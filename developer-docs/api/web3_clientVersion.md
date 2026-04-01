@@ -1,6 +1,6 @@
 # web3_clientVersion
 
-Returns the current client version string, including the client name, version number, and build target.
+Returns the current client version string.
 
 ## Parameters
 

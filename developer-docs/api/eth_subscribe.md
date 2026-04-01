@@ -1,34 +1,34 @@
 # eth_subscribe
 
-Opens a real-time event stream over WebSocket. Delivers new blocks, logs, pending transactions, sync-status changes, or MegaETH mini-block and state-change updates as they occur. Not available over HTTP.
+Opens a real-time event stream over WebSocket. Not available over HTTP.
 
 ## Parameters
 
 | Position | Name | Type | Required | Notes |
 |---|---|---|---|---|
-| `0` | `subscriptionType` | `string` | Yes | Subscription type (see table below) |
-| `1` | `filter` | varies | No | Shape depends on `subscriptionType` (see table below) |
+| `0` | `subscriptionType` | `string` | Yes | One of the types listed below |
+| `1` | `filter` | varies | No | Shape depends on `subscriptionType` |
 
 **Subscription types:**
 
 | Type | Filter | Notes |
 |---|---|---|
 | `newHeads` | — | Block headers as blocks are sealed |
-| `logs` | `LogFilter` | Log entries matching address/topic criteria |
+| `logs` | `object` | Log entries matching address/topic criteria |
 | `newPendingTransactions` | `boolean` | `false` (default): transaction hashes only; `true`: full transaction objects |
 | `syncing` | — | Sync status changes |
-| `miniBlocks` | — | Sub-block updates at ~10 ms granularity (MegaETH) |
-| `stateChanges` | `Address[]` | Per-mini-block account/storage diffs. Default: all accounts (MegaETH) |
+| `miniBlocks` | — | Sub-block updates at ~10 ms granularity |
+| `stateChanges` | `Address[]` | Per-mini-block account/storage diffs. Default: all accounts |
 
 When `subscriptionType` is `logs`, the filter object contains:
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| `fromBlock` | `BlockNumberOrTag` | No | Inclusive start |
-| `toBlock` | `BlockNumberOrTag` | No | Inclusive end |
-| `blockHash` | `BlockHash` | No | Single-block mode; mutually exclusive with `fromBlock`/`toBlock` |
+| `fromBlock` | `string` | No | Hex block number or tag |
+| `toBlock` | `string` | No | Hex block number or tag |
+| `blockHash` | `Hash32` | No | Single-block mode; mutually exclusive with `fromBlock`/`toBlock` |
 | `address` | `Address \| Address[]` | No | Filter by emitting address(es) |
-| `topics` | `(Hash32 \| Hash32[] \| null)[]` | No | Positional topic filter; positions are AND, values within a position are OR |
+| `topics` | `array` | No | Positional topic filter; positions are AND, values within a position are OR |
 
 ## Returns
 
@@ -54,17 +54,18 @@ The shape of `result` depends on the subscription type.
 | Field | Type | Notes |
 |---|---|---|
 | `number` | `Quantity` | Block number |
-| `hash` | `BlockHash` | Block hash |
-| `parentHash` | `BlockHash` | Parent block hash |
+| `hash` | `Hash32` | Block hash |
+| `parentHash` | `Hash32` | Parent block hash |
 | `timestamp` | `Quantity` | Block timestamp |
 | `miner` | `Address` | Fee recipient |
 | `gasLimit` | `Quantity` | Block gas limit |
 | `gasUsed` | `Quantity` | Gas consumed |
 | `baseFeePerGas` | `Quantity` | Base fee |
-| `stateRoot` | `StateRoot` | State trie root |
+| `stateRoot` | `Hash32` | State trie root |
 | `miniBlockCount` | `Quantity` | Mini-block count for this block |
 | `miniBlockOffset` | `Quantity` | Mini-block offset |
-| ... | | See [`Header`](../types.md#header) for the complete standard field list |
+
+Additional standard header fields (`logsBloom`, `transactionsRoot`, `receiptsRoot`, …) are also included.
 
 **`logs`**
 
@@ -74,18 +75,19 @@ The shape of `result` depends on the subscription type.
 | `topics` | `Hash32[]` | Indexed topics |
 | `data` | `Data` | Unindexed payload |
 | `blockNumber` | `Quantity \| null` | Containing block number |
-| `transactionHash` | `TransactionHash \| null` | Containing transaction hash |
+| `transactionHash` | `Hash32 \| null` | Containing transaction hash |
 | `transactionIndex` | `Quantity \| null` | Transaction position in block |
 | `logIndex` | `Quantity \| null` | Log position in block |
 | `removed` | `boolean` | `true` if removed during reorg |
+| `blockTimestamp` | `Quantity` | Block timestamp |
 
 **`newPendingTransactions`**
 
-`TransactionHash` by default. When `true` is passed as the filter, each event is a full transaction object:
+`Hash32` by default. When `true` is passed as the filter, each event is a full transaction object:
 
 | Field | Type | Notes |
 |---|---|---|
-| `hash` | `TransactionHash` | Transaction hash |
+| `hash` | `Hash32` | Transaction hash |
 | `type` | `Quantity` | Transaction type identifier |
 | `from` | `Address` | Sender |
 | `to` | `Address \| null` | Recipient; `null` for contract creation |
@@ -93,10 +95,11 @@ The shape of `result` depends on the subscription type.
 | `nonce` | `Quantity` | Sender nonce |
 | `gas` | `Quantity` | Gas limit |
 | `input` | `Data` | Calldata |
-| `blockHash` | `BlockHash \| null` | `null` for pending transactions |
+| `blockHash` | `Hash32 \| null` | `null` for pending transactions |
 | `blockNumber` | `Quantity \| null` | `null` for pending transactions |
 | `transactionIndex` | `Quantity \| null` | `null` for pending transactions |
-| ... | | See [`Transaction`](../types.md#transaction) for the complete field list |
+
+Additional fields vary by transaction type (`gasPrice`, `maxFeePerGas`, `accessList`, `chainId`, `v`, `r`, `s`, etc.).
 
 **`syncing`**
 
@@ -108,7 +111,7 @@ The shape of `result` depends on the subscription type.
 | `currentBlock` | `Quantity` | Current progress |
 | `highestBlock` | `Quantity` | Target block |
 
-**`miniBlocks`** *(MegaETH)*
+**`miniBlocks`**
 
 Uses `snake_case` field names.
 
@@ -123,7 +126,7 @@ Uses `snake_case` field names.
 | `transactions` | `Data[]` | Raw transaction bytes |
 | `receipts` | `object[]` | Mini-block receipts |
 
-**`stateChanges`** *(MegaETH)*
+**`stateChanges`**
 
 | Field | Type | Notes |
 |---|---|---|

@@ -6,8 +6,8 @@ Returns the block with the given hash, or `null` if no block matches.
 
 | Position | Name | Type | Required | Notes |
 |---|---|---|---|---|
-| `0` | `blockHash` | [`BlockHash`](../types.md#blockhash) | Yes | Target block hash |
-| `1` | `fullTransactions` | `boolean` | No | `false` (default) returns transaction hashes; `true` returns full transaction objects |
+| `0` | `blockHash` | `Hash32` | Yes | Target block hash |
+| `1` | `fullTransactions` | `boolean` | Yes | `false` returns transaction hashes; `true` returns full transaction objects |
 
 ## Returns
 
@@ -16,14 +16,15 @@ Returns the block with the given hash, or `null` if no block matches.
 | Field | Type | Notes |
 |---|---|---|
 | `number` | `Quantity` | Block number |
-| `hash` | `BlockHash` | Block hash |
-| `parentHash` | `BlockHash` | Parent block hash |
+| `hash` | `Hash32` | Block hash |
+| `parentHash` | `Hash32` | Parent block hash |
 | `timestamp` | `Quantity` | Block timestamp |
 | `miner` | `Address` | Fee recipient / coinbase |
 | `gasLimit` | `Quantity` | Block gas limit |
 | `gasUsed` | `Quantity` | Gas consumed by the block |
-| `transactions` | `TransactionHash[] \| Transaction[]` | Hashes when `fullTransactions = false`; full objects when `true` |
-| ... | | See [`Block`](../types.md#block) for the complete field list |
+| `transactions` | `Hash32[]` \| `Transaction[]` | Hashes when `fullTransactions = false`; full objects when `true` |
+
+Additional standard fields (`stateRoot`, `logsBloom`, `transactionsRoot`, `receiptsRoot`, `baseFeePerGas`, …) are also included.
 
 ## Errors
 

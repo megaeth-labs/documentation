@@ -6,8 +6,8 @@ Returns a block by its block number or block tag, or `null` if the block is not 
 
 | Position | Name | Type | Required | Notes |
 |---|---|---|---|---|
-| `0` | `block` | [`BlockNumberOrTag`](../types.md#blocknumberortag) | Yes | Hex block number or tag: `earliest`, `latest`, `pending`, `safe`, `finalized` |
-| `1` | `fullTransactions` | `boolean` | No | `false` (default) returns transaction hashes; `true` returns full transaction objects |
+| `0` | `block` | `string` | Yes | Hex block number or tag: `latest`, `safe`, `finalized`, `earliest`, `pending` |
+| `1` | `fullTransactions` | `boolean` | Yes | `false` returns transaction hashes; `true` returns full transaction objects |
 
 ## Returns
 
@@ -16,14 +16,15 @@ Returns a block by its block number or block tag, or `null` if the block is not 
 | Field | Type | Notes |
 |---|---|---|
 | `number` | `Quantity` | Block number |
-| `hash` | `BlockHash` | Block hash |
-| `parentHash` | `BlockHash` | Parent block hash |
+| `hash` | `Hash32` | Block hash |
+| `parentHash` | `Hash32` | Parent block hash |
 | `timestamp` | `Quantity` | Block timestamp |
 | `miner` | `Address` | Fee recipient / coinbase |
 | `gasLimit` | `Quantity` | Block gas limit |
 | `gasUsed` | `Quantity` | Gas consumed by the block |
-| `transactions` | `TransactionHash[] \| Transaction[]` | Hashes when `fullTransactions = false`; full objects when `true` |
-| ... | | See [`Block`](../types.md#block) for the complete field list |
+| `transactions` | `Hash32[]` \| `Transaction[]` | Hashes when `fullTransactions = false`; full objects when `true` |
+
+Additional standard fields (`stateRoot`, `logsBloom`, `transactionsRoot`, `receiptsRoot`, `baseFeePerGas`, …) are also included.
 
 ## Errors
 

@@ -1,8 +1,6 @@
-
-
 # eth_maxPriorityFeePerGas
 
-Returns a suggested max priority fee per gas in wei. On MegaETH, this always returns `0x0`.
+Returns the max priority fee per gas in wei. Always `0x0`.
 
 ## Parameters
 
@@ -12,7 +10,7 @@ None.
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Quantity`](../types.md#quantity) | Suggested max priority fee per gas in wei |
+| `result` | `Quantity` | Always `0x0` |
 
 ## Errors
 

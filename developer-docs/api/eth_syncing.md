@@ -1,5 +1,3 @@
-
-
 # eth_syncing
 
 Returns whether the node is currently syncing.

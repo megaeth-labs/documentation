@@ -1,5 +1,3 @@
-
-
 # net_peerCount
 
 Returns the number of peers currently connected to the node.
@@ -12,7 +10,7 @@ None.
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Quantity`](../types.md#quantity) | Number of connected peers |
+| `result` | `Quantity` | Number of connected peers |
 
 ## Errors
 
