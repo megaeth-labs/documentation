@@ -1,53 +1,37 @@
 # eth_getBlockByNumber
 
-Returns a block selected by block number or canonical block tag.
+Returns a block by block number or tag.
 
-## Ethereum Standard
-
-`eth_getBlockByNumber(block, fullTransactions) -> Block | null`
-
-## MegaETH Differences
-
-- The public MegaETH endpoint currently accepts an omitted `fullTransactions` parameter and treats it as `false`.
-- That omitted-boolean behavior is a MegaETH convenience, not portable Ethereum JSON-RPC behavior.
-- If you only need header fields, prefer [`eth_getHeaderByNumber`](./eth_getHeaderByNumber.md).
-
-## Request
-
-Send `params` as `[block, fullTransactions]`.
+## Parameters
 
 | Position | Type | Required | Notes |
 |---|---|---|---|
-| `0` | [`BlockNumberOrTag`](../types.md#blocknumberortag) | Yes | Accepts `earliest`, `latest`, `pending`, `safe`, `finalized`, or a hex block number |
-| `1` | `boolean` | Yes for portable clients | `false` returns transaction hashes; `true` returns full transaction objects |
+| `0` | [`BlockNumberOrTag`](../types.md#blocknumberortag) | Yes | `earliest`, `latest`, `pending`, `safe`, `finalized`, or a hex block number |
+| `1` | `Boolean` | No | `false` returns transaction hashes; `true` returns full transaction objects. Default: `false` |
 
-Reader notes:
+## Returns
 
-- Send `fullTransactions` explicitly if you want portable client behavior.
-- Use a fixed block number when you need deterministic results.
-- EIP-1898-style block selector objects are not accepted here.
-- Keep `fullTransactions = false` unless you actually need full transaction objects.
-
-## Response
+A [`Block`](../types.md#block) object, or `null` if the block does not exist or has not been produced yet. The object contains:
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Block`](../types.md#block) or `null` | Selected block object |
+| `hash` | `Data` (32 bytes) | Block hash |
+| `number` | `Quantity` | Block number |
+| `parentHash` | `Data` (32 bytes) | Parent block hash |
+| `timestamp` | `Quantity` | Unix timestamp |
+| `gasLimit` | `Quantity` | Gas limit for the block |
+| `gasUsed` | `Quantity` | Total gas used by all transactions |
+| `miner` | `Data` (20 bytes) | Block producer address |
+| `transactions` | `Data[]` \| [`Transaction`](../types.md#transaction)`[]` | Transaction hashes when `fullTransactions = false`; full transaction objects when `true` |
+| `logsBloom` | `Data` (256 bytes) | Bloom filter for log lookups |
+| ... | | See [`Block`](../types.md#block) for the complete field list |
 
-Reader notes:
+## Errors
 
-- With `fullTransactions = false`, `result.transactions` is an array of [`TransactionHash`](../types.md#transactionhash) values.
-- With `fullTransactions = true`, `result.transactions` is an array of [`Transaction`](../types.md#transaction) objects.
-- `result: null` is a normal outcome when the block cannot be resolved or is not available.
-- On the public MegaETH endpoint, `pending` and future block numbers can return `null`.
-
-## Common Errors
-
-| Code | When it usually happens | What to do |
+| Code | Cause | Fix |
 |---|---|---|
-| `-32602` | The block selector is malformed or `fullTransactions` is not a boolean | Fix the request before retrying |
-| `4444` | The endpoint cannot serve the requested historical block data | Keep the request unchanged and verify historical-state availability for that endpoint |
-| `-32005` | The public endpoint rate-limited the request | Back off and retry later |
+| `-32602` | Malformed block selector or `fullTransactions` is not a boolean | Fix the request |
+| `4444` | Requested historical block is not available on this endpoint | Verify historical-state availability for the endpoint |
 
 See also [Error reference](../errors.md).
 

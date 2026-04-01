@@ -1,24 +1,20 @@
 # eth_gasPrice
 
-Returns a gas price suggestion in wei.
+Returns the current gas price in wei. MegaETH has a stable base fee, so this method always returns `0xf4240` (1,000,000 wei = 0.001 gwei).
 
-`eth_gasPrice() -> Quantity` — no parameters.
+## Parameters
 
-## MegaETH Differences
+None.
 
-- On the public MegaETH gateway, a standalone request currently returns a fixed value: `0xf4240`.
-- On the public MegaETH gateway, a batch request returns a network-derived gas price instead.
-- That standalone-vs-batch behavior is public-gateway-specific and is not part of standard Ethereum JSON-RPC.
-
-## Response
+## Returns
 
 | Field | Type | Notes |
 |---|---|---|
-| `result` | [`Quantity`](../types.md#quantity) | Gas price suggestion in wei |
+| `result` | [`Quantity`](../types.md#quantity) | Gas price in wei |
 
-- If your application builds EIP-1559 transactions, do not use this as your only fee input.
+## Errors
 
-For error handling, see [Error reference](../errors.md).
+Standard JSON-RPC errors only. See [Error reference](../errors.md) for details.
 
 ## Example
 
@@ -29,5 +25,5 @@ curl -sS https://mainnet.megaeth.com/rpc \
 ```
 
 ```json
-{"jsonrpc":"2.0","id":1,"result":"0xf4240"}
+{"jsonrpc":"2.0","id":1,"result":"0xf4240"}  // 1,000,000 wei = 0.001 gwei
 ```
