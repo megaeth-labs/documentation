@@ -4,7 +4,7 @@ description: Key contract addresses and tokens on MegaETH and Ethereum Mainnet.
 
 # Key Contracts & Tokens
 
-### Core
+## Core
 
 {% tabs %}
 {% tab title="Mainnet" %}
@@ -16,7 +16,7 @@ description: Key contract addresses and tokens on MegaETH and Ethereum Mainnet.
 {% endtab %}
 {% endtabs %}
 
-### Stablecoins
+## Stablecoins
 
 {% tabs %}
 {% tab title="Mainnet" %}
@@ -32,7 +32,7 @@ description: Key contract addresses and tokens on MegaETH and Ethereum Mainnet.
 {% endtab %}
 {% endtabs %}
 
-### ETH Liquid Staking & Restaking
+## ETH Liquid Staking & Restaking
 
 {% tabs %}
 {% tab title="Mainnet" %}
@@ -46,7 +46,7 @@ description: Key contract addresses and tokens on MegaETH and Ethereum Mainnet.
 {% endtab %}
 {% endtabs %}
 
-### BTC
+## BTC
 
 {% tabs %}
 {% tab title="Mainnet" %}
@@ -58,7 +58,7 @@ description: Key contract addresses and tokens on MegaETH and Ethereum Mainnet.
 {% endtab %}
 {% endtabs %}
 
-### Other Tokens
+## Other Tokens
 
 {% tabs %}
 {% tab title="Mainnet" %}
@@ -75,7 +75,7 @@ If a token you are looking for is not listed, check the registry for the latest 
 {% endtab %}
 {% endtabs %}
 
-### OP Stack Predeploys
+## OP Stack Predeploys
 
 These contracts are predeployed at fixed addresses on all OP Stack chains.
 The addresses are the same on both MegaETH Mainnet and Testnet.
@@ -98,7 +98,7 @@ WETH and Multicall3 are also OP Stack predeploys/preinstalls — they are listed
 For full details, see the OP Stack [predeploys](https://docs.optimism.io/op-stack/protocol/smart-contracts#layer-2-contracts-predeploys) documentation.
 {% endhint %}
 
-### OP Stack Preinstalls
+## OP Stack Preinstalls
 
 These contracts come preinstalled on OP Stack chains at their standard addresses.
 The addresses are the same on both MegaETH Mainnet and Testnet.
@@ -123,7 +123,7 @@ The addresses are the same on both MegaETH Mainnet and Testnet.
 For full details, see the OP Stack [preinstalls](https://docs.optimism.io/op-stack/features/preinstalls#contracts-and-deployed-addresses) documentation.
 {% endhint %}
 
-### L1 Contracts (Ethereum)
+## L1 Contracts (Ethereum)
 
 {% tabs %}
 {% tab title="Mainnet" %}

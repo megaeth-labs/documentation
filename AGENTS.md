@@ -6,8 +6,7 @@ This file provides guidance to AI agents (e.g., Claude Code, Codex, Cursor, etc.
 
 MegaETH Documentation — the official documentation site for MegaETH, hosted at [docs.megaeth.com](https://docs.megaeth.com).
 Documentation is written in GitBook-flavored Markdown and deployed via GitBook with Git Sync.
-For GitBook syntax, custom blocks, configuration, and best practices, follow the official GitBook skill file:
-https://raw.githubusercontent.com/GitbookIO/public-docs/refs/heads/main/skill.md
+For GitBook syntax, custom blocks, configuration, and best practices, follow the [official GitBook skill file](https://raw.githubusercontent.com/GitbookIO/public-docs/refs/heads/main/skill.md).
 
 ## Documentation Architecture
 

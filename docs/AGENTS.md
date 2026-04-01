@@ -52,7 +52,7 @@ When in doubt: top-level pages prioritize readability, layer pages prioritize de
   "If the transaction exceeds 10M gas, use a managed provider" not "Use a managed provider if the transaction exceeds 10M gas."
 - **Descriptive link text.**
   Links must describe the destination.
-  "[Gas Model](gas-model.md)" not "[click here](gas-model.md)" or "[this page](gas-model.md)."
+  `[Gas Model](dev/execution/gas-model.md)` not `[click here](dev/execution/gas-model.md)` or `[this page](dev/execution/gas-model.md)`.
   Never use "here", "this link", "this page", or "read more" as link text.
 
 ## Terminology
@@ -92,7 +92,7 @@ Use these exact forms consistently. Do not alternate between variants.
 
 ### Within the same layer
 
-Use relative paths: `[Gas Model](gas-model.md)` or `[RPC Methods](rpc/overview.md)`.
+Use relative paths: `[Gas Model](gas-model.md)` or `[RPC Methods](../read/overview.md)`.
 
 ### Between layers
 
@@ -106,7 +106,7 @@ Use absolute URLs:
 
 ### Direction rule
 
-- **User docs → Developer docs**: "For technical details, see [Developer Docs](../dev/...)."
+- **User docs → Developer docs**: "For technical details, see [Developer Docs](dev/overview.md)."
 - **Developer docs → EVM Spec**: "For the formal specification, see [Dual Gas Model](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/dual-gas-model)."
 - **EVM Spec → nothing**: The spec is self-contained. It never links to user or developer docs.
 

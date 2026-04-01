@@ -81,7 +81,6 @@ If your contract needs both volatile data and heavy computation, split the work 
 1. A lightweight transaction that reads volatile data and stores the result on-chain.
 2. A separate transaction that reads the stored result and performs heavy computation — no cap applies because it never accesses volatile data.
 
-
 <details>
 <summary>Rex4 (unstable): Read volatile data as late as possible</summary>
 
@@ -113,7 +112,6 @@ Under the current absolute cap, read order makes no difference — the 20M ceili
 For the formal definition, see [Gas Detention](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/gas-detention).
 
 </details>
-
 
 ## Related Pages
 

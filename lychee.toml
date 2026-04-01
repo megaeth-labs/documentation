@@ -19,5 +19,6 @@ exclude = [
 
 # Skip these file paths
 exclude_path = [
-  "AGENTS.md",
+  ".claude/",
+  ".sisyphus/",
 ]

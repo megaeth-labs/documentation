@@ -1,4 +1,4 @@
-name: Check Links
+name: Lint
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 jobs:
-  check-links:
+  lint:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
@@ -16,8 +16,11 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Check internal links
+      - name: Check links
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --no-progress 'docs/**/*.md'
+          args: --no-progress '**/*.md'
           fail: true
+
+      - name: Lint Markdown
+        run: npx markdownlint-cli2

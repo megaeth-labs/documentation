@@ -19,24 +19,30 @@ docs/                  Documentation source
     └── execution/     EVM differences, gas model, resource limits
 ```
 
-## Link checking
+## Linting
 
-CI runs [lychee](https://lychee.cli.rs/) to verify internal links.
-To run it locally:
+CI runs two checks on all Markdown files:
+
+| Tool | What it checks | Config |
+| ---- | -------------- | ------ |
+| [lychee](https://lychee.cli.rs/) | Internal links resolve to existing files | `lychee.toml` |
+| [markdownlint](https://github.com/DavidAnson/markdownlint-cli2) | Markdown structure (blank lines, heading style, bare URLs) | `.markdownlint-cli2.yaml` |
+
+To run locally:
 
 ```bash
-# Install lychee (macOS)
+# Install
 brew install lychee
+npm install -g markdownlint-cli2
 
-# Check links
-lychee 'docs/**/*.md'
+# Run
+lychee '**/*.md'
+markdownlint-cli2
 ```
-
-Configuration is in `lychee.toml`.
 
 ## Contributing
 
 1. Edit or create Markdown files under `docs/`.
 2. Update `docs/SUMMARY.md` if adding or removing pages.
-3. Run `lychee 'docs/**/*.md'` to verify links before pushing.
+3. Run `lychee '**/*.md'` and `markdownlint-cli2` to verify before pushing.
 4. See `AGENTS.md` for writing conventions and layer-specific rules.

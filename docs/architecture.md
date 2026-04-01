@@ -85,7 +85,6 @@ There are two ways to access them (see [Connect to MegaETH](user/connect.md) for
 - **Public RPC endpoint** — available to everyone, rate-limited.
 - **Managed RPC providers** — [Alchemy](https://www.alchemy.com/) and others offer higher throughput and debug methods (`debug_*`, `trace_*`).
 
-
 ### Data Availability
 
 When the sequencer produces a block, it must make the block data publicly available so that anyone can verify the chain — this is the [data availability](https://docs.optimism.io/connect/resources/glossary#data-availability) requirement.
