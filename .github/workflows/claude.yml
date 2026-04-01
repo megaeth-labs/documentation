@@ -78,7 +78,7 @@ jobs:
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.pull_request.number }}
 
-            Review this pull request following the guidelines in CLAUDE.md and REVIEW.md.
+            Review this pull request following the guidelines in CLAUDE.md and AGENTS.md.
             Be concise and actionable. Only comment on issues that matter.
 
             Before writing new comments, check all previous review threads on this PR.

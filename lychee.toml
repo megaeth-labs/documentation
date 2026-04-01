@@ -1,0 +1,18 @@
+# lychee link checker configuration
+# https://lychee.cli.rs/
+
+# Only check local files — skip all external URLs.
+# GitBook handles external link rendering; CI validates internal consistency.
+mode = "offline"
+
+# Resolve relative links from the GitBook root
+base = "docs"
+
+# Check anchor fragments (#section-name)
+include_fragments = true
+
+# Skip these patterns (regex)
+exclude = [
+  "space\\.vars\\.",            # GitBook variable expressions (rendered at deploy time)
+  "^https://app\\.gitbook\\.com", # GitBook app links (require authentication)
+]
