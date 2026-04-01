@@ -1,6 +1,6 @@
 # eth_createAccessList
 
-Simulates a transaction and returns the EIP-2930 access list of addresses and storage keys touched during execution, along with the gas estimate.
+Generates an access list for a transaction.
 
 ## Parameters
 
