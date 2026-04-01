@@ -57,6 +57,7 @@ To browse all projects (including upcoming ones), see the [**Discover**](https:/
 | [**deBridge**](https://debridge.com/)              | Instant bridging from Solana and 25+ chains.                                        |
 | [**Across**](https://across.to/)                   | Fast, cheap, and secure cross-chain transfers.                                      |
 | [**Portal (Wormhole)**](https://portalbridge.com/) | Bridge USDC, ETH, SOL, and 100+ tokens across 30+ chains.                           |
+| [**Meridian**](https://mrdn.finance/)              | x402 facilitator for the agent economy.                                             |
 
 For more bridge options, see [Get Funds on Mainnet](bridge.md).
 
