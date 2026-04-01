@@ -1,1 +1,0 @@
-50	<li><a href="/rpc.html">RPC</a></li>

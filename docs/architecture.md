@@ -1,49 +1,114 @@
 ---
-title: Architecture
-rank: 10
+description: MegaETH network architecture — how transactions flow from submission through execution, streaming, and L1 settlement.
 ---
 
-The complete MegaETH system will consist of the following logical components:
+# Architecture
 
-**Sequencers.** Users’ transactions (write requests) coming into the system end
-up with them. They execute users’ transactions, assemble executed transactions
-into blocks, and disseminate execution results such as transaction receipts and
-state changes. They also submit the blocks to the L1 for finality.
+MegaETH is an Ethereum L2 built on the [OP Stack](https://docs.optimism.io/stack/getting-started), optimized for real-time execution.
+The sequencer produces [mini-blocks](mini-block.md) every ~10 milliseconds and [EVM blocks](mini-block.md) every ~1 second, streaming state to globally distributed RPC nodes so that users and applications see transaction results within milliseconds.
 
-**Read replicas.** They maintain replicas of the chain’s state and (recent)
-history to service read requests. They may also choose to screen write requests
-by validating them against local replicas of the chain’s state. Depending on
-how a replica maintains the state and the history, there are two types of
-nodes.
+## How a Transaction Moves Through MegaETH
 
-- _Replica nodes._ They receive new blocks and execution results and apply them to local replicas of the chain’s state and history without validation.
-- _Full nodes._ They receive new blocks, locally re-execute the blocks, and update local replicas of the chain’s state and history.
+Like all blockchains, MegaETH processes transactions and maintains a shared ledger.
+What makes it different is _speed_: a transaction is confirmed in roughly 10 milliseconds — not seconds or minutes.
+The rest of this page walks through exactly how that happens, from submission to final settlement on Ethereum L1.
 
-**Provers.** They receive new blocks, locally re-execute the blocks, and
-generate proofs for the blocks. These proofs might be fault proofs or validity
-proofs, depending on how the chain is operated.
+```mermaid
+sequenceDiagram
+    participant User
+    participant RPC as RPC Endpoint
+    participant Seq as Sequencer
+    participant Nodes as RPC Nodes
+    participant L1 as Ethereum L1
 
-**Data availability (DA) service.** When a sequencer produces a block, it must
-submit to the DA service any associated data that the rest of the network
-depends on to process the block; the DA service will return a receipt
-certifying that the data is received and make the data publicly available for a
-finite period of time. Without the receipt, the sequencer cannot submit the
-block to the L1. The DA service ensures that replica nodes and full nodes can
-keep up with the chain’s state, and prover nodes can produce proofs for any
-block that is submitted to the L1, even if the sequencer maliciously withholds
-data.
+    User->>RPC: Submit transaction
+    RPC->>Seq: Forward to sequencer
+    Seq->>Seq: Execute (~10ms)
+    Seq-->>Nodes: Stream mini-block (receipts, logs, state)
+    Nodes-->>User: Transaction confirmed
+    Note over Seq,L1: Periodically
+    Seq->>L1: Batch and submit block data (via EigenDA)
+    L1->>L1: Finalize via dispute resolution
+```
 
-The current phase of the MegaETH Testnet contains the following components:
+### 1. Submission
 
-- One sequencer
-- Multiple replica nodes maintained by MegaETH to serve RPC requests
-- EigenDA devnet as the DA service
-- An Ethereum devnet as the L1
+A user's transaction — a swap, a transfer, a contract call — arrives at an RPC endpoint.
+The endpoint validates it (correct format, valid signature, sufficient balance) and forwards it to the [sequencer](https://docs.optimism.io/connect/resources/glossary#sequencer), the single node responsible for ordering and executing transactions.
 
-Upcoming phases of the Testnet will introduce
+### 2. Execution
 
-- Multiple sequencers for failover and rotation
-- Permissionless full nodes
-- Permissionless replica nodes
-- Permissionless prover nodes running in optimistic (fault proof) mode
-- Ethereum Testnet as the L1
+The sequencer executes the transaction against the current chain state.
+Every ~10 milliseconds, it seals the recently executed transactions into a [mini-block](mini-block.md) — a lightweight block containing the transactions, their execution results (receipts), and the resulting state changes.
+
+### 3. Streaming
+
+The sequencer streams each mini-block to RPC nodes distributed across multiple regions.
+As soon as an RPC node receives a mini-block, its contents — transaction receipts, event logs, and state updates — become immediately queryable.
+This is how a wallet can show a confirmed transaction within milliseconds: the RPC node it connects to has already received the mini-block containing the result.
+
+Applications that need the lowest possible latency can subscribe to mini-blocks directly via the [Realtime API](dev/read/realtime-api.md).
+
+### 4. L1 Settlement
+
+Periodically, the sequencer seals an [EVM block](mini-block.md#relationship-to-evm-blocks) — a standard Ethereum-format block that bundles all the mini-blocks produced during that interval.
+The block data is posted to [EigenDA](https://docs.eigenlayer.xyz/eigenda/overview/) for [data availability](https://docs.optimism.io/connect/resources/glossary#data-availability).
+EigenDA returns a certificate proving the data is available, and the OP Stack [batcher](https://docs.optimism.io/builders/chain-operators/architecture#batcher) submits that certificate to Ethereum L1.
+Block proposals can then be challenged through [dispute resolution](https://specs.optimism.io/fault-proof/index.html).
+
+This is what gives MegaETH its security: even though the sequencer processes transactions at sub-second speed, all results are ultimately anchored to Ethereum and can be independently verified.
+
+## Components
+
+### Sequencer
+
+The [sequencer](https://docs.optimism.io/connect/resources/glossary#sequencer) is the block producer — the single node that decides transaction ordering.
+It executes transactions, assembles them into mini-blocks and EVM blocks, and broadcasts execution results to the rest of the network.
+
+The sequencer is operated with high availability.
+If the active node goes down, a standby takes over within seconds, and software upgrades happen without pausing the chain.
+
+### RPC Nodes
+
+RPC nodes are the network's public interface.
+They serve read requests (account balances, contract calls, event logs), accept transaction submissions, and maintain a replica of the chain state synced from the sequencer.
+Depending on how a node maintains state, there are two types:
+
+- **Replica nodes** receive blocks and execution results from the sequencer and apply them to a local replica of the chain's state and history without re-execution.
+  This is the default mode — it is lightweight and optimized for serving read requests at scale.
+- **Full nodes** receive blocks and locally re-execute them, independently validating every state transition.
+  Full nodes do not need to trust the sequencer's execution results.
+
+MegaETH operates RPC nodes across multiple geographic regions so that users worldwide connect to a nearby node with low latency.
+There are two ways to access them (see [Connect to MegaETH](user/connect.md) for endpoints):
+
+- **Public RPC endpoint** — available to everyone, rate-limited.
+- **Managed RPC providers** — [Alchemy](https://www.alchemy.com/) and others offer higher throughput and debug methods (`debug_*`, `trace_*`).
+
+### Data Availability
+
+When the sequencer produces a block, it must make the block data publicly available so that anyone can verify the chain — this is the [data availability](https://docs.optimism.io/connect/resources/glossary#data-availability) requirement.
+MegaETH uses [EigenDA](https://www.eigenlayer.xyz/) as the primary data availability layer.
+Without a DA certificate, the sequencer cannot submit the block to L1.
+This ensures that even if the sequencer behaves maliciously, replica nodes and provers can always access the data they need.
+
+### Fault Proof
+
+MegaETH settles on Ethereum L1 using the OP Stack's [dispute resolution](https://specs.optimism.io/fault-proof/index.html) framework.
+Block proposals are submitted to L1 and can be challenged within a dispute window.
+
+For dispute resolution, MegaETH uses **Kailua** — a ZK fraud proof system built on RISC-Zero.
+Instead of the multi-round interactive bisection used by standard OP Stack, Kailua generates a single zero-knowledge proof to resolve disputes, making challenges faster and cheaper.
+
+### Provers
+
+Provers re-execute blocks and generate cryptographic proofs that attest to the correctness of the sequencer's execution results.
+These proofs are used in the [fault proof](#fault-proof) process: if a block proposal on L1 is challenged, a prover can produce a proof to resolve the dispute.
+
+## Related Pages
+
+- [Get Started](user/get-started.md) — connect your wallet, bridge ETH, and explore the network
+- [Connect to MegaETH](user/connect.md) — chain IDs, RPC endpoints, and network parameters
+- [Mini-Blocks](mini-block.md) — the two block types and how they enable sub-second latency
+- [Overview](dev/overview.md) — developer quickstart with RPC endpoints and chain configuration
+- [Realtime API](dev/read/realtime-api.md) — subscribe to mini-blocks and get results in real time

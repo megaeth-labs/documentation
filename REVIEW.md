@@ -1,19 +1,20 @@
-# Documentation Review Guidelines
+# Review Guidelines
 
 ## Always check
 
-- Every new or modified `.md` file under `docs/` has YAML frontmatter with both `title` and `rank`
-- Internal links use root-relative paths without extensions: `[text](/pagename)`, not `[text](pagename.html)` or `[text](pagename.md)`
-- Multi-file pages (directories under `docs/`) use numeric prefixes for ordering (e.g., `1-intro.md`, `2-details.md`)
-- Content follows one-sentence-per-line style for diff readability
-- Technical claims are accurate and consistent with other documentation pages
+- Markdown files have YAML frontmatter with `description` field
+- Internal links use correct relative paths with `.md` extensions
+- New pages are listed in `docs/SUMMARY.md`
+- One sentence per line (improves diff readability)
+- GitBook custom blocks (`{% hint %}`, `{% tabs %}`, etc.) are correctly opened and closed
 
 ## Content quality
 
-- New documentation is clear, concise, and written for developers
-- Pandoc-flavored Markdown is used correctly (not GitHub-flavored Markdown assumptions)
-- No broken links to internal pages or external resources
-- Code examples are syntactically correct and use appropriate language tags in fenced code blocks
+- Writing follows the layer-specific `AGENTS.md` rules for the directory being edited
+- Heading hierarchy is correct (no skipped levels)
+- Code examples use appropriate language tags in fenced code blocks
+- Cross-references between layers use correct relative paths
+- External spec links use absolute GitBook URLs (not relative paths to `docs/spec/`)
 
 ## Previous comments
 
@@ -23,6 +24,5 @@
 
 ## Skip
 
-- Changes to `public/` that are simply regenerated output from `make`
-- Whitespace-only or formatting-only diffs in generated HTML files
-- CSS styling changes (these are design decisions, not documentation correctness)
+- Whitespace-only or formatting-only diffs
+- Changes to `.claude/` skill files

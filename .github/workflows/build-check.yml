@@ -1,4 +1,4 @@
-name: Build
+name: Lint
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -6,32 +6,17 @@ on:
     branches: [main]
 
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-24.04
     permissions:
-      contents: write
+      contents: read
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.head_ref || github.ref_name }}
           fetch-depth: 1
 
-      - name: Install Pandoc
-        run: |
-          PANDOC_VERSION=2.9.2.1
-          wget -q "https://github.com/jgm/pandoc/releases/download/${PANDOC_VERSION}/pandoc-${PANDOC_VERSION}-1-amd64.deb" -O /tmp/pandoc.deb
-          sudo dpkg -i /tmp/pandoc.deb
+      - uses: jdx/mise-action@v2
 
-      - name: Build
-        run: make clean && make
-
-      - name: Commit and push if changed
-        run: |
-          if [ -n "$(git status --porcelain public/ manifest/)" ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add public/ manifest/
-            git commit -m "build: regenerate public/"
-            git push
-          fi
+      - name: Lint
+        run: mise run lint
