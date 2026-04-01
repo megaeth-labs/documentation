@@ -12,7 +12,7 @@ layout:
 # MegaETH Documentation
 
 Welcome to the MegaETH documentation.
-MegaETH is a high-performance Ethereum L2 with sub-millisecond block times and real-time transaction processing.
+MegaETH is a high-performance Ethereum L2 with ~10ms block times and real-time transaction processing.
 
 ## Get Started
 

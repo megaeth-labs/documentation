@@ -106,7 +106,8 @@ When a PR creation is requested, the agent should:
 - **One sentence, one line.**
   When writing Markdown files, put each sentence on a separate line.
   This improves diff readability and makes reviews easier.
-- **Cross-link to the EVM spec with relative paths.**
-  The EVM spec is in `docs/spec/`. Link to it as `[text](spec/evm/dual-gas-model.md)` from docs root, or `[text](../spec/evm/dual-gas-model.md)` from layer subdirectories.
+- **Cross-link to the EVM spec with absolute GitBook URLs.**
+  The EVM spec is maintained in the mega-evm repo and synced into a separate GitBook space — it does not exist as a file in this repo.
+  Use absolute URLs: `[Dual Gas Model](https://app.gitbook.com/o/iBzILuNyLtuxU3vUEuPe/s/apRp1sxFYuGhHAo7Y2Pz/evm/dual-gas-model)`.
 - **Keep commit messages simple.**
   No co-author information or "generated with" footers.

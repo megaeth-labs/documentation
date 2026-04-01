@@ -50,7 +50,7 @@ See the [Contract Limits specification](https://app.gitbook.com/o/iBzILuNyLtuxU3
 
 60,000,000 compute gas on the public RPC endpoint.
 
-Note that this limit is _different_ from the on-chain transaction gas limit of 1,000,000,000.
+Note that this limit is _different_ from the protocol per-transaction gas limit of 10,000,000,000.
 It applies only to RPC simulation calls.
 Managed RPC providers may allow higher limits.
 
@@ -132,7 +132,7 @@ Preconfirmation of mini-blocks by the sequencer has the same level of guarantees
 
 Mini-blocks.
 
-### Why am I seeing `0xfff[...]fff` `blockHash` in a realtime transaction receipt, even though I get a valid `blockNumber`?
+### Why is `blockHash` `null` in a realtime transaction receipt even though `blockNumber` is valid?
 
 In the realtime RPC, if a transaction receipt has a `null` `blockHash` but a valid `blockNumber`, it means the transaction was included in a mini-block and is preconfirmed by the sequencer, but not yet part of an EVM block.
 
@@ -179,7 +179,7 @@ MegaETH only disables outdated ciphers and protocol versions, so modern routers 
 
 ### Where can I find standard token contract addresses?
 
-On the community-run [wiki](https://megaeth-1.gitbook.io/untitled).
+See [Contracts & Tokens](send-tx/contracts.md) for all token and contract addresses on MegaETH.
 
 ### How do I wrap the native (gas) token?
 

@@ -58,7 +58,7 @@ Any Ethereum SDK (ethers.js, viem, alloy, web3.py, etc.) works the same way — 
 ### The RPC Compute Gas Cap
 
 `eth_estimateGas` (and `eth_call`) enforce a compute gas limit of **60,000,000** on the public RPC endpoint.
-This is separate from the on-chain transaction gas limit of 1,000,000,000.
+This is separate from the protocol per-transaction gas limit of 10,000,000,000.
 
 If your transaction requires more than 60M compute gas to simulate, the RPC call will fail.
 There are two workarounds:

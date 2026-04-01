@@ -1,6 +1,6 @@
 # Documentation Audit Report
 
-Audited against rules in `docs/AGENTS.md`, `docs/dev/AGENTS.md`, `docs/user/AGENTS.md`, `docs/integration/AGENTS.md`.
+Audited against rules in `docs/AGENTS.md`, `docs/dev/AGENTS.md`, `docs/user/AGENTS.md`.
 
 ## Legend
 
@@ -21,7 +21,7 @@ This is factually stale and violates **MegaETH-first** (describes hypothetical f
 
 ### 2. `faq.md` — Stale/wrong answers
 
-- **Line 51**: `eth_call` gas limit says "10,000,000 (increased on 28/03/2025 from 5,000,000)" — the date qualifier violates **terse over verbose** and the historical note adds no value. Also on line 53, it says "on-chain transactions, which is 1,000,000,000" but `resource-limits.md` says 2,000,000,000 (2B). **One of these is wrong.**
+- **Line 51**: `eth_call` gas limit says "10,000,000 (increased on 28/03/2025 from 5,000,000)" — the date qualifier violates **terse over verbose** and the historical note adds no value. Also on line 53, it says "on-chain transactions, which is 1,000,000,000" but `resource-limits.md` says 10,000,000,000 (10B). **One of these is wrong.**
 - **Line 171–181**: WETH address given as `0x4eB2Bd7beE16F38B1F4a0A5796Fffd028b6040e9`, but `contracts.md` lists WETH at `0x4200000000000000000000000000000000000006` (the OP Stack canonical WETH). **Contradiction.**
 - **Line 173**: "Where can I find standard token contract addresses?" points to a "community-run wiki" — we now have `contracts.md`. **Stale redirect.**
 
