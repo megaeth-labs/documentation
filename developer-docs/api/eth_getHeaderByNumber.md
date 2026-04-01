@@ -1,6 +1,6 @@
 # eth_getHeaderByNumber
 
-Returns a header-only view of a block by number or block tag. This is a MegaETH-specific method; for wider provider compatibility, use [`eth_getBlockByNumber`](./eth_getBlockByNumber.md).
+Returns a header-only view of a block by number or block tag.
 
 ## Parameters
 

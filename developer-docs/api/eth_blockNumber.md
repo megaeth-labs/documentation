@@ -1,6 +1,6 @@
 # eth_blockNumber
 
-Returns the number of the most recent block known to the node.
+Returns the latest block number.
 
 ## Parameters
 

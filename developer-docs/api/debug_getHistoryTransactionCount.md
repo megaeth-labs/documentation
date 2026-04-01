@@ -1,6 +1,6 @@
 # debug_getHistoryTransactionCount
 
-Returns the chain-wide cumulative transaction count up to and including a given block. This is a MegaETH-specific method — not to be confused with [eth_getTransactionCount](./eth_getTransactionCount.md), which returns a per-account nonce.
+Returns the chain-wide cumulative transaction count up to and including a given block.
 
 ## Parameters
 

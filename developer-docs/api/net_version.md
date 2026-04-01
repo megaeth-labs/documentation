@@ -1,6 +1,6 @@
 # net_version
 
-Returns the current network ID as a decimal string. For transaction signing, use [`eth_chainId`](./eth_chainId.md) instead.
+Returns the current network ID as a decimal string.
 
 ## Parameters
 

@@ -2,7 +2,7 @@
 
 # eth_getCodeByHash
 
-Returns runtime bytecode for a given code hash. This is a MegaETH-specific method; if you start from an address and block selector, use [eth_getCode](./eth_getCode.md) instead.
+Returns runtime bytecode for a given code hash.
 
 ## Parameters
 

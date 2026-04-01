@@ -1,6 +1,6 @@
 # mega_getWithdrawalProof
 
-Returns a Merkle proof for the L2ToL1MessagePasser contract at a given block, used to prove withdrawal state to L1. `eth_getWithdrawalProof` is an alias with identical behavior.
+Returns a Merkle proof for the L2ToL1MessagePasser contract at a given block, used to prove withdrawal state to L1.
 
 ## Parameters
 

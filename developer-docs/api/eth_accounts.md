@@ -2,7 +2,7 @@
 
 # eth_accounts
 
-Returns a list of addresses controlled by the RPC node. On public MegaETH endpoints, this always returns an empty list.
+Returns a list of addresses controlled by the RPC node.
 
 ## Parameters
 

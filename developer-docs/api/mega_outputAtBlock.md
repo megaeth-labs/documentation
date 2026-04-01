@@ -1,6 +1,6 @@
 # mega_outputAtBlock
 
-Returns the L2 output commitment for a given block, including the output root, state root, and current sync status. Used by bridges and verifiers to construct withdrawal proofs on L1. `optimism_outputAtBlock` is an alias with identical behavior.
+Returns the L2 output commitment for a given block, including the output root, state root, and current sync status.
 
 ## Parameters
 
