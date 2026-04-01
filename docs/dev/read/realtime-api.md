@@ -62,14 +62,14 @@ Filter by contract address and topics to receive only the events you care about.
 
 **Problem:** You need to track balance or storage changes for specific accounts in real time (e.g., a liquidation bot watching collateral ratios).
 
-**Solution:** Subscribe to [`stateChanges`](rpc/eth_subscribe.md#state-changes) with the account addresses you want to monitor.
+**Solution:** Subscribe to [`stateChanges`](rpc/eth_subscribe.md#statechanges) with the account addresses you want to monitor.
 Each notification includes the updated balance, nonce, and any storage slots that changed.
 
 ### Building a block explorer or indexer
 
 **Problem:** You need every transaction and receipt as soon as it's executed, not when the next EVM block is sealed.
 
-**Solution:** Subscribe to [`miniBlocks`](rpc/eth_subscribe.md#mini-blocks).
+**Solution:** Subscribe to [`miniBlocks`](rpc/eth_subscribe.md#miniblocks).
 Each notification contains the full set of transactions and receipts for that mini-block.
 
 ### Chaining dependent transactions
