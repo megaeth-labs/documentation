@@ -30,8 +30,8 @@ Many tooling and infrastructure integrations are still being finalized.
 | ---------------------------------------------- | ---------------------------- | ---------------- | -------   |
 | [Uptime Dashboard](https://uptime.megaeth.com) | Native performance dashboard | Supported        | Supported |
 | [Dune Dashboard](https://dune.com)             |                              | —                | Supported |
-| [Growthepie](https://www.growthepie.com/chains/megaeth)|                      | —              | Supported |
-| [Miniblocks](https://miniblocks.io/)           |Real-time miniblock explorer  | —              | Supported |
+| [Growthepie](https://www.growthepie.com/chains/megaeth) |                      | —              | Supported |
+| [Miniblocks](https://miniblocks.io/)           | Real-time miniblock explorer  | —              | Supported |
 | [DefiLlama](https://defillama.com/chain/megaeth) |                            | —              | Supported |
 
 ## Block Explorers
