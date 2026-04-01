@@ -15,10 +15,10 @@ Opens a real-time event stream over WebSocket. Delivers new blocks, logs, pendin
 |---|---|---|
 | `newHeads` | — | Block headers as blocks are sealed |
 | `logs` | `LogFilter` | Log entries matching address/topic criteria |
-| `newPendingTransactions` | `boolean` | Omit or `false` for hashes only; `true` for full transaction objects |
+| `newPendingTransactions` | `boolean` | `false` (default): transaction hashes only; `true`: full transaction objects |
 | `syncing` | — | Sync status changes |
 | `miniBlocks` | — | Sub-block updates at ~10 ms granularity (MegaETH) |
-| `stateChanges` | `Address[]` | Per-mini-block account/storage diffs; omit for all accounts (MegaETH) |
+| `stateChanges` | `Address[]` | Per-mini-block account/storage diffs. Default: all accounts (MegaETH) |
 
 When `subscriptionType` is `logs`, the filter object contains:
 

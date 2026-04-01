@@ -1,6 +1,6 @@
 # eth_sendRawTransaction
 
-Submits a signed transaction to the network and returns its transaction hash. EIP-155 replay protection is required — transactions with a legacy `v` of `27` or `28` are rejected.
+Submits a signed transaction to the network and returns its transaction hash.
 
 ## Parameters
 

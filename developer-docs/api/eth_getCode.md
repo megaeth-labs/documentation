@@ -7,7 +7,7 @@ Returns the runtime bytecode stored at an address at a given block.
 | Position | Name | Type | Required | Notes |
 |---|---|---|---|---|
 | `0` | `address` | [`Address`](../types.md#address) | Yes | Target account or contract address |
-| `1` | `block` | [`BlockReferenceString`](../types.md#blockreferencestring) | No | Block selector (`earliest`, `latest`, `pending`, `safe`, `finalized`, hex block number, or block hash). Default: `latest` |
+| `1` | `block` | [`BlockReferenceString`](../types.md#blockreferencestring) | No | Default: `"latest"` |
 
 ## Returns
 

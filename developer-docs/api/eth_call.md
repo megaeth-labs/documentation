@@ -7,7 +7,7 @@ Simulates a transaction against a given block's state and returns the result wit
 | Position | Name | Type | Required | Notes |
 |---|---|---|---|---|
 | `0` | `transaction` | `object` | Yes | Call parameters |
-| `1` | `block` | `string` | No | Execution context |
+| `1` | `block` | [`BlockNumberOrTag`](../types.md#blocknumberortag) | No | Default: `"latest"` |
 | `2` | `stateOverride` | `object` | No | Per-account overrides |
 | `3` | `blockOverrides` | `object` | No | Block-environment overrides |
 

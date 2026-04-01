@@ -1,6 +1,6 @@
 # mega_getBlockWitness
 
-Returns the execution witness for a block as a zstd-compressed, base64-encoded string with a `v0:` version prefix. This is a MegaETH-specific method used for stateless verification.
+Returns the execution witness for a block.
 
 ## Parameters
 

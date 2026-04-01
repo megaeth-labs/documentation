@@ -1,13 +1,13 @@
 # eth_estimateGas
 
-Estimates the gas required to execute a transaction without sending it. Returns the estimated gas as a [`Quantity`](../types.md#quantity).
+Estimates the gas required to execute a transaction.
 
 ## Parameters
 
 | Position | Name | Type | Required | Notes |
 |---|---|---|---|---|
 | `0` | `transaction` | `object` | Yes | Transaction to simulate |
-| `1` | `block` | `string` | No | Execution context |
+| `1` | `block` | [`BlockNumberOrTag`](../types.md#blocknumberortag) | No | Default: `"latest"` |
 
 ### `transaction`
 

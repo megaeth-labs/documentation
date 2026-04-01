@@ -2,7 +2,7 @@
 
 # eth_syncing
 
-Returns whether the node is currently syncing. Returns `false` when fully synced, or a `SyncProgress` object with sync details.
+Returns whether the node is currently syncing.
 
 ## Parameters
 

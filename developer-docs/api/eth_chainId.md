@@ -1,6 +1,6 @@
 # eth_chainId
 
-Returns the chain ID of the connected network as a hex-encoded integer.
+Returns the chain ID of the connected network.
 
 ## Parameters
 

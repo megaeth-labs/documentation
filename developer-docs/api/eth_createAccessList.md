@@ -7,7 +7,7 @@ Simulates a transaction and returns the EIP-2930 access list of addresses and st
 | Position | Name | Type | Required | Notes |
 |---|---|---|---|---|
 | `0` | `transaction` | `object` | Yes | Transaction to simulate |
-| `1` | `block` | `string` | No | Execution context |
+| `1` | `block` | [`BlockNumberOrTag`](../types.md#blocknumberortag) | No | Default: `"latest"` |
 
 ### `transaction`
 

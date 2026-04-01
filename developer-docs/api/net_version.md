@@ -1,6 +1,6 @@
 # net_version
 
-Returns the current network ID as a decimal string. On MegaETH mainnet the result is `"4326"`; on testnet, `"6343"`. The value is a decimal string, not a hex `Quantity` — use [`eth_chainId`](./eth_chainId.md) when you need the chain ID for transaction signing.
+Returns the current network ID as a decimal string. For transaction signing, use [`eth_chainId`](./eth_chainId.md) instead.
 
 ## Parameters
 

@@ -1,13 +1,13 @@
 # eth_sendRawTransactionSync
 
-Submits a signed transaction and returns a [`Receipt`](../types.md#receipt) once the transaction is included in a canonical block. Defined by draft EIP-7966; a returned receipt reflects inclusion at response time, not finality.
+Submits a signed transaction and returns a receipt once the transaction is included in a block.
 
 ## Parameters
 
 | Position | Name | Type | Required | Notes |
 |---|---|---|---|---|
 | `0` | `data` | [`Data`](../types.md#data) | Yes | Signed raw transaction bytes |
-| `1` | `timeoutMs` | `number` | No | Positive client wait budget in milliseconds |
+| `1` | `timeoutMs` | `number` | No | Client wait budget in milliseconds. Default: `10000` (10 s) |
 
 ## Returns
 
