@@ -19,30 +19,32 @@ docs/                  Documentation source
     └── execution/     EVM differences, gas model, resource limits
 ```
 
-## Linting
+## Linting & Formatting
 
-CI runs two checks on all Markdown files:
+CI runs three checks on all Markdown files:
 
-| Tool | What it checks | Config |
-| ---- | -------------- | ------ |
-| [lychee](https://lychee.cli.rs/) | Internal links resolve to existing files | `lychee.toml` |
+| Tool                                                            | What it checks                                             | Config                    |
+| --------------------------------------------------------------- | ---------------------------------------------------------- | ------------------------- |
+| [lychee](https://lychee.cli.rs/)                                | Internal links resolve to existing files                   | `lychee.toml`             |
 | [markdownlint](https://github.com/DavidAnson/markdownlint-cli2) | Markdown structure (blank lines, heading style, bare URLs) | `.markdownlint-cli2.yaml` |
+| [Prettier](https://prettier.io/)                                | Consistent formatting (tables, spacing, indentation)       | `.prettierrc.yaml`        |
 
 To run locally:
 
 ```bash
-# Install
-brew install lychee
-npm install -g markdownlint-cli2
+# Install tools via mise (one-time setup)
+mise install
 
-# Run
-lychee '**/*.md'
-markdownlint-cli2
+# Run all checks
+mise run lint
+
+# Auto-fix formatting
+mise run fmt
 ```
 
 ## Contributing
 
 1. Edit or create Markdown files under `docs/`.
 2. Update `docs/SUMMARY.md` if adding or removing pages.
-3. Run `lychee '**/*.md'` and `markdownlint-cli2` to verify before pushing.
+3. Run `mise run fmt` to format, then `mise run lint` to verify.
 4. See `AGENTS.md` for writing conventions and layer-specific rules.

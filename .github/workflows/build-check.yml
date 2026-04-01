@@ -16,11 +16,7 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Check links
-        uses: lycheeverse/lychee-action@v2
-        with:
-          args: --no-progress '**/*.md'
-          fail: true
+      - uses: jdx/mise-action@v2
 
-      - name: Lint Markdown
-        run: npx markdownlint-cli2
+      - name: Lint
+        run: mise run lint

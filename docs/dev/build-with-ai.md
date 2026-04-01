@@ -11,13 +11,13 @@ Skills follow the [SKILL.md](https://docs.anthropic.com/en/docs/claude-code/skil
 
 ## Available Skills
 
-| Category | Skills |
-| -------- | ------ |
-| **General** | End-to-end MegaETH development — Foundry setup, gas model, WebSocket subscriptions, debugging |
-| **Payments** | x402 HTTP payments, USDm stablecoin integration, Permit2 flows |
-| **DeFi** | Kumbaya DEX (Uniswap V3 fork) — swaps, quoting, liquidity, multi-hop routing |
-| **Identity & Content** | .Mega Domains (naming service), WARREN (on-chain permanent web CMS) |
-| **Agents** | ERC-8004 Trustless Agents — on-chain identity, reputation, and validation |
+| Category               | Skills                                                                                        |
+| ---------------------- | --------------------------------------------------------------------------------------------- |
+| **General**            | End-to-end MegaETH development — Foundry setup, gas model, WebSocket subscriptions, debugging |
+| **Payments**           | x402 HTTP payments, USDm stablecoin integration, Permit2 flows                                |
+| **DeFi**               | Kumbaya DEX (Uniswap V3 fork) — swaps, quoting, liquidity, multi-hop routing                  |
+| **Identity & Content** | .Mega Domains (naming service), WARREN (on-chain permanent web CMS)                           |
+| **Agents**             | ERC-8004 Trustless Agents — on-chain identity, reputation, and validation                     |
 
 For the full list with installation links and detailed descriptions, see the **[awesome-megaeth-ai](https://github.com/megaeth-labs/awesome-megaeth-ai)** repository.
 

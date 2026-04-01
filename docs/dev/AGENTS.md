@@ -5,7 +5,7 @@ They know Ethereum. They write code. They need to understand what's different.
 
 ## Tone & Language
 
-- **Technical but practical.** Explain *what developers need to know*, not the full protocol specification.
+- **Technical but practical.** Explain _what developers need to know_, not the full protocol specification.
 - **Include code examples.** Solidity, TypeScript (ethers.js/viem), and `cast` CLI where relevant.
 - **Use `{% tabs %}` blocks** for multi-language code examples.
 - **Use `{% hint %}` blocks** for warnings (gas pitfalls), tips (best practices), and danger (breaking changes).
@@ -39,15 +39,16 @@ For every concept that has a formal spec in `mega-evm/docs/`:
 4. **Link** to the spec: "For the formal specification, see [Dual Gas Model](https://docs.megaeth.com/evm-spec/evm/dual-gas-model)."
 
 Example pattern:
+
 ```markdown
 ## Storage Gas
 
 MegaETH charges additional storage gas on top of standard EVM compute gas for operations that grow on-chain state.
 
-| Operation | Storage Gas |
-|-----------|-------------|
+| Operation          | Storage Gas               |
+| ------------------ | ------------------------- |
 | SSTORE (0 → non-0) | 20,000 × (multiplier − 1) |
-| Contract creation | 32,000 × (multiplier − 1) |
+| Contract creation  | 32,000 × (multiplier − 1) |
 
 {% hint style="success" %}
 Use `eth_estimateGas` on a MegaETH RPC endpoint for accurate gas estimates.
@@ -71,7 +72,7 @@ For the complete storage gas schedule, see the [formal specification](https://do
 - **Annotate with inline comments.**
   Include comments explaining each non-obvious step, decoded values, or MegaETH-specific behavior.
 - **Language identifier required.**
-  Every fenced code block MUST have a language identifier (e.g., `` ```solidity ``, `` ```typescript ``, `` ```bash ``).
+  Every fenced code block MUST have a language identifier (e.g., ` ```solidity `, ` ```typescript `, ` ```bash `).
 
 ## Formatting Preferences
 
@@ -180,6 +181,7 @@ Decode hex values in example responses with inline comments: `"result": "0xf4240
 ## FAQ
 
 The developer FAQ (`dev/faq.md`) covers questions like:
+
 - "How do I estimate gas on MegaETH?"
 - "Why did my transaction fail with OutOfGas even though I had enough gas?"
 - "Does MegaETH support EIP-1559?"

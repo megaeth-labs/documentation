@@ -34,30 +34,30 @@ For the formal definition, see [Gas Detention](https://app.gitbook.com/o/iBzILuN
 
 Accessing any of these opcodes caps the transaction's total compute gas to **20,000,000**.
 
-| Opcode | Description |
-| ------ | ----------- |
-| `NUMBER` | Current block number |
-| `TIMESTAMP` | Current block timestamp |
-| `COINBASE` | Block beneficiary address |
-| `DIFFICULTY` | Block difficulty |
-| `GASLIMIT` | Block gas limit |
-| `BASEFEE` | Base fee per gas |
-| `PREVRANDAO` | Previous block randomness |
-| `BLOCKHASH` | Historical block hash |
-| `BLOBBASEFEE` | Blob base fee |
-| `BLOBHASH` | Blob hash lookup |
+| Opcode        | Description               |
+| ------------- | ------------------------- |
+| `NUMBER`      | Current block number      |
+| `TIMESTAMP`   | Current block timestamp   |
+| `COINBASE`    | Block beneficiary address |
+| `DIFFICULTY`  | Block difficulty          |
+| `GASLIMIT`    | Block gas limit           |
+| `BASEFEE`     | Base fee per gas          |
+| `PREVRANDAO`  | Previous block randomness |
+| `BLOCKHASH`   | Historical block hash     |
+| `BLOBBASEFEE` | Blob base fee             |
+| `BLOBHASH`    | Blob hash lookup          |
 
 ### Beneficiary Account Access
 
 Accessing the block beneficiary (coinbase) account in any way also triggers the cap:
 
-| Trigger | Description |
-| ------- | ----------- |
-| `BALANCE`, `SELFBALANCE` | Reading beneficiary's balance |
-| `EXTCODECOPY`, `EXTCODESIZE`, `EXTCODEHASH` | Accessing beneficiary's code |
-| Transaction sender is beneficiary | When `msg.sender == block.coinbase` |
-| Transaction recipient is beneficiary | When call target is `block.coinbase` |
-| `DELEGATECALL` to beneficiary | Delegated context accessing beneficiary |
+| Trigger                                     | Description                             |
+| ------------------------------------------- | --------------------------------------- |
+| `BALANCE`, `SELFBALANCE`                    | Reading beneficiary's balance           |
+| `EXTCODECOPY`, `EXTCODESIZE`, `EXTCODEHASH` | Accessing beneficiary's code            |
+| Transaction sender is beneficiary           | When `msg.sender == block.coinbase`     |
+| Transaction recipient is beneficiary        | When call target is `block.coinbase`    |
+| `DELEGATECALL` to beneficiary               | Delegated context accessing beneficiary |
 
 ### Native Oracle Service
 

@@ -8,6 +8,7 @@ description: Detects new features and changes across MegaETH repos that are not 
 Check for undocumented changes across MegaETH repositories: $ARGUMENTS
 
 Parse the arguments to determine the time window. Accepted inputs:
+
 - A duration (e.g., `7d`, `14d`, `30d`) — check merged PRs in that window.
 - A date (e.g., `2025-03-01`) — check merged PRs since that date.
 - A git ref or tag (e.g., `v0.5.0`, `rex3-release`) — check merged PRs since that ref.
@@ -19,15 +20,15 @@ Default (no arguments): last 14 days, all tracked repos.
 
 These are the repos whose changes may require documentation updates.
 
-| Repo | GitHub | What doc-worthy changes look like |
-|---|---|---|
-| mega-evm | `megaeth-labs/mega-evm` | New spec, gas constant changes, new/modified system contracts, opcode behavior changes, new resource limits |
-| mega-reth | `megaeth-labs/mega-reth` | New RPC methods, changed RPC behavior, new config flags, block execution changes, new node features |
-| mega-rpc | `megaeth-labs/mega-rpc` | New routes, changed caching/routing behavior, new error codes, rate limit changes, WebSocket changes. **Note**: mega-rpc implements the MegaETH public endpoint only. Method availability and restrictions found here may not apply to managed RPC providers (e.g., Alchemy), which have their own configurations. When reporting gaps, distinguish between "unavailable on public endpoint" and "unsupported by MegaETH entirely." |
-| devops-ansible-inventory | `megaeth-labs/devops-ansible-inventory` | Network parameter changes (chain IDs, RPC URLs, explorer URLs), new network deployments, config changes |
-| mega-op-contracts | `megaeth-labs/mega-op-contracts` | Bridge contract changes, L1/L2 interface changes, system config changes, new dispute game types |
-| mega-optimism | `megaeth-labs/mega-optimism` | Sequencer behavior changes, payload building changes, L1 settlement changes |
-| dist-docs | `megaeth-labs/dist-docs` | Release tags — determines which mega-reth changes are live and doc-worthy. Not scanned for PRs; used only to identify the latest released version. |
+| Repo                     | GitHub                                  | What doc-worthy changes look like                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------------ | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| mega-evm                 | `megaeth-labs/mega-evm`                 | New spec, gas constant changes, new/modified system contracts, opcode behavior changes, new resource limits                                                                                                                                                                                                                                                                                                                         |
+| mega-reth                | `megaeth-labs/mega-reth`                | New RPC methods, changed RPC behavior, new config flags, block execution changes, new node features                                                                                                                                                                                                                                                                                                                                 |
+| mega-rpc                 | `megaeth-labs/mega-rpc`                 | New routes, changed caching/routing behavior, new error codes, rate limit changes, WebSocket changes. **Note**: mega-rpc implements the MegaETH public endpoint only. Method availability and restrictions found here may not apply to managed RPC providers (e.g., Alchemy), which have their own configurations. When reporting gaps, distinguish between "unavailable on public endpoint" and "unsupported by MegaETH entirely." |
+| devops-ansible-inventory | `megaeth-labs/devops-ansible-inventory` | Network parameter changes (chain IDs, RPC URLs, explorer URLs), new network deployments, config changes                                                                                                                                                                                                                                                                                                                             |
+| mega-op-contracts        | `megaeth-labs/mega-op-contracts`        | Bridge contract changes, L1/L2 interface changes, system config changes, new dispute game types                                                                                                                                                                                                                                                                                                                                     |
+| mega-optimism            | `megaeth-labs/mega-optimism`            | Sequencer behavior changes, payload building changes, L1 settlement changes                                                                                                                                                                                                                                                                                                                                                         |
+| dist-docs                | `megaeth-labs/dist-docs`                | Release tags — determines which mega-reth changes are live and doc-worthy. Not scanned for PRs; used only to identify the latest released version.                                                                                                                                                                                                                                                                                  |
 
 ## Workflow
 
@@ -46,6 +47,7 @@ git log --oneline --since="{since_date}" --merges -- .
 ```
 
 For each PR, record:
+
 - PR number and title
 - Merge date
 - Labels (if any)
@@ -70,6 +72,7 @@ This does not apply to mega-rpc (deployed continuously) or mega-evm (spec change
 Classify each PR as **doc-worthy** or **internal-only**. A change is doc-worthy if it affects any of these surfaces:
 
 **Always doc-worthy** (auto-include):
+
 - New or modified RPC method (parameters, return values, error codes)
 - Gas constant or limit changes
 - New or modified system contract (address, interface, behavior)
@@ -80,12 +83,14 @@ Classify each PR as **doc-worthy** or **internal-only**. A change is doc-worthy 
 - Breaking changes to any external API
 
 **Usually doc-worthy** (include if impact is significant):
+
 - New config flags that operators or integrators need to know about
 - Performance characteristics that affect developer decisions
 - New error codes or changed error behavior
 - Deprecations
 
 **Internal-only** (exclude):
+
 - Pure refactoring with no behavioral change
 - Test-only changes
 - CI/CD pipeline changes
@@ -103,15 +108,15 @@ For each doc-worthy change, search the documentation for existing coverage.
 2. **Search for the feature/method/constant name** across `docs/` using grep.
 3. **Check the most likely target page(s)** based on the change type:
 
-| Change type | Check these pages first |
-|---|---|
-| Gas constant/limit | `docs/spec/evm/dual-gas-model.md`, `docs/spec/evm/resource-limits.md`, `docs/dev/gas-model.md` |
-| New system contract | `docs/spec/system-contracts/`, `docs/dev/system-contracts.md` |
-| RPC method | `docs/dev/rpc/`, `docs/integration/rpc-providers.md` |
-| Network params | `docs/integration/connect.md`, `docs/user/mainnet.md`, `docs/user/testnet.md` |
-| Spec/upgrade | `docs/spec/upgrades/`, `docs/spec/hardfork-spec.md` |
-| Bridge/L1 | `docs/integration/bridges.md`, `docs/dev/architecture.md` |
-| Wallet-facing | `docs/integration/wallets.md`, `docs/user/` |
+| Change type         | Check these pages first                                                                        |
+| ------------------- | ---------------------------------------------------------------------------------------------- |
+| Gas constant/limit  | `docs/spec/evm/dual-gas-model.md`, `docs/spec/evm/resource-limits.md`, `docs/dev/gas-model.md` |
+| New system contract | `docs/spec/system-contracts/`, `docs/dev/system-contracts.md`                                  |
+| RPC method          | `docs/dev/rpc/`, `docs/integration/rpc-providers.md`                                           |
+| Network params      | `docs/integration/connect.md`, `docs/user/mainnet.md`, `docs/user/testnet.md`                  |
+| Spec/upgrade        | `docs/spec/upgrades/`, `docs/spec/hardfork-spec.md`                                            |
+| Bridge/L1           | `docs/integration/bridges.md`, `docs/dev/architecture.md`                                      |
+| Wallet-facing       | `docs/integration/wallets.md`, `docs/user/`                                                    |
 
 4. **Classify coverage**:
    - **Covered**: The change is already documented accurately.
@@ -123,11 +128,11 @@ For each doc-worthy change, search the documentation for existing coverage.
 
 Assign priority to each gap:
 
-| Priority | Criteria |
-|---|---|
-| **P0** | Breaking change, incorrect values live in docs, security-relevant, or user-facing feature with no docs |
-| **P1** | New feature or behavior change that developers/integrators need to know about |
-| **P2** | Minor parameter change, non-breaking addition, or enhancement to existing feature |
+| Priority | Criteria                                                                                               |
+| -------- | ------------------------------------------------------------------------------------------------------ |
+| **P0**   | Breaking change, incorrect values live in docs, security-relevant, or user-facing feature with no docs |
+| **P1**   | New feature or behavior change that developers/integrators need to know about                          |
+| **P2**   | Minor parameter change, non-breaking addition, or enhancement to existing feature                      |
 
 ### Phase 5: Report
 
@@ -147,18 +152,19 @@ Produce the report in the output format below.
 
 ## Summary
 
-| Repo | PRs | Doc-worthy | Covered | Gaps |
-|---|---|---|---|---|
-| mega-evm | N | N | N | N |
-| mega-reth | N | N | N | N |
-| mega-rpc | N | N | N | N |
-| devops-ansible-inventory | N | N | N | N |
-| mega-op-contracts | N | N | N | N |
-| mega-optimism | N | N | N | N |
+| Repo                     | PRs | Doc-worthy | Covered | Gaps |
+| ------------------------ | --- | ---------- | ------- | ---- |
+| mega-evm                 | N   | N          | N       | N    |
+| mega-reth                | N   | N          | N       | N    |
+| mega-rpc                 | N   | N          | N       | N    |
+| devops-ansible-inventory | N   | N          | N       | N    |
+| mega-op-contracts        | N   | N          | N       | N    |
+| mega-optimism            | N   | N          | N       | N    |
 
 ## Gaps (ordered by priority)
 
 ### F-001: {short description}
+
 - **Priority**: P0 | P1 | P2
 - **Source**: {repo} PR #{number} — {title} ({url})
 - **Merged**: {date}
@@ -175,10 +181,10 @@ Produce the report in the output format below.
 <details>
 <summary>N changes already documented (click to expand)</summary>
 
-| # | Repo | PR | Change | Documented in |
-|---|---|---|---|---|
-| 1 | {repo} | #{number} | {summary} | `{doc page path}` |
-| 2 | ... | ... | ... | ... |
+| #   | Repo   | PR        | Change    | Documented in     |
+| --- | ------ | --------- | --------- | ----------------- |
+| 1   | {repo} | #{number} | {summary} | `{doc page path}` |
+| 2   | ...    | ...       | ...       | ...               |
 
 </details>
 
@@ -187,19 +193,21 @@ Produce the report in the output format below.
 <details>
 <summary>N internal changes excluded (click to expand)</summary>
 
-| # | Repo | PR | Why excluded |
-|---|---|---|---|
-| 1 | {repo} | #{number} — {title} | {reason: refactor, test-only, CI, etc.} |
-| 2 | ... | ... | ... |
+| #   | Repo   | PR                  | Why excluded                            |
+| --- | ------ | ------------------- | --------------------------------------- |
+| 1   | {repo} | #{number} — {title} | {reason: refactor, test-only, CI, etc.} |
+| 2   | ...    | ...                 | ...                                     |
 
 </details>
 
 ## Handoff
 
 Impacted claim families for `/doc-correctness` verification:
+
 - {family}: {list of specific claims to re-verify}
 
 Impacted pages for `/doc-readability` review:
+
 - {page path}: {reason — new content added, section rewritten, etc.}
 ```
 

@@ -24,17 +24,17 @@ A transaction can be halted by either ceiling: the total `gas_limit` or the comp
 - **`gas_limit`:** Set this to cover your expected total gas (compute + storage). `eth_estimateGas` on a MegaETH endpoint accounts for both.
 - **`gas_used` in receipts:** Reports total gas consumed (compute + storage combined).
 - **Compute gas limit:** An invisible additional ceiling of 200,000,000. Most transactions stay well under it.
-{% endhint %}
+  {% endhint %}
 
 ### Transaction Intrinsic Costs
 
 Every transaction pays a base cost before any execution begins:
 
-| Component | Cost |
-| --------- | ---- |
-| Compute gas | 21,000 |
-| Storage gas | 39,000 |
-| **Total** | **60,000** |
+| Component   | Cost       |
+| ----------- | ---------- |
+| Compute gas | 21,000     |
+| Storage gas | 39,000     |
+| **Total**   | **60,000** |
 
 The RPC returns "intrinsic gas too low" when the transaction gas limit is below 60,000.
 
@@ -53,19 +53,19 @@ The following table lists all operations where storage gas applies.
 Some storage gas calculations involve a parameter called _bucket multiplier_ (denoted as m).
 The next section explains this concept.
 
-| Operation | Storage Gas Cost | Remarks |
-| --------- | ---------------- | ------- |
-| Intrinsic | 39,000 | Incurred by every transaction. Combined with the intrinsic compute gas cost of 21,000, the total intrinsic gas cost of a transaction is 60,000. |
-| Zero-to-nonzero `SSTORE` | 20,000 × (m−1) | Only applies to zero-to-nonzero writes. |
-| Account creation | 25,000 × (m−1) | Value transfer to empty account. |
-| Contract creation | 32,000 × (m−1) | `CREATE`/`CREATE2` operations. |
-| Code deposit | 10,000/byte | Per byte of deployed bytecode. |
-| `LOG` topic | 3,750/topic | Per topic in event. |
-| `LOG` data | 80/byte | Per byte of event data. |
-| Calldata (zero) | 40/byte | Per zero byte in transaction input. |
-| Calldata (nonzero) | 160/byte | Per nonzero byte in transaction input. |
-| EIP-7623 floor (zero) | 100/byte | [EIP-7623](https://eips.ethereum.org/EIPS/eip-7623) floor cost per zero byte in transaction input. |
-| EIP-7623 floor (nonzero) | 400/byte | [EIP-7623](https://eips.ethereum.org/EIPS/eip-7623) floor cost per nonzero byte in transaction input. |
+| Operation                | Storage Gas Cost | Remarks                                                                                                                                         |
+| ------------------------ | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| Intrinsic                | 39,000           | Incurred by every transaction. Combined with the intrinsic compute gas cost of 21,000, the total intrinsic gas cost of a transaction is 60,000. |
+| Zero-to-nonzero `SSTORE` | 20,000 × (m−1)   | Only applies to zero-to-nonzero writes.                                                                                                         |
+| Account creation         | 25,000 × (m−1)   | Value transfer to empty account.                                                                                                                |
+| Contract creation        | 32,000 × (m−1)   | `CREATE`/`CREATE2` operations.                                                                                                                  |
+| Code deposit             | 10,000/byte      | Per byte of deployed bytecode.                                                                                                                  |
+| `LOG` topic              | 3,750/topic      | Per topic in event.                                                                                                                             |
+| `LOG` data               | 80/byte          | Per byte of event data.                                                                                                                         |
+| Calldata (zero)          | 40/byte          | Per zero byte in transaction input.                                                                                                             |
+| Calldata (nonzero)       | 160/byte         | Per nonzero byte in transaction input.                                                                                                          |
+| EIP-7623 floor (zero)    | 100/byte         | [EIP-7623](https://eips.ethereum.org/EIPS/eip-7623) floor cost per zero byte in transaction input.                                              |
+| EIP-7623 floor (nonzero) | 400/byte         | [EIP-7623](https://eips.ethereum.org/EIPS/eip-7623) floor cost per nonzero byte in transaction input.                                           |
 
 All other operations not mentioned in the table incur no storage gas cost.
 
@@ -107,11 +107,11 @@ A few rules of thumb for developers:
 
 Below are examples of storage gas costs at different bucket multiplier values.
 
-| Operation | m=1 | m=2 | m=4 |
-| --------- | --- | --- | --- |
-| Zero-to-nonzero `SSTORE` | 0 | 20,000 | 60,000 |
-| Account creation | 0 | 25,000 | 75,000 |
-| Contract creation | 0 | 32,000 | 96,000 |
+| Operation                | m=1 | m=2    | m=4    |
+| ------------------------ | --- | ------ | ------ |
+| Zero-to-nonzero `SSTORE` | 0   | 20,000 | 60,000 |
+| Account creation         | 0   | 25,000 | 75,000 |
+| Contract creation        | 0   | 32,000 | 96,000 |
 
 {% hint style="success" %}
 **Gas estimation:** Use `eth_estimateGas` on a MegaETH RPC endpoint for accurate gas estimates.

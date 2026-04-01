@@ -36,6 +36,7 @@ They are not developers. They do not read code.
 ## FAQ
 
 The user FAQ (`user/faq.md`) covers questions like:
+
 - "What wallet works with MegaETH?"
 - "Why is my transaction pending?"
 - "How much does a transaction cost?"

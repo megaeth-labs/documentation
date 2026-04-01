@@ -62,13 +62,13 @@ Mini-blocks share the core properties you would expect from any block:
 
 Where they differ from EVM blocks:
 
-| Property | EVM Block | Mini-Block |
-| -------- | --------- | ---------- |
-| Production interval | ~1 second | ~10 milliseconds |
-| Header size | ~500+ bytes | Compact (no Merkle roots, no bloom filter) |
-| Timestamp resolution | 1 second | Microsecond (via [High-Precision Timestamp](dev/execution/system-contracts.md#high-precision-timestamp)) |
-| Compatible with standard tools | Yes | Requires [Realtime API](dev/read/realtime-api.md) |
-| Contains state root | Yes | No |
+| Property                       | EVM Block   | Mini-Block                                                                                               |
+| ------------------------------ | ----------- | -------------------------------------------------------------------------------------------------------- |
+| Production interval            | ~1 second   | ~10 milliseconds                                                                                         |
+| Header size                    | ~500+ bytes | Compact (no Merkle roots, no bloom filter)                                                               |
+| Timestamp resolution           | 1 second    | Microsecond (via [High-Precision Timestamp](dev/execution/system-contracts.md#high-precision-timestamp)) |
+| Compatible with standard tools | Yes         | Requires [Realtime API](dev/read/realtime-api.md)                                                        |
+| Contains state root            | Yes         | No                                                                                                       |
 
 ## Relationship to EVM Blocks
 
@@ -88,7 +88,12 @@ To get the precise number, use the `miniBlockCount` field in the `newHeads` subs
 To take advantage of mini-block latency, subscribe over WebSocket using the [Realtime API](dev/read/realtime-api.md):
 
 ```json
-{"jsonrpc":"2.0","id":1,"method":"eth_subscribe","params":["miniBlocks"]}
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "eth_subscribe",
+  "params": ["miniBlocks"]
+}
 ```
 
 Each notification delivers the mini-block's transactions, receipts, and state changes — everything your application needs to react immediately, without waiting for the next EVM block.

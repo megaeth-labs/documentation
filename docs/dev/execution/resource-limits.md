@@ -6,15 +6,15 @@ description: MegaETH resource limits — 7 per-transaction and per-block ceiling
 
 MegaETH enforces seven resource limits on transactions and blocks.
 
-| Resource | Per-Transaction | Per-Block | How it changes |
-| -------- | --------------- | --------- | -------------- |
-| **Gas** | 10,000,000,000 | 10,000,000,000 | Sequencer-configured |
-| **Compute Gas** | 200,000,000 | Unlimited | Protocol constant |
-| **Data Size** | 12.5 MB | 12.5 MB | Protocol constant |
-| **KV Updates** | 500,000 | 500,000 | Protocol constant |
-| **State Growth** | 1,000 | 1,000 | Protocol constant |
-| **Transaction Encoded Size** | 1 MB | Unlimited | Sequencer-configured |
-| **DA Size** | Adaptive | Adaptive | Adaptive |
+| Resource                     | Per-Transaction | Per-Block      | How it changes       |
+| ---------------------------- | --------------- | -------------- | -------------------- |
+| **Gas**                      | 10,000,000,000  | 10,000,000,000 | Sequencer-configured |
+| **Compute Gas**              | 200,000,000     | Unlimited      | Protocol constant    |
+| **Data Size**                | 12.5 MB         | 12.5 MB        | Protocol constant    |
+| **KV Updates**               | 500,000         | 500,000        | Protocol constant    |
+| **State Growth**             | 1,000           | 1,000          | Protocol constant    |
+| **Transaction Encoded Size** | 1 MB            | Unlimited      | Sequencer-configured |
+| **DA Size**                  | Adaptive        | Adaptive       | Adaptive             |
 
 Note: "Unlimited" means no dedicated per-block limit exists for that resource, but it is still implicitly bounded by other per-block limits such as block gas limit and DA size.
 

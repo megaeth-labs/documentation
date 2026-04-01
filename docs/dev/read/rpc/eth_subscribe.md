@@ -2,7 +2,7 @@
 description: eth_subscribe — WebSocket subscriptions for real-time logs, state changes, mini-blocks, and block headers on MegaETH.
 ---
 
-# eth\_subscribe
+# eth_subscribe
 
 Creates a WebSocket subscription that streams data as mini-blocks are produced.
 This is the lowest-latency way to receive transaction results — logs, state changes, and block contents arrive within ~10ms of execution.
@@ -24,12 +24,12 @@ Set both `fromBlock` and `toBlock` to `"pending"` for real-time delivery.
 
 **Parameters:**
 
-| Field | Type | Required | Notes |
-| ----- | ---- | -------- | ----- |
-| `fromBlock` | `BlockTag` | No | Set to `"pending"` for real-time logs |
-| `toBlock` | `BlockTag` | No | Set to `"pending"` for real-time logs |
-| `address` | `Data` \| `Data[]` | No | Contract address(es) to filter |
-| `topics` | `Data[]` | No | Position-sensitive topic filter |
+| Field       | Type               | Required | Notes                                 |
+| ----------- | ------------------ | -------- | ------------------------------------- |
+| `fromBlock` | `BlockTag`         | No       | Set to `"pending"` for real-time logs |
+| `toBlock`   | `BlockTag`         | No       | Set to `"pending"` for real-time logs |
+| `address`   | `Data` \| `Data[]` | No       | Contract address(es) to filter        |
+| `topics`    | `Data[]`           | No       | Position-sensitive topic filter       |
 
 **Example:**
 
@@ -42,7 +42,9 @@ Set both `fromBlock` and `toBlock` to `"pending"` for real-time delivery.
     "logs",
     {
       "address": "0x8320fe7702b96808f7bbc0d4a888ed1468216cfd",
-      "topics": ["0xd78a0cb8bb633d06981248b816e7bd33c2a35a6089241d099fa519e361cab902"],
+      "topics": [
+        "0xd78a0cb8bb633d06981248b816e7bd33c2a35a6089241d099fa519e361cab902"
+      ],
       "fromBlock": "pending",
       "toBlock": "pending"
     }
@@ -59,9 +61,9 @@ Takes a list of account addresses to monitor.
 
 **Parameters:**
 
-| Position | Type | Required | Notes |
-| -------- | ---- | -------- | ----- |
-| `0` | `Data[]` | Yes | List of account addresses to monitor |
+| Position | Type     | Required | Notes                                |
+| -------- | -------- | -------- | ------------------------------------ |
+| `0`      | `Data[]` | Yes      | List of account addresses to monitor |
 
 **Example:**
 
@@ -70,21 +72,18 @@ Takes a list of account addresses to monitor.
   "jsonrpc": "2.0",
   "id": 1,
   "method": "eth_subscribe",
-  "params": [
-    "stateChanges",
-    ["0x2ef038991d64c72646d4f06ba78d93f4f1654e3f"]
-  ]
+  "params": ["stateChanges", ["0x2ef038991d64c72646d4f06ba78d93f4f1654e3f"]]
 }
 ```
 
 **Notification schema:**
 
-| Field | Type | Notes |
-| ----- | ---- | ----- |
-| `address` | `Data` (20 bytes) | Account address |
-| `nonce` | `Number` | Latest nonce |
-| `balance` | `Quantity` | Latest balance |
-| `storage` | `Object` | Changed storage slots (slot → value) |
+| Field     | Type              | Notes                                |
+| --------- | ----------------- | ------------------------------------ |
+| `address` | `Data` (20 bytes) | Account address                      |
+| `nonce`   | `Number`          | Latest nonce                         |
+| `balance` | `Quantity`        | Latest balance                       |
+| `storage` | `Object`          | Changed storage slots (slot → value) |
 
 **Example notification:**
 
@@ -119,16 +118,16 @@ Streams mini-blocks as they are produced by the sequencer.
 
 **Notification schema:**
 
-| Field | Type | Notes |
-| ----- | ---- | ----- |
-| `block_number` | `Quantity` | EVM block number that this mini-block belongs to |
-| `block_timestamp` | `Quantity` | EVM block timestamp |
-| `index` | `Quantity` | Index of this mini-block within the EVM block |
-| `mini_block_number` | `Quantity` | Global mini-block height |
-| `mini_block_timestamp` | `Quantity` | Creation timestamp (Unix microseconds) |
-| `gas_used` | `Quantity` | Gas consumed in this mini-block |
-| `transactions` | `Transaction[]` | Transactions (same schema as `eth_getTransactionByHash`) |
-| `receipts` | `Receipt[]` | Receipts (same schema as `eth_getTransactionReceipt`) |
+| Field                  | Type            | Notes                                                    |
+| ---------------------- | --------------- | -------------------------------------------------------- |
+| `block_number`         | `Quantity`      | EVM block number that this mini-block belongs to         |
+| `block_timestamp`      | `Quantity`      | EVM block timestamp                                      |
+| `index`                | `Quantity`      | Index of this mini-block within the EVM block            |
+| `mini_block_number`    | `Quantity`      | Global mini-block height                                 |
+| `mini_block_timestamp` | `Quantity`      | Creation timestamp (Unix microseconds)                   |
+| `gas_used`             | `Quantity`      | Gas consumed in this mini-block                          |
+| `transactions`         | `Transaction[]` | Transactions (same schema as `eth_getTransactionByHash`) |
+| `receipts`             | `Receipt[]`     | Receipts (same schema as `eth_getTransactionReceipt`)    |
 
 ### `newHeads`
 
@@ -151,9 +150,9 @@ On MegaETH, headers include an additional `miniBlockCount` field.
 
 ## Errors
 
-| Code | Cause | Fix |
-| ---- | ----- | --- |
-| `-32602` | Invalid subscription type or malformed parameters | Fix the request |
-| `-32000` | WebSocket connection required | Use a WebSocket endpoint, not HTTP |
+| Code     | Cause                                             | Fix                                |
+| -------- | ------------------------------------------------- | ---------------------------------- |
+| `-32602` | Invalid subscription type or malformed parameters | Fix the request                    |
+| `-32000` | WebSocket connection required                     | Use a WebSocket endpoint, not HTTP |
 
 See also [Error reference](error-codes.md).

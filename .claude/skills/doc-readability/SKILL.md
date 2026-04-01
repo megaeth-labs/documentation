@@ -8,6 +8,7 @@ description: Evaluates documentation readability, tone, structure, and audience-
 Evaluate readability and layer-appropriateness for: $ARGUMENTS
 
 Parse the arguments to determine scope. Accepted inputs:
+
 - A single page path (e.g., `docs/dev/gas-model.md`) — evaluate that page.
 - A layer directory (e.g., `docs/dev/`, `docs/spec/`) — evaluate all pages in that layer.
 - `all` — evaluate every page listed in `docs/SUMMARY.md`.
@@ -64,18 +65,18 @@ For each page, run through these checks in order. Not every check applies to eve
 
 ## Layer Matrix
 
-| Check | User | Dev | Spec |
-|---|---|---|---|
-| Code blocks | Forbidden | Required for features with usage patterns | Pseudocode only |
-| "you" / second person | Encouraged | OK | Forbidden in Specification sections |
-| MUST/SHALL/SHOULD | Inappropriate | Avoid unless quoting spec | Required for behavioral rules |
-| Stepper blocks | Required for multi-step | Optional | Not used |
-| Summarize + link to spec | N/A | Required when referencing spec behavior | N/A |
-| Copy-pasteable values | N/A | Nice-to-have | N/A |
-| `{% hint style="success" %}` | OK (tips) | OK (best practices) | Forbidden |
-| `{% hint style="danger" %}` | OK (warnings) | OK (breaking changes) | Deprecation notices only |
-| Glossary first-use linking | Not required | Not required | Required |
-| Page length | Flag >500 words, consider splitting | No hard limit | No hard limit |
+| Check                        | User                                | Dev                                       | Spec                                |
+| ---------------------------- | ----------------------------------- | ----------------------------------------- | ----------------------------------- |
+| Code blocks                  | Forbidden                           | Required for features with usage patterns | Pseudocode only                     |
+| "you" / second person        | Encouraged                          | OK                                        | Forbidden in Specification sections |
+| MUST/SHALL/SHOULD            | Inappropriate                       | Avoid unless quoting spec                 | Required for behavioral rules       |
+| Stepper blocks               | Required for multi-step             | Optional                                  | Not used                            |
+| Summarize + link to spec     | N/A                                 | Required when referencing spec behavior   | N/A                                 |
+| Copy-pasteable values        | N/A                                 | Nice-to-have                              | N/A                                 |
+| `{% hint style="success" %}` | OK (tips)                           | OK (best practices)                       | Forbidden                           |
+| `{% hint style="danger" %}`  | OK (warnings)                       | OK (breaking changes)                     | Deprecation notices only            |
+| Glossary first-use linking   | Not required                        | Not required                              | Required                            |
+| Page length                  | Flag >500 words, consider splitting | No hard limit                             | No hard limit                       |
 
 ## Output Format
 
@@ -91,14 +92,15 @@ Produce a Markdown report with this structure:
 ## Summary
 
 | Layer | Pages | Pass | Fail | Findings |
-|---|---|---|---|---|
-| User | N | N | N | N |
-| Dev | N | N | N | N |
-| Spec | N | N | N | N |
+| ----- | ----- | ---- | ---- | -------- |
+| User  | N     | N    | N    | N        |
+| Dev   | N     | N    | N    | N        |
+| Spec  | N     | N    | N    | N        |
 
 ## Findings
 
 ### R-001: {short description}
+
 - **Severity**: Blocker | Major | Minor
 - **Layer**: {layer}
 - **Page**: {path}
@@ -116,6 +118,7 @@ Produce a Markdown report with this structure:
 ```
 
 **Severity definitions**:
+
 - **Blocker**: Content in the wrong layer, code blocks in User layer, normative language in User layer, spec linking to dev/user docs.
 - **Major**: Missing frontmatter, heading hierarchy violations, wrong hint block style for the layer, missing summarize+link pattern in Dev.
 - **Minor**: Multi-sentence lines, missing glossary links, suboptimal block usage, minor tone drift.

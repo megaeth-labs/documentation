@@ -8,12 +8,12 @@ description: Frequently asked questions for MegaETH developers — EVM compatibi
 
 ### Which EIPs are supported or enforced on MegaETH?
 
-| EIP | Title | Enforced / Supported | Notes |
-| --- | ----- | -------------------- | ----- |
-| **EIP-55** | Mixed-case checksum address encoding | Not enforced | Addresses may appear in lowercase, especially in logs and WebSocket responses. |
-| **EIP-170** | Contract code size limit | Not enforced | MegaETH raises the contract size limit to **512 KB** to support larger deployments. |
-| **EIP-1559** | Fee market change for ETH 1.0 chain | Supported | MegaETH uses a dynamically adjusting base fee model with a different set of parameters. |
-| **EIP-7702** | Account abstraction via temporary smart contract accounts | Supported | EOAs can be delegated to smart contracts and behave like smart contract wallets. See compatible tools on the [tooling page](tooling.md). |
+| EIP          | Title                                                     | Enforced / Supported | Notes                                                                                                                                    |
+| ------------ | --------------------------------------------------------- | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| **EIP-55**   | Mixed-case checksum address encoding                      | Not enforced         | Addresses may appear in lowercase, especially in logs and WebSocket responses.                                                           |
+| **EIP-170**  | Contract code size limit                                  | Not enforced         | MegaETH raises the contract size limit to **512 KB** to support larger deployments.                                                      |
+| **EIP-1559** | Fee market change for ETH 1.0 chain                       | Supported            | MegaETH uses a dynamically adjusting base fee model with a different set of parameters.                                                  |
+| **EIP-7702** | Account abstraction via temporary smart contract accounts | Supported            | EOAs can be delegated to smart contracts and behave like smart contract wallets. See compatible tools on the [tooling page](tooling.md). |
 
 ### What versions of Solidity does MegaETH support?
 
@@ -91,21 +91,25 @@ To recover:
 
 {% stepper %}
 {% step %}
+
 ## Identify the last executed nonce
 
 Find the last nonce that was successfully executed and included in a block.
 {% endstep %}
 {% step %}
+
 ## Send a transaction with nonce x+1
 
 Submit a transaction with the next sequential nonce.
 {% endstep %}
 {% step %}
+
 ## Wait for execution
 
 Wait for it to be executed and included in a block.
 {% endstep %}
 {% step %}
+
 ## Repeat if necessary
 
 If there are more gaps, repeat the process until the queue is unblocked.
@@ -214,6 +218,7 @@ To fix this:
 
 {% stepper %}
 {% step %}
+
 ## Install `reqwest` with the `rustls-tls` feature
 
 Add to your `Cargo.toml`:
@@ -221,8 +226,10 @@ Add to your `Cargo.toml`:
 ```toml
 reqwest = { version = "...", features = ["rustls-tls"] }
 ```
+
 {% endstep %}
 {% step %}
+
 ## Use a custom transport to build your HTTP provider
 
 ```rust
@@ -236,13 +243,16 @@ let is_local = http_client.guess_local();
 let http_client = ClientBuilder::default().transport(http_client, is_local);
 let http_provider = ProviderBuilder::new().on_client(http_client);
 ```
+
 {% endstep %}
 {% step %}
+
 ## Install the default TLS provider early in `main.rs`
 
 ```rust
 let _ = rustls::crypto::ring::default_provider().install_default();
 ```
+
 {% endstep %}
 {% endstepper %}
 

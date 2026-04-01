@@ -56,12 +56,14 @@ Everything on the chain is solely for experimental purposes.
 
 {% stepper %}
 {% step %}
+
 ### Open your wallet settings
 
 In MetaMask, Rabby, or any Ethereum-compatible wallet, go to **Settings → Networks → Add Network**.
 {% endstep %}
 
 {% step %}
+
 ### Enter MegaETH network details
 
 {% tabs %}
@@ -88,6 +90,7 @@ In MetaMask, Rabby, or any Ethereum-compatible wallet, go to **Settings → Netw
 {% endstep %}
 
 {% step %}
+
 ### Save and switch
 
 Save the network and switch to MegaETH.
@@ -99,14 +102,16 @@ Your wallet is now connected.
 
 {% tabs %}
 {% tab title="Mainnet" %}
+
 - [Blockscout](https://megaeth.blockscout.com/)
 - [Etherscan](https://mega.etherscan.io)
-{% endtab %}
+  {% endtab %}
 
 {% tab title="Testnet" %}
+
 - [Blockscout](https://megaeth-testnet-v2.blockscout.com/)
-{% endtab %}
-{% endtabs %}
+  {% endtab %}
+  {% endtabs %}
 
 ## Network Status
 

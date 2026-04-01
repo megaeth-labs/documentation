@@ -17,18 +17,21 @@ The easiest way to move assets to MegaETH is through **Rabbithole**, the officia
 
 {% stepper %}
 {% step %}
+
 ### Go to the bridge
 
 Visit [**rabbithole.megaeth.com/bridge**](https://rabbithole.megaeth.com/bridge).
 {% endstep %}
 
 {% step %}
+
 ### Connect your wallet
 
 Click **Connect Wallet** and approve the connection in your wallet (MetaMask, Rabby, etc.).
 {% endstep %}
 
 {% step %}
+
 ### Choose a bridge and token
 
 Rabbithole offers two built-in options:
@@ -40,6 +43,7 @@ Select the token and amount you want to bridge, then confirm the transaction in 
 {% endstep %}
 
 {% step %}
+
 ### Wait for confirmation
 
 Your tokens will appear on MegaETH once the transaction is processed.

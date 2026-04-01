@@ -7,7 +7,7 @@ These rules apply across the documentation site.
 The documentation has two tonal registers depending on where a page lives:
 
 - **Top-level pages** (`docs/architecture.md`, `docs/mini-block.md`, `docs/README.md`) use a **narrative, explanatory tone**.
-  Build an argument. Walk the reader through reasoning. Explain *why* things are the way they are.
+  Build an argument. Walk the reader through reasoning. Explain _why_ things are the way they are.
   These pages read like a well-written technical blog post — engaging, flowing prose that tells a story.
 
 - **Layer pages** (`user/`, `dev/`, `spec/`) use a **terse, reference tone**.
@@ -59,22 +59,23 @@ When in doubt: top-level pages prioritize readability, layer pages prioritize de
 
 Use these exact forms consistently. Do not alternate between variants.
 
-| Term | Correct | Incorrect |
-|------|---------|-----------|
-| Project name | MegaETH | megaETH, Mega ETH, megaeth, MEGAETH |
-| EVM implementation | MegaEVM | MegaEvm, mega-evm, Mega EVM |
-| Mainnet (proper noun) | MegaETH Mainnet | MegaETH mainnet, main net, main-net |
-| Testnet (proper noun) | MegaETH Testnet | MegaETH testnet, test net, test-net |
-| Currency ticker | ETH | eth, Eth |
-| Currency name | ether | Ether, ETH (when referring to the currency, not the ticker) |
-| Block type | mini-block | miniblock, mini block, MiniBlock |
-| Onchain / offchain | onchain, offchain | on-chain, off-chain, on chain |
-| Smart contract | smart contract | Smart Contract, smartcontract |
-| Gas dimensions | compute gas, storage gas | Compute Gas, Storage Gas, Compute gas |
-| Spec names | MiniRex, Rex, Rex1, Rex2, Rex3, Rex4 | minirex, MINIREX, mini-rex, rex-3 |
-| State trie | SALT | Salt, salt |
+| Term                  | Correct                              | Incorrect                                                   |
+| --------------------- | ------------------------------------ | ----------------------------------------------------------- |
+| Project name          | MegaETH                              | megaETH, Mega ETH, megaeth, MEGAETH                         |
+| EVM implementation    | MegaEVM                              | MegaEvm, mega-evm, Mega EVM                                 |
+| Mainnet (proper noun) | MegaETH Mainnet                      | MegaETH mainnet, main net, main-net                         |
+| Testnet (proper noun) | MegaETH Testnet                      | MegaETH testnet, test net, test-net                         |
+| Currency ticker       | ETH                                  | eth, Eth                                                    |
+| Currency name         | ether                                | Ether, ETH (when referring to the currency, not the ticker) |
+| Block type            | mini-block                           | miniblock, mini block, MiniBlock                            |
+| Onchain / offchain    | onchain, offchain                    | on-chain, off-chain, on chain                               |
+| Smart contract        | smart contract                       | Smart Contract, smartcontract                               |
+| Gas dimensions        | compute gas, storage gas             | Compute Gas, Storage Gas, Compute gas                       |
+| Spec names            | MiniRex, Rex, Rex1, Rex2, Rex3, Rex4 | minirex, MINIREX, mini-rex, rex-3                           |
+| State trie            | SALT                                 | Salt, salt                                                  |
 
 **Capitalization rules:**
+
 - Spec names are proper nouns — always capitalized as shown.
 - Gas dimension names are common nouns — always lowercase in running text.
 - "Mainnet" and "Testnet" are capitalized when referring to MegaETH's specific networks (proper nouns), lowercase when used generically ("run a testnet").
@@ -145,7 +146,9 @@ Content for tab 2.
 
 {% stepper %}
 {% step %}
+
 ## Step title
+
 Step content.
 {% endstep %}
 {% endstepper %}
@@ -154,6 +157,7 @@ Step content.
 ## Images
 
 Store images in `docs/.gitbook/assets/` and reference them as:
+
 ```markdown
 ![Alt text](../.gitbook/assets/image-name.png)
 ```

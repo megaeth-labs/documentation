@@ -10,7 +10,7 @@ The sequencer produces [mini-blocks](mini-block.md) every ~10 milliseconds and [
 ## How a Transaction Moves Through MegaETH
 
 Like all blockchains, MegaETH processes transactions and maintains a shared ledger.
-What makes it different is *speed*: a transaction is confirmed in roughly 10 milliseconds — not seconds or minutes.
+What makes it different is _speed_: a transaction is confirmed in roughly 10 milliseconds — not seconds or minutes.
 The rest of this page walks through exactly how that happens, from submission to final settlement on Ethereum L1.
 
 ```mermaid

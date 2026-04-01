@@ -2,7 +2,7 @@
 description: realtime_sendRawTransaction — submit a transaction and receive the receipt in a single call without polling.
 ---
 
-# realtime\_sendRawTransaction
+# realtime_sendRawTransaction
 
 Submits a signed transaction and returns the receipt directly once the transaction is executed — no polling required.
 This is a drop-in replacement for `eth_sendRawTransaction` that eliminates the need to poll `eth_getTransactionReceipt`.
@@ -10,29 +10,29 @@ The method times out after 10 seconds if the transaction has not been executed.
 
 ## Parameters
 
-| Position | Type | Required | Notes |
-| -------- | ---- | -------- | ----- |
-| `0` | `Data` | Yes | Hex-encoded signed transaction |
+| Position | Type   | Required | Notes                          |
+| -------- | ------ | -------- | ------------------------------ |
+| `0`      | `Data` | Yes      | Hex-encoded signed transaction |
 
 ## Returns
 
 A transaction receipt object on success:
 
-| Field | Type | Notes |
-| ----- | ---- | ----- |
-| `transactionHash` | `Data` (32 bytes) | Hash of the submitted transaction |
-| `blockNumber` | `Quantity` | Block containing the transaction |
-| `from` | `Data` (20 bytes) | Sender address |
-| `to` | `Data` (20 bytes) | Recipient address (`null` for contract creation) |
-| `gasUsed` | `Quantity` | Gas consumed by the transaction |
-| `status` | `Quantity` | `0x1` for success, `0x0` for revert |
-| `logs` | `Log[]` | Event logs emitted during execution |
-| `contractAddress` | `Data` (20 bytes) | Deployed contract address, or `null` |
+| Field             | Type              | Notes                                            |
+| ----------------- | ----------------- | ------------------------------------------------ |
+| `transactionHash` | `Data` (32 bytes) | Hash of the submitted transaction                |
+| `blockNumber`     | `Quantity`        | Block containing the transaction                 |
+| `from`            | `Data` (20 bytes) | Sender address                                   |
+| `to`              | `Data` (20 bytes) | Recipient address (`null` for contract creation) |
+| `gasUsed`         | `Quantity`        | Gas consumed by the transaction                  |
+| `status`          | `Quantity`        | `0x1` for success, `0x0` for revert              |
+| `logs`            | `Log[]`           | Event logs emitted during execution              |
+| `contractAddress` | `Data` (20 bytes) | Deployed contract address, or `null`             |
 
 ## Errors
 
-| Code | Cause | Fix |
-| ---- | ----- | --- |
+| Code     | Cause                                                                       | Fix                                              |
+| -------- | --------------------------------------------------------------------------- | ------------------------------------------------ |
 | `-32000` | `realtime transaction expired` — transaction not executed within 10 seconds | Fall back to polling `eth_getTransactionReceipt` |
 
 See also [Error reference](error-codes.md).

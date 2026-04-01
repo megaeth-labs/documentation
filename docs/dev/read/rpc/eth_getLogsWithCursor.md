@@ -2,7 +2,7 @@
 description: eth_getLogsWithCursor — paginated log queries using a cursor for incremental retrieval of large datasets.
 ---
 
-# eth\_getLogsWithCursor
+# eth_getLogsWithCursor
 
 Returns event logs with cursor-based pagination.
 Accepts the same filter parameters as `eth_getLogs`, with an additional optional `cursor`.
@@ -12,30 +12,30 @@ When a query exceeds server-side resource limits, the server returns a partial r
 
 Pass a single filter object as `params[0]`.
 
-| Field | Type | Required | Notes |
-| ----- | ---- | -------- | ----- |
-| `fromBlock` | `BlockTag` | No | Start of range (inclusive) |
-| `toBlock` | `BlockTag` | No | End of range (inclusive) |
-| `blockHash` | `Data` (32 bytes) | No | Single block to query. Cannot be combined with `fromBlock` / `toBlock` |
-| `address` | `Data` \| `Data[]` | No | Contract address(es) to match |
-| `topics` | `Data[]` | No | Position-sensitive topic filter. Use `null` as a wildcard |
-| `cursor` | `String` | No | Opaque cursor from a previous response. Omit for the initial request |
+| Field       | Type               | Required | Notes                                                                  |
+| ----------- | ------------------ | -------- | ---------------------------------------------------------------------- |
+| `fromBlock` | `BlockTag`         | No       | Start of range (inclusive)                                             |
+| `toBlock`   | `BlockTag`         | No       | End of range (inclusive)                                               |
+| `blockHash` | `Data` (32 bytes)  | No       | Single block to query. Cannot be combined with `fromBlock` / `toBlock` |
+| `address`   | `Data` \| `Data[]` | No       | Contract address(es) to match                                          |
+| `topics`    | `Data[]`           | No       | Position-sensitive topic filter. Use `null` as a wildcard              |
+| `cursor`    | `String`           | No       | Opaque cursor from a previous response. Omit for the initial request   |
 
 ## Returns
 
-| Field | Type | Notes |
-| ----- | ---- | ----- |
-| `logs` | `Log[]` | Matching log objects (same schema as `eth_getLogs`) |
+| Field    | Type     | Notes                                                               |
+| -------- | -------- | ------------------------------------------------------------------- |
+| `logs`   | `Log[]`  | Matching log objects (same schema as `eth_getLogs`)                 |
 | `cursor` | `String` | Present when more results remain. Absent when the query is complete |
 
 The cursor is derived from the block number and log index of the last log in the batch, but clients should treat it as an opaque string.
 
 ## Errors
 
-| Code | Cause | Fix |
-| ---- | ----- | --- |
-| `-32602` | Malformed filter, or `blockHash` combined with `fromBlock` / `toBlock` | Fix the filter |
-| `-32000` | Query too large for the endpoint | Narrow the filter or reduce the range |
+| Code     | Cause                                                                  | Fix                                   |
+| -------- | ---------------------------------------------------------------------- | ------------------------------------- |
+| `-32602` | Malformed filter, or `blockHash` combined with `fromBlock` / `toBlock` | Fix the filter                        |
+| `-32000` | Query too large for the endpoint                                       | Narrow the filter or reduce the range |
 
 See also [Error reference](error-codes.md).
 

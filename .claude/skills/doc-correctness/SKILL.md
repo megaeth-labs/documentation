@@ -8,6 +8,7 @@ description: Verifies documentation claims against implementation source code, c
 Verify factual claims in the documentation against implementation sources: $ARGUMENTS
 
 Parse the arguments to determine scope. Accepted inputs:
+
 - A single page path (e.g., `docs/spec/evm/dual-gas-model.md`) — verify claims on that page.
 - A layer directory (e.g., `docs/spec/`) — verify all pages in that layer.
 - A claim family (e.g., `gas`, `system-contracts`, `rpc`, `network`, `upgrades`, `security`) — verify all claims of that type across all pages.
@@ -26,14 +27,14 @@ Before verifying, consult the knowledge base for architectural context and sourc
 
 Every verifiable claim in the docs falls into one of these families. Each family has a primary source of truth.
 
-| Family | What to verify | Primary repo | Key source locations |
-|---|---|---|---|
-| Gas | Gas costs, limits, compute gas caps, storage gas bases, detention caps, refund rules | mega-evm | `crates/mega-evm/src/constants.rs`, gas schedule code in `evm/` |
-| System Contracts | Addresses, Solidity interfaces, execution semantics, deployment specs | mega-evm | `crates/system-contracts/contracts/`, Rust bindings, address constants |
-| RPC | Method parameters, return fields, error codes, behavioral differences from Ethereum | mega-rpc, mega-reth | mega-rpc Workers routes (`src/`), mega-reth RPC handlers (`crates/megaeth/rpc/`). **Note**: mega-rpc is the implementation of MegaETH's official public RPC endpoint only. Methods unavailable on the public endpoint may still be available through managed RPC providers (e.g., Alchemy). When verifying RPC method availability, distinguish between "unavailable on public endpoint" and "unsupported by MegaETH entirely." |
-| Network | Chain IDs, RPC URLs, block times, currency symbols, explorer URLs | devops-ansible-inventory | Inventory files and deployment configs |
-| Upgrades | Spec progression, per-upgrade behavioral deltas, activation order, backward compatibility | mega-evm | `crates/mega-evm/src/evm/spec.rs`, `block/hardfork.rs`, `docs/upgrades/` |
-| Security | Security Considerations sections: claimed attack vectors, invariants, risk consequences | mega-evm, mega-reth | Same as the claim's primary family (Gas → gas sources, RPC → rpc sources, etc.) |
+| Family           | What to verify                                                                            | Primary repo             | Key source locations                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ---------------- | ----------------------------------------------------------------------------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Gas              | Gas costs, limits, compute gas caps, storage gas bases, detention caps, refund rules      | mega-evm                 | `crates/mega-evm/src/constants.rs`, gas schedule code in `evm/`                                                                                                                                                                                                                                                                                                                                                                 |
+| System Contracts | Addresses, Solidity interfaces, execution semantics, deployment specs                     | mega-evm                 | `crates/system-contracts/contracts/`, Rust bindings, address constants                                                                                                                                                                                                                                                                                                                                                          |
+| RPC              | Method parameters, return fields, error codes, behavioral differences from Ethereum       | mega-rpc, mega-reth      | mega-rpc Workers routes (`src/`), mega-reth RPC handlers (`crates/megaeth/rpc/`). **Note**: mega-rpc is the implementation of MegaETH's official public RPC endpoint only. Methods unavailable on the public endpoint may still be available through managed RPC providers (e.g., Alchemy). When verifying RPC method availability, distinguish between "unavailable on public endpoint" and "unsupported by MegaETH entirely." |
+| Network          | Chain IDs, RPC URLs, block times, currency symbols, explorer URLs                         | devops-ansible-inventory | Inventory files and deployment configs                                                                                                                                                                                                                                                                                                                                                                                          |
+| Upgrades         | Spec progression, per-upgrade behavioral deltas, activation order, backward compatibility | mega-evm                 | `crates/mega-evm/src/evm/spec.rs`, `block/hardfork.rs`, `docs/upgrades/`                                                                                                                                                                                                                                                                                                                                                        |
+| Security         | Security Considerations sections: claimed attack vectors, invariants, risk consequences   | mega-evm, mega-reth      | Same as the claim's primary family (Gas → gas sources, RPC → rpc sources, etc.)                                                                                                                                                                                                                                                                                                                                                 |
 
 ## Verification Workflow
 
@@ -49,6 +50,7 @@ Read the target page(s) and extract every verifiable claim. A claim is any state
 - **Security claims**: Attack vectors, invariants, and risk consequences stated in Security Considerations sections (e.g., "if a node fails to charge X, an attacker can Y").
 
 For each claim, record:
+
 - The exact text from the doc.
 - The page path and section.
 - The claim family (Gas / System Contracts / RPC / Network / Upgrades / Security).
@@ -73,13 +75,13 @@ For each claim, locate the authoritative source:
 
 For each claim, compare the doc text against the source and assign a disposition:
 
-| Disposition | Meaning |
-|---|---|
-| **Verified** | Doc matches source exactly. Record: file path, line number, commit hash. |
-| **Incorrect** | Doc contradicts source. Record: what the doc says, what the source says, and the source location. |
-| **Stale** | Doc was correct for a previous spec/version but is outdated. Record: which spec introduced the change. |
-| **Ambiguous** | Source is unclear or claim cannot be verified with available information. Record: what was searched and why it's unclear. |
-| **Version-dependent** | Claim is correct for some specs but not others, and the doc doesn't specify which. Record: which specs it applies to. |
+| Disposition           | Meaning                                                                                                                   |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **Verified**          | Doc matches source exactly. Record: file path, line number, commit hash.                                                  |
+| **Incorrect**         | Doc contradicts source. Record: what the doc says, what the source says, and the source location.                         |
+| **Stale**             | Doc was correct for a previous spec/version but is outdated. Record: which spec introduced the change.                    |
+| **Ambiguous**         | Source is unclear or claim cannot be verified with available information. Record: what was searched and why it's unclear. |
+| **Version-dependent** | Claim is correct for some specs but not others, and the doc doesn't specify which. Record: which specs it applies to.     |
 
 ### Phase 4: Report
 
@@ -96,17 +98,18 @@ Produce the report in the output format below.
 
 ## Summary
 
-| Disposition | Count |
-|---|---|
-| Verified | N |
-| Incorrect | N |
-| Stale | N |
-| Ambiguous | N |
-| Version-dependent | N |
+| Disposition       | Count |
+| ----------------- | ----- |
+| Verified          | N     |
+| Incorrect         | N     |
+| Stale             | N     |
+| Ambiguous         | N     |
+| Version-dependent | N     |
 
 ## Findings (Incorrect / Stale / Ambiguous / Version-dependent only)
 
 ### C-001: {short description}
+
 - **Severity**: Blocker | Major | Minor
 - **Disposition**: {Incorrect | Stale | Ambiguous | Version-dependent}
 - **Claim family**: {Gas | System Contracts | RPC | Network | Upgrades}
@@ -124,25 +127,28 @@ Produce the report in the output format below.
 <details>
 <summary>N claims verified (click to expand)</summary>
 
-| # | Page | Claim | Source | Line |
-|---|---|---|---|---|
-| 1 | {path} | {claim summary} | `{repo}/{file}` | {line} |
-| 2 | ... | ... | ... | ... |
+| #   | Page   | Claim           | Source          | Line   |
+| --- | ------ | --------------- | --------------- | ------ |
+| 1   | {path} | {claim summary} | `{repo}/{file}` | {line} |
+| 2   | ...    | ...             | ...             | ...    |
 
 </details>
 
 ## Source Resolution Trace
 
 Repos consulted:
+
 - {repo} at `{local path}` (commit `{short hash}`)
 - ...
 
 Knowledge docs used:
+
 - `knowledge/{file}.md` — {why it was consulted}
 - ...
 ```
 
 **Severity definitions**:
+
 - **Blocker**: Incorrect numeric values (gas costs, limits, addresses), wrong spec attribution, wrong interface signature — would cause implementation bugs if someone followed the doc.
 - **Major**: Stale values from a previous spec, missing version qualification, misleading behavioral description.
 - **Minor**: Ambiguous claim that could be misread, minor wording imprecision that doesn't change meaning.

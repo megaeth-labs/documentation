@@ -22,13 +22,13 @@ The following methods are available through managed providers:
 
 ### Supported Tracers
 
-| Tracer | `tracer` value | Description |
-| ------ | -------------- | ----------- |
-| Default (struct logger) | *(omit `tracer` field)* | Opcode-level trace with gas, stack, memory, and storage at each step |
-| callTracer | `"callTracer"` | Nested call tree with inputs, outputs, and gas usage per call |
-| prestateTracer | `"prestateTracer"` | Account state before execution; set `"diffMode": true` for before/after diff |
-| flatCallTracer | `"flatCallTracer"` | Parity-style flat list of all calls |
-| 4byteTracer | `"4byteTracer"` | Counts function selector usage |
+| Tracer                  | `tracer` value          | Description                                                                  |
+| ----------------------- | ----------------------- | ---------------------------------------------------------------------------- |
+| Default (struct logger) | _(omit `tracer` field)_ | Opcode-level trace with gas, stack, memory, and storage at each step         |
+| callTracer              | `"callTracer"`          | Nested call tree with inputs, outputs, and gas usage per call                |
+| prestateTracer          | `"prestateTracer"`      | Account state before execution; set `"diffMode": true` for before/after diff |
+| flatCallTracer          | `"flatCallTracer"`      | Parity-style flat list of all calls                                          |
+| 4byteTracer             | `"4byteTracer"`         | Counts function selector usage                                               |
 
 {% hint style="info" %}
 JavaScript tracers are not supported.
@@ -151,12 +151,12 @@ Produces a step-by-step log of every EVM opcode executed, including the program 
 Use this when you need to pinpoint the exact instruction where a transaction fails — for example, identifying which `SSTORE` consumed unexpected storage gas, or confirming that a specific opcode triggered the volatile data compute gas cap.
 The output is verbose; use the flags below to reduce noise:
 
-| Flag | Effect |
-| ---- | ------ |
-| `--trace.opcode.disable-memory` | Omit memory snapshots (significantly reduces output size) |
-| `--trace.opcode.disable-stack` | Omit stack contents |
-| `--trace.opcode.disable-storage` | Omit storage changes |
-| `--trace.opcode.enable-return-data` | Include return data from calls |
+| Flag                                | Effect                                                    |
+| ----------------------------------- | --------------------------------------------------------- |
+| `--trace.opcode.disable-memory`     | Omit memory snapshots (significantly reduces output size) |
+| `--trace.opcode.disable-stack`      | Omit stack contents                                       |
+| `--trace.opcode.disable-storage`    | Omit storage changes                                      |
+| `--trace.opcode.enable-return-data` | Include return data from calls                            |
 
 #### Call Tracer (`--tracer call`)
 

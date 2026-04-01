@@ -6,10 +6,10 @@ description: MegaETH system contracts — addresses, interfaces, preconditions, 
 
 MegaETH provides system contracts that give transactions access to functionality beyond the standard EVM.
 
-| Contract | Address | Purpose |
-| -------- | ------- | ------- |
-| [High-Precision Timestamp](#high-precision-timestamp) | [`0x6342000000000000000000000000000000000002`](https://megaeth.blockscout.com/address/0x6342000000000000000000000000000000000002) | Microsecond-resolution timestamps |
-| [KeylessDeploy](#keyless-deployment) | [`0x6342000000000000000000000000000000000003`](https://megaeth.blockscout.com/address/0x6342000000000000000000000000000000000003) | Deterministic cross-chain deployment (Nick's Method) |
+| Contract                                              | Address                                                                                                                           | Purpose                                              |
+| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| [High-Precision Timestamp](#high-precision-timestamp) | [`0x6342000000000000000000000000000000000002`](https://megaeth.blockscout.com/address/0x6342000000000000000000000000000000000002) | Microsecond-resolution timestamps                    |
+| [KeylessDeploy](#keyless-deployment)                  | [`0x6342000000000000000000000000000000000003`](https://megaeth.blockscout.com/address/0x6342000000000000000000000000000000000003) | Deterministic cross-chain deployment (Nick's Method) |
 
 ## High-Precision Timestamp
 
@@ -49,12 +49,12 @@ uint256 timestampSec = timestampUs / 1_000_000; // convert to second timestamp
 
 **Properties:**
 
-| Property | Value |
-| -------- | ----- |
-| Precision | 1 μs (1/1,000,000 second) |
-| Range | `(previous_block.timestamp × 1,000,000, block.timestamp × 1,000,000]` |
-| Monotonicity | Non-decreasing within a block |
-| Snapshot | Stable within a single transaction — repeated reads return the same value |
+| Property     | Value                                                                     |
+| ------------ | ------------------------------------------------------------------------- |
+| Precision    | 1 μs (1/1,000,000 second)                                                 |
+| Range        | `(previous_block.timestamp × 1,000,000, block.timestamp × 1,000,000]`     |
+| Monotonicity | Non-decreasing within a block                                             |
+| Snapshot     | Stable within a single transaction — repeated reads return the same value |
 
 **Common use cases:** HFT strategies, rate limiting, latency measurements, sub-second auctions, TWAP calculations.
 
@@ -116,10 +116,10 @@ If you need a widely-used contract deployed, reach out to the MegaETH team — i
 
 **Already-deployed contracts** (available on MegaETH via KeylessDeploy):
 
-| Contract | Deployed Address |
-| -------- | ---------------- |
+| Contract                                                                      | Deployed Address                                                                                                                  |
+| ----------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | [CREATE2 Factory](https://github.com/Arachnid/deterministic-deployment-proxy) | [`0x4e59b44847b379578588920ca78fbf26c0b4956c`](https://megaeth.blockscout.com/address/0x4e59b44847b379578588920ca78fbf26c0b4956c) |
-| [EIP-1820 Registry](https://eips.ethereum.org/EIPS/eip-1820) | [`0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24`](https://megaeth.blockscout.com/address/0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24) |
+| [EIP-1820 Registry](https://eips.ethereum.org/EIPS/eip-1820)                  | [`0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24`](https://megaeth.blockscout.com/address/0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24) |
 
 <details>
 <summary>Rex4 preview — upcoming system contracts</summary>
@@ -127,10 +127,10 @@ If you need a widely-used contract deployed, reach out to the MegaETH team — i
 The following system contracts are planned for the Rex4 hardfork.
 Addresses and interfaces are subject to change before release.
 
-| Contract | Address | Purpose |
-| -------- | ------- | ------- |
+| Contract          | Address                                      | Purpose                                                                     |
+| ----------------- | -------------------------------------------- | --------------------------------------------------------------------------- |
 | MegaAccessControl | `0x6342000000000000000000000000000000000004` | Opt out of volatile data access detection via `disableVolatileDataAccess()` |
-| MegaLimitControl | `0x6342000000000000000000000000000000000005` | Query remaining compute gas budget via `remainingComputeGas()` |
+| MegaLimitControl  | `0x6342000000000000000000000000000000000005` | Query remaining compute gas budget via `remainingComputeGas()`              |
 
 </details>
 

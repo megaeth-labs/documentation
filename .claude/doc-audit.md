@@ -55,6 +55,7 @@ Line 9: "Mini-blocks are specific to MegaETH and anchor an ecosystem of applicat
 ### ~~8. `gas-model.md` — "Tips for Developers" section~~ ✅ FIXED
 
 Deleted the standalone section. Inlined each tip where relevant:
+
 - "Account for storage gas" → after Transaction Intrinsic Costs table
 - "Prefer transient storage" + "Reuse storage slots" → end of Storage Gas Costs section
 - "Use native gas estimation APIs" → folded into existing hint in Bucket Multiplier section
@@ -95,8 +96,8 @@ Most pages have `description` frontmatter (good). Verify all pages comply with t
 
 ## Summary
 
-| Priority | Count | Key Items |
-|----------|-------|-----------|
-| HIGH     | 3 (1 fixed) | Stale architecture page, contradictory gas limits in FAQ, WETH address conflict, ~~duplicated L1 contracts~~ ✅ |
-| MEDIUM   | 6     | Ethereum-centric comparison table, duplicated volatile data explanation, marketing-speak opening, method availability contradictions |
-| LOW      | 4     | Broken anchors, empty integration pages, minor formatting |
+| Priority | Count       | Key Items                                                                                                                            |
+| -------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| HIGH     | 3 (1 fixed) | Stale architecture page, contradictory gas limits in FAQ, WETH address conflict, ~~duplicated L1 contracts~~ ✅                      |
+| MEDIUM   | 6           | Ethereum-centric comparison table, duplicated volatile data explanation, marketing-speak opening, method availability contradictions |
+| LOW      | 4           | Broken anchors, empty integration pages, minor formatting                                                                            |

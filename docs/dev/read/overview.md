@@ -31,82 +31,82 @@ Methods marked "Managed only" are unavailable on the public endpoint but support
 See [Debugging Transactions](../send-tx/debugging.md) for usage of debug methods, and [Tooling](../tooling.md#rpc-providers) for provider options.
 {% endhint %}
 
-| Method | Availability | Additional Restrictions |
-| ------ | ------------ | ----------------------- |
-| `debug_getRawBlock` | Managed only | |
-| `debug_getRawHeader` | Managed only | |
-| `debug_getRawReceipts` | Managed only | |
-| `debug_getRawTransaction` | Managed only | |
-| `debug_replayBlock` | Managed only | |
-| `debug_traceBlock` | Managed only | |
-| `debug_traceBlockByHash` | Available | |
-| `debug_traceBlockByNumber` | Available | |
-| `debug_traceCall` | Managed only | |
-| `debug_traceCallMany` | Managed only | |
-| `debug_traceTransaction` | Available | |
-| `eth_accounts` | Available | |
-| `eth_blockNumber` | Available | |
-| `eth_call` | Available | Compute gas limited to 60,000,000. |
-| `eth_callAfter` | Available | Compute gas limited to 60,000,000. Timeout limited to 60 seconds. |
-| `eth_callMany` | Available | Compute gas limited to 60,000,000 per call. |
-| `eth_chainId` | Available | |
-| `eth_createAccessList` | Available | Compute gas limited to 60,000,000. |
-| `eth_estimateGas` | Available | Compute gas limited to 60,000,000. |
-| `eth_feeHistory` | Available | Block range limited to 256. |
-| `eth_gasPrice` | Available | |
-| `eth_getBalance` | Available | |
-| `eth_getBlockByHash` | Available | |
-| `eth_getBlockByNumber` | Available | |
-| `eth_getBlockReceipts` | Available | |
-| `eth_getBlockTransactionCountByHash` | Available | |
-| `eth_getBlockTransactionCountByNumber` | Available | |
-| `eth_getCode` | Available | |
-| `eth_getFilterChanges` | Unavailable | |
-| `eth_getFilterLogs` | Unavailable | |
-| `eth_getLogs` | Available | |
-| `eth_getLogsWithCursor` | Managed only | |
-| `eth_getStorageAt` | Available | |
-| `eth_getTransactionByBlockHashAndIndex` | Available | |
-| `eth_getTransactionByBlockNumberAndIndex` | Available | |
-| `eth_getTransactionByHash` | Available | |
-| `eth_getTransactionCount` | Available | |
-| `eth_getTransactionReceipt` | Available | |
-| `eth_getUncleByBlockHashAndIndex` | Available | |
-| `eth_getUncleByBlockNumberAndIndex` | Available | |
-| `eth_getUncleCountByBlockHash` | Available | |
-| `eth_getUncleCountByBlockNumber` | Available | |
-| `eth_maxPriorityFeePerGas` | Available | |
-| `eth_mining` | Available | |
-| `eth_newBlockFilter` | Available | |
-| `eth_newFilter` | Available | |
-| `eth_newPendingTransactionFilter` | Available | |
-| `eth_protocolVersion` | Available | |
-| `eth_sendRawTransaction` | Available | |
-| `eth_sendTransaction` | Unavailable | Use `eth_sendRawTransaction` with a signed transaction. |
-| `eth_sign` | Unavailable | Sign client-side. |
-| `eth_signTransaction` | Unavailable | Sign client-side. |
-| `eth_signTypedData` | Unavailable | Sign client-side. |
-| `eth_subscribe` | WebSocket only | |
-| `eth_syncing` | Available | |
-| `eth_uninstallFilter` | Available | |
-| `eth_unsubscribe` | WebSocket only | |
-| `net_listening` | Available | |
-| `net_peerCount` | Available | |
-| `net_version` | Available | |
-| `realtime_sendRawTransaction` | Available | |
-| `trace_block` | Managed only | |
-| `trace_call` | Managed only | |
-| `trace_callMany` | Managed only | |
-| `trace_get` | Managed only | |
-| `trace_rawTransaction` | Managed only | |
-| `trace_replayBlockTransactions` | Managed only | |
-| `trace_replayTransaction` | Managed only | |
-| `trace_transaction` | Managed only | |
-| `txpool_content` | Unavailable | |
-| `txpool_contentFrom` | Unavailable | |
-| `txpool_inspect` | Unavailable | |
-| `txpool_status` | Unavailable | |
-| `web3_clientVersion` | Available | |
+| Method                                    | Availability   | Additional Restrictions                                           |
+| ----------------------------------------- | -------------- | ----------------------------------------------------------------- |
+| `debug_getRawBlock`                       | Managed only   |                                                                   |
+| `debug_getRawHeader`                      | Managed only   |                                                                   |
+| `debug_getRawReceipts`                    | Managed only   |                                                                   |
+| `debug_getRawTransaction`                 | Managed only   |                                                                   |
+| `debug_replayBlock`                       | Managed only   |                                                                   |
+| `debug_traceBlock`                        | Managed only   |                                                                   |
+| `debug_traceBlockByHash`                  | Available      |                                                                   |
+| `debug_traceBlockByNumber`                | Available      |                                                                   |
+| `debug_traceCall`                         | Managed only   |                                                                   |
+| `debug_traceCallMany`                     | Managed only   |                                                                   |
+| `debug_traceTransaction`                  | Available      |                                                                   |
+| `eth_accounts`                            | Available      |                                                                   |
+| `eth_blockNumber`                         | Available      |                                                                   |
+| `eth_call`                                | Available      | Compute gas limited to 60,000,000.                                |
+| `eth_callAfter`                           | Available      | Compute gas limited to 60,000,000. Timeout limited to 60 seconds. |
+| `eth_callMany`                            | Available      | Compute gas limited to 60,000,000 per call.                       |
+| `eth_chainId`                             | Available      |                                                                   |
+| `eth_createAccessList`                    | Available      | Compute gas limited to 60,000,000.                                |
+| `eth_estimateGas`                         | Available      | Compute gas limited to 60,000,000.                                |
+| `eth_feeHistory`                          | Available      | Block range limited to 256.                                       |
+| `eth_gasPrice`                            | Available      |                                                                   |
+| `eth_getBalance`                          | Available      |                                                                   |
+| `eth_getBlockByHash`                      | Available      |                                                                   |
+| `eth_getBlockByNumber`                    | Available      |                                                                   |
+| `eth_getBlockReceipts`                    | Available      |                                                                   |
+| `eth_getBlockTransactionCountByHash`      | Available      |                                                                   |
+| `eth_getBlockTransactionCountByNumber`    | Available      |                                                                   |
+| `eth_getCode`                             | Available      |                                                                   |
+| `eth_getFilterChanges`                    | Unavailable    |                                                                   |
+| `eth_getFilterLogs`                       | Unavailable    |                                                                   |
+| `eth_getLogs`                             | Available      |                                                                   |
+| `eth_getLogsWithCursor`                   | Managed only   |                                                                   |
+| `eth_getStorageAt`                        | Available      |                                                                   |
+| `eth_getTransactionByBlockHashAndIndex`   | Available      |                                                                   |
+| `eth_getTransactionByBlockNumberAndIndex` | Available      |                                                                   |
+| `eth_getTransactionByHash`                | Available      |                                                                   |
+| `eth_getTransactionCount`                 | Available      |                                                                   |
+| `eth_getTransactionReceipt`               | Available      |                                                                   |
+| `eth_getUncleByBlockHashAndIndex`         | Available      |                                                                   |
+| `eth_getUncleByBlockNumberAndIndex`       | Available      |                                                                   |
+| `eth_getUncleCountByBlockHash`            | Available      |                                                                   |
+| `eth_getUncleCountByBlockNumber`          | Available      |                                                                   |
+| `eth_maxPriorityFeePerGas`                | Available      |                                                                   |
+| `eth_mining`                              | Available      |                                                                   |
+| `eth_newBlockFilter`                      | Available      |                                                                   |
+| `eth_newFilter`                           | Available      |                                                                   |
+| `eth_newPendingTransactionFilter`         | Available      |                                                                   |
+| `eth_protocolVersion`                     | Available      |                                                                   |
+| `eth_sendRawTransaction`                  | Available      |                                                                   |
+| `eth_sendTransaction`                     | Unavailable    | Use `eth_sendRawTransaction` with a signed transaction.           |
+| `eth_sign`                                | Unavailable    | Sign client-side.                                                 |
+| `eth_signTransaction`                     | Unavailable    | Sign client-side.                                                 |
+| `eth_signTypedData`                       | Unavailable    | Sign client-side.                                                 |
+| `eth_subscribe`                           | WebSocket only |                                                                   |
+| `eth_syncing`                             | Available      |                                                                   |
+| `eth_uninstallFilter`                     | Available      |                                                                   |
+| `eth_unsubscribe`                         | WebSocket only |                                                                   |
+| `net_listening`                           | Available      |                                                                   |
+| `net_peerCount`                           | Available      |                                                                   |
+| `net_version`                             | Available      |                                                                   |
+| `realtime_sendRawTransaction`             | Available      |                                                                   |
+| `trace_block`                             | Managed only   |                                                                   |
+| `trace_call`                              | Managed only   |                                                                   |
+| `trace_callMany`                          | Managed only   |                                                                   |
+| `trace_get`                               | Managed only   |                                                                   |
+| `trace_rawTransaction`                    | Managed only   |                                                                   |
+| `trace_replayBlockTransactions`           | Managed only   |                                                                   |
+| `trace_replayTransaction`                 | Managed only   |                                                                   |
+| `trace_transaction`                       | Managed only   |                                                                   |
+| `txpool_content`                          | Unavailable    |                                                                   |
+| `txpool_contentFrom`                      | Unavailable    |                                                                   |
+| `txpool_inspect`                          | Unavailable    |                                                                   |
+| `txpool_status`                           | Unavailable    |                                                                   |
+| `web3_clientVersion`                      | Available      |                                                                   |
 
 ## Rate Limiting
 

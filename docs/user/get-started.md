@@ -9,6 +9,7 @@ Whether you are here to try the testnet or use mainnet, this guide will help you
 
 {% stepper %}
 {% step %}
+
 ### Connect your wallet
 
 In MetaMask, Rabby, or any Ethereum-compatible wallet, go to **Settings → Networks → Add Network** and enter these details:
@@ -40,6 +41,7 @@ For more details, see [Connect to MegaETH](connect.md).
 {% endstep %}
 
 {% step %}
+
 ### Get tokens
 
 {% tabs %}
@@ -58,6 +60,7 @@ See the [Faucet](faucet.md) page for details.
 {% endstep %}
 
 {% step %}
+
 ### Start using MegaETH
 
 You are ready to interact with dApps, send transactions, and explore the network.

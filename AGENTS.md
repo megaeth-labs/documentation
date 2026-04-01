@@ -12,11 +12,11 @@ For GitBook syntax, custom blocks, configuration, and best practices, follow the
 
 The site is organized into layers, each targeting a different audience:
 
-| Layer | Directory | Audience | Tone |
-|-------|-----------|----------|------|
-| **User Guide** | `docs/user/` | End users (wallets, DeFi users) | Plain language, no code |
-| **Developer Docs** | `docs/dev/` | Dapp/contract builders | Practical guidance, code examples |
-| **Specification** | [mega-evm repo](https://github.com/megaeth-labs/mega-evm) | Protocol implementers, auditors | Normative (MUST/SHALL), exhaustive |
+| Layer              | Directory                                                 | Audience                        | Tone                               |
+| ------------------ | --------------------------------------------------------- | ------------------------------- | ---------------------------------- |
+| **User Guide**     | `docs/user/`                                              | End users (wallets, DeFi users) | Plain language, no code            |
+| **Developer Docs** | `docs/dev/`                                               | Dapp/contract builders          | Practical guidance, code examples  |
+| **Specification**  | [mega-evm repo](https://github.com/megaeth-labs/mega-evm) | Protocol implementers, auditors | Normative (MUST/SHALL), exhaustive |
 
 Each layer has its own `AGENTS.md` with layer-specific writing rules.
 The Specification layer is maintained in the [mega-evm repository](https://github.com/megaeth-labs/mega-evm) and synced into the same GitBook site via Git Sync.

@@ -26,6 +26,7 @@ The endpoint runs the transaction through MegaEVM and returns an accurate estima
 
 {% tabs %}
 {% tab title="curl" %}
+
 ```bash
 curl -s https://mainnet.megaeth.com/rpc \
   -X POST \
@@ -41,15 +42,18 @@ curl -s https://mainnet.megaeth.com/rpc \
     "id": 1
   }'
 ```
+
 {% endtab %}
 
 {% tab title="cast" %}
+
 ```bash
 cast estimate 0xContractAddress \
   'myFunction(uint256)' 42 \
   --rpc-url https://mainnet.megaeth.com/rpc \
   --from 0xYourAddress
 ```
+
 {% endtab %}
 {% endtabs %}
 

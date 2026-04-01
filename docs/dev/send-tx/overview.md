@@ -21,13 +21,16 @@ A toolchain that estimates 21,000 will produce a transaction that reverts with "
 
 {% tabs %}
 {% tab title="Foundry" %}
+
 ```bash
 # Estimate with MegaETH RPC (correct)
 cast estimate 0xContract 'myFunction(uint256)' 42 \
   --rpc-url https://mainnet.megaeth.com/rpc
 ```
+
 {% endtab %}
 {% tab title="curl" %}
+
 ```bash
 curl -s https://mainnet.megaeth.com/rpc \
   -X POST -H "Content-Type: application/json" \
@@ -38,6 +41,7 @@ curl -s https://mainnet.megaeth.com/rpc \
     "id": 1
   }'
 ```
+
 {% endtab %}
 {% endtabs %}
 
@@ -53,14 +57,17 @@ For the full list of pitfalls (volatile data caps, resource limits, receipt inte
 
 {% tabs %}
 {% tab title="Foundry (forge create)" %}
+
 ```bash
 # forge create calls eth_estimateGas on the RPC — no local simulation
 forge create src/MyContract.sol:MyContract \
   --rpc-url https://mainnet.megaeth.com/rpc \
   --private-key $PRIVATE_KEY
 ```
+
 {% endtab %}
 {% tab title="Foundry (forge script)" %}
+
 ```bash
 # forge script runs local EVM simulation by default, which underestimates gas.
 # Use --skip-simulation to bypass local estimation and let the RPC handle it.
@@ -70,16 +77,20 @@ forge script script/Deploy.s.sol \
   --skip-simulation \
   --broadcast
 ```
+
 {% endtab %}
 {% tab title="cast" %}
+
 ```bash
 # Send a simple ETH transfer
 cast send 0xRecipient --value 0.1ether \
   --rpc-url https://mainnet.megaeth.com/rpc \
   --private-key $PRIVATE_KEY
 ```
+
 {% endtab %}
 {% tab title="eth_sendRawTransaction" %}
+
 ```bash
 # 1. Sign the transaction offline (e.g., with cast)
 SIGNED_TX=$(cast mktx 0xRecipient --value 0.1ether \
@@ -94,6 +105,7 @@ curl -s https://mainnet.megaeth.com/rpc \
 
 {% endtab %}
 {% tab title="realtime_sendRawTransaction" %}
+
 ```bash
 # Sign the transaction offline
 SIGNED_TX=$(cast mktx 0xRecipient --value 0.1ether \
@@ -124,38 +136,44 @@ When a transaction reverts, MegaETH provides two debugging tools:
 
 {% tabs %}
 {% tab title="mega-evme (replay)" %}
+
 ```bash
 # Replay a failed transaction with call-level tracing
 mega-evme replay 0xYourTxHash \
   --rpc https://mainnet.megaeth.com/rpc \
   --trace --tracer call
 ```
+
 {% endtab %}
 {% tab title="mega-evme (what-if)" %}
+
 ```bash
 # Would the transaction succeed with more gas?
 mega-evme replay 0xYourTxHash \
   --rpc https://mainnet.megaeth.com/rpc \
   --override.gas-limit 30000000
 ```
+
 {% endtab %}
 {% tab title="cast (debug RPC)" %}
+
 ```bash
 # Requires a provider that supports debug_traceTransaction
 cast rpc debug_traceTransaction 0xYourTxHash \
   --rpc-url https://your-alchemy-endpoint.com
 ```
+
 {% endtab %}
 {% endtabs %}
 
 Common failure causes:
 
-| Symptom | Likely cause | Fix |
-| ------- | ------------ | --- |
-| `intrinsic gas too low` | Gas estimated by local EVM, missing storage gas | Estimate against MegaETH RPC |
-| `out of gas` with low compute usage | Storage gas exceeded the limit | Increase gas limit or reduce state writes |
-| `out of gas` after reading `block.timestamp` | Volatile data access caps compute gas to 20M | Split work across multiple transactions |
-| `resource limit exceeded` | Hit data size, KV updates, or state growth cap | Reduce state operations per transaction |
+| Symptom                                      | Likely cause                                    | Fix                                       |
+| -------------------------------------------- | ----------------------------------------------- | ----------------------------------------- |
+| `intrinsic gas too low`                      | Gas estimated by local EVM, missing storage gas | Estimate against MegaETH RPC              |
+| `out of gas` with low compute usage          | Storage gas exceeded the limit                  | Increase gas limit or reduce state writes |
+| `out of gas` after reading `block.timestamp` | Volatile data access caps compute gas to 20M    | Split work across multiple transactions   |
+| `resource limit exceeded`                    | Hit data size, KV updates, or state growth cap  | Reduce state operations per transaction   |
 
 For the full debugging guide, see [Debugging Transactions](debugging.md).
 

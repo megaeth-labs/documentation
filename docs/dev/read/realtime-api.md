@@ -18,27 +18,27 @@ Additional functionality will be added based on feedback.
 
 ## Available Methods
 
-| Method | What it does | Reference |
-| ------ | ------------ | --------- |
-| [`eth_subscribe`](rpc/eth_subscribe.md) | Stream logs, state changes, mini-blocks, and block headers over WebSocket | [Full reference](rpc/eth_subscribe.md) |
-| [`realtime_sendRawTransaction`](rpc/realtime_sendRawTransaction.md) | Submit a transaction and get the receipt back in one call — no polling | [Full reference](rpc/realtime_sendRawTransaction.md) |
-| [`eth_callAfter`](rpc/eth_callAfter.md) | Run `eth_call` after a prior transaction confirms (nonce-gated) | [Full reference](rpc/eth_callAfter.md) |
-| [`eth_getLogsWithCursor`](rpc/eth_getLogsWithCursor.md) | Paginated log queries for large result sets | [Full reference](rpc/eth_getLogsWithCursor.md) |
+| Method                                                              | What it does                                                              | Reference                                            |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------- |
+| [`eth_subscribe`](rpc/eth_subscribe.md)                             | Stream logs, state changes, mini-blocks, and block headers over WebSocket | [Full reference](rpc/eth_subscribe.md)               |
+| [`realtime_sendRawTransaction`](rpc/realtime_sendRawTransaction.md) | Submit a transaction and get the receipt back in one call — no polling    | [Full reference](rpc/realtime_sendRawTransaction.md) |
+| [`eth_callAfter`](rpc/eth_callAfter.md)                             | Run `eth_call` after a prior transaction confirms (nonce-gated)           | [Full reference](rpc/eth_callAfter.md)               |
+| [`eth_getLogsWithCursor`](rpc/eth_getLogsWithCursor.md)             | Paginated log queries for large result sets                               | [Full reference](rpc/eth_getLogsWithCursor.md)       |
 
 The following standard Ethereum methods also return real-time results on MegaETH — they query against the latest mini-block automatically when called with `latest` or `pending`:
 
-| Method | What it does |
-| ------ | ------------ |
-| `eth_getBalance` | Account balance |
-| `eth_getStorageAt` | Contract storage slot |
-| `eth_getTransactionCount` | Account nonce |
-| `eth_getCode` | Contract bytecode |
-| `eth_call` | Simulate a call |
-| `eth_callMany` | Simulate multiple calls |
-| `eth_createAccessList` | Generate an access list |
-| `eth_estimateGas` | Estimate gas |
-| `eth_getTransactionByHash` | Transaction by hash |
-| `eth_getTransactionReceipt` | Transaction receipt |
+| Method                      | What it does            |
+| --------------------------- | ----------------------- |
+| `eth_getBalance`            | Account balance         |
+| `eth_getStorageAt`          | Contract storage slot   |
+| `eth_getTransactionCount`   | Account nonce           |
+| `eth_getCode`               | Contract bytecode       |
+| `eth_call`                  | Simulate a call         |
+| `eth_callMany`              | Simulate multiple calls |
+| `eth_createAccessList`      | Generate an access list |
+| `eth_estimateGas`           | Estimate gas            |
+| `eth_getTransactionByHash`  | Transaction by hash     |
+| `eth_getTransactionReceipt` | Transaction receipt     |
 
 ## Use Cases
 
