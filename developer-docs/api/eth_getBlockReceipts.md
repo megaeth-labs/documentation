@@ -1,6 +1,6 @@
 # eth_getBlockReceipts
 
-Returns all transaction receipts for a given block, or `null` if the block is not found.
+Returns all transaction receipts for a block.
 
 ## Parameters
 

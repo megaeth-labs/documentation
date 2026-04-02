@@ -1,6 +1,6 @@
 # eth_getBlockByHash
 
-Returns the block with the given hash, or `null` if no block matches.
+Returns a block by its hash.
 
 ## Parameters
 

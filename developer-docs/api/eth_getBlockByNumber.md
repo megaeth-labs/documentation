@@ -1,6 +1,6 @@
 # eth_getBlockByNumber
 
-Returns a block by its block number or block tag, or `null` if the block is not available.
+Returns a block by number or tag.
 
 ## Parameters
 

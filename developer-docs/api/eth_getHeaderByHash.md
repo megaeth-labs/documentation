@@ -1,6 +1,6 @@
 # eth_getHeaderByHash
 
-Returns the block header for the given block hash, or `null` if no block matches.
+Returns a block header by its hash.
 
 ## Parameters
 

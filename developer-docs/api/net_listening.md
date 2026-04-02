@@ -1,6 +1,6 @@
 # net_listening
 
-Returns `true` if the client is actively listening for network connections.
+Returns whether the node is listening for connections.
 
 ## Parameters
 

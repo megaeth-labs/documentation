@@ -1,6 +1,6 @@
 # eth_getTransactionReceipt
 
-Returns the receipt for a transaction that has been included in a block, or `null` if the transaction is unknown or pending.
+Returns a transaction receipt by hash.
 
 ## Parameters
 

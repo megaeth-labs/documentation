@@ -1,6 +1,6 @@
 # eth_getTransactionByHash
 
-Returns the transaction with the given hash, or `null` if no matching transaction is found.
+Returns a transaction by its hash.
 
 ## Parameters
 
