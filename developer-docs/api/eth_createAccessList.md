@@ -4,33 +4,38 @@ Generates an access list for a transaction.
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `transaction` | `object` | Yes | Transaction to simulate; see fields below |
-| `1` | `block` | `string` | No | Hex block number or tag (`latest`, `safe`, `finalized`, `earliest`, `pending`). Default: `"latest"` |
+1. **`transaction`** · `object` · **required**
 
-### `transaction`
+   Transaction to simulate. Fields:
 
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| `from` | `Address` | No | Caller |
-| `to` | `Address` | No | Target; `null` for contract-creation simulation |
-| `value` | `Quantity` | No | Wei value sent |
-| `input` | `Data` | No | Calldata; prefer over `data` |
-| `gas` | `Quantity` | No | Gas cap |
-| `gasPrice` | `Quantity` | No | Legacy gas price; do not combine with EIP-1559 fields |
-| `maxFeePerGas` | `Quantity` | No | EIP-1559 max fee |
-| `maxPriorityFeePerGas` | `Quantity` | No | EIP-1559 priority fee |
-| `nonce` | `Quantity` | No | Caller nonce override |
-| `accessList` | `array` | No | EIP-2930 access list; each entry: `{ "address": Address, "storageKeys": [Bytes32] }` |
+   - **`from`** · `Address` — Caller
+   - **`to`** · `Address` — Target; `null` for contract-creation simulation
+   - **`value`** · `Quantity` — Wei value sent
+   - **`input`** · `Data` — Calldata; prefer over `data`
+   - **`gas`** · `Quantity` — Gas cap
+   - **`gasPrice`** · `Quantity` — Legacy gas price; do not combine with EIP-1559 fields
+   - **`maxFeePerGas`** · `Quantity` — EIP-1559 max fee
+   - **`maxPriorityFeePerGas`** · `Quantity` — EIP-1559 priority fee
+   - **`nonce`** · `Quantity` — Caller nonce override
+   - **`accessList`** · `array` — EIP-2930 access list; each entry: `{ "address": Address, "storageKeys": [Bytes32] }`
+
+2. **`block`** · `string`
+
+   Hex block number or tag (`latest`, `safe`, `finalized`, `earliest`, `pending`). Default: `"latest"`.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `accessList` | `array` | Generated EIP-2930 access list; each entry: `{ "address": Address, "storageKeys": [Bytes32] }` |
-| `gasUsed` | `Quantity` | Gas with the generated access list applied |
-| `error` | `string` | Execution error when the call reverts; may coexist with `accessList` and `gasUsed` |
+- **`accessList`** · `array`
+
+  Generated EIP-2930 access list; each entry: `{ "address": Address, "storageKeys": [Bytes32] }`.
+
+- **`gasUsed`** · `Quantity`
+
+  Gas with the generated access list applied.
+
+- **`error`** · `string`
+
+  Execution error when the call reverts; may coexist with `accessList` and `gasUsed`.
 
 ## Errors
 
