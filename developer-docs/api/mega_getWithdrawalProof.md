@@ -6,7 +6,7 @@ Returns a Merkle proof for the L2ToL1MessagePasser contract at a given block.
 
 **`address`** Address **REQUIRED**
 
-Must be `0x4200000000000000000000000000000000000016` (L2ToL1MessagePasser).
+The contract address to prove.
 
 ---
 
