@@ -4,25 +4,25 @@ Returns the 32-byte value stored at a given contract storage slot at a specified
 
 ## Parameters
 
-**`address`** (Address) **REQUIRED**
+**`address`** Address **REQUIRED**
 
 > Contract address.
 
 ---
 
-**`slot`** (string) **REQUIRED**
+**`slot`** string **REQUIRED**
 
 > Hex storage slot; use a 32-byte zero-padded value for portability.
 
 ---
 
-**`block`** (string)
+**`block`** string
 
 > Hex block number, block hash, or tag (`latest`, `safe`, `finalized`, …). Default: `"latest"`.
 
 ## Returns
 
-**`result`** (Bytes32)
+**`result`** Bytes32
 
 > Raw 32-byte storage word; a zero value can mean an empty slot, a non-existent account, or an explicitly stored zero.
 
