@@ -8,7 +8,7 @@ None.
 
 ## Returns
 
-**`result`** *Quantity*
+**`result`** `Quantity`
 
 Always `0x0`.
 
