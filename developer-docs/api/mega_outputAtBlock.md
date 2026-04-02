@@ -4,31 +4,59 @@ Returns the L2 output commitment for a given block, including the output root, s
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `blockNumber` | `Quantity` | Yes | Concrete hex block number; block tags such as `latest` are not accepted |
+**`blockNumber`** Quantity **REQUIRED**
+
+Concrete hex block number; block tags such as `latest` are not accepted.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `version` | `Hash32` | Output version |
-| `outputRoot` | `Hash32` | Output commitment |
-| `blockRef` | `object` | Block reference; see fields below |
-| `withdrawalStorageRoot` | `Hash32` | Withdrawal storage root |
-| `stateRoot` | `Hash32` | State root |
-| `syncStatus` | `object` | Backend sync-status snapshot |
+- **`version`** Hash32
 
-**`blockRef` fields:**
+  Output version.
 
-| Field | Type | Notes |
-|---|---|---|
-| `hash` | `Hash32` | Block hash |
-| `number` | `number` | Block number (JSON number) |
-| `parentHash` | `Hash32` | Parent block hash |
-| `timestamp` | `number` | Block timestamp (JSON number) |
-| `l1origin` | `object` | L1 origin with `hash` and `number` |
-| `sequenceNumber` | `number` | Sequence number |
+- **`outputRoot`** Hash32
+
+  Output commitment.
+
+- **`blockRef`** object
+
+  Block reference; see fields below.
+
+  - **`hash`** Hash32
+
+    Block hash.
+
+  - **`number`** number
+
+    Block number (JSON number).
+
+  - **`parentHash`** Hash32
+
+    Parent block hash.
+
+  - **`timestamp`** number
+
+    Block timestamp (JSON number).
+
+  - **`l1origin`** object
+
+    L1 origin with `hash` and `number`.
+
+  - **`sequenceNumber`** number
+
+    Sequence number.
+
+- **`withdrawalStorageRoot`** Hash32
+
+  Withdrawal storage root.
+
+- **`stateRoot`** Hash32
+
+  State root.
+
+- **`syncStatus`** object
+
+  Backend sync-status snapshot.
 
 ## Errors
 

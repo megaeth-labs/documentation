@@ -4,13 +4,15 @@ Cancels an active subscription created by [`eth_subscribe`](./eth_subscribe.md).
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `subscriptionId` | `Data` | Yes | Subscription ID returned by `eth_subscribe` |
+**`subscriptionId`** Data **REQUIRED**
+
+Subscription ID returned by `eth_subscribe`.
 
 ## Returns
 
-`boolean` — `true` if the subscription was found and cancelled; `false` if the ID was not active.
+**`result`** boolean
+
+`true` if the subscription was found and cancelled; `false` if the ID was not active.
 
 ## Errors
 

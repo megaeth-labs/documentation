@@ -15,11 +15,17 @@ None.
 
 When syncing, the result contains:
 
-| Field | Type | Notes |
-|---|---|---|
-| `startingBlock` | `Quantity` | Sync start point |
-| `currentBlock` | `Quantity` | Current progress |
-| `highestBlock` | `Quantity` | Target block |
+- **`startingBlock`** Quantity
+
+  Sync start point.
+
+- **`currentBlock`** Quantity
+
+  Current progress.
+
+- **`highestBlock`** Quantity
+
+  Target block.
 
 ## Errors
 

@@ -4,23 +4,41 @@ Returns a header-only view of a block by number or block tag.
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `block` | `string` | Yes | Hex block number or tag: `latest`, `safe`, `finalized`, `earliest`, `pending` |
+**`block`** string **REQUIRED**
+
+Hex block number or tag: `latest`, `safe`, `finalized`, `earliest`, `pending`.
 
 ## Returns
 
 `Header | null` — `null` when the block is not found.
 
-| Field | Type | Notes |
-|---|---|---|
-| `number` | `Quantity` | Block number |
-| `hash` | `Hash32` | Block hash |
-| `parentHash` | `Hash32` | Parent block hash |
-| `timestamp` | `Quantity` | Block timestamp |
-| `miner` | `Address` | Fee recipient / coinbase |
-| `gasLimit` | `Quantity` | Block gas limit |
-| `gasUsed` | `Quantity` | Gas consumed |
+- **`number`** Quantity
+
+  Block number.
+
+- **`hash`** Hash32
+
+  Block hash.
+
+- **`parentHash`** Hash32
+
+  Parent block hash.
+
+- **`timestamp`** Quantity
+
+  Block timestamp.
+
+- **`miner`** Address
+
+  Fee recipient / coinbase.
+
+- **`gasLimit`** Quantity
+
+  Block gas limit.
+
+- **`gasUsed`** Quantity
+
+  Gas consumed.
 
 Additional standard header fields (`stateRoot`, `logsBloom`, `transactionsRoot`, `receiptsRoot`, `baseFeePerGas`, …) are also included.
 

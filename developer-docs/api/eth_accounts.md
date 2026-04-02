@@ -8,9 +8,9 @@ None.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | `Address[]` | Accounts controlled by the RPC node; always empty on public endpoints |
+**`result`** Address[]
+
+Accounts controlled by the RPC node; always empty on public endpoints.
 
 ## Errors
 

@@ -4,16 +4,21 @@ Returns the number of transactions sent from an address at a given block.
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `address` | `Address` | Yes | Target account address |
-| `1` | `block` | `string` | No | Hex block number or tag (`latest`, `safe`, `finalized`, `earliest`, `pending`). Default: `"latest"` |
+**`address`** Address **REQUIRED**
+
+Target account address.
+
+---
+
+**`block`** string
+
+Hex block number or tag (`latest`, `safe`, `finalized`, `earliest`, `pending`). Default: `"latest"`.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | `Quantity` | Transaction count at the requested block. Returns `0x0` for both unknown accounts and accounts with zero transactions |
+**`result`** Quantity
+
+Transaction count at the requested block. Returns `0x0` for both unknown accounts and accounts with zero transactions.
 
 ## Errors
 

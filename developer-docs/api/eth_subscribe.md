@@ -4,10 +4,9 @@ Opens a real-time event stream over WebSocket. Not available over HTTP.
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `subscriptionType` | `string` | Yes | One of the types listed below |
-| `1` | `filter` | varies | No | Shape depends on `subscriptionType` |
+**`subscriptionType`** string **REQUIRED**
+
+One of the types listed below.
 
 **Subscription types:**
 
@@ -20,15 +19,33 @@ Opens a real-time event stream over WebSocket. Not available over HTTP.
 | `miniBlocks` | — | Sub-block updates at ~10 ms granularity |
 | `stateChanges` | `Address[]` | Per-mini-block account/storage diffs. Default: all accounts |
 
+---
+
+**`filter`** varies
+
+Shape depends on `subscriptionType`.
+
 When `subscriptionType` is `logs`, the filter object contains:
 
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| `fromBlock` | `string` | No | Hex block number or tag |
-| `toBlock` | `string` | No | Hex block number or tag |
-| `blockHash` | `Hash32` | No | Single-block mode; mutually exclusive with `fromBlock`/`toBlock` |
-| `address` | `Address \| Address[]` | No | Filter by emitting address(es) |
-| `topics` | `array` | No | Positional topic filter; positions are AND, values within a position are OR |
+- **`fromBlock`** string
+
+  Hex block number or tag.
+
+- **`toBlock`** string
+
+  Hex block number or tag.
+
+- **`blockHash`** Hash32
+
+  Single-block mode; mutually exclusive with `fromBlock`/`toBlock`.
+
+- **`address`** Address | Address[]
+
+  Filter by emitting address(es).
+
+- **`topics`** array
+
+  Positional topic filter; positions are AND, values within a position are OR.
 
 ## Returns
 
@@ -49,91 +66,211 @@ Events are delivered as `eth_subscription` notifications:
 
 The shape of `result` depends on the subscription type.
 
-**`newHeads`**
+### `newHeads`
 
-| Field | Type | Notes |
-|---|---|---|
-| `number` | `Quantity` | Block number |
-| `hash` | `Hash32` | Block hash |
-| `parentHash` | `Hash32` | Parent block hash |
-| `timestamp` | `Quantity` | Block timestamp |
-| `miner` | `Address` | Fee recipient |
-| `gasLimit` | `Quantity` | Block gas limit |
-| `gasUsed` | `Quantity` | Gas consumed |
-| `baseFeePerGas` | `Quantity` | Base fee |
-| `stateRoot` | `Hash32` | State trie root |
-| `miniBlockCount` | `Quantity` | Mini-block count for this block |
-| `miniBlockOffset` | `Quantity` | Mini-block offset |
+- **`number`** Quantity
+
+  Block number.
+
+- **`hash`** Hash32
+
+  Block hash.
+
+- **`parentHash`** Hash32
+
+  Parent block hash.
+
+- **`timestamp`** Quantity
+
+  Block timestamp.
+
+- **`miner`** Address
+
+  Fee recipient.
+
+- **`gasLimit`** Quantity
+
+  Block gas limit.
+
+- **`gasUsed`** Quantity
+
+  Gas consumed.
+
+- **`baseFeePerGas`** Quantity
+
+  Base fee.
+
+- **`stateRoot`** Hash32
+
+  State trie root.
+
+- **`miniBlockCount`** Quantity
+
+  Mini-block count for this block.
+
+- **`miniBlockOffset`** Quantity
+
+  Mini-block offset.
 
 Additional standard header fields (`logsBloom`, `transactionsRoot`, `receiptsRoot`, …) are also included.
 
-**`logs`**
+### `logs`
 
-| Field | Type | Notes |
-|---|---|---|
-| `address` | `Address` | Emitting contract |
-| `topics` | `Hash32[]` | Indexed topics |
-| `data` | `Data` | Unindexed payload |
-| `blockNumber` | `Quantity \| null` | Containing block number |
-| `transactionHash` | `Hash32 \| null` | Containing transaction hash |
-| `transactionIndex` | `Quantity \| null` | Transaction position in block |
-| `logIndex` | `Quantity \| null` | Log position in block |
-| `removed` | `boolean` | `true` if removed during reorg |
-| `blockTimestamp` | `Quantity` | Block timestamp |
+- **`address`** Address
 
-**`newPendingTransactions`**
+  Emitting contract.
+
+- **`topics`** Hash32[]
+
+  Indexed topics.
+
+- **`data`** Data
+
+  Unindexed payload.
+
+- **`blockNumber`** Quantity | null
+
+  Containing block number.
+
+- **`transactionHash`** Hash32 | null
+
+  Containing transaction hash.
+
+- **`transactionIndex`** Quantity | null
+
+  Transaction position in block.
+
+- **`logIndex`** Quantity | null
+
+  Log position in block.
+
+- **`removed`** boolean
+
+  `true` if removed during reorg.
+
+- **`blockTimestamp`** Quantity
+
+  Block timestamp.
+
+### `newPendingTransactions`
 
 `Hash32` by default. When `true` is passed as the filter, each event is a full transaction object:
 
-| Field | Type | Notes |
-|---|---|---|
-| `hash` | `Hash32` | Transaction hash |
-| `type` | `Quantity` | Transaction type identifier |
-| `from` | `Address` | Sender |
-| `to` | `Address \| null` | Recipient; `null` for contract creation |
-| `value` | `Quantity` | Transfer value in wei |
-| `nonce` | `Quantity` | Sender nonce |
-| `gas` | `Quantity` | Gas limit |
-| `input` | `Data` | Calldata |
-| `blockHash` | `Hash32 \| null` | `null` for pending transactions |
-| `blockNumber` | `Quantity \| null` | `null` for pending transactions |
-| `transactionIndex` | `Quantity \| null` | `null` for pending transactions |
+- **`hash`** Hash32
+
+  Transaction hash.
+
+- **`type`** Quantity
+
+  Transaction type identifier.
+
+- **`from`** Address
+
+  Sender.
+
+- **`to`** Address | null
+
+  Recipient; `null` for contract creation.
+
+- **`value`** Quantity
+
+  Transfer value in wei.
+
+- **`nonce`** Quantity
+
+  Sender nonce.
+
+- **`gas`** Quantity
+
+  Gas limit.
+
+- **`input`** Data
+
+  Calldata.
+
+- **`blockHash`** Hash32 | null
+
+  `null` for pending transactions.
+
+- **`blockNumber`** Quantity | null
+
+  `null` for pending transactions.
+
+- **`transactionIndex`** Quantity | null
+
+  `null` for pending transactions.
 
 Additional fields vary by transaction type (`gasPrice`, `maxFeePerGas`, `accessList`, `chainId`, `v`, `r`, `s`, etc.).
 
-**`syncing`**
+### `syncing`
 
 `false` when not syncing. When syncing, a `SyncProgress` object:
 
-| Field | Type | Notes |
-|---|---|---|
-| `startingBlock` | `Quantity` | Sync start point |
-| `currentBlock` | `Quantity` | Current progress |
-| `highestBlock` | `Quantity` | Target block |
+- **`startingBlock`** Quantity
 
-**`miniBlocks`**
+  Sync start point.
+
+- **`currentBlock`** Quantity
+
+  Current progress.
+
+- **`highestBlock`** Quantity
+
+  Target block.
+
+### `miniBlocks`
 
 Uses `snake_case` field names.
 
-| Field | Type | Notes |
-|---|---|---|
-| `block_number` | `Quantity` | Parent full-block number |
-| `block_timestamp` | `Quantity` | Parent full-block timestamp |
-| `index` | `Quantity` | Mini-block index within the full block |
-| `mini_block_number` | `Quantity` | Global mini-block number |
-| `mini_block_timestamp` | `Quantity` | Mini-block timestamp (sub-millisecond) |
-| `gas_used` | `Quantity` | Gas consumed |
-| `transactions` | `Data[]` | Raw transaction bytes |
-| `receipts` | `object[]` | Mini-block receipts |
+- **`block_number`** Quantity
 
-**`stateChanges`**
+  Parent full-block number.
 
-| Field | Type | Notes |
-|---|---|---|
-| `address` | `Address` | Changed account |
-| `nonce` | `Quantity` | Current nonce |
-| `balance` | `Quantity` | Current balance |
-| `storage` | `object` | Changed storage slots as `{ key: value }` pairs |
+- **`block_timestamp`** Quantity
+
+  Parent full-block timestamp.
+
+- **`index`** Quantity
+
+  Mini-block index within the full block.
+
+- **`mini_block_number`** Quantity
+
+  Global mini-block number.
+
+- **`mini_block_timestamp`** Quantity
+
+  Mini-block timestamp (sub-millisecond).
+
+- **`gas_used`** Quantity
+
+  Gas consumed.
+
+- **`transactions`** Data[]
+
+  Raw transaction bytes.
+
+- **`receipts`** object[]
+
+  Mini-block receipts.
+
+### `stateChanges`
+
+- **`address`** Address
+
+  Changed account.
+
+- **`nonce`** Quantity
+
+  Current nonce.
+
+- **`balance`** Quantity
+
+  Current balance.
+
+- **`storage`** object
+
+  Changed storage slots as `{ key: value }` pairs.
 
 ## Errors
 

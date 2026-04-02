@@ -4,22 +4,47 @@ Returns historical fee data for a range of recent blocks, including base fees, g
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `blockCount` | `Quantity` | Yes | Number of blocks (`1`–`256`) |
-| `1` | `newestBlock` | `string` | Yes | Hex block number or tag: `latest`, `safe`, `finalized`, `earliest`, `pending` |
-| `2` | `rewardPercentiles` | `number[]` | No | Monotonically increasing values from `0` to `100`; omit to exclude `reward` from the result |
+**`blockCount`** Quantity **REQUIRED**
+
+Number of blocks (`1`–`256`).
+
+---
+
+**`newestBlock`** string **REQUIRED**
+
+Hex block number or tag: `latest`, `safe`, `finalized`, `earliest`, `pending`.
+
+---
+
+**`rewardPercentiles`** number[]
+
+Monotonically increasing values from `0` to `100`; omit to exclude `reward` from the result.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `oldestBlock` | `Quantity` | First block in the returned range |
-| `baseFeePerGas` | `Quantity[]` | Base fee per block; length is `blockCount + 1` |
-| `gasUsedRatio` | `number[]` | Gas utilization ratio per block |
-| `reward` | `Quantity[][]` | Percentile reward values; present only when `rewardPercentiles` was provided |
-| `baseFeePerBlobGas` | `Quantity[]` | Blob base fee per block when available |
-| `blobGasUsedRatio` | `number[]` | Blob gas utilization ratio per block when available |
+- **`oldestBlock`** Quantity
+
+  First block in the returned range.
+
+- **`baseFeePerGas`** Quantity[]
+
+  Base fee per block; length is `blockCount + 1`.
+
+- **`gasUsedRatio`** number[]
+
+  Gas utilization ratio per block.
+
+- **`reward`** Quantity[][]
+
+  Percentile reward values; present only when `rewardPercentiles` was provided.
+
+- **`baseFeePerBlobGas`** Quantity[]
+
+  Blob base fee per block when available.
+
+- **`blobGasUsedRatio`** number[]
+
+  Blob gas utilization ratio per block when available.
 
 ## Errors
 

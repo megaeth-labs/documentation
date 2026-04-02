@@ -4,31 +4,61 @@ Estimates the gas required to execute a transaction.
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `transaction` | `object` | Yes | Transaction to simulate; see fields below |
-| `1` | `block` | `string` | No | Hex block number or tag (`latest`, `safe`, `finalized`, `earliest`, `pending`). Default: `"latest"` |
+**`transaction`** object **REQUIRED**
 
-### `transaction`
+Transaction to simulate.
 
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| `from` | `Address` | No | Caller |
-| `to` | `Address` | No | Target; `null` for contract-creation simulation |
-| `value` | `Quantity` | No | Wei value sent |
-| `input` | `Data` | No | Calldata; prefer over `data` |
-| `gas` | `Quantity` | No | Gas cap |
-| `gasPrice` | `Quantity` | No | Legacy gas price; do not combine with EIP-1559 fields |
-| `maxFeePerGas` | `Quantity` | No | EIP-1559 max fee |
-| `maxPriorityFeePerGas` | `Quantity` | No | EIP-1559 priority fee |
-| `nonce` | `Quantity` | No | Caller nonce override |
-| `accessList` | `array` | No | EIP-2930 access list; each entry: `{ "address": Address, "storageKeys": [Bytes32] }` |
+- **`from`** Address
+
+  Caller.
+
+- **`to`** Address
+
+  Target; `null` for contract-creation simulation.
+
+- **`value`** Quantity
+
+  Wei value sent.
+
+- **`input`** Data
+
+  Calldata; prefer over `data`.
+
+- **`gas`** Quantity
+
+  Gas cap.
+
+- **`gasPrice`** Quantity
+
+  Legacy gas price; do not combine with EIP-1559 fields.
+
+- **`maxFeePerGas`** Quantity
+
+  EIP-1559 max fee.
+
+- **`maxPriorityFeePerGas`** Quantity
+
+  EIP-1559 priority fee.
+
+- **`nonce`** Quantity
+
+  Caller nonce override.
+
+- **`accessList`** array
+
+  EIP-2930 access list; each entry: `{ "address": Address, "storageKeys": [Bytes32] }`.
+
+---
+
+**`block`** string
+
+Hex block number or tag (`latest`, `safe`, `finalized`, `earliest`, `pending`). Default: `"latest"`.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | `Quantity` | Estimated execution gas |
+**`result`** Quantity
+
+Estimated execution gas.
 
 ## Errors
 

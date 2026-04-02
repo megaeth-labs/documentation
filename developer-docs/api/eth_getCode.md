@@ -4,16 +4,21 @@ Returns the runtime bytecode stored at an address at a given block.
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `address` | `Address` | Yes | Target account or contract address |
-| `1` | `block` | `string` | No | Hex block number, block hash, or tag (`latest`, `safe`, `finalized`, …). Default: `"latest"` |
+**`address`** Address **REQUIRED**
+
+Target account or contract address.
+
+---
+
+**`block`** string
+
+Hex block number, block hash, or tag (`latest`, `safe`, `finalized`, …). Default: `"latest"`.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | `Data` | Runtime bytecode (not creation bytecode) at the address; `0x` when no code is deployed |
+**`result`** Data
+
+Runtime bytecode (not creation bytecode) at the address; `0x` when no code is deployed.
 
 ## Errors
 

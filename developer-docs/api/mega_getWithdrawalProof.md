@@ -4,23 +4,51 @@ Returns a Merkle proof for the L2ToL1MessagePasser contract at a given block, us
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `address` | `Address` | Yes | Must be `0x4200000000000000000000000000000000000016` (L2ToL1MessagePasser) |
-| `1` | `storageKeys` | `Bytes32[]` | Yes | Storage keys to prove; empty array is valid |
-| `2` | `block` | `string` | No | Hex block number or tag (`latest`, `safe`, `finalized`, `earliest`, `pending`). Default: `"latest"` |
+**`address`** Address **REQUIRED**
+
+Must be `0x4200000000000000000000000000000000000016` (L2ToL1MessagePasser).
+
+---
+
+**`storageKeys`** Bytes32[] **REQUIRED**
+
+Storage keys to prove; empty array is valid.
+
+---
+
+**`block`** string
+
+Hex block number or tag (`latest`, `safe`, `finalized`, `earliest`, `pending`). Default: `"latest"`.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `address` | `Address` | Proved address |
-| `accountProof` | `Data[]` | Account trie proof nodes |
-| `balance` | `Quantity` | Account balance |
-| `codeHash` | `Hash32` | Account code hash |
-| `nonce` | `Quantity` | Account nonce |
-| `storageHash` | `Hash32` | Storage trie root |
-| `storageProof` | `object[]` | Per-key storage proofs; each entry has `key` (`Bytes32`), `value` (`Bytes32`), `proof` (`Data[]`) |
+- **`address`** Address
+
+  Proved address.
+
+- **`accountProof`** Data[]
+
+  Account trie proof nodes.
+
+- **`balance`** Quantity
+
+  Account balance.
+
+- **`codeHash`** Hash32
+
+  Account code hash.
+
+- **`nonce`** Quantity
+
+  Account nonce.
+
+- **`storageHash`** Hash32
+
+  Storage trie root.
+
+- **`storageProof`** object[]
+
+  Per-key storage proofs; each entry has `key` (`Bytes32`), `value` (`Bytes32`), `proof` (`Data[]`).
 
 ## Errors
 

@@ -4,24 +4,31 @@ Returns the execution witness for a block.
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `keys` | `object` | Yes | Block lookup key; see fields below |
+**`keys`** object **REQUIRED**
 
-### `keys`
+Block lookup key; see fields below.
 
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| `blockNumber` | `Quantity` | Yes | Target block number |
-| `blockHash` | `Hash32` | No | Block hash; mutually exclusive with `parentHash` + `attributesHash` |
-| `parentHash` | `Hash32` | No | Parent hash; must pair with `attributesHash` |
-| `attributesHash` | `Hash32` | No | Attributes hash; must pair with `parentHash` |
+- **`blockNumber`** Quantity **REQUIRED**
+
+  Target block number.
+
+- **`blockHash`** Hash32
+
+  Block hash; mutually exclusive with `parentHash` + `attributesHash`.
+
+- **`parentHash`** Hash32
+
+  Parent hash; must pair with `attributesHash`.
+
+- **`attributesHash`** Hash32
+
+  Attributes hash; must pair with `parentHash`.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | `string` | `v0:` followed by a base64-encoded zstd-compressed witness blob |
+**`result`** string
+
+`v0:` followed by a base64-encoded zstd-compressed witness blob.
 
 ## Errors
 

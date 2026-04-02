@@ -4,58 +4,127 @@ Simulates a transaction against a given block's state and returns the result wit
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `transaction` | `object` | Yes | Transaction to simulate; see fields below |
-| `1` | `block` | `string` | No | Hex block number or tag (`latest`, `safe`, `finalized`, `earliest`, `pending`). Default: `"latest"` |
-| `2` | `stateOverride` | `object` | No | Per-address state overrides for this simulation |
-| `3` | `blockOverrides` | `object` | No | Block environment overrides for this simulation |
+**`transaction`** object **REQUIRED**
 
-### `transaction`
+Transaction to simulate.
 
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| `from` | `Address` | No | Caller; set explicitly when `msg.sender` matters |
-| `to` | `Address` | No | Target; `null` for contract-creation simulation |
-| `value` | `Quantity` | No | Wei value sent |
-| `input` | `Data` | No | Calldata; `data` is also accepted but `input` is preferred. If both are present they must be identical |
-| `gas` | `Quantity` | No | Gas cap |
-| `gasPrice` | `Quantity` | No | Legacy gas price; do not combine with EIP-1559 fields |
-| `maxFeePerGas` | `Quantity` | No | EIP-1559 max fee |
-| `maxPriorityFeePerGas` | `Quantity` | No | EIP-1559 priority fee |
-| `nonce` | `Quantity` | No | Caller nonce override |
-| `accessList` | `array` | No | EIP-2930 access list; each entry: `{ "address": Address, "storageKeys": [Bytes32] }` |
+- **`from`** Address
 
-### `stateOverride`
+  Caller; set explicitly when `msg.sender` matters.
+
+- **`to`** Address
+
+  Target; `null` for contract-creation simulation.
+
+- **`value`** Quantity
+
+  Wei value sent.
+
+- **`input`** Data
+
+  Calldata; `data` is also accepted but `input` is preferred. If both are present they must be identical.
+
+- **`gas`** Quantity
+
+  Gas cap.
+
+- **`gasPrice`** Quantity
+
+  Legacy gas price; do not combine with EIP-1559 fields.
+
+- **`maxFeePerGas`** Quantity
+
+  EIP-1559 max fee.
+
+- **`maxPriorityFeePerGas`** Quantity
+
+  EIP-1559 priority fee.
+
+- **`nonce`** Quantity
+
+  Caller nonce override.
+
+- **`accessList`** array
+
+  EIP-2930 access list; each entry: `{ "address": Address, "storageKeys": [Bytes32] }`.
+
+---
+
+**`block`** string
+
+Hex block number or tag (`latest`, `safe`, `finalized`, `earliest`, `pending`). Default: `"latest"`.
+
+---
+
+**`stateOverride`** object
+
+Per-address state overrides for this simulation.
 
 Object keyed by address. Each value:
 
-| Field | Type | Notes |
-|---|---|---|
-| `balance` | `Quantity` | Override the account balance |
-| `nonce` | `Quantity` | Override the account nonce |
-| `code` | `Data` | Override the account bytecode |
-| `state` | `object` | Replace full storage (slot → value); mutually exclusive with `stateDiff` |
-| `stateDiff` | `object` | Patch individual storage slots; mutually exclusive with `state` |
-| `movePrecompileToAddress` | `Address` | Move a precompile to the specified address before `code` is applied |
+- **`balance`** Quantity
 
-### `blockOverrides`
+  Override the account balance.
 
-| Field | Type | Notes |
-|---|---|---|
-| `number` | `Quantity` | Override `block.number` |
-| `time` | `Quantity` | Override `block.timestamp` |
-| `gasLimit` | `Quantity` | Override `block.gasLimit` |
-| `feeRecipient` | `Address` | Override `block.coinbase` |
-| `prevRandao` | `Quantity` | Override randomness |
-| `baseFeePerGas` | `Quantity` | Override `block.baseFee` |
-| `blobBaseFee` | `Quantity` | Override blob base fee |
+- **`nonce`** Quantity
+
+  Override the account nonce.
+
+- **`code`** Data
+
+  Override the account bytecode.
+
+- **`state`** object
+
+  Replace full storage (slot → value); mutually exclusive with `stateDiff`.
+
+- **`stateDiff`** object
+
+  Patch individual storage slots; mutually exclusive with `state`.
+
+- **`movePrecompileToAddress`** Address
+
+  Move a precompile to the specified address before `code` is applied.
+
+---
+
+**`blockOverrides`** object
+
+Block environment overrides for this simulation.
+
+- **`number`** Quantity
+
+  Override `block.number`.
+
+- **`time`** Quantity
+
+  Override `block.timestamp`.
+
+- **`gasLimit`** Quantity
+
+  Override `block.gasLimit`.
+
+- **`feeRecipient`** Address
+
+  Override `block.coinbase`.
+
+- **`prevRandao`** Quantity
+
+  Override randomness.
+
+- **`baseFeePerGas`** Quantity
+
+  Override `block.baseFee`.
+
+- **`blobBaseFee`** Quantity
+
+  Override blob base fee.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | `Data` | Raw return bytes. `0x` for calls to non-contract addresses. Reverts surface as JSON-RPC errors, not as a normal result |
+**`result`** Data
+
+Raw return bytes. `0x` for calls to non-contract addresses. Reverts surface as JSON-RPC errors, not as a normal result.
 
 ## Errors
 

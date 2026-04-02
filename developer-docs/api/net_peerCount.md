@@ -8,9 +8,9 @@ None.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | `Quantity` | Number of connected peers |
+**`result`** Quantity
+
+Number of connected peers.
 
 ## Errors
 

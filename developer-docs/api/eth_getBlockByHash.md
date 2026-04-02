@@ -4,25 +4,51 @@ Returns the block with the given hash, or `null` if no block matches.
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `blockHash` | `Hash32` | Yes | Target block hash |
-| `1` | `fullTransactions` | `boolean` | Yes | `false` returns transaction hashes; `true` returns full transaction objects |
+**`blockHash`** Hash32 **REQUIRED**
+
+Target block hash.
+
+---
+
+**`fullTransactions`** boolean **REQUIRED**
+
+`false` returns transaction hashes; `true` returns full transaction objects.
 
 ## Returns
 
 `Block | null` — `null` when the hash is well-formed but does not match any block.
 
-| Field | Type | Notes |
-|---|---|---|
-| `number` | `Quantity` | Block number |
-| `hash` | `Hash32` | Block hash |
-| `parentHash` | `Hash32` | Parent block hash |
-| `timestamp` | `Quantity` | Block timestamp |
-| `miner` | `Address` | Fee recipient / coinbase |
-| `gasLimit` | `Quantity` | Block gas limit |
-| `gasUsed` | `Quantity` | Gas consumed by the block |
-| `transactions` | `Hash32[]` \| `Transaction[]` | Hashes when `fullTransactions = false`; full objects when `true` |
+- **`number`** Quantity
+
+  Block number.
+
+- **`hash`** Hash32
+
+  Block hash.
+
+- **`parentHash`** Hash32
+
+  Parent block hash.
+
+- **`timestamp`** Quantity
+
+  Block timestamp.
+
+- **`miner`** Address
+
+  Fee recipient / coinbase.
+
+- **`gasLimit`** Quantity
+
+  Block gas limit.
+
+- **`gasUsed`** Quantity
+
+  Gas consumed by the block.
+
+- **`transactions`** Hash32[] | Transaction[]
+
+  Hashes when `fullTransactions = false`; full objects when `true`.
 
 Additional standard fields (`stateRoot`, `logsBloom`, `transactionsRoot`, `receiptsRoot`, `baseFeePerGas`, …) are also included.
 

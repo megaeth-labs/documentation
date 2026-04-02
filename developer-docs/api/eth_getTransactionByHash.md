@@ -4,27 +4,57 @@ Returns the transaction with the given hash, or `null` if no matching transactio
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `transactionHash` | `Hash32` | Yes | Target transaction hash |
+**`transactionHash`** Hash32 **REQUIRED**
+
+Target transaction hash.
 
 ## Returns
 
 `Transaction | null` — `null` when the transaction cannot be found.
 
-| Field | Type | Notes |
-|---|---|---|
-| `hash` | `Hash32` | Transaction hash |
-| `type` | `Quantity` | Transaction type identifier |
-| `from` | `Address` | Sender |
-| `to` | `Address \| null` | Recipient; `null` for contract creation |
-| `value` | `Quantity` | Transfer value in wei |
-| `nonce` | `Quantity` | Sender nonce |
-| `gas` | `Quantity` | Gas limit |
-| `input` | `Data` | Calldata |
-| `blockHash` | `Hash32 \| null` | `null` for pending transactions |
-| `blockNumber` | `Quantity \| null` | `null` for pending transactions |
-| `transactionIndex` | `Quantity \| null` | `null` for pending transactions |
+- **`hash`** Hash32
+
+  Transaction hash.
+
+- **`type`** Quantity
+
+  Transaction type identifier.
+
+- **`from`** Address
+
+  Sender.
+
+- **`to`** Address | null
+
+  Recipient; `null` for contract creation.
+
+- **`value`** Quantity
+
+  Transfer value in wei.
+
+- **`nonce`** Quantity
+
+  Sender nonce.
+
+- **`gas`** Quantity
+
+  Gas limit.
+
+- **`input`** Data
+
+  Calldata.
+
+- **`blockHash`** Hash32 | null
+
+  `null` for pending transactions.
+
+- **`blockNumber`** Quantity | null
+
+  `null` for pending transactions.
+
+- **`transactionIndex`** Quantity | null
+
+  `null` for pending transactions.
 
 Additional fields vary by transaction type (`gasPrice`, `maxFeePerGas`, `accessList`, `chainId`, `v`, `r`, `s`, etc.).
 

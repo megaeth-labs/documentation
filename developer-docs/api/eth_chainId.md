@@ -8,7 +8,9 @@ None.
 
 ## Returns
 
-`Quantity` — the chain ID for the connected network.
+**`result`** Quantity
+
+The chain ID for the connected network.
 
 | Network | Chain ID (hex) | Chain ID (decimal) |
 |---|---|---|

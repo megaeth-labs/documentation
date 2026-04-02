@@ -4,16 +4,21 @@ Returns the ETH balance of an account in wei at a given block.
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `address` | `Address` | Yes | Target account or contract address |
-| `1` | `block` | `string` | No | Hex block number or tag (`latest`, `safe`, `finalized`, `earliest`, `pending`). Default: `"latest"` |
+**`address`** Address **REQUIRED**
+
+Target account or contract address.
+
+---
+
+**`block`** string
+
+Hex block number or tag (`latest`, `safe`, `finalized`, `earliest`, `pending`). Default: `"latest"`.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | `Quantity` | Balance in wei. Returns `0x0` for unknown accounts and zero-balance accounts alike |
+**`result`** Quantity
+
+Balance in wei. Returns `0x0` for unknown accounts and zero-balance accounts alike.
 
 ## Errors
 

@@ -8,9 +8,9 @@ None.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | `Quantity` | Gas price in wei |
+**`result`** Quantity
+
+Gas price in wei.
 
 ## Errors
 

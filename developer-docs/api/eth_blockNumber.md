@@ -8,9 +8,9 @@ None.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | `Quantity` | Current head block number; advances with each new block |
+**`result`** Quantity
+
+Current head block number; advances with each new block.
 
 ## Errors
 

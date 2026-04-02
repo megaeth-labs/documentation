@@ -8,9 +8,9 @@ None.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | `string` | Network ID as a decimal integer string |
+**`result`** string
+
+Network ID as a decimal integer string.
 
 ## Errors
 

@@ -4,15 +4,15 @@ Returns the number of transactions in the block matching the given hash.
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `blockHash` | `Hash32` | Yes | Target block hash |
+**`blockHash`** Hash32 **REQUIRED**
+
+Target block hash.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | `Quantity \| null` | Transaction count; `null` when the block is not found |
+**`result`** Quantity | null
+
+Transaction count; `null` when the block is not found.
 
 ## Errors
 

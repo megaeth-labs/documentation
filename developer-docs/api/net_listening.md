@@ -8,9 +8,9 @@ None.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | `boolean` | Always `true` |
+**`result`** boolean
+
+Always `true`.
 
 ## Errors
 

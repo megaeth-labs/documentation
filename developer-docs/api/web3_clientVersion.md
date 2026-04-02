@@ -8,9 +8,9 @@ None.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | `string` | Client name, version, and build target |
+**`result`** string
+
+Client name, version, and build target.
 
 ## Errors
 

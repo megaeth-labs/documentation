@@ -4,9 +4,9 @@ Returns all transaction receipts for a given block, or `null` if the block is no
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `block` | `string \| object` | Yes | Block number, tag (`earliest`, `latest`, `safe`, `finalized`, `pending`), block hash, or `{"blockHash":"0x…"}` selector object |
+**`block`** string | object **REQUIRED**
+
+Block number, tag (`earliest`, `latest`, `safe`, `finalized`, `pending`), block hash, or `{"blockHash":"0x…"}` selector object.
 
 ## Returns
 
@@ -14,18 +14,45 @@ Returns all transaction receipts for a given block, or `null` if the block is no
 
 Each array element contains:
 
-| Field | Type | Notes |
-|---|---|---|
-| `transactionHash` | `Hash32` | Transaction hash |
-| `status` | `Quantity` | `0x1` success; `0x0` failure |
-| `blockHash` | `Hash32` | Containing block hash |
-| `blockNumber` | `Quantity` | Containing block number |
-| `from` | `Address` | Sender |
-| `to` | `Address \| null` | Recipient; `null` for contract creation |
-| `gasUsed` | `Quantity` | Gas consumed by this transaction |
-| `effectiveGasPrice` | `Quantity` | Effective gas price |
-| `contractAddress` | `Address \| null` | Created contract address when applicable |
-| `logs` | `Log[]` | Emitted log entries |
+- **`transactionHash`** Hash32
+
+  Transaction hash.
+
+- **`status`** Quantity
+
+  `0x1` success; `0x0` failure.
+
+- **`blockHash`** Hash32
+
+  Containing block hash.
+
+- **`blockNumber`** Quantity
+
+  Containing block number.
+
+- **`from`** Address
+
+  Sender.
+
+- **`to`** Address | null
+
+  Recipient; `null` for contract creation.
+
+- **`gasUsed`** Quantity
+
+  Gas consumed by this transaction.
+
+- **`effectiveGasPrice`** Quantity
+
+  Effective gas price.
+
+- **`contractAddress`** Address | null
+
+  Created contract address when applicable.
+
+- **`logs`** Log[]
+
+  Emitted log entries.
 
 Additional fields include `cumulativeGasUsed`, `logsBloom`, `type`, and L1 fee fields (`l1Fee`, `l1GasPrice`, `l1GasUsed`, etc.).
 

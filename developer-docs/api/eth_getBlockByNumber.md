@@ -4,25 +4,51 @@ Returns a block by its block number or block tag, or `null` if the block is not 
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `block` | `string` | Yes | Hex block number or tag: `latest`, `safe`, `finalized`, `earliest`, `pending` |
-| `1` | `fullTransactions` | `boolean` | Yes | `false` returns transaction hashes; `true` returns full transaction objects |
+**`block`** string **REQUIRED**
+
+Hex block number or tag: `latest`, `safe`, `finalized`, `earliest`, `pending`.
+
+---
+
+**`fullTransactions`** boolean **REQUIRED**
+
+`false` returns transaction hashes; `true` returns full transaction objects.
 
 ## Returns
 
 `Block | null` — `null` when the requested block does not exist or is not yet available.
 
-| Field | Type | Notes |
-|---|---|---|
-| `number` | `Quantity` | Block number |
-| `hash` | `Hash32` | Block hash |
-| `parentHash` | `Hash32` | Parent block hash |
-| `timestamp` | `Quantity` | Block timestamp |
-| `miner` | `Address` | Fee recipient / coinbase |
-| `gasLimit` | `Quantity` | Block gas limit |
-| `gasUsed` | `Quantity` | Gas consumed by the block |
-| `transactions` | `Hash32[]` \| `Transaction[]` | Hashes when `fullTransactions = false`; full objects when `true` |
+- **`number`** Quantity
+
+  Block number.
+
+- **`hash`** Hash32
+
+  Block hash.
+
+- **`parentHash`** Hash32
+
+  Parent block hash.
+
+- **`timestamp`** Quantity
+
+  Block timestamp.
+
+- **`miner`** Address
+
+  Fee recipient / coinbase.
+
+- **`gasLimit`** Quantity
+
+  Block gas limit.
+
+- **`gasUsed`** Quantity
+
+  Gas consumed by the block.
+
+- **`transactions`** Hash32[] | Transaction[]
+
+  Hashes when `fullTransactions = false`; full objects when `true`.
 
 Additional standard fields (`stateRoot`, `logsBloom`, `transactionsRoot`, `receiptsRoot`, `baseFeePerGas`, …) are also included.
 

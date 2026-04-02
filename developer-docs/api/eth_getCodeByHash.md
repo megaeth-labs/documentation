@@ -4,15 +4,15 @@ Returns runtime bytecode for a given code hash.
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `codeHash` | `Hash32` | Yes | Target runtime code hash |
+**`codeHash`** Hash32 **REQUIRED**
+
+Target runtime code hash.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | `Data` | Runtime bytecode; `0x` when no bytecode is stored for that hash |
+**`result`** Data
+
+Runtime bytecode; `0x` when no bytecode is stored for that hash.
 
 ## Errors
 

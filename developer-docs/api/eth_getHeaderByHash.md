@@ -4,23 +4,41 @@ Returns the block header for the given block hash, or `null` if no block matches
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `blockHash` | `Hash32` | Yes | Target block hash |
+**`blockHash`** Hash32 **REQUIRED**
+
+Target block hash.
 
 ## Returns
 
 `Header | null` — `null` when the hash does not match any known block.
 
-| Field | Type | Notes |
-|---|---|---|
-| `number` | `Quantity` | Block number |
-| `hash` | `Hash32` | Block hash |
-| `parentHash` | `Hash32` | Parent block hash |
-| `timestamp` | `Quantity` | Block timestamp |
-| `miner` | `Address` | Fee recipient / coinbase |
-| `gasLimit` | `Quantity` | Block gas limit |
-| `gasUsed` | `Quantity` | Gas consumed |
+- **`number`** Quantity
+
+  Block number.
+
+- **`hash`** Hash32
+
+  Block hash.
+
+- **`parentHash`** Hash32
+
+  Parent block hash.
+
+- **`timestamp`** Quantity
+
+  Block timestamp.
+
+- **`miner`** Address
+
+  Fee recipient / coinbase.
+
+- **`gasLimit`** Quantity
+
+  Block gas limit.
+
+- **`gasUsed`** Quantity
+
+  Gas consumed.
 
 Additional standard header fields (`stateRoot`, `logsBloom`, `transactionsRoot`, `receiptsRoot`, `baseFeePerGas`, …) are also included.
 

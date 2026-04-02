@@ -4,15 +4,15 @@ Returns the chain-wide cumulative transaction count up to and including a given 
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `block` | `string` | Yes | Hex block number or tag (`earliest`, `latest`, `safe`, `finalized`). `pending` is not supported |
+**`block`** string **REQUIRED**
+
+Hex block number or tag (`earliest`, `latest`, `safe`, `finalized`). `pending` is not supported.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | `Quantity` | Cumulative transaction count across all blocks up to the selected block. Consecutive blocks with no transactions return the same value |
+**`result`** Quantity
+
+Cumulative transaction count across all blocks up to the selected block. Consecutive blocks with no transactions return the same value.
 
 ## Errors
 

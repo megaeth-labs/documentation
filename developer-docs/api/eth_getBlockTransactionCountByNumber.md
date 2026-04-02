@@ -4,15 +4,15 @@ Returns the number of transactions in a block identified by block number or tag.
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `block` | `string` | Yes | Hex block number or tag: `latest`, `safe`, `finalized`, `earliest`, `pending` |
+**`block`** string **REQUIRED**
+
+Hex block number or tag: `latest`, `safe`, `finalized`, `earliest`, `pending`.
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | `Quantity \| null` | Transaction count; `null` when the block is not found |
+**`result`** Quantity | null
+
+Transaction count; `null` when the block is not found.
 
 ## Errors
 

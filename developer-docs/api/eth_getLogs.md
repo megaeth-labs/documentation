@@ -4,35 +4,69 @@ Returns event logs emitted by smart contracts, filtered by block range, contract
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `filter` | `object` | Yes | Log filter; see fields below |
+**`filter`** object **REQUIRED**
 
-### `filter`
+Log filter.
 
-| Field | Type | Required | Notes |
-|---|---|---|---|
-| `fromBlock` | `string` | No | Inclusive start; hex block number or tag. Default: `latest` |
-| `toBlock` | `string` | No | Inclusive end; hex block number or tag. Default: `latest` |
-| `blockHash` | `Hash32` | No | Single-block mode; mutually exclusive with `fromBlock`/`toBlock` |
-| `address` | `Address \| Address[]` | No | Filter by emitting address(es) |
-| `topics` | `array` | No | Positional topic filter; positions are AND, values within a position are OR. Use `null` for wildcards |
+- **`fromBlock`** string
+
+  Inclusive start; hex block number or tag. Default: `latest`.
+
+- **`toBlock`** string
+
+  Inclusive end; hex block number or tag. Default: `latest`.
+
+- **`blockHash`** Hash32
+
+  Single-block mode; mutually exclusive with `fromBlock`/`toBlock`.
+
+- **`address`** Address | Address[]
+
+  Filter by emitting address(es).
+
+- **`topics`** array
+
+  Positional topic filter; positions are AND, values within a position are OR. Use `null` for wildcards.
 
 ## Returns
 
 `Log[]` — array of matching log entries.
 
-| Field | Type | Notes |
-|---|---|---|
-| `address` | `Address` | Emitting contract |
-| `topics` | `Hash32[]` | Indexed topics |
-| `data` | `Data` | Unindexed payload |
-| `blockNumber` | `Quantity \| null` | Containing block number |
-| `transactionHash` | `Hash32 \| null` | Containing transaction hash |
-| `transactionIndex` | `Quantity \| null` | Transaction position in block |
-| `logIndex` | `Quantity \| null` | Log position in block |
-| `removed` | `boolean` | `true` if removed during reorg |
-| `blockTimestamp` | `Quantity` | Block timestamp |
+- **`address`** Address
+
+  Emitting contract.
+
+- **`topics`** Hash32[]
+
+  Indexed topics.
+
+- **`data`** Data
+
+  Unindexed payload.
+
+- **`blockNumber`** Quantity | null
+
+  Containing block number.
+
+- **`transactionHash`** Hash32 | null
+
+  Containing transaction hash.
+
+- **`transactionIndex`** Quantity | null
+
+  Transaction position in block.
+
+- **`logIndex`** Quantity | null
+
+  Log position in block.
+
+- **`removed`** boolean
+
+  `true` if removed during reorg.
+
+- **`blockTimestamp`** Quantity
+
+  Block timestamp.
 
 ## Errors
 

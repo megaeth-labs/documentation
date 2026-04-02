@@ -4,15 +4,15 @@ Submits a signed transaction to the network and returns its transaction hash.
 
 ## Parameters
 
-| Position | Name | Type | Required | Notes |
-|---|---|---|---|---|
-| `0` | `rawTx` | `Data` | Yes | Signed, RLP-encoded transaction bytes. Supported envelope types: legacy, EIP-2930 (`0x01`), EIP-1559 (`0x02`), EIP-4844 (`0x03`), EIP-7702 (`0x04`) |
+**`rawTx`** Data **REQUIRED**
+
+Signed, RLP-encoded transaction bytes. Supported envelope types: legacy, EIP-2930 (`0x01`), EIP-1559 (`0x02`), EIP-4844 (`0x03`), EIP-7702 (`0x04`).
 
 ## Returns
 
-| Field | Type | Notes |
-|---|---|---|
-| `result` | `Data` | 32-byte transaction hash |
+**`result`** Data
+
+32-byte transaction hash.
 
 ## Errors
 
