@@ -86,7 +86,7 @@ Use these exact forms consistently. Do not alternate between variants.
 - **GitBook Markdown**: Use GitBook-flavored Markdown with custom blocks. See `/skill.md` for full syntax reference.
 - **One sentence, one line**: Each sentence goes on its own line for better diffs.
 - **Frontmatter**: Every page must have YAML frontmatter with at least `description` for SEO.
-- **Headings**: Use `#` for the page title (H1), `##` for sections (H2), `###` for subsections (H3). One H1 per page. Use sentence case: "Gas forwarding rules" not "Gas Forwarding Rules." Capitalize only proper nouns (MegaETH, Ethereum, Rex3).
+- **Headings**: Use `#` for the page title (H1), `##` for sections (H2), `###` for subsections (H3). One H1 per page. Use sentence case: "Gas forwarding rules" not "Gas Forwarding Rules." Capitalize only proper nouns (MegaETH, Ethereum, Rex4).
 - **Serial commas**: Use serial (Oxford) commas in lists of three or more: "compute gas, storage gas, and detention gas."
 
 ## Cross-Linking

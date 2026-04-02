@@ -10,6 +10,8 @@ MegaETH provides system contracts that give transactions access to functionality
 | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
 | [High-Precision Timestamp](#high-precision-timestamp) | [`0x6342000000000000000000000000000000000002`](https://megaeth.blockscout.com/address/0x6342000000000000000000000000000000000002) | Microsecond-resolution timestamps                    |
 | [KeylessDeploy](#keyless-deployment)                  | [`0x6342000000000000000000000000000000000003`](https://megaeth.blockscout.com/address/0x6342000000000000000000000000000000000003) | Deterministic cross-chain deployment (Nick's Method) |
+| [MegaAccessControl](#mega-access-control)             | [`0x6342000000000000000000000000000000000004`](https://megaeth.blockscout.com/address/0x6342000000000000000000000000000000000004) | Opt out of volatile data access detection            |
+| [MegaLimitControl](#mega-limit-control)               | [`0x6342000000000000000000000000000000000005`](https://megaeth.blockscout.com/address/0x6342000000000000000000000000000000000005) | Query remaining compute gas budget                   |
 
 ## High-Precision Timestamp
 
@@ -44,7 +46,7 @@ uint256 timestampSec = timestampUs / 1_000_000; // convert to second timestamp
 **Outcome:**
 
 - Returns the current timestamp in microseconds since Unix epoch.
-- Reading the timestamp accesses [volatile data](volatile-data.md) and **caps the transaction's Compute Gas to 20M**.
+- Reading the timestamp accesses [volatile data](volatile-data.md) and **triggers the 20M compute gas detention cap**.
   Avoid reading it in transactions that perform heavy computation.
 
 **Properties:**
@@ -121,18 +123,74 @@ If you need a widely-used contract deployed, reach out to the MegaETH team — i
 | [CREATE2 Factory](https://github.com/Arachnid/deterministic-deployment-proxy) | [`0x4e59b44847b379578588920ca78fbf26c0b4956c`](https://megaeth.blockscout.com/address/0x4e59b44847b379578588920ca78fbf26c0b4956c) |
 | [EIP-1820 Registry](https://eips.ethereum.org/EIPS/eip-1820)                  | [`0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24`](https://megaeth.blockscout.com/address/0x1820a4B7618BdE71Dce8cdc73aAB6C95905faD24) |
 
-<details>
-<summary>Rex4 preview — upcoming system contracts</summary>
+## Mega Access Control
 
-The following system contracts are planned for the Rex4 hardfork.
-Addresses and interfaces are subject to change before release.
+Provides a proactive mechanism to prevent untrusted subcalls from accessing [volatile data](volatile-data.md).
+A contract can disable volatile data access for its entire call subtree before any untrusted code runs.
+Attempts to access volatile data while disabled revert immediately, preventing both the access and the [detention](volatile-data.md) side effect.
 
-| Contract          | Address                                      | Purpose                                                                     |
-| ----------------- | -------------------------------------------- | --------------------------------------------------------------------------- |
-| MegaAccessControl | `0x6342000000000000000000000000000000000004` | Opt out of volatile data access detection via `disableVolatileDataAccess()` |
-| MegaLimitControl  | `0x6342000000000000000000000000000000000005` | Query remaining compute gas budget via `remainingComputeGas()`              |
+**Address:** `0x6342000000000000000000000000000000000004`
 
-</details>
+**Interface:**
+
+```solidity
+interface IMegaAccessControl {
+    function disableVolatileDataAccess() external view;
+    function enableVolatileDataAccess() external view;
+    function isVolatileDataAccessDisabled() external view returns (bool disabled);
+}
+
+IMegaAccessControl accessControl = IMegaAccessControl(
+    0x6342000000000000000000000000000000000004
+);
+accessControl.disableVolatileDataAccess();
+// All subcalls from this point cannot access volatile data.
+// Attempts to read block.timestamp, oracle storage, etc. revert immediately.
+```
+
+**Outcome:**
+
+- `disableVolatileDataAccess()` — disables volatile data access for the caller's call frame and all descendant call frames.
+- `enableVolatileDataAccess()` — re-enables access, but only if the restriction was set at the caller's own depth. If a parent frame disabled access, the call reverts with `DisabledByParent()`.
+- `isVolatileDataAccessDisabled()` — returns `true` if volatile data access is currently disabled.
+
+The restriction automatically ends when the call frame that called `disableVolatileDataAccess` returns.
+No explicit cleanup is needed.
+
+{% hint style="success" %}
+Use MegaAccessControl when calling untrusted contracts to prevent them from silently triggering gas detention and tightening your gas budget.
+{% endhint %}
+
+**Common use cases:** DeFi protocols calling untrusted hooks, proxy contracts with user-supplied logic, batch execution of arbitrary calls.
+
+## Mega Limit Control
+
+Provides a runtime query for the effective remaining compute gas, accounting for both [gas detention](volatile-data.md) and per-call-frame resource budgets.
+The standard `GAS` opcode does not reflect these MegaETH-specific constraints.
+
+**Address:** `0x6342000000000000000000000000000000000005`
+
+**Interface:**
+
+```solidity
+interface IMegaLimitControl {
+    function remainingComputeGas() external view returns (uint64 remaining);
+}
+
+IMegaLimitControl limitControl = IMegaLimitControl(
+    0x6342000000000000000000000000000000000005
+);
+uint64 remaining = limitControl.remainingComputeGas();
+// Use 'remaining' to decide whether to attempt a costly sub-call
+```
+
+**Outcome:**
+
+- Returns the effective remaining compute gas for the caller's call frame at the time of the call.
+- The returned value accounts for both the detention cap (if triggered) and the per-call-frame compute gas budget — it is the minimum of the two.
+- The value is a point-in-time snapshot that decreases as execution proceeds.
+
+**Common use cases:** Gas-aware batching (loop until budget exhausted), deciding whether to attempt expensive sub-calls, on-chain gas budgeting.
 
 ## Related Pages
 
@@ -140,3 +198,5 @@ Addresses and interfaces are subject to change before release.
 - [System Contracts (spec)](https://docs.megaeth.com/spec/system-contracts/overview) — formal specification of the system contract registry
 - [Oracle (spec)](https://docs.megaeth.com/spec/system-contracts/oracle) — underlying oracle contract that powers the High-Precision Timestamp and other services
 - [KeylessDeploy (spec)](https://docs.megaeth.com/spec/system-contracts/keyless-deploy) — keyless deployment sandbox and validation rules
+- [MegaAccessControl (spec)](https://docs.megaeth.com/spec/system-contracts/mega-access-control) — volatile data access restriction mechanism
+- [MegaLimitControl (spec)](https://docs.megaeth.com/spec/system-contracts/mega-limit-control) — remaining compute gas query

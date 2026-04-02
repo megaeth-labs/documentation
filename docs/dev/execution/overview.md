@@ -10,7 +10,7 @@ It is fully compatible with Ethereum smart contracts while introducing optimizat
 ## Overview
 
 MegaEVM builds on established standards.
-Its latest hardfork, _Rex3_, is based on [Optimism Isthmus](https://specs.optimism.io/protocol/isthmus/overview.html), which in turn is adapted from [Ethereum Prague](https://ethereum.org/roadmap/pectra/).
+Its latest hardfork, _Rex4_, is based on [Optimism Isthmus](https://specs.optimism.io/protocol/isthmus/overview.html), which in turn is adapted from [Ethereum Prague](https://ethereum.org/roadmap/pectra/).
 This means:
 
 - All standard Solidity contracts work on MegaETH.
@@ -39,7 +39,7 @@ For the full gas model details, see [Gas Model](gas-model.md).
 
 ## Access to Volatile Data
 
-Reading volatile data — `block.timestamp`, `block.number`, oracle storage, or the beneficiary account — caps the transaction's total compute gas to **20,000,000**.
+Reading volatile data — `block.timestamp`, `block.number`, oracle storage, or the beneficiary account — triggers a detention cap of additional **20,000,000 compute gas** from the point of access.
 This ensures transactions with external dependencies yield quickly and don't block parallel execution.
 
 For the full list of triggers, best practices for structuring contracts around this cap, and Solidity examples, see [Volatile Data Access](volatile-data.md).
