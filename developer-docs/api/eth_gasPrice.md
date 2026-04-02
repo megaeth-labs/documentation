@@ -1,6 +1,6 @@
 # eth_gasPrice
 
-Returns the current gas price in wei. Always `0xf4240` (1,000,000 wei).
+Returns the current gas price in wei. MegaETH has a stable base fee, so this method always returns `0xf4240` (1,000,000 wei = 0.001 gwei).
 
 ## Parameters
 

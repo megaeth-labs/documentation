@@ -1,6 +1,6 @@
 # mega_outputAtBlock
 
-Returns the L2 output commitment for a given block, including the output root, state root, and current sync status.
+Returns the output root at a given block.
 
 ## Parameters
 

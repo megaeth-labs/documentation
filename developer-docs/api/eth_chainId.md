@@ -12,11 +12,6 @@ None.
 
 The chain ID for the connected network.
 
-| Network | Chain ID (hex) | Chain ID (decimal) |
-|---|---|---|
-| Mainnet | `0x10e6` | 4326 |
-| Testnet | `0x18c7` | 6343 |
-
 ## Errors
 
 Standard JSON-RPC errors only. See [Error reference](../errors.md).

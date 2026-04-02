@@ -1,6 +1,6 @@
 # eth_unsubscribe
 
-Cancels an active subscription created by [`eth_subscribe`](./eth_subscribe.md). Returns `true` if the subscription was found and cancelled. Requires a WebSocket connection.
+Cancels an existing subscription so that no further events are sent.
 
 ## Parameters
 

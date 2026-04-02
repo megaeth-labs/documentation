@@ -1,6 +1,6 @@
 # eth_subscribe
 
-Opens a real-time event stream over WebSocket. Not available over HTTP.
+Opens a real-time event stream over WebSocket.
 
 ## Parameters
 

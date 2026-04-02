@@ -1,6 +1,6 @@
 # eth_feeHistory
 
-Returns historical fee data for a range of recent blocks, including base fees, gas utilization ratios, and optional reward percentiles.
+Returns historical gas fee data for a range of blocks.
 
 ## Parameters
 

@@ -8,12 +8,7 @@ None.
 
 ## Returns
 
-| Value | Condition |
-|---|---|
-| `false` | Node is fully synced |
-| `SyncProgress` object | Node is still syncing |
-
-When syncing, the result contains:
+`false` when the node is fully synced. When syncing, a `SyncProgress` object:
 
 - **`startingBlock`** Quantity
 
