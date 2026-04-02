@@ -8,9 +8,9 @@ None.
 
 ## Returns
 
-**`result`** `Quantity`
+**`result`** (Quantity)
 
-Always `0x0`.
+> Always `0x0`.
 
 ## Errors
 
