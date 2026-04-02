@@ -4,38 +4,67 @@ Generates an access list for a transaction.
 
 ## Parameters
 
-1. **`transaction`** · `object` · **required**
+**`transaction`** *object* **REQUIRED**
 
-   Transaction to simulate. Fields:
+Transaction to simulate.
 
-   - **`from`** · `Address` — Caller
-   - **`to`** · `Address` — Target; `null` for contract-creation simulation
-   - **`value`** · `Quantity` — Wei value sent
-   - **`input`** · `Data` — Calldata; prefer over `data`
-   - **`gas`** · `Quantity` — Gas cap
-   - **`gasPrice`** · `Quantity` — Legacy gas price; do not combine with EIP-1559 fields
-   - **`maxFeePerGas`** · `Quantity` — EIP-1559 max fee
-   - **`maxPriorityFeePerGas`** · `Quantity` — EIP-1559 priority fee
-   - **`nonce`** · `Quantity` — Caller nonce override
-   - **`accessList`** · `array` — EIP-2930 access list; each entry: `{ "address": Address, "storageKeys": [Bytes32] }`
+> **`from`** *Address*
+>
+> Caller.
+>
+> **`to`** *Address*
+>
+> Target; `null` for contract-creation simulation.
+>
+> **`value`** *Quantity*
+>
+> Wei value sent.
+>
+> **`input`** *Data*
+>
+> Calldata; prefer over `data`.
+>
+> **`gas`** *Quantity*
+>
+> Gas cap.
+>
+> **`gasPrice`** *Quantity*
+>
+> Legacy gas price; do not combine with EIP-1559 fields.
+>
+> **`maxFeePerGas`** *Quantity*
+>
+> EIP-1559 max fee.
+>
+> **`maxPriorityFeePerGas`** *Quantity*
+>
+> EIP-1559 priority fee.
+>
+> **`nonce`** *Quantity*
+>
+> Caller nonce override.
+>
+> **`accessList`** *array*
+>
+> EIP-2930 access list; each entry: `{ "address": Address, "storageKeys": [Bytes32] }`.
 
-2. **`block`** · `string`
+**`block`** *string*
 
-   Hex block number or tag (`latest`, `safe`, `finalized`, `earliest`, `pending`). Default: `"latest"`.
+Hex block number or tag (`latest`, `safe`, `finalized`, `earliest`, `pending`). Default: `"latest"`.
 
 ## Returns
 
-- **`accessList`** · `array`
+**`accessList`** *array*
 
-  Generated EIP-2930 access list; each entry: `{ "address": Address, "storageKeys": [Bytes32] }`.
+Generated EIP-2930 access list; each entry: `{ "address": Address, "storageKeys": [Bytes32] }`.
 
-- **`gasUsed`** · `Quantity`
+**`gasUsed`** *Quantity*
 
-  Gas with the generated access list applied.
+Gas with the generated access list applied.
 
-- **`error`** · `string`
+**`error`** *string*
 
-  Execution error when the call reverts; may coexist with `accessList` and `gasUsed`.
+Execution error when the call reverts; may coexist with `accessList` and `gasUsed`.
 
 ## Errors
 

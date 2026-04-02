@@ -1,6 +1,6 @@
 # eth_maxPriorityFeePerGas
 
-Returns the max priority fee per gas in wei. Always `0x0` because MegaETH's single active sequencer orders all transactions — there is no tip-based priority auction. Set `maxPriorityFeePerGas` to `0` when building transactions.
+Returns the max priority fee per gas in wei. Always `0x0` because MegaETH's single active sequencer orders all transactions — there is no tip-based priority auction.
 
 ## Parameters
 
@@ -8,9 +8,9 @@ None.
 
 ## Returns
 
-- **`result`** · `Quantity`
+**`result`** *Quantity*
 
-  Always `0x0`.
+Always `0x0`.
 
 ## Errors
 
