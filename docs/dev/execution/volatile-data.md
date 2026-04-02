@@ -10,39 +10,24 @@ This includes the current block metadata (block number, timestamp, coinbase), th
 When a transaction reads volatile data, a dependency forms between it and other transactions that modify the same data.
 This harms parallel execution performance — for example, reading `block.number` prevents the sequencer from producing the next block until the reading transaction finishes.
 
-To mitigate this, MegaEVM imposes an **absolute cap of 20,000,000 compute gas** on the entire transaction once it accesses any volatile data source.
-This is not 20M of _additional_ gas — it is a hard ceiling on total compute gas for the transaction.
-If the transaction has already consumed more than 20M compute gas before the access, execution halts immediately.
-
-<details>
-<summary>Rex4 (unstable): Relative detention</summary>
-
-Rex4 changes the cap from absolute to relative: accessing volatile data allows **20M more** compute gas from the point of access, regardless of how much was consumed before.
-
-For example, a transaction that uses 15M compute gas before reading `block.timestamp` would still have 20M of compute gas remaining (effective limit = 15M + 20M = 35M).
-Under the current absolute model, the same transaction would have only 5M remaining (absolute cap = 20M).
-
-This change removes the penalty for accessing volatile data late in a transaction's execution.
-Under relative detention, reading volatile data **as late as possible** becomes a valid optimization — see [Best Practices](#best-practices).
-For the formal definition, see [Gas Detention](https://docs.megaeth.com/spec/megaevm/gas-detention).
-
-</details>
+To mitigate this, MegaEVM imposes a **detention cap of 20,000,000 compute gas** on the transaction once it accesses any volatile data source.
+The cap is relative: accessing volatile data allows **20M more** compute gas from the point of access, regardless of how much was consumed before.
+For example, a transaction that uses 15M compute gas before reading `block.timestamp` still has 20M of compute gas remaining (effective limit = 15M + 20M = 35M).
 
 ## What Triggers the Cap
 
 ### Block Environment Opcodes
 
-Accessing any of these opcodes caps the transaction's total compute gas to **20,000,000**.
+Accessing any of these opcodes triggers a **20,000,000 compute gas** detention cap from the point of access.
 
 | Opcode        | Description               |
 | ------------- | ------------------------- |
 | `NUMBER`      | Current block number      |
 | `TIMESTAMP`   | Current block timestamp   |
 | `COINBASE`    | Block beneficiary address |
-| `DIFFICULTY`  | Block difficulty          |
+| `PREVRANDAO`  | Previous block randomness |
 | `GASLIMIT`    | Block gas limit           |
 | `BASEFEE`     | Base fee per gas          |
-| `PREVRANDAO`  | Previous block randomness |
 | `BLOCKHASH`   | Historical block hash     |
 | `BLOBBASEFEE` | Blob base fee             |
 | `BLOBHASH`    | Blob hash lookup          |
@@ -69,26 +54,17 @@ Reading oracle data via `SLOAD` from the oracle contract storage triggers the ca
 
 ### Shared Cap
 
-All volatile data sources share the same 20,000,000 compute gas cap.
-Accessing multiple sources (e.g., both `block.timestamp` and oracle storage) does not increase the cap to 40M — the same 20M ceiling applies.
+All volatile data sources share the same 20,000,000 compute gas detention cap.
+The first volatile read triggers the cap; subsequent reads of other volatile sources do not extend it.
 
 ## Best Practices
 
-### Split volatile reads and heavy computation into separate transactions
+### Read volatile data as late as possible
 
-If your contract needs both volatile data and heavy computation, split the work across two transactions:
-
-1. A lightweight transaction that reads volatile data and stores the result on-chain.
-2. A separate transaction that reads the stored result and performs heavy computation — no cap applies because it never accesses volatile data.
-
-<details>
-<summary>Rex4 (unstable): Read volatile data as late as possible</summary>
-
-Rex4 changes the cap from absolute to relative: accessing volatile data allows **20M more** compute gas from the point of access, regardless of how much was consumed before.
-This means deferring the volatile data read to the end of the transaction maximizes the computation you can perform.
+Because the detention cap is measured from the point of access, deferring the volatile data read to the end of the transaction maximizes the computation you can perform.
 
 ```solidity
-// Good under Rex4: heavy computation first, volatile read last
+// Good: heavy computation first, volatile read last
 function processAndCheckTime(uint256[] calldata items) external {
     for (uint i = 0; i < items.length; i++) {
         processItem(items[i]);
@@ -99,7 +75,7 @@ function processAndCheckTime(uint256[] calldata items) external {
 ```
 
 ```solidity
-// Bad under Rex4: reading volatile data first wastes the budget
+// Bad: reading volatile data first wastes the budget
 function processWithTimestamp(uint256[] calldata items) external {
     uint256 currentTime = block.timestamp; // Cap starts immediately
     for (uint i = 0; i < items.length; i++) {
@@ -108,10 +84,14 @@ function processWithTimestamp(uint256[] calldata items) external {
 }
 ```
 
-Under the current absolute cap, read order makes no difference — the 20M ceiling applies to total compute gas regardless.
 For the formal definition, see [Gas Detention](https://docs.megaeth.com/spec/megaevm/gas-detention).
 
-</details>
+### Split volatile reads and heavy computation into separate transactions
+
+If your contract needs both volatile data and more than 20M compute gas of heavy computation after the volatile read, split the work across two transactions:
+
+1. A lightweight transaction that reads volatile data and stores the result on-chain.
+2. A separate transaction that reads the stored result and performs heavy computation — no cap applies because it never accesses volatile data.
 
 ## Related Pages
 

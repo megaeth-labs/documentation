@@ -81,7 +81,7 @@ For the complete storage gas schedule, see the [formal specification](https://do
 - Use `{% hint style="success" %}` for practical tips and best practices.
 - Use tables for reference data (gas costs, resource limits, contract addresses).
 - Use `<details>` for optional deep-dives that most developers can skip.
-- Use `<details>` with a `<summary>` label like `"Rex4 (unstable): ..."` for upcoming behavior changes in unstable specs, mirroring the convention used in the EVM specification (maintained in the [mega-evm repo](https://github.com/megaeth-labs/mega-evm)). This keeps the main content focused on the current stable spec while giving developers early visibility into upcoming changes.
+- Use `<details>` with a `<summary>` label like `"<SpecName> (unstable): ..."` for upcoming behavior changes in unstable specs, mirroring the convention used in the EVM specification (maintained in the [mega-evm repo](https://github.com/megaeth-labs/mega-evm)). This keeps the main content focused on the current stable spec while giving developers early visibility into upcoming changes. At present, all specs are stable.
 
 ## RPC Method Page Rules
 
