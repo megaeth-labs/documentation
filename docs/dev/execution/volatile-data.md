@@ -25,10 +25,9 @@ Accessing any of these opcodes triggers a **20,000,000 compute gas** detention c
 | `NUMBER`      | Current block number      |
 | `TIMESTAMP`   | Current block timestamp   |
 | `COINBASE`    | Block beneficiary address |
-| `DIFFICULTY`  | Block difficulty          |
+| `PREVRANDAO`  | Previous block randomness |
 | `GASLIMIT`    | Block gas limit           |
 | `BASEFEE`     | Base fee per gas          |
-| `PREVRANDAO`  | Previous block randomness |
 | `BLOCKHASH`   | Historical block hash     |
 | `BLOBBASEFEE` | Blob base fee             |
 | `BLOBHASH`    | Blob hash lookup          |

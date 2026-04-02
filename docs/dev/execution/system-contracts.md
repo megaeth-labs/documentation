@@ -133,6 +133,9 @@ Attempts to access volatile data while disabled revert immediately, preventing b
 
 **Interface:**
 
+Functions are declared `view` so they can be called from `view` contexts.
+The node intercepts these calls and tracks the restriction outside EVM storage, so no state modification occurs.
+
 ```solidity
 interface IMegaAccessControl {
     function disableVolatileDataAccess() external view;
