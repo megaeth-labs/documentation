@@ -11,7 +11,7 @@ description: Developer tooling and infrastructure partners on MegaETH — accoun
 | Provider | Protocol | Get Started | Public Endpoint | Mainnet |
 |---|---|---|---|---|
 | MegaETH | HTTP | [Docs](https://docs.megaeth.com/developer-docs/overview-2) | `https://mainnet.megaeth.com/rpc` | Supported |
-| MegaETH | WebSocket | [Docs](https://docs.megaeth.com/realtime-api](https://docs.megaeth.com/developer-docs/overview-2)) | `wss://mainnet.megaeth.com/ws` | Supported |
+| MegaETH | WebSocket | [Docs](https://docs.megaeth.com/developer-docs/overview-2) | `wss://mainnet.megaeth.com/ws` | Supported |
 | Alchemy | HTTP | [Docs](https://www.alchemy.com/docs/megaeth/megaeth-api-overview) | No public endpoint (API key required) | Supported |
 | Alchemy | WebSocket | [Docs](https://www.alchemy.com/docs/megaeth/megaeth-api-overview) | No public endpoint (API key required) | Supported |
 | QuickNode | HTTP | [Docs](https://www.quicknode.com/chains/megaeth) | No public endpoint (API key required) | Supported |
@@ -63,9 +63,9 @@ description: Developer tooling and infrastructure partners on MegaETH — accoun
 | [Goldsky](https://goldsky.com) | [Docs](https://docs.goldsky.com/chains/megaeth) | [Subgraphs](https://docs.goldsky.com/chains/megaeth#subgraphs), [Mirror (Data Pipelines)](https://docs.goldsky.com/chains/megaeth#mirror) | Supported |
 | [Envio](https://envio.dev/) | [Docs](https://docs.envio.dev/docs/HyperIndex/contract-import) | [HyperIndex (Subgraphs)](https://docs.envio.dev/blog/how-to-index-megaeth-data-using-envio#hyperindex), [HyperSync (Data Access)](https://docs.envio.dev/blog/how-to-index-megaeth-data-using-envio#hypersync) | Supported |
 | [Mobula](https://mobula.io) | [Docs](https://mobula.io/chain-mega) | [Real-time Market & Wallet Data API](https://mobula.io/chain-mega), [Streams     (WebSockets)](https://docs.mobula.io/indexing-stream/introduction) | Supported | 
-[The Graph](https://thegraph.com) | [Docs](https://thegraph.com/docs/en/supported-networks/megaeth/) | [Subgraphs](https://thegraph.com/docs/en/subgraphs/quick-start/) | Supported |
- | [SQD](https://www.sqd.ai) | [Docs](https://beta.docs.sqd.dev/en/data/evm/megaeth-mainnet/overview) | [Subsquid data lake / Portal API](https://beta.docs.sqd.dev/en/data/evm/megaeth-mainnet/overview), [Squid SDK](https://github.com/subsquid-labs/squid-megaeth-example) | Supported |
- | [GoldRush](https://goldrush.dev) | [Docs](https://goldrush.dev/docs/chains/megaeth) | [Foundational API](https://goldrush.dev/docs/goldrush-foundational-api),   [Streaming API](https://goldrush.dev/docs/goldrush-streaming-api)  | Supported |
+| [The Graph](https://thegraph.com) | [Docs](https://thegraph.com/docs/en/supported-networks/megaeth/) | [Subgraphs](https://thegraph.com/docs/en/subgraphs/quick-start/) | Supported |
+| [SQD](https://www.sqd.ai) | [Docs](https://beta.docs.sqd.dev/en/data/evm/megaeth-mainnet/overview) | [Subsquid data lake / Portal API](https://beta.docs.sqd.dev/en/data/evm/megaeth-mainnet/overview), [Squid SDK](https://github.com/subsquid-labs/squid-megaeth-example) | Supported |
+| [GoldRush](https://goldrush.dev) | [Docs](https://goldrush.dev/docs/chains/megaeth) | [Foundational API](https://goldrush.dev/docs/goldrush-foundational-api), [Streaming API](https://goldrush.dev/docs/goldrush-streaming-api) | Supported |
 | [Allium](https://allium.so) | [Docs](https://docs.allium.so/historical-data/supported-blockchains/evm/megaeth) | [Historical Data](https://docs.allium.so/historical-data/supported-blockchains/evm/megaeth), [Realtime API](https://docs.allium.so/api/developer/overview), [Kafka Streams](https://docs.allium.so/api/datastreams/overview) | Supported | 
 ---
 
@@ -153,12 +153,12 @@ description: Developer tooling and infrastructure partners on MegaETH — accoun
 
 
 
-   | Provider | Type | Get Started | Mainnet |              
-   |---|---|---|---|                               
-   | [Transak](https://transak.com) | Fiat on-ramp | [Docs](https://docs.transak.com) | Supported |                                                                       
-   | [Ramp Network](https://ramp.network) | Fiat on-ramp | [Docs](https://docs.ramp.network) | Supported |                                                                
-   | [Meridian](https://mrdn.finance/) | x402 micropayments (agent economy) | — | Supported |
- | [Halliday](https://halliday.xyz) | Crypto payments, onramps & swaps | [Docs](https://docs.halliday.xyz) | Supported |                                                
+| Provider | Type | Get Started | Mainnet |
+|---|---|---|---|
+| [Transak](https://transak.com) | Fiat on-ramp | [Docs](https://docs.transak.com) | Supported |
+| [Ramp Network](https://ramp.network) | Fiat on-ramp | [Docs](https://docs.ramp.network) | Supported |
+| [Meridian](https://mrdn.finance/) | x402 micropayments (agent economy) | — | Supported |
+| [Halliday](https://halliday.xyz) | Crypto payments, onramps & swaps | [Docs](https://docs.halliday.xyz) | Supported |
 
 
 ---
