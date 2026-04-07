@@ -1,12 +1,12 @@
 ---
-description: Developer tooling and infrastructure partners on MegaETH — account abstraction, analytics, block explorers, oracles, indexers, and RPC providers.
+description: Developer tooling and infrastructure partners on MegaETH — RPC providers, block explorers, oracles, indexers, bridges, wallets, account abstraction, developer tooling, and more.
 ---
 # Tooling and Infrastructure 
 
 
 
 
-# RPC Providers
+## RPC Providers
 
 | Provider | Protocol | Get Started | Public Endpoint | Mainnet |
 |---|---|---|---|---|
@@ -31,13 +31,13 @@ description: Developer tooling and infrastructure partners on MegaETH — accoun
 
 ---
 
-#  Explorers
+## Explorers
 
 | Explorer | URL | Mainnet |
 |---|---|---|
-| Etherscan | https://mega.etherscan.io | Supported |
-| Blockscout | https://megaeth.blockscout.com | Supported |
-| Explore Mega | https://exploremega.xyz | Supported |
+| [Etherscan](https://mega.etherscan.io) | https://mega.etherscan.io | Supported |
+| [Blockscout](https://megaeth.blockscout.com) | https://megaeth.blockscout.com | Supported |
+| [Explore Mega](https://exploremega.xyz) | https://exploremega.xyz | Supported |
 
 
 
@@ -99,7 +99,11 @@ description: Developer tooling and infrastructure partners on MegaETH — accoun
 | [Socket](https://socket.tech)  | [Docs](https://docs.socket.tech) | Supported |
 | [Relay](https://relay.link)  | [Docs](https://docs.relay.link) | Supported |
 | [GasZip](https://www.gas.zip)  | [Docs](https://www.gas.zip) | Supported |
-
+{% hint style="info" %}
+**Canonical Bridge:** The official Ethereum ↔ MegaETH bridge uses the OP Stack canonical bridge.
+L1 contract (Ethereum): `0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75`.
+Withdrawals take up to 30 minutes.
+{% endhint %}
 > **Canonical Bridge:** The official Ethereum ↔ MegaETH bridge uses the OP Stack canonical bridge. L1 contract (Ethereum): `0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75`. Withdrawals take up to 30 minutes. 
 
 ---
