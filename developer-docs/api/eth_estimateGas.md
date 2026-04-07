@@ -54,6 +54,38 @@ Transaction to simulate.
 
 Hex block number or tag (`latest`, `safe`, `finalized`, `earliest`, `pending`). Default: `"latest"`.
 
+---
+
+**`stateOverride`** object
+
+Per-address state overrides for this simulation.
+
+Object keyed by address. Each value:
+
+- **`balance`** Quantity
+
+  Override the account balance.
+
+- **`nonce`** Quantity
+
+  Override the account nonce.
+
+- **`code`** Data
+
+  Override the account bytecode.
+
+- **`state`** object
+
+  Replace full storage (slot → value); mutually exclusive with `stateDiff`.
+
+- **`stateDiff`** object
+
+  Patch individual storage slots; mutually exclusive with `state`.
+
+- **`movePrecompileToAddress`** Address
+
+  Move a precompile to the specified address before `code` is applied.
+
 ## Returns
 
 **`result`** Quantity
