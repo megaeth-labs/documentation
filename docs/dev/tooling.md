@@ -43,7 +43,7 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 
 ---
 
-# Oracles
+## Oracles
 
 | Provider | Get Started | Mainnet Contract | Feeds | Mainnet |
 |---|---|---|---|---|
@@ -56,7 +56,7 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 
 ---
 
-# Indexers
+## Indexers
 
 | Indexer | Get Started | Supported Services | Mainnet |
 |---|---|---|---|
@@ -69,7 +69,7 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | [Allium](https://allium.so) | [Docs](https://docs.allium.so/historical-data/supported-blockchains/evm/megaeth) | [Historical Data](https://docs.allium.so/historical-data/supported-blockchains/evm/megaeth), [Realtime API](https://docs.allium.so/api/developer/overview), [Kafka Streams](https://docs.allium.so/api/datastreams/overview) | Supported | 
 ---
 
-# Data & Analytics
+## Data & Analytics
 
 | Tool | URL | Mainnet |
 |---|---|---|
@@ -85,7 +85,7 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 
 
 
-# Bridges & Interoperability
+## Bridges & Interoperability
 
 | Provider | Get Started | Mainnet |
 |---|---|---|
@@ -99,16 +99,13 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | [Socket](https://socket.tech)  | [Docs](https://docs.socket.tech) | Supported |
 | [Relay](https://relay.link)  | [Docs](https://docs.relay.link) | Supported |
 | [GasZip](https://www.gas.zip)  | [Docs](https://www.gas.zip) | Supported |
-{% hint style="info" %}
-**Canonical Bridge:** The official Ethereum ↔ MegaETH bridge uses the OP Stack canonical bridge.
-L1 contract (Ethereum): `0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75`.
-Withdrawals take up to 30 minutes.
-{% endhint %}
-> **Canonical Bridge:** The official Ethereum ↔ MegaETH bridge uses the OP Stack canonical bridge. L1 contract (Ethereum): `0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75`. Withdrawals take up to 30 minutes. 
+
+
+
 
 ---
 
-# Account Abstraction & Smart Accounts
+## Account Abstraction & Smart Accounts
 
 | Provider | Type | Get Started | Mainnet |
 |---|---|---|---|
@@ -120,7 +117,7 @@ Withdrawals take up to 30 minutes.
 
 ---
 
-# Wallets
+## Wallets
 
 | Wallet | Type | Mainnet |
 |---|---|---|
@@ -132,7 +129,7 @@ Withdrawals take up to 30 minutes.
 
 ---
 
-# Developer Tooling
+## Developer Tooling
 
 | Tool | Type | Get Started | Mainnet |
 |---|---|---|---|
@@ -143,7 +140,7 @@ Withdrawals take up to 30 minutes.
 
 ---
 
-# Security & Compliance
+## Security & Compliance
 
 | Provider | Type | Mainnet |
 |---|---|---|
@@ -153,7 +150,7 @@ Withdrawals take up to 30 minutes.
 
 ---
 
-# On-Ramps & Payments
+## On-Ramps & Payments
 
 
 
@@ -167,7 +164,7 @@ Withdrawals take up to 30 minutes.
 
 ---
 
-# Custody
+## Custody
 
 | Provider | Mainnet |
 |---|---|
