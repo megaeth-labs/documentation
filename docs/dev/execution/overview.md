@@ -1,5 +1,5 @@
 ---
-description: How MegaEVM differs from standard Ethereum — contract size limits, gas forwarding, SELFDESTRUCT semantics, and precompile overrides.
+description: How MegaEVM differs from standard Ethereum — contract size limits, gas forwarding, and precompile overrides.
 ---
 
 # EVM Differences
@@ -25,15 +25,14 @@ Developers should consider these changes in contrast to Ethereum's EVM, where ga
 
 ## Key Differences at a Glance
 
-| Feature             | Ethereum       | MegaETH                | Remarks                                                                                               |
-| ------------------- | -------------- | ---------------------- | ----------------------------------------------------------------------------------------------------- |
-| Max contract size   | 24 KB          | **512 KB**             |                                                                                                       |
-| Max initcode size   | 48 KB          | **536 KB**             |                                                                                                       |
-| Gas forwarding rule | 63/64          | **98/100**             | As defined in [EIP-150](https://eips.ethereum.org/EIPS/eip-150).                                      |
-| `SELFDESTRUCT`      | Deprecated     | **EIP-6780 semantics** | Active only within the creating transaction, per [EIP-6780](https://eips.ethereum.org/EIPS/eip-6780). |
-| Gas model           | Unidimensional | **Multidimensional**   | Compute gas and storage gas. Compute gas is identical to Ethereum's gas.                              |
-| Resource limits     | Unidimensional | **Multidimensional**   | 4 limits in addition to total gas limit specified by sender.                                          |
-| Base intrinsic gas  | 21,000         | **60,000**             | 21,000 compute gas plus 39,000 storage gas.                                                           |
+| Feature             | Ethereum       | MegaETH              | Remarks                                                                  |
+| ------------------- | -------------- | -------------------- | ------------------------------------------------------------------------ |
+| Max contract size   | 24 KB          | **512 KB**           |                                                                          |
+| Max initcode size   | 48 KB          | **536 KB**           |                                                                          |
+| Gas forwarding rule | 63/64          | **98/100**           | As defined in [EIP-150](https://eips.ethereum.org/EIPS/eip-150).         |
+| Gas model           | Unidimensional | **Multidimensional** | Compute gas and storage gas. Compute gas is identical to Ethereum's gas. |
+| Resource limits     | Unidimensional | **Multidimensional** | 4 limits in addition to total gas limit specified by sender.             |
+| Base intrinsic gas  | 21,000         | **60,000**           | 21,000 compute gas plus 39,000 storage gas.                              |
 
 For the full gas model details, see [Gas Model](gas-model.md).
 

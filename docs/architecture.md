@@ -66,7 +66,7 @@ The [sequencer](https://docs.optimism.io/connect/resources/glossary#sequencer) i
 It executes transactions, assembles them into mini-blocks and EVM blocks, and broadcasts execution results to the rest of the network.
 
 The sequencer is operated with high availability.
-If the active node goes down, a standby takes over within seconds, and software upgrades happen without pausing the chain.
+If the active node goes down, a standby takes over within tens of milliseconds, and software upgrades happen without pausing the chain.
 
 ### RPC Nodes
 
