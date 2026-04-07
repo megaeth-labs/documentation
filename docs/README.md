@@ -32,7 +32,7 @@ MegaETH is a high-performance Ethereum L2 with ~10ms block times and real-time t
         </tr>
         <tr>
             <td><strong>Developer Docs</strong></td>
-            <td>Build dapps on MegaETH — EVM differences, gas model, RPC reference.</td>
+            <td>Build dApps on MegaETH — EVM differences, gas model, RPC reference.</td>
             <td><a href="dev/overview.md">Developer Docs</a></td>
         </tr>
         <tr>
