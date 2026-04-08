@@ -75,9 +75,10 @@ Parse the `localToken` field from the receipt to get your L2 token address.
 
 ```bash
 # Extract the L2 token address from the event logs
-# topic[0] is keccak256("OptimismMintableERC20Created(address,address,address)")
+# topics[0] is keccak256("OptimismMintableERC20Created(address,address,address)")
+# topics[1] is the L2 token address ABI-encoded as a 32-byte padded value; [26:] strips the leading zeros
 cast receipt $TX_HASH --rpc-url $L2_RPC --json \
-  | jq '.logs[] | select(.topics[0] == "0x52fe89dd5930f343d25650b62fd367bae47088bcddffd2a88350a6ecdd620cdb") | .topics[1]'
+  | jq -r '.logs[] | select(.topics[0] == "0x52fe89dd5930f343d25650b62fd367bae47088bcddffd2a88350a6ecdd620cdb") | "0x" + .topics[1][26:]'
 ```
 
 {% endstep %}
