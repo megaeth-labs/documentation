@@ -20,7 +20,7 @@ Bridging locks tokens in the `L1StandardBridge` on Ethereum and mints a paired `
 | Contract | Chain | Address |
 | -------- | ----- | ------- |
 | L1StandardBridge | Ethereum (chain 1) | `0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75` |
-| OptimismMintableERC20Factory | Ethereum (chain 1) | `0x0B3004b843dA84FE5D4C46AeB5E80F826e5CD69A` |
+| OptimismMintableERC20Factory | Ethereum (chain 1) | `0xF875030B9464001fC0f964E47546b0AFEEbD7C61` |
 | L2StandardBridge | MegaETH Mainnet (chain 4326) | `0x4200000000000000000000000000000000000010` |
 | OptimismMintableERC20Factory | MegaETH Mainnet (chain 4326) | `0x4200000000000000000000000000000000000012` |
 {% endtab %}
