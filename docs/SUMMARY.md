@@ -16,6 +16,7 @@
 ## Developer Docs
 
 - [Overview](dev/overview.md)
+- [Bridge ERC-20 Tokens](dev/bridge-erc20.md)
 - [Send Transaction](dev/send-tx/overview.md)
   - [Contracts & Tokens](dev/send-tx/contracts.md)
   - [Gas Estimation](dev/send-tx/gas-estimation.md)
