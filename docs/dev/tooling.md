@@ -1,10 +1,7 @@
 ---
 description: Developer tooling and infrastructure partners on MegaETH — RPC providers, block explorers, oracles, indexers, bridges, wallets, account abstraction, developer tooling, and more.
 ---
-# Tooling and Infrastructure 
-
-
-
+# Tooling and Infrastructure
 
 ## RPC Providers
 
@@ -30,21 +27,19 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 
 
 ---
-
 ## Explorers
 
 | Explorer | URL | Mainnet |
 |---|---|---|
-| [Etherscan](https://mega.etherscan.io) | https://mega.etherscan.io | Supported |
-| [Blockscout](https://megaeth.blockscout.com) | https://megaeth.blockscout.com | Supported |
-| [Explore Mega](https://exploremega.xyz) | https://exploremega.xyz | Supported |
+| [Etherscan](https://mega.etherscan.io) | <https://mega.etherscan.io> | Supported |
+| [Blockscout](https://megaeth.blockscout.com) | <https://megaeth.blockscout.com> | Supported |
+| [Explore Mega](https://exploremega.xyz) | <https://exploremega.xyz> | Supported |
 
 
 
 ---
 
 ## Oracles
-
 | Provider | Get Started | Mainnet Contract | Feeds | Mainnet |
 |---|---|---|---|---|
 | [Chainlink](https://chain.link) | [Docs](https://docs.chain.link/) | [Data Streams](https://docs.chain.link/data-streams/supported-networks?streamsNetwork=mega), [Data Feeds](https://docs.chain.link/data-feeds/price-feeds/addresses?network=MegaETH)  | [Data Streams](https://docs.chain.link/data-streams), [Data Feeds](https://docs.chain.link/data-feeds) | Supported |
@@ -57,31 +52,30 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 ---
 
 ## Indexers
-
 | Indexer | Get Started | Supported Services | Mainnet |
 |---|---|---|---|
 | [Goldsky](https://goldsky.com) | [Docs](https://docs.goldsky.com/chains/megaeth) | [Subgraphs](https://docs.goldsky.com/chains/megaeth#subgraphs), [Mirror (Data Pipelines)](https://docs.goldsky.com/chains/megaeth#mirror) | Supported |
 | [Envio](https://envio.dev/) | [Docs](https://docs.envio.dev/docs/HyperIndex/contract-import) | [HyperIndex (Subgraphs)](https://docs.envio.dev/blog/how-to-index-megaeth-data-using-envio#hyperindex), [HyperSync (Data Access)](https://docs.envio.dev/blog/how-to-index-megaeth-data-using-envio#hypersync) | Supported |
-| [Mobula](https://mobula.io) | [Docs](https://mobula.io/chain-mega) | [Real-time Market & Wallet Data API](https://mobula.io/chain-mega), [Streams     (WebSockets)](https://docs.mobula.io/indexing-stream/introduction) | Supported | 
+| [Mobula](https://mobula.io) | [Docs](https://mobula.io/chain-mega) | [Real-time Market & Wallet Data API](https://mobula.io/chain-mega), [Streams     (WebSockets)](https://docs.mobula.io/indexing-stream/introduction) | Supported |
 | [The Graph](https://thegraph.com) | [Docs](https://thegraph.com/docs/en/supported-networks/megaeth/) | [Subgraphs](https://thegraph.com/docs/en/subgraphs/quick-start/) | Supported |
 | [SQD](https://www.sqd.ai) | [Docs](https://beta.docs.sqd.dev/en/data/evm/megaeth-mainnet/overview) | [Subsquid data lake / Portal API](https://beta.docs.sqd.dev/en/data/evm/megaeth-mainnet/overview), [Squid SDK](https://github.com/subsquid-labs/squid-megaeth-example) | Supported |
 | [GoldRush](https://goldrush.dev) | [Docs](https://goldrush.dev/docs/chains/megaeth) | [Foundational API](https://goldrush.dev/docs/goldrush-foundational-api), [Streaming API](https://goldrush.dev/docs/goldrush-streaming-api) | Supported |
-| [Allium](https://allium.so) | [Docs](https://docs.allium.so/historical-data/supported-blockchains/evm/megaeth) | [Historical Data](https://docs.allium.so/historical-data/supported-blockchains/evm/megaeth), [Realtime API](https://docs.allium.so/api/developer/overview), [Kafka Streams](https://docs.allium.so/api/datastreams/overview) | Supported | 
+| [Allium](https://allium.so) | [Docs](https://docs.allium.so/historical-data/supported-blockchains/evm/megaeth) | [Historical Data](https://docs.allium.so/historical-data/supported-blockchains/evm/megaeth), [Realtime API](https://docs.allium.so/api/developer/overview), [Kafka Streams](https://docs.allium.so/api/datastreams/overview) | Supported |
 ---
 
 ## Data & Analytics
 
 | Tool | URL | Mainnet |
 |---|---|---|
-| Uptime Dashboard | https://uptime.megaeth.com | Supported |
-| Dune Analytics | https://dune.com/blockchains/megaeth | Supported |
-| Birdeye | https://birdeye.so/megaeth/find-gems | Supported |
-| DexScreener | https://dexscreener.com/megaeth | Supported |
-| Defined.fi | https://www.defined.fi/tokens/discover?network=mega | Supported |
-| Miniblocks | https://miniblocks.io | Supported |
-| DefiLlama | https://defillama.com/chain/megaeth | Supported |
-| CoinGecko | https://www.coingecko.com/en/categories/megaeth-ecosystem | Supported |
-| Grow The Pie | https://www.growthepie.com/chains/megaeth | Supported |
+| Uptime Dashboard | <https://uptime.megaeth.com> | Supported |
+| Dune Analytics | <https://dune.com/blockchains/megaeth> | Supported |
+| Birdeye | <https://birdeye.so/megaeth/find-gems> | Supported |
+| DexScreener | <https://dexscreener.com/megaeth> | Supported |
+| Defined.fi | <https://www.defined.fi/tokens/discover?network=mega> | Supported |
+| Miniblocks | <https://miniblocks.io> | Supported |
+| DefiLlama | <https://defillama.com/chain/megaeth> | Supported |
+| CoinGecko | <https://www.coingecko.com/en/categories/megaeth-ecosystem> | Supported |
+| Grow The Pie | <https://www.growthepie.com/chains/megaeth> | Supported |
 
 
 
