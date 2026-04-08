@@ -29,11 +29,11 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 
 ## Explorers
 
-| Explorer                                     | URL                              | Mainnet   |
-| -------------------------------------------- | -------------------------------- | --------- |
-| [Etherscan](https://mega.etherscan.io)       | <https://mega.etherscan.io>      | Supported |
-| [Blockscout](https://megaeth.blockscout.com) | <https://megaeth.blockscout.com> | Supported |
-| [Explore Mega](https://exploremega.xyz)      | <https://exploremega.xyz>        | Supported |
+| Explorer                                     | Mainnet   |
+| -------------------------------------------- | --------- |
+| [Etherscan](https://mega.etherscan.io)       | Supported |
+| [Blockscout](https://megaeth.blockscout.com) | Supported |
+| [Explore Mega](https://exploremega.xyz)      | Supported |
 
 ---
 
@@ -64,17 +64,19 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 
 ## Data & Analytics
 
-| Tool             | URL                                                         | Mainnet   |
-| ---------------- | ----------------------------------------------------------- | --------- |
-| Uptime Dashboard | <https://uptime.megaeth.com>                                | Supported |
-| Dune Analytics   | <https://dune.com/blockchains/megaeth>                      | Supported |
-| Birdeye          | <https://birdeye.so/megaeth/find-gems>                      | Supported |
-| DexScreener      | <https://dexscreener.com/megaeth>                           | Supported |
-| Defined.fi       | <https://www.defined.fi/tokens/discover?network=mega>       | Supported |
-| Miniblocks       | <https://miniblocks.io>                                     | Supported |
-| DefiLlama        | <https://defillama.com/chain/megaeth>                       | Supported |
-| CoinGecko        | <https://www.coingecko.com/en/categories/megaeth-ecosystem> | Supported |
-| Grow The Pie     | <https://www.growthepie.com/chains/megaeth>                 | Supported |
+| Tool                                                                   | Mainnet   |
+| ---------------------------------------------------------------------- | --------- |
+| [Uptime Dashboard](https://uptime.megaeth.com)                         | Supported |
+| [Dune Analytics](https://dune.com/blockchains/megaeth)                 | Supported |
+| [Birdeye](https://birdeye.so/megaeth/find-gems)                        | Supported |
+| [DexScreener](https://dexscreener.com/megaeth)                         | Supported |
+| [Defined.fi](https://www.defined.fi/tokens/discover?network=mega)      | Supported |
+| [Miniblocks](https://miniblocks.io)                                    | Supported |
+| [DefiLlama](https://defillama.com/chain/megaeth)                       | Supported |
+| [CoinGecko](https://www.coingecko.com/en/categories/megaeth-ecosystem) | Supported |
+| [Grow The Pie](https://www.growthepie.com/chains/megaeth)              | Supported |
+
+---
 
 ## Bridges & Interoperability
 
@@ -118,11 +120,11 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 
 ## Developer Tooling
 
-| Tool                                                  | Type                               | Get Started                                                                        | Mainnet   |
-| ----------------------------------------------------- | ---------------------------------- | ---------------------------------------------------------------------------------- | --------- |
-| [Tenderly](https://tenderly.co)                       | Debugging, simulation, alerts      | [Docs](https://docs.tenderly.co)                                                   | Planned   |
-| [mega-evme](https://github.com/megaeth-labs/mega-evm) | EVM debugger / tx replay           | [Docs](https://github.com/megaeth-labs/mega-evm/blob/main/bin/mega-evme/README.md) | Supported |
-| [Blocksec Phalcon](https://blocksec.com/phalcon)      | Transaction debugging & simulation | [App](https://blocksec.com/phalcon/explorer)                                       | Supported |
+| Tool                                                 | Type                               | Get Started                                                                        | Mainnet   |
+| ---------------------------------------------------- | ---------------------------------- | ---------------------------------------------------------------------------------- | --------- |
+| [Tenderly](https://tenderly.co)                      | Debugging, simulation, alerts      | [Docs](https://docs.tenderly.co)                                                   | Planned   |
+| [mega-evm](https://github.com/megaeth-labs/mega-evm) | EVM debugger / tx replay           | [Docs](https://github.com/megaeth-labs/mega-evm/blob/main/bin/mega-evme/README.md) | Supported |
+| [Blocksec Phalcon](https://blocksec.com/phalcon)     | Transaction debugging & simulation | [App](https://blocksec.com/phalcon/explorer)                                       | Supported |
 
 ---
 
