@@ -25,7 +25,6 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | Chainstack | HTTP | [Docs](https://chainstack.com/build-better-with-megaeth/) | No public endpoint (API key required) | Supported |
 
 
-
 ---
 ## Explorers
 
@@ -34,7 +33,6 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | [Etherscan](https://mega.etherscan.io) | <https://mega.etherscan.io> | Supported |
 | [Blockscout](https://megaeth.blockscout.com) | <https://megaeth.blockscout.com> | Supported |
 | [Explore Mega](https://exploremega.xyz) | <https://exploremega.xyz> | Supported |
-
 
 
 ---
@@ -46,7 +44,6 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | [Redstone](https://www.redstone.finance/) | [Docs](https://docs.redstone.finance/docs/introduction) | [Contract Addresses](https://app.redstone.finance/app/feeds/?networks=4326) | [Push Model feeds](https://app.redstone.finance/app/feeds/?page=1&sortBy=popularity&sortDesc=false&perPage=32), [Pull Model](https://app.redstone.finance/app/pull-model/redstone-primary-prod/) | Supported |
 | [Pyth](https://www.pyth.network/) | [Docs](https://docs.pyth.network/price-feeds) | `0x2880aB155794e7179c9eE2e38200202908C17B43` | [Price Feeds](https://docs.pyth.network/price-feeds/contract-addresses/evm) | Supported |
 | [Stork](https://www.stork.network/) | [Docs](https://docs.stork.network) | `0xacC0a0cF13571d30B4b8637996F5D6D774d4fd62` | Real-time price feeds | Supported |
-
 
 
 ---
@@ -78,7 +75,6 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | Grow The Pie | <https://www.growthepie.com/chains/megaeth> | Supported |
 
 
-
 ## Bridges & Interoperability
 
 | Provider | Get Started | Mainnet |
@@ -95,8 +91,6 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | [GasZip](https://www.gas.zip)  | [Docs](https://www.gas.zip) | Supported |
 
 
-
-
 ---
 
 ## Account Abstraction & Smart Accounts
@@ -107,7 +101,6 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | [Privy](https://privy.io) | Embedded wallets / headless signing | [Docs](https://docs.privy.io) | Supported |
 | [Safe](https://safe.global) | Multisig / smart account | [Docs](https://docs.safe.global) | Supported |
 | [MetaMask Smart Accounts](https://metamask.io) | Smart Accounts | [Docs](https://docs.metamask.io/smart-accounts-kit) | Supported |
-
 
 ---
 
@@ -131,7 +124,6 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | [mega-evme](https://github.com/megaeth-labs/mega-evm) | EVM debugger / tx replay | [Docs](https://github.com/megaeth-labs/mega-evm/blob/main/bin/mega-evme/README.md) | Supported |
 | [Blocksec Phalcon](https://blocksec.com/phalcon) | Transaction debugging & simulation | [App](https://blocksec.com/phalcon/explorer) | Supported |
 
-
 ---
 
 ## Security & Compliance
@@ -147,14 +139,12 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 ## On-Ramps & Payments
 
 
-
 | Provider | Type | Get Started | Mainnet |
 |---|---|---|---|
 | [Transak](https://transak.com) | Fiat on-ramp | [Docs](https://docs.transak.com) | Supported |
 | [Ramp Network](https://ramp.network) | Fiat on-ramp | [Docs](https://docs.ramp.network) | Supported |
 | [Meridian](https://mrdn.finance/) | x402 micropayments (agent economy) | — | Supported |
 | [Halliday](https://halliday.xyz) | Crypto payments, onramps & swaps | [Docs](https://docs.halliday.xyz) | Supported |
-
 
 ---
 
@@ -167,6 +157,4 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | [BitGo](https://bitgo.com) | Supported |
 
 ---
-
-
 
