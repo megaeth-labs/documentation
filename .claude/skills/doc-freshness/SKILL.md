@@ -28,7 +28,7 @@ These are the repos whose changes may require documentation updates.
 | devops-ansible-inventory | `megaeth-labs/devops-ansible-inventory` | Network parameter changes (chain IDs, RPC URLs, explorer URLs), new network deployments, config changes                                                                                                                                                                                                                                                                                                                             |
 | mega-op-contracts        | `megaeth-labs/mega-op-contracts`        | Bridge contract changes, L1/L2 interface changes, system config changes, new dispute game types                                                                                                                                                                                                                                                                                                                                     |
 | mega-optimism            | `megaeth-labs/mega-optimism`            | Sequencer behavior changes, payload building changes, L1 settlement changes                                                                                                                                                                                                                                                                                                                                                         |
-| dist-docs                | `megaeth-labs/dist-docs`                | Release notes and hardfork schedules — determines which mega-reth changes are released (via merged `chore: release vX.Y.Z` PRs) and which mega-evm hardforks are active (via genesis config timestamps). Not scanned for code changes.                                                                                                                                                                                                                                                                                  |
+| dist-docs                | `megaeth-labs/dist-docs`                | Release notes and hardfork schedules — determines which mega-reth changes are released (via merged `chore: release vX.Y.Z` PRs) and which mega-evm hardforks are active (via genesis config timestamps). Not scanned for code changes.                                                                                                                                                                                              |
 
 ## Workflow
 
@@ -84,6 +84,7 @@ gh api repos/megaeth-labs/dist-docs/contents/versions --jq '.[].name' | sort | t
 Some mega-evm spec changes are tied to a named hardfork and should only be made public in documentation after the hardfork activates on mainnet.
 
 1. **Check dist-docs release notes** for hardfork mentions:
+
    ```bash
    gh pr list --repo megaeth-labs/dist-docs --state merged --search "hardfork in:body" --json number,title,body,mergedAt --limit 5
    ```
