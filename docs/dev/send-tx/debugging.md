@@ -118,7 +118,7 @@ Simulate a transaction against live chain state by forking from an RPC endpoint:
 ```bash
 mega-evme tx \
   --fork \
-  --fork.rpc https://mainnet.megaeth.com/rpc \
+  --rpc https://mainnet.megaeth.com/rpc \
   --receiver 0xContractAddress \
   --input 0xCalldata \
   --sender 0xYourAddress \
@@ -131,7 +131,7 @@ Fork from a specific block:
 ```bash
 mega-evme tx \
   --fork \
-  --fork.rpc https://mainnet.megaeth.com/rpc \
+  --rpc https://mainnet.megaeth.com/rpc \
   --fork.block 12345678 \
   --receiver 0xContractAddress \
   --input 0xCalldata \
