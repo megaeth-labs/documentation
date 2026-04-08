@@ -60,11 +60,12 @@ Save the deployed token address — you will need it in the next step.
 
 Call `createOptimismMintableERC20` on the `OptimismMintableERC20Factory` **on MegaETH**.
 This deploys a bridgeable ERC-20 on L2 that is linked to your L1 token.
+Replace `"MyToken"` and `"MTK"` with your token's name and symbol.
 
 ```bash
 cast send $L2_MINTABLE_FACTORY \
   "createOptimismMintableERC20(address,string,string)" \
-  $L1_TOKEN "MyToken" "MTK" \       # use your token's name and symbol
+  $L1_TOKEN "MyToken" "MTK" \
   --rpc-url $L2_RPC \
   --private-key $PRIVATE_KEY
 ```
@@ -74,8 +75,9 @@ Parse the `localToken` field from the receipt to get your L2 token address.
 
 ```bash
 # Extract the L2 token address from the event logs
+# topic[0] is keccak256("OptimismMintableERC20Created(address,address,address)")
 cast receipt $TX_HASH --rpc-url $L2_RPC --json \
-  | jq '.logs[] | select(.topics[0] == "0x52fe89dd5930f343d25650b62fd367bae47ef185") | .topics[1]'
+  | jq '.logs[] | select(.topics[0] == "0x52fe89dd5930f343d25650b62fd367bae47088bcddffd2a88350a6ecdd620cdb") | .topics[1]'
 ```
 
 {% endstep %}
@@ -84,11 +86,12 @@ cast receipt $TX_HASH --rpc-url $L2_RPC --json \
 ### Approve the L1 bridge
 
 Approve `L1StandardBridge` to spend the tokens you want to bridge.
+Set `$AMOUNT` in wei (e.g. `100000000000000000000` for 100 tokens with 18 decimals).
 
 ```bash
 cast send $L1_TOKEN \
   "approve(address,uint256)" \
-  $L1_BRIDGE $AMOUNT \              # amount in wei, e.g. 100ether = 100000000000000000000
+  $L1_BRIDGE $AMOUNT \
   --rpc-url $L1_RPC \
   --private-key $PRIVATE_KEY
 ```
@@ -99,20 +102,21 @@ cast send $L1_TOKEN \
 ### Bridge tokens to MegaETH
 
 Call `bridgeERC20` on `L1StandardBridge`.
-Pass both the L1 and L2 token addresses, the amount in wei, and a gas limit for L2 execution.
+Pass both the L1 and L2 token addresses, the amount in wei, a minimum gas limit for L2 execution, and empty extra data.
 
 ```bash
 cast send $L1_BRIDGE \
   "bridgeERC20(address,address,uint256,uint32,bytes)" \
-  $L1_TOKEN \                       # your L1 token
-  $L2_TOKEN \                       # your registered L2 token
-  $AMOUNT \                         # amount in wei
-  200000 \                          # minGasLimit — 200 000 is sufficient for most tokens
-  0x \                              # extraData — empty
+  $L1_TOKEN \
+  $L2_TOKEN \
+  $AMOUNT \
+  200000 \
+  0x \
   --rpc-url $L1_RPC \
   --private-key $PRIVATE_KEY
 ```
 
+`200000` is sufficient for most standard ERC-20 tokens.
 The bridge transaction locks tokens on L1 and relays a message to MegaETH to mint the equivalent amount on L2.
 
 {% endstep %}
