@@ -25,6 +25,7 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | Chainstack | HTTP | [Docs](https://chainstack.com/build-better-with-megaeth/) | No public endpoint (API key required) | Supported |
 
 ---
+
 ## Explorers
 
 | Explorer | URL | Mainnet |
@@ -36,6 +37,7 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 ---
 
 ## Oracles
+
 | Provider | Get Started | Mainnet Contract | Feeds | Mainnet |
 |---|---|---|---|---|
 | [Chainlink](https://chain.link) | [Docs](https://docs.chain.link/) | [Data Streams](https://docs.chain.link/data-streams/supported-networks?streamsNetwork=mega), [Data Feeds](https://docs.chain.link/data-feeds/price-feeds/addresses?network=MegaETH)  | [Data Streams](https://docs.chain.link/data-streams), [Data Feeds](https://docs.chain.link/data-feeds) | Supported |
@@ -46,6 +48,7 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 ---
 
 ## Indexers
+
 | Indexer | Get Started | Supported Services | Mainnet |
 |---|---|---|---|
 | [Goldsky](https://goldsky.com) | [Docs](https://docs.goldsky.com/chains/megaeth) | [Subgraphs](https://docs.goldsky.com/chains/megaeth#subgraphs), [Mirror (Data Pipelines)](https://docs.goldsky.com/chains/megaeth#mirror) | Supported |
@@ -55,6 +58,7 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | [SQD](https://www.sqd.ai) | [Docs](https://beta.docs.sqd.dev/en/data/evm/megaeth-mainnet/overview) | [Subsquid data lake / Portal API](https://beta.docs.sqd.dev/en/data/evm/megaeth-mainnet/overview), [Squid SDK](https://github.com/subsquid-labs/squid-megaeth-example) | Supported |
 | [GoldRush](https://goldrush.dev) | [Docs](https://goldrush.dev/docs/chains/megaeth) | [Foundational API](https://goldrush.dev/docs/goldrush-foundational-api), [Streaming API](https://goldrush.dev/docs/goldrush-streaming-api) | Supported |
 | [Allium](https://allium.so) | [Docs](https://docs.allium.so/historical-data/supported-blockchains/evm/megaeth) | [Historical Data](https://docs.allium.so/historical-data/supported-blockchains/evm/megaeth), [Realtime API](https://docs.allium.so/api/developer/overview), [Kafka Streams](https://docs.allium.so/api/datastreams/overview) | Supported |
+
 ---
 
 ## Data & Analytics
