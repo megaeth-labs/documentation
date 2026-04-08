@@ -24,7 +24,6 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | Envio HyperRPC | HTTP *(read-only)* | [Docs](https://docs.envio.dev/docs/HyperRPC/overview-hyperrpc) | `https://megaeth.rpc.hypersync.xyz` | Supported |
 | Chainstack | HTTP | [Docs](https://chainstack.com/build-better-with-megaeth/) | No public endpoint (API key required) | Supported |
 
-
 ---
 ## Explorers
 
@@ -33,7 +32,6 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | [Etherscan](https://mega.etherscan.io) | <https://mega.etherscan.io> | Supported |
 | [Blockscout](https://megaeth.blockscout.com) | <https://megaeth.blockscout.com> | Supported |
 | [Explore Mega](https://exploremega.xyz) | <https://exploremega.xyz> | Supported |
-
 
 ---
 
@@ -44,7 +42,6 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | [Redstone](https://www.redstone.finance/) | [Docs](https://docs.redstone.finance/docs/introduction) | [Contract Addresses](https://app.redstone.finance/app/feeds/?networks=4326) | [Push Model feeds](https://app.redstone.finance/app/feeds/?page=1&sortBy=popularity&sortDesc=false&perPage=32), [Pull Model](https://app.redstone.finance/app/pull-model/redstone-primary-prod/) | Supported |
 | [Pyth](https://www.pyth.network/) | [Docs](https://docs.pyth.network/price-feeds) | `0x2880aB155794e7179c9eE2e38200202908C17B43` | [Price Feeds](https://docs.pyth.network/price-feeds/contract-addresses/evm) | Supported |
 | [Stork](https://www.stork.network/) | [Docs](https://docs.stork.network) | `0xacC0a0cF13571d30B4b8637996F5D6D774d4fd62` | Real-time price feeds | Supported |
-
 
 ---
 
@@ -74,7 +71,6 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | CoinGecko | <https://www.coingecko.com/en/categories/megaeth-ecosystem> | Supported |
 | Grow The Pie | <https://www.growthepie.com/chains/megaeth> | Supported |
 
-
 ## Bridges & Interoperability
 
 | Provider | Get Started | Mainnet |
@@ -89,7 +85,6 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | [Socket](https://socket.tech)  | [Docs](https://docs.socket.tech) | Supported |
 | [Relay](https://relay.link)  | [Docs](https://docs.relay.link) | Supported |
 | [GasZip](https://www.gas.zip)  | [Docs](https://www.gas.zip) | Supported |
-
 
 ---
 
@@ -138,7 +133,6 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 
 ## On-Ramps & Payments
 
-
 | Provider | Type | Get Started | Mainnet |
 |---|---|---|---|
 | [Transak](https://transak.com) | Fiat on-ramp | [Docs](https://docs.transak.com) | Supported |
@@ -157,4 +151,3 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | [BitGo](https://bitgo.com) | Supported |
 
 ---
-
