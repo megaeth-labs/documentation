@@ -52,6 +52,8 @@ cast send 0x0CA3A2FBC3D770b578223FBB6b062fa875a2eE75 \
   --value 0.001ether
 ```
 
+To bridge ERC-20 tokens using the canonical bridge, see [Bridge ERC-20 Tokens](bridge-erc20.md).
+
 ## L1 Contracts (Ethereum Mainnet)
 
 See [Contracts & Tokens](send-tx/contracts.md#l1-contracts-ethereum) for all L1 contract addresses (bridge, DisputeGameFactory, OptimismPortal, SystemConfig, etc.).
