@@ -28,7 +28,7 @@ These are the repos whose changes may require documentation updates.
 | devops-ansible-inventory | `megaeth-labs/devops-ansible-inventory` | Network parameter changes (chain IDs, RPC URLs, explorer URLs), new network deployments, config changes                                                                                                                                                                                                                                                                                                                             |
 | mega-op-contracts        | `megaeth-labs/mega-op-contracts`        | Bridge contract changes, L1/L2 interface changes, system config changes, new dispute game types                                                                                                                                                                                                                                                                                                                                     |
 | mega-optimism            | `megaeth-labs/mega-optimism`            | Sequencer behavior changes, payload building changes, L1 settlement changes                                                                                                                                                                                                                                                                                                                                                         |
-| dist-docs                | `megaeth-labs/dist-docs`                | Release tags — determines which mega-reth changes are live and doc-worthy. Not scanned for PRs; used only to identify the latest released version.                                                                                                                                                                                                                                                                                  |
+| dist-docs                | `megaeth-labs/dist-docs`                | Release notes and hardfork schedules — determines which mega-reth changes are released (via merged `chore: release vX.Y.Z` PRs) and which mega-evm hardforks are active (via genesis config timestamps). Not scanned for code changes.                                                                                                                                                                                                                                                                                  |
 
 ## Workflow
 
@@ -53,19 +53,54 @@ For each PR, record:
 - Labels (if any)
 - A one-line summary of what changed (from PR title or body)
 
-### Phase 1.5: Determine Latest Released Version (mega-reth)
+### Phase 1.5: Determine Release Status
 
-For mega-reth, only changes included in the **latest released version** should be considered for new behavior or behavior changes.
-PRs merged after the latest release are unreleased and should not drive documentation updates yet.
+#### Part A: Latest Released mega-reth Version
 
-1. **Check the dist-docs repo** for the latest release tag:
+Check mega-reth GitHub Releases for the latest version and release date:
+
+```bash
+gh release list --repo megaeth-labs/mega-reth --limit 5
+```
+
+Cross-reference with dist-docs to confirm the release has been announced to external partners:
+
+```bash
+gh pr list --repo megaeth-labs/dist-docs --state merged --search "release {version} in:title" --json number,title,mergedAt --limit 1
+```
+
+If a mega-reth release exists but has no corresponding dist-docs PR, note it as "Released but not yet announced — pending dist-docs release note."
+Only mega-reth changes included in a version that has been both released **and** announced via dist-docs should be considered doc-worthy.
+PRs merged after the latest announced release should be excluded and noted as "Unreleased — pending next release."
+
+As a fallback, dist-docs version files follow the naming pattern `versions/{date}-v{version}.m4` and can be listed via:
+
+```bash
+gh api repos/megaeth-labs/dist-docs/contents/versions --jq '.[].name' | sort | tail -5
+```
+
+#### Part B: Hardfork Activation Gating
+
+Some mega-evm spec changes are tied to a named hardfork and should only be made public in documentation after the hardfork activates on mainnet.
+
+1. **Check dist-docs release notes** for hardfork mentions:
    ```bash
-   gh release list --repo megaeth-labs/dist-docs --limit 5
+   gh pr list --repo megaeth-labs/dist-docs --state merged --search "hardfork in:body" --json number,title,body,mergedAt --limit 5
    ```
-2. **Identify the release date and tag** (e.g., `v0.6.0`, `2026-03-20`).
-3. **Filter mega-reth PRs**: only include PRs merged on or before the release date. PRs merged after the latest release should be excluded from the doc-worthy triage and noted as "Unreleased — pending next release" in the report.
 
-This does not apply to mega-rpc (deployed continuously) or mega-evm (spec changes are doc-worthy regardless of release).
+2. **Extract the hardfork name and mainnet activation timestamp** from the release note body.
+
+3. **Compare activation timestamp against current time**:
+   - If **activated** (timestamp in the past): mega-evm spec changes for this hardfork are doc-worthy and can be made public.
+   - If **not yet activated** (timestamp in the future): note as "Hardfork {name} not yet active — activates {date}. Defer public documentation."
+
+#### Scope
+
+- **mega-reth**: gated by mega-reth GitHub Releases + dist-docs announcement to external partners.
+- **mega-evm**: spec changes tied to a named hardfork are gated by hardfork activation time; tooling changes (like mega-evme CLI flags) are doc-worthy regardless of hardfork status.
+- **mega-rpc**: deployed continuously, not gated.
+
+---
 
 ### Phase 2: Triage — Doc-Worthy vs Internal
 
