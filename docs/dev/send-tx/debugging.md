@@ -6,15 +6,14 @@ description: Debug failing transactions on MegaETH — trace with debug_traceTra
 
 MegaETH provides two ways to debug transactions:
 
-1. **`debug_*` RPC methods** — trace transactions via JSON-RPC (requires a managed RPC endpoint)
+1. **`debug_*` RPC methods** — trace transactions via JSON-RPC
 2. **`mega-evme`** — replay or simulate transactions locally with full tracing
 
 ## Debug RPC Methods
 
-Standard Ethereum debug methods — `debug_traceTransaction`, `debug_traceCall`, and `debug_traceBlockByNumber` — are available through managed RPC providers but **not on the public MegaETH RPC endpoint**.
-Use a provider such as [Alchemy](https://www.alchemy.com/) to access them.
+Standard Ethereum debug methods are available on the public MegaETH RPC endpoint (`https://mainnet.megaeth.com/rpc`) and through managed RPC providers such as [Alchemy](https://www.alchemy.com/).
 
-The following methods are available through managed providers:
+The following methods are supported:
 
 - **`debug_traceTransaction`** — trace an already-mined transaction by hash
 - **`debug_traceCall`** — simulate and trace a call without broadcasting
@@ -28,7 +27,6 @@ The following methods are available through managed providers:
 | callTracer              | `"callTracer"`          | Nested call tree with inputs, outputs, and gas usage per call                |
 | prestateTracer          | `"prestateTracer"`      | Account state before execution; set `"diffMode": true` for before/after diff |
 | flatCallTracer          | `"flatCallTracer"`      | Parity-style flat list of all calls                                          |
-| 4byteTracer             | `"4byteTracer"`         | Counts function selector usage                                               |
 
 {% hint style="info" %}
 JavaScript tracers are not supported.
@@ -41,7 +39,7 @@ For method parameters, tracer configuration options, and response formats, see t
 [`mega-evme`](https://docs.megaeth.com/mega-evme) is a local CLI tool that uses the open-source [MegaEVM](https://github.com/megaeth-labs/mega-evm) implementation.
 It can perfectly simulate any transaction's behavior on MegaETH, including storage gas, compute gas caps, and resource limits.
 
-Use `mega-evme` when you want full local control over tracing, or when you don't have access to a managed RPC endpoint with debug methods.
+Use `mega-evme` when you want full local control over tracing, deterministic replay, or what-if analysis with transaction overrides.
 
 ### Installation
 
