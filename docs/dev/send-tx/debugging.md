@@ -12,7 +12,6 @@ MegaETH provides two ways to debug transactions:
 ## Debug RPC Methods
 
 Standard Ethereum debug methods are available on the public MegaETH RPC endpoint (`https://mainnet.megaeth.com/rpc`) and through managed RPC providers such as [Alchemy](https://www.alchemy.com/).
-Debug methods share the `compute` rate limit tier (200 requests per 10 seconds).
 
 The following methods are supported:
 
