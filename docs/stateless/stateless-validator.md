@@ -13,22 +13,9 @@ For how validators fit into the broader network, see [Architecture](../architect
 ## Why run a stateless validator
 
 - **Independent verification** — you re-execute the state transition function (STF) of every block yourself, rather than trusting an RPC provider to tell you the truth.
-- **Low hardware cost** — thanks to [SALT (Small Authentication Large Trie)](https://github.com/megaeth-labs/salt) witnesses, per-block proof data is compact (tens of KB) — small enough to validate on a commodity server.
-- **Parallel-friendly** — validation workers are embarrassingly parallel; throughput scales with CPU cores.
+- **Low hardware cost** — thanks to [SALT (Small Authentication Large Trie)](https://github.com/megaeth-labs/salt) witnesses, proof data per block is significantly smaller than traditional Merkle Patricia Tree or Verkle tree approaches, so validators do not need sequencer-class hardware.
+- **Parallel-friendly** — validation workers are embarrassingly parallel; throughput scales linearly with CPU cores.
 - **Auditable TCB** — the validator is built on a vanilla Revm interpreter with an in-memory backend, keeping the trusted computing base small and reviewable.
-
-## System requirements
-
-| Resource | Minimum         | Recommended           |
-| -------- | --------------- | --------------------- |
-| CPU      | 4 cores         | 16+ cores             |
-| RAM      | 8 GB            | 16 GB                 |
-| Disk     | 20 GB SSD       | 100 GB SSD            |
-| Network  | 50 Mbps, stable | 100+ Mbps, low jitter |
-| OS       | Linux / macOS   | Linux (Ubuntu 22.04+) |
-
-Witness data is small but arrives continuously, so network stability matters more than raw bandwidth.
-Disk usage is dominated by the canonical chain index and the contract bytecode cache.
 
 ## Installation
 
@@ -147,22 +134,20 @@ Legacy `STATELESS_VALIDATOR_LOG_*` env vars are migrated to `STATELESS_LOG_*` au
 ## Running in the background
 
 For long-lived deployments, run the validator under a supervisor (systemd, Docker, or a PID-file script).
-The snippet below is a minimal `start_validator.sh` you can drop next to the binary:
+A minimal launcher looks like this — substitute the variables at the top for your deployment paths:
 
 ```bash
 #!/bin/bash
-# start_validator.sh — launch stateless-validator in the background
+# Launch stateless-validator in the background under a PID file.
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-BINARY="$SCRIPT_DIR/stateless-validator"
-PID_FILE="$SCRIPT_DIR/stateless-validator.pid"
-
-DATA_DIR="${DATA_DIR:-$HOME/megaeth/validator}"
-RPC_ENDPOINT="${RPC_ENDPOINT:-https://mainnet.megaeth.com/rpc}"
-WITNESS_ENDPOINT="${WITNESS_ENDPOINT:-https://mainnet.megaeth.com/rpc}"
-GENESIS_FILE="${GENESIS_FILE:-$DATA_DIR/genesis.json}"
-LOG_DIR="${LOG_DIR:-$DATA_DIR/logs}"
+BINARY=/path/to/stateless-validator
+DATA_DIR=/path/to/validator-data
+GENESIS_FILE=/path/to/genesis.json
+LOG_DIR=/path/to/logs
+RPC_ENDPOINT=https://mainnet.megaeth.com/rpc
+WITNESS_ENDPOINT=https://mainnet.megaeth.com/rpc
+PID_FILE="$DATA_DIR/stateless-validator.pid"
 
 if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
     echo "validator already running (pid $(cat "$PID_FILE"))"
@@ -177,19 +162,16 @@ nohup "$BINARY" \
     --witness-endpoint "$WITNESS_ENDPOINT" \
     --genesis-file "$GENESIS_FILE" \
     --log.file-directory "$LOG_DIR" \
-    --log.file-filter "debug" \
-    --log.stdout-filter "info" \
     --metrics-enabled \
     >/dev/null 2>&1 &
 
 echo $! > "$PID_FILE"
-echo "started (pid $(cat "$PID_FILE"))"
 ```
 
 Stop the validator with:
 
 ```bash
-kill "$(cat stateless-validator.pid)" && rm stateless-validator.pid
+kill "$(cat "$DATA_DIR/stateless-validator.pid")" && rm "$DATA_DIR/stateless-validator.pid"
 ```
 
 {% hint style="info" %}
