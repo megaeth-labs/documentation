@@ -37,3 +37,7 @@
 - [Build with AI](dev/build-with-ai.md)
 - [Tooling & Infrastructure](dev/tooling.md)
 - [Developer FAQ](dev/faq.md)
+
+## Stateless Validator
+
+- [Overview](stateless/stateless-validator.md)
