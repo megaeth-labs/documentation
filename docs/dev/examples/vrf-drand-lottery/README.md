@@ -4,26 +4,43 @@ description: End-to-end onchain randomness example using drand quicknet verified
 
 # Drand VRF Lottery
 
-A runnable demo of publicly verifiable onchain randomness on MegaETH, built on top of the stateless [DrandVerifier](https://github.com/Zodomo/DrandVerifier) contracts.
+A self-contained, runnable demo of publicly verifiable onchain randomness on MegaETH, built on top of the stateless [DrandVerifier](https://github.com/Zodomo/DrandVerifier) contracts.
 
 drand is a public threshold-BLS randomness beacon.
 Every three seconds, the drand network produces and publishes a signed random value that anyone can fetch and verify.
 No oracle service, no subscription, no callback.
 For background on the protocol, see the [drand developer docs](https://docs.drand.love/developer/).
 
-This example deploys a stateless verifier (`DrandOracleQuicknet`) and a single-slot lottery that consumes it via commit-reveal.
+This example ships a complete Foundry project that deploys a single-slot lottery and drives it end-to-end via three shell scripts.
 
 ## What this example shows
 
 - Calling a stateless BLS12-381 signature verifier from a user contract.
 - A correct commit-reveal flow: committing a target round **before** its signature exists, then revealing once drand publishes it.
-- Adversarial-path testing: the same contract correctly rejects early settlement and wrong-round signatures.
+- Unit-testing a drand consumer with a mock oracle.
+- Working around MegaETH's dual-gas model when deploying via scripts.
+
+## Project layout
+
+```
+vrf-drand-lottery/
+├── foundry.toml
+├── .env.example                          # copy to .env and fill in
+├── src/
+│   └── DrandLotteryDemo.sol              # the contract
+├── test/
+│   └── DrandLotteryDemo.t.sol            # unit tests with a mock oracle
+└── script/
+    ├── deploy-lottery.sh                 # forge build + deploy with correct gas
+    ├── open.sh                           # commit entrants + future round
+    └── settle.sh                         # poll drand, fetch sig, submit
+```
 
 ## Prerequisites
 
-- [Foundry](https://getfoundry.sh/) installed (`forge`, `cast`)
+- [Foundry](https://getfoundry.sh/) (`forge`, `cast`)
+- `jq`, `curl`, `bash`
 - A MegaETH Testnet wallet with testnet ETH — see [Get ETH on Testnet](../../../user/faucet.md)
-- `curl` and `jq` for fetching drand beacons
 
 {% hint style="info" %}
 drand verification uses the BLS12-381 precompiles activated in Pectra (EIP-2537).
@@ -31,14 +48,105 @@ MegaETH Testnet has these enabled.
 The `DrandVerifier` libraries will not work on chains without EIP-2537.
 {% endhint %}
 
-## Deployed addresses (MegaETH Testnet, chain id 6343)
+## Already-deployed addresses (MegaETH Testnet, chain id 6343)
+
+You can either reuse these or run `script/deploy-lottery.sh` to deploy your own copy.
 
 | Contract            | Address                                      |
 | ------------------- | -------------------------------------------- |
 | DrandOracleQuicknet | `0x4e1673dcAA38136b5032F27ef93423162aF977Cc` |
 | DrandLotteryDemo    | `0x0Eed2baF5a317D8C20a20dc51E6a6BBb8390f4e5` |
 
-You can interact with these directly, or deploy your own copy using the steps below.
+## Quick start
+
+{% stepper %}
+{% step %}
+
+### Clone and configure
+
+```bash
+# From the documentation repo checkout:
+cd docs/dev/examples/vrf-drand-lottery
+
+cp .env.example .env
+# then edit .env — at minimum set PRIVATE_KEY
+```
+
+`.env` contains:
+
+- `RPC_URL` — MegaETH Testnet endpoint (default is fine).
+- `PRIVATE_KEY` — funded testnet account.
+- `ORACLE_ADDRESS` — pre-filled with the already-deployed oracle.
+- `LOTTERY_ADDRESS` — auto-populated by `deploy-lottery.sh`.
+- `ENTRANTS`, `DELAY_SECONDS` — defaults for `open.sh`.
+
+{% endstep %}
+{% step %}
+
+### Install dependencies and build
+
+The test suite uses `forge-std`.
+Clone it into `lib/` (it is git-ignored so it won't be committed):
+
+```bash
+git clone --depth 1 https://github.com/foundry-rs/forge-std.git lib/forge-std
+forge build
+forge test -vv
+```
+
+You should see 8 tests pass.
+
+{% endstep %}
+{% step %}
+
+### Deploy
+
+```bash
+./script/deploy-lottery.sh
+# DrandLotteryDemo deployed: 0x…
+# wrote LOTTERY_ADDRESS to .env
+```
+
+The script queries `eth_estimateGas` on the node and sets `--gas-limit` with a 30% margin.
+This is necessary because MegaETH's dual-gas model charges materially more for contract creation than local Foundry simulation — deployments with the default estimator will revert out-of-gas.
+See [Gas Estimation](../../send-tx/gas-estimation.md).
+
+{% endstep %}
+{% step %}
+
+### Open a round
+
+```bash
+./script/open.sh
+# opening lottery on 0x…
+# entrants:    [0x1111…,0x2222…,0x3333…,0x4444…]
+# delay:       24s
+# revealRound: 27985651
+# publishTime: 1776760317
+```
+
+{% endstep %}
+{% step %}
+
+### Settle
+
+```bash
+./script/settle.sh
+# revealRound: 27985651
+# publishTime: 1776760317
+# now:         1776760300
+# polling https://api.drand.sh/…/rounds/27985651
+# signature:   b3548e49…
+# winner:      0x2222222222222222222222222222222222222222
+# randomness:  0xd743530bc80936fe28d1f6a79556cfc67a97796eb1e61d853d4dbdde089c93f1
+```
+
+`settle.sh` waits until `publishTime` is reached, polls `api.drand.sh` until the round is available, and then submits the signature.
+
+{% endstep %}
+{% endstepper %}
+
+To run another round, just call `open.sh` and `settle.sh` again — the contract resets on each `open` after settlement.
 
 ## How it works
 
@@ -61,13 +169,14 @@ Otherwise, an attacker can read the public beacon offchain and choose whether to
 
 ## The contract
 
-The full source is in [`DrandLotteryDemo.sol`](DrandLotteryDemo.sol).
+Full source in [`src/DrandLotteryDemo.sol`](src/DrandLotteryDemo.sol).
 Key invariants:
 
 - `open` computes `revealRound` from the future publish window and requires `publishTime > block.timestamp`.
 - `settle` requires `block.timestamp >= publishTime` so an early submission cannot succeed by accident.
 - `settle` requires the oracle's pairing check to pass — only one signature per round is valid, so the wrong signature reverts.
 - Entrants are frozen at `open` time; no input used in winner selection can be changed after the commit.
+- `settle` flips `settled = true` before the external oracle call (checks-effects-interactions).
 
 ```solidity
 function settle(bytes calldata sig) external {
@@ -87,101 +196,33 @@ function settle(bytes calldata sig) external {
 }
 ```
 
-## Walkthrough
+## Testing with a mock oracle
 
-The testnet oracle and lottery addresses above are already deployed.
-The steps below use them directly; skip to "Deploy your own copy" if you want fresh instances.
-
-{% stepper %}
-{% step %}
-
-### Open a round
-
-Commit an entrant set and a reveal round that is at least a few seconds in the future.
+[`test/DrandLotteryDemo.t.sol`](test/DrandLotteryDemo.t.sol) exercises the commit-reveal flow against a `MockOracleQuicknet` that returns caller-chosen results.
+This decouples the lottery logic from the real BLS verifier so unit tests stay fast and deterministic.
 
 ```bash
-export RPC_URL="https://carrot.megaeth.com/rpc"
-export PRIVATE_KEY=0x...
-
-LOT=0x0Eed2baF5a317D8C20a20dc51E6a6BBb8390f4e5
-ENTRANTS='[0x1111111111111111111111111111111111111111,0x2222222222222222222222222222222222222222,0x3333333333333333333333333333333333333333,0x4444444444444444444444444444444444444444]'
-
-cast send --private-key $PRIVATE_KEY --rpc-url $RPC_URL \
-  --gas-limit 30000000 \
-  $LOT "open(address[],uint64)" $ENTRANTS 24
+forge test -vv
 ```
 
-Read the committed round:
+The suite covers:
 
-```bash
-cast call $LOT "revealRound()(uint64)" --rpc-url $RPC_URL
-# 27985651
-cast call $LOT "publishTime()(uint256)" --rpc-url $RPC_URL
-# 1776760317
-```
+- `open` commits a future round, rejects empty entrants, rejects re-open while in flight.
+- `settle` reverts before `publishTime`, reverts on bad signature, reverts on replay.
+- Winner selection is deterministic given the oracle's normalized hash.
+- After `settle`, `open` can start a fresh round.
 
-{% endstep %}
-{% step %}
-
-### Wait for drand to produce that round
-
-Quicknet publishes every three seconds, so the wait is bounded by `publishTime - now` plus a few seconds of API propagation.
-Poll until the round is available:
-
-```bash
-ROUND=27985651
-URL=https://api.drand.sh/v2/chains/52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971/rounds/$ROUND
-
-until RESP=$(curl -fsSL "$URL" 2>/dev/null) && [ -n "$RESP" ]; do sleep 1; done
-SIG=$(echo "$RESP" | jq -r '.signature')
-echo "$SIG"
-# b3548e49211c5285c23420d01f4be07ef60d55680f1d609191524aa3e4089360ad869393f6a7b28451617e3acbf0c58f
-```
-
-The signature is a 48-byte compressed G1 point.
-Nothing about fetching it is privileged — anyone can pull the beacon from `api.drand.sh`.
-
-{% endstep %}
-{% step %}
-
-### Settle
-
-Submit the signature back to the lottery.
-The oracle runs the BLS pairing check and the contract selects a winner deterministically from the canonical random value:
-
-```bash
-cast send --private-key $PRIVATE_KEY --rpc-url $RPC_URL \
-  --gas-limit 30000000 \
-  $LOT "settle(bytes)" "0x$SIG"
-```
-
-Read the result:
-
-```bash
-cast call $LOT "winner()(address)"     --rpc-url $RPC_URL
-# 0x2222222222222222222222222222222222222222
-cast call $LOT "randomness()(bytes32)" --rpc-url $RPC_URL
-# 0xd743530bc80936fe28d1f6a79556cfc67a97796eb1e61d853d4dbdde089c93f1
-```
-
-Verify offchain that the winner matches the committed selection rule:
-
-```bash
-python3 -c "r=0xd743530bc80936fe28d1f6a79556cfc67a97796eb1e61d853d4dbdde089c93f1; print(r % 4)"
-# 1  → entrants[1] = 0x2222…
-```
-
-{% endstep %}
-{% endstepper %}
+For integration-style testing against the real verifier on a forked MegaETH Testnet, use `forge test --fork-url $RPC_URL` with the already-deployed oracle address.
 
 ## Adversarial paths
 
 The contract rejects both of the obvious attacks.
+These are also covered by `DrandLotteryDemoTest`.
 
 Settling before the target round has been produced:
 
 ```bash
-cast call $LOT "settle(bytes)" "0x<any_sig>" --rpc-url $RPC_URL
+cast call $LOTTERY_ADDRESS "settle(bytes)" "0x<any_sig>" --rpc-url $RPC_URL
 # execution reverted: round not yet published
 ```
 
@@ -189,83 +230,11 @@ Submitting a valid signature for a different round:
 
 ```bash
 # Known-good signature for round 20791007, submitted against a different revealRound
-cast call $LOT "settle(bytes)" "0x8d2c8bbc37…198ac5" --rpc-url $RPC_URL
+cast call $LOTTERY_ADDRESS "settle(bytes)" "0x8d2c8bbc37…198ac5" --rpc-url $RPC_URL
 # execution reverted: bad signature
 ```
 
 The oracle's pairing check binds signature validity to the specific round hash, so a signature from any other round fails verification.
-
-## Deploy your own copy
-
-{% stepper %}
-{% step %}
-
-### Clone the verifier repo
-
-```bash
-git clone https://github.com/Zodomo/DrandVerifier.git
-cd DrandVerifier
-git submodule update --init --recursive
-forge build
-```
-
-{% endstep %}
-{% step %}
-
-### Deploy `DrandOracleQuicknet`
-
-The contract has no constructor arguments.
-MegaETH's dual-gas model returns a larger `eth_estimateGas` than local Foundry simulation, so ask the node directly and set `--gas-limit` above its estimate:
-
-```bash
-BYTECODE=$(jq -r '.bytecode.object' out/DrandOracleQuicknet.sol/DrandOracleQuicknet.json)
-
-cast rpc eth_estimateGas \
-  "{\"from\":\"$(cast wallet address --private-key $PRIVATE_KEY)\",\"data\":\"$BYTECODE\"}" \
-  --rpc-url $RPC_URL
-# "0x929b16e"  → 153,534,830 gas
-
-cast send --private-key $PRIVATE_KEY --rpc-url $RPC_URL \
-  --gas-limit 200000000 \
-  --create "$BYTECODE"
-```
-
-Record the returned `contractAddress`.
-Sanity-check the deployment by verifying a known-good vector:
-
-`verify(uint64,bytes)` is a companion method on `DrandOracleQuicknet` that returns `bool` only (no randomness), intended for sanity checks like this one.
-It is distinct from `verifyNormalized` used in the contract above, which returns the canonical random value.
-Both run the same pairing check, so either proves the precompiles are wired up correctly.
-
-```bash
-ORACLE=0x...
-# verify() is a separate helper on DrandOracleQuicknet — not part of the minimal
-# interface declared at the top of DrandLotteryDemo.sol.
-cast call $ORACLE "verify(uint64,bytes)(bool)" 20791007 \
-  0x8d2c8bbc37170dbacc5e280a21d4e195cff5f32a19fd6a58633fa4e4670478b5fb39bc13dd8f8c4372c5a76191198ac5 \
-  --rpc-url $RPC_URL
-# true  → BLS12-381 precompiles working, contract wired up correctly
-```
-
-{% endstep %}
-{% step %}
-
-### Deploy `DrandLotteryDemo`
-
-Copy [`DrandLotteryDemo.sol`](DrandLotteryDemo.sol) into your Foundry project and build.
-Then deploy with the oracle address as the constructor argument:
-
-```bash
-BYTECODE=$(jq -r '.bytecode.object' out/DrandLotteryDemo.sol/DrandLotteryDemo.json)
-CTOR=$(cast abi-encode 'constructor(address)' $ORACLE)
-
-cast send --private-key $PRIVATE_KEY --rpc-url $RPC_URL \
-  --gas-limit 80000000 \
-  --create "${BYTECODE}${CTOR#0x}"
-```
-
-{% endstep %}
-{% endstepper %}
 
 ## Gas profile
 
@@ -282,6 +251,7 @@ Observed on MegaETH Testnet at the time of deployment.
 {% hint style="warning" %}
 Deployments are dominated by MegaETH's storage gas.
 `forge script`'s local simulation understates the cost by ~50×; always query `eth_estimateGas` on a MegaETH RPC endpoint before setting `--gas-limit` for non-trivial deploys.
+`script/deploy-lottery.sh` does this for you.
 See [Gas Estimation](../../send-tx/gas-estimation.md) for details.
 {% endhint %}
 
@@ -305,9 +275,34 @@ Checklist for a production integration:
 - **Handle drand stalls.** The network can miss rounds. Define fallback behavior (secondary round, expiry, refund path) rather than deadlocking the contract.
 - **Pick one signature encoding.** Compressed (48 bytes) and uncompressed (96 bytes) G1 points hash to different values if you derive randomness from raw bytes. Use `verifyNormalized` — it returns the canonical point bytes and avoids this footgun.
 
+## Deploying your own oracle
+
+The steps above reuse the already-deployed `DrandOracleQuicknet`.
+If you want your own instance, clone the source and deploy it:
+
+```bash
+git clone https://github.com/Zodomo/DrandVerifier.git
+cd DrandVerifier
+git submodule update --init --recursive
+forge build
+
+BYTECODE=$(jq -r '.bytecode.object' out/DrandOracleQuicknet.sol/DrandOracleQuicknet.json)
+FROM=$(cast wallet address --private-key $PRIVATE_KEY)
+GAS_HEX=$(cast rpc eth_estimateGas \
+  "{\"from\":\"$FROM\",\"data\":\"$BYTECODE\"}" \
+  --rpc-url $RPC_URL | tr -d '"')
+LIMIT=$(( $(printf '%d' "$GAS_HEX") * 130 / 100 ))
+
+cast send --private-key $PRIVATE_KEY --rpc-url $RPC_URL \
+  --gas-limit $LIMIT --create "$BYTECODE"
+```
+
+Point `ORACLE_ADDRESS` in `.env` at the returned address and re-run `script/deploy-lottery.sh`.
+
 ## References
 
-- [DrandVerifier repository](https://github.com/Zodomo/DrandVerifier) — source, tests, gas snapshot
+- [DrandVerifier repository](https://github.com/Zodomo/DrandVerifier) — source, tests, gas snapshot for the underlying verifier
 - [drand developer docs](https://docs.drand.love/developer/) — protocol spec, beacon format, security model
 - [EIP-2537: BLS12-381 curve operations](https://eips.ethereum.org/EIPS/eip-2537) — precompile reference
-- [`DrandLotteryDemo.sol`](DrandLotteryDemo.sol) — full source of the contract used in this walkthrough
+- [`src/DrandLotteryDemo.sol`](src/DrandLotteryDemo.sol) — the demo contract
+- [`test/DrandLotteryDemo.t.sol`](test/DrandLotteryDemo.t.sol) — mock-oracle unit tests
