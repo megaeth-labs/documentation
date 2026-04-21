@@ -1,5 +1,0 @@
-generate:
-	cargo run
-
-format:
-	forge fmt
