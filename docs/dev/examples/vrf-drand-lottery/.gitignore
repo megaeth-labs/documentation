@@ -3,4 +3,5 @@ cache/
 broadcast/
 lib/
 dependencies/
+.drandverifier/
 .env

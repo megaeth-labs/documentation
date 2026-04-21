@@ -31,7 +31,8 @@ vrf-drand-lottery/
 ├── test/
 │   └── DrandLotteryDemo.t.sol            # unit tests with a mock oracle
 └── script/
-    ├── deploy-lottery.sh                 # forge build + deploy with correct gas
+    ├── deploy-oracle.sh                  # optional: clone DrandVerifier, build, deploy oracle
+    ├── deploy-lottery.sh                 # forge build + deploy lottery with correct gas
     ├── open.sh                           # commit entrants + future round
     └── settle.sh                         # poll drand, fetch sig, submit
 ```
@@ -99,7 +100,28 @@ You should see 8 tests pass.
 {% endstep %}
 {% step %}
 
-### Deploy
+### (Optional) Deploy your own oracle
+
+`ORACLE_ADDRESS` in `.env.example` already points at a DrandOracleQuicknet instance on MegaETH Testnet, so you can skip this step.
+If you want your own, run:
+
+```bash
+./script/deploy-oracle.sh
+# cloning https://github.com/Zodomo/DrandVerifier.git (main)…
+# building DrandVerifier…
+# node eth_estimateGas = 153534830 → --gas-limit 199595279
+# DrandOracleQuicknet deployed: 0x…
+# sanity check — verify(known-good vector): true
+# wrote ORACLE_ADDRESS to .env
+```
+
+The script clones the upstream [DrandVerifier](https://github.com/Zodomo/DrandVerifier) repo (cached in `.drandverifier/`), builds it with `forge`, deploys the compiled bytecode via `cast send`, and writes the deployed address back into `.env`.
+It also runs a post-deploy sanity check against a known-good drand vector — `true` confirms the chain has EIP-2537 precompiles and the contract is wired up correctly.
+
+{% endstep %}
+{% step %}
+
+### Deploy the lottery
 
 ```bash
 ./script/deploy-lottery.sh
@@ -274,30 +296,6 @@ Checklist for a production integration:
 - **Prevent replay.** Mark the commitment settled before any external calls, including the oracle call.
 - **Handle drand stalls.** The network can miss rounds. Define fallback behavior (secondary round, expiry, refund path) rather than deadlocking the contract.
 - **Pick one signature encoding.** Compressed (48 bytes) and uncompressed (96 bytes) G1 points hash to different values if you derive randomness from raw bytes. Use `verifyNormalized` — it returns the canonical point bytes and avoids this footgun.
-
-## Deploying your own oracle
-
-The steps above reuse the already-deployed `DrandOracleQuicknet`.
-If you want your own instance, clone the source and deploy it:
-
-```bash
-git clone https://github.com/Zodomo/DrandVerifier.git
-cd DrandVerifier
-git submodule update --init --recursive
-forge build
-
-BYTECODE=$(jq -r '.bytecode.object' out/DrandOracleQuicknet.sol/DrandOracleQuicknet.json)
-FROM=$(cast wallet address --private-key $PRIVATE_KEY)
-GAS_HEX=$(cast rpc eth_estimateGas \
-  "{\"from\":\"$FROM\",\"data\":\"$BYTECODE\"}" \
-  --rpc-url $RPC_URL | tr -d '"')
-LIMIT=$(( $(printf '%d' "$GAS_HEX") * 130 / 100 ))
-
-cast send --private-key $PRIVATE_KEY --rpc-url $RPC_URL \
-  --gas-limit $LIMIT --create "$BYTECODE"
-```
-
-Point `ORACLE_ADDRESS` in `.env` at the returned address and re-run `script/deploy-lottery.sh`.
 
 ## References
 
