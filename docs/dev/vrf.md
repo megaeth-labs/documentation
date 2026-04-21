@@ -40,13 +40,8 @@ Source and full ABI: [Zodomo/DrandVerifier](https://github.com/Zodomo/DrandVerif
 
 | Network         | Chain ID | `DrandOracleQuicknet`                        |
 | --------------- | -------- | -------------------------------------------- |
+| MegaETH Mainnet | 4326     | `0x7a53a6eFA81c426838fcf4824E6e207923969b36` |
 | MegaETH Testnet | 6343     | `0x4e1673dcAA38136b5032F27ef93423162aF977Cc` |
-| MegaETH Mainnet | 4326     | _Deployment pending_                         |
-
-{% hint style="info" %}
-The Mainnet deployment will be published at the official MegaETH address registry once live.
-Use the Testnet address above for development and integration testing.
-{% endhint %}
 
 ### What it is (and isn't)
 
