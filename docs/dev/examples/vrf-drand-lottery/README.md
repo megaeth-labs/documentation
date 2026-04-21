@@ -1,306 +1,277 @@
+<p align="center">
+  <img src="logo.png" alt="DrandVerifier logo" width="50%" />
+</p>
+
+# DrandVerifier
+
+Stateless Solidity drand verification stack for two BLS12-381 networks:
+
+- **Quicknet** (`DrandOracleQuicknet` deployable oracle, `DrandVerifierQuicknet` internal library)
+- **Default network** (`DrandOracleDefault` deployable oracle, `DrandVerifierDefault` internal library)
+
+The project currently uses both vendored `bls-solidity` (`BLS2`) and an in-repo internal library (`LibBLS`) for cryptographic operations.
+
+**DISCLAIMER:** This code has not been professionally audited. It was developed, tested, and self-audited with AI. The `bls-solidity` library may have been audited, but include any of this within your audit scope if you're getting one.
+
 ---
-description: End-to-end onchain randomness example using drand quicknet verified with BLS12-381 precompiles on MegaETH.
+
+## Why verify drand signatures onchain?
+
+For many apps, the value is not just “getting a provably random value", but getting randomness that is publicly retrievable and independently verifiable without a privileged oracle callback path. This is randomness your users can copy and paste into your app.
+
+With drand, beacon data is public (`round`, `signature`) and can be fetched from public endpoints, then submitted onchain by anyone. That means integrators are not forced into a provider-managed callback flow with subscription/premium mechanics, and users can still supply signature data directly (including via a block explorer) if a frontend is unavailable. In this model, you pay normal transaction gas for your own app flow and verification, not an additional oracle fulfillment callback into your contract. You can then use this signature as a random number after hashing it.
+
+Security-wise, this only gives the intended “external randomness” properties if integration is done correctly: commit to a specific future round before reveal, stop accepting user inputs that could be adapted after commitment, and enforce freshness/replay policy in the consuming contract.
+
 ---
 
-# Drand VRF Lottery
+## What this project includes
 
-A self-contained, runnable demo of publicly verifiable onchain randomness on MegaETH, built on top of the stateless [DrandVerifier](https://github.com/Zodomo/DrandVerifier) contracts.
+- `src/verifiers/DrandVerifierQuicknet.sol`
+  - Internal quicknet verifier library (for embedding in other contracts).
+  - Accepts **compressed** (48-byte) and **uncompressed** (96-byte) G1 signatures.
+- `src/verifiers/DrandVerifierDefault.sol`
+  - Internal default network verifier library (for embedding in other contracts).
+  - Verifies chained beacons with `sha256(previous_signature || uint64(round))`.
+  - Accepts **compressed** (96-byte) and **uncompressed** (192-byte) G2 signatures.
+  - Requires `previousSignature.length == 96` (compressed previous round signature bytes).
+- `src/oracles/DrandOracleQuicknet.sol`
+  - Deployable quicknet oracle contract exposing the external verifier API.
+- `src/oracles/DrandOracleDefault.sol`
+  - Deployable default network oracle contract exposing the external verifier API.
+- `src/utils/LibBLS.sol`
+  - Internal BLS12-381 helper library used by default verification paths.
+- `src/interfaces/IDrandOracleQuicknet.sol`
+  - Quicknet oracle interface.
+- `src/interfaces/IDrandOracleDefault.sol`
+  - Default oracle interface.
+- `test/DrandVerifierQuicknet.t.sol`
+  - Quicknet unit/adversarial/fuzz/live-FFI coverage.
+- `test/DrandVerifierDefault.t.sol`
+  - Default network unit/adversarial/fuzz/live-FFI coverage.
+- `test/LibBLS.t.sol`
+  - Direct coverage for LibBLS decoding/math/hash-to-curve/pairing wiring paths.
 
-drand is a public threshold-BLS randomness beacon.
-Every three seconds, the drand network produces and publishes a signed random value that anyone can fetch and verify.
-No oracle service, no subscription, no callback.
-For background on the protocol, see the [drand developer docs](https://docs.drand.love/developer/).
+---
 
-This example ships a complete Foundry project that deploys a single-slot lottery and drives it end-to-end via three shell scripts.
+## Verifier libraries vs oracle contracts
 
-## What this example shows
+The codebase separates **internal-use verification logic** from **deployable entrypoints**:
 
-- Calling a stateless BLS12-381 signature verifier from a user contract.
-- A correct commit-reveal flow: committing a target round **before** its signature exists, then revealing once drand publishes it.
-- Unit-testing a drand consumer with a mock oracle.
-- Working around MegaETH's dual-gas model when deploying via scripts.
+- `src/verifiers/*` are **libraries** with internal functions. Use these when integrating drand verification directly inside your own contracts.
+- `src/oracles/*` are **deployable contracts** that expose the same external API and are suitable when you want a standalone oracle/verifier address.
 
-## Project layout
+### Quicknet (`bls-unchained-g1-rfc9380`)
 
-```
-vrf-drand-lottery/
-├── foundry.toml
-├── .env.example                          # copy to .env and fill in
-├── src/
-│   └── DrandLotteryDemo.sol              # the contract
-├── test/
-│   └── DrandLotteryDemo.t.sol            # unit tests with a mock oracle
-└── script/
-    ├── deploy-oracle.sh                  # optional: clone DrandVerifier, build, deploy oracle
-    ├── deploy-lottery.sh                 # forge build + deploy lottery with correct gas
-    ├── open.sh                           # commit entrants + future round
-    └── settle.sh                         # poll drand, fetch sig, submit
-```
+- Message digest input: `uint64(round)`
+- Message digest: `sha256(uint64(round))`
+- Signature group: **G1**
+- Public key group: **G2**
+- Contract flow: `BLS2.hashToPoint(...)` on G1 + `BLS2.verifySingle(...)`
 
-## Prerequisites
+### Default (`pedersen-bls-chained`)
 
-- [Foundry](https://getfoundry.sh/) (`forge`, `cast`)
-- `jq`, `curl`, `bash`
-- A MegaETH Testnet wallet with testnet ETH — see [Get ETH on Testnet](../../../user/faucet.md)
+- Message digest input: `previous_signature || uint64(round)`
+- Message digest: `sha256(previous_signature || uint64(round))`
+- Signature group: **G2**
+- Public key group: **G1**
+- Contract flow: `LibBLS.verifyDefaultSignature(...)`
 
-{% hint style="info" %}
-drand verification uses the BLS12-381 precompiles activated in Pectra (EIP-2537).
-MegaETH Testnet has these enabled.
-The `DrandVerifier` libraries will not work on chains without EIP-2537.
-{% endhint %}
+### Which one should you use?
 
-## Already-deployed addresses (MegaETH Testnet, chain id 6343)
+From an onchain randomness perspective, **both networks are functionally usable**. Both provide publicly verifiable drand beacons you can verify onchain.
 
-You can either reuse these or run `script/deploy-lottery.sh` to deploy your own copy.
+- Use **Quicknet** for most new integrations when you want faster cadence (3s rounds) and simpler verification inputs (`round + signature`).
+- Use **Default** when you specifically need the chained scheme (`previous_signature` linked into the message).
 
-| Contract            | Address                                      |
-| ------------------- | -------------------------------------------- |
-| DrandOracleQuicknet | `0x4e1673dcAA38136b5032F27ef93423162aF977Cc` |
-| DrandLotteryDemo    | `0x0Eed2baF5a317D8C20a20dc51E6a6BBb8390f4e5` |
+---
 
-## Quick start
+## LibBLS
 
-{% stepper %}
-{% step %}
+`LibBLS` is the internal library that powers `DrandVerifierDefault`. It exists because the default network uses a G2-signature / G1-public-key path with chained message construction, which is not the same turnkey path used by Quicknet.
 
-### Clone and configure
+In this repository, `LibBLS` provides the default network-specific cryptographic flow: compressed G2 decoding, canonical checks, G2 subgroup validation, hash-to-G2 mapping for the chained digest, and pairing-precompile wiring for final verification. `DrandVerifierDefault.verify(...)` computes the chained digest, then calls `LibBLS.verifyDefaultSignature(...)`, decompression paths call `LibBLS.decompressG2Signature(...)`.
 
-```bash
-# From the documentation repo checkout:
-cd docs/dev/examples/vrf-drand-lottery
+`LibBLS` does **not** replace Quicknet’s `BLS2` G1-verification flow. Quicknet verification still uses `BLS2` directly.
 
-cp .env.example .env
-# then edit .env — at minimum set PRIVATE_KEY
-```
+---
 
-`.env` contains:
+## Technical differences at a glance
 
-- `RPC_URL` — MegaETH Testnet endpoint (default is fine).
-- `PRIVATE_KEY` — funded testnet account.
-- `ORACLE_ADDRESS` — pre-filled with the already-deployed oracle.
-- `LOTTERY_ADDRESS` — auto-populated by `deploy-lottery.sh`.
-- `ENTRANTS`, `DELAY_SECONDS` — defaults for `open.sh`.
+| Property                          | Quicknet                                  | Default                                    |
+| --------------------------------- | ----------------------------------------- | ------------------------------------------ |
+| Oracle contract                   | `DrandOracleQuicknet`                     | `DrandOracleDefault`                       |
+| Internal library                  | `DrandVerifierQuicknet`                   | `DrandVerifierDefault`                     |
+| drand scheme                      | `bls-unchained-g1-rfc9380`                | `pedersen-bls-chained`                     |
+| Hash input                        | `round`                                   | `previous_signature + round`               |
+| Signature bytes accepted          | 48 (compressed G1) / 96 (uncompressed G1) | 96 (compressed G2) / 192 (uncompressed G2) |
+| Signature group                   | G1                                        | G2                                         |
+| Public key group                  | G2                                        | G1                                         |
+| Verification backend in this repo | `bls-solidity` (`BLS2`)                   | `LibBLS`                                   |
 
-{% endstep %}
-{% step %}
+---
 
-### Install dependencies and build
+## Practical integration notes
 
-The test suite uses `forge-std`.
-Clone it into `lib/` (it is git-ignored so it won't be committed):
+### Integrating Quicknet
 
-```bash
-git clone --depth 1 https://github.com/foundry-rs/forge-std.git lib/forge-std
-forge build
-forge test -vv
-```
+1. Fetch round and signature from the Quicknet API.
+2. Call `verify(round, sig)` with either compressed (48-byte) or uncompressed (96-byte) signature.
+3. Use `decompressSignature(...)` offchain only if you explicitly need uncompressed bytes.
+4. Or pass raw API JSON directly to `verifyAPI(apiResponse)` for simpler integration (with extra gas for JSON parsing).
+5. Use `safeVerify` if you want to ensure no reverts occur due to malformed signature data or precompile failures, and return false instead.
+6. Use `verifyNormalized(round, sig)` when you need consistent randomness outputs across compressed/uncompressed signature representations.
 
-You should see 8 tests pass.
+### Integrating Default network
 
-{% endstep %}
-{% step %}
+1. Fetch `round`, `signature`, and `previous_signature` from the Default chain API.
+2. Pass `previous_signature` exactly as 96-byte compressed bytes.
+3. Call `verify(round, previousSignature, sig)` with either compressed (96-byte) or uncompressed (192-byte) signature.
+4. `decompressSignature(...)` can be used offchain when you need uncompressed form.
+5. Or pass raw API JSON directly to `verifyAPI(apiResponse)` for simpler integration (with extra gas for JSON parsing).
+6. Use `safeVerify` if you want to ensure no reverts occur due to malformed signature data or precompile failures, and return false instead.
+7. Use `verifyNormalized(round, previousSignature, sig)` when you need consistent randomness outputs across compressed/uncompressed signature representations.
 
-### (Optional) Deploy your own oracle
+If `previous_signature` is omitted, malformed, or from the wrong round, verification fails by design.
 
-`ORACLE_ADDRESS` in `.env.example` already points at a DrandOracleQuicknet instance on MegaETH Testnet, so you can skip this step.
-If you want your own, run:
-
-```bash
-./script/deploy-oracle.sh
-# cloning https://github.com/Zodomo/DrandVerifier.git (main)…
-# building DrandVerifier…
-# node eth_estimateGas = 153534830 → --gas-limit 199595279
-# DrandOracleQuicknet deployed: 0x…
-# sanity check — verify(known-good vector): true
-# wrote ORACLE_ADDRESS to .env
-```
-
-The script clones the upstream [DrandVerifier](https://github.com/Zodomo/DrandVerifier) repo (cached in `.drandverifier/`), builds it with `forge`, deploys the compiled bytecode via `cast send`, and writes the deployed address back into `.env`.
-It also runs a post-deploy sanity check against a known-good drand vector — `true` confirms the chain has EIP-2537 precompiles and the contract is wired up correctly.
-
-{% endstep %}
-{% step %}
-
-### Deploy the lottery
-
-```bash
-./script/deploy-lottery.sh
-# DrandLotteryDemo deployed: 0x…
-# wrote LOTTERY_ADDRESS to .env
-```
-
-The script queries `eth_estimateGas` on the node and sets `--gas-limit` with a 30% margin.
-This is necessary because MegaETH's dual-gas model charges materially more for contract creation than local Foundry simulation — deployments with the default estimator will revert out-of-gas.
-See [Gas Estimation](../../send-tx/gas-estimation.md).
-
-{% endstep %}
-{% step %}
-
-### Open a round
-
-```bash
-./script/open.sh
-# opening lottery on 0x…
-# entrants:    [0x1111…,0x2222…,0x3333…,0x4444…]
-# delay:       24s
-# revealRound: 27985651
-# publishTime: 1776760317
-```
+---
 
-{% endstep %}
-{% step %}
+## APIs
 
-### Settle
+### `DrandOracleQuicknet`
 
-```bash
-./script/settle.sh
-# revealRound: 27985651
-# publishTime: 1776760317
-# now:         1776760300
-# polling https://api.drand.sh/…/rounds/27985651
-# signature:   b3548e49…
-# winner:      0x2222222222222222222222222222222222222222
-# randomness:  0xd743530bc80936fe28d1f6a79556cfc67a97796eb1e61d853d4dbdde089c93f1
-```
+- `roundMessageHash(uint64 round) -> bytes32`
+- `verify(uint64 round, bytes sig) -> bool`
+- `safeVerify(uint64 round, bytes sig) -> bool`
+- `verifyAPI(string apiResponse) -> bool`
+- `verifyNormalized(uint64 round, bytes sig) -> (bool verified, bytes32 normalizedRoundHash, bytes32 chainScopedHash)`
+- `decompressSignature(bytes compressedSig) -> bytes`
+- constants/metadata: `DST`, `COMPRESSED_G1_SIG_LENGTH`, `UNCOMPRESSED_G1_SIG_LENGTH`, `PUBLIC_KEY`
 
-`settle.sh` waits until `publishTime` is reached, polls `api.drand.sh` until the round is available, and then submits the signature.
+### `DrandOracleDefault`
 
-{% endstep %}
-{% endstepper %}
+- `roundMessageHash(uint64 round, bytes previousSignature) -> bytes32`
+- `verify(uint64 round, bytes previousSignature, bytes signature) -> bool`
+- `safeVerify(uint64 round, bytes previousSignature, bytes signature) -> bool`
+- `verifyAPI(string apiResponse) -> bool`
+- `verifyNormalized(uint64 round, bytes previousSignature, bytes signature) -> (bool verified, bytes32 normalizedRoundHash, bytes32 chainScopedHash)`
+- `decompressSignature(bytes compressedSig) -> bytes`
+- constants/metadata: `DST`, `COMPRESSED_G2_SIG_LENGTH`, `UNCOMPRESSED_G2_SIG_LENGTH`, `PUBLIC_KEY`
 
-To run another round, just call `open.sh` and `settle.sh` again — the contract resets on each `open` after settlement.
+---
 
-## How it works
+## Test strategy
 
-drand quicknet publishes one threshold-BLS signature per round, every three seconds, under a fixed group public key.
-Anyone with the public key can verify any round's signature onchain.
-A contract that wants randomness picks a future round, waits for it to be produced, then accepts `(round, signature)` from any submitter and checks the signature onchain.
-
-Randomness is "fair" only if the app commits to a round **before** that round's signature exists.
-Otherwise, an attacker can read the public beacon offchain and choose whether to reveal based on the result.
+- Known good values
+- Wrong round / wrong previous signature / wrong signature negatives
+- Adversarial malformed/non-canonical input coverage
+- Fuzzing for bit flips and random payloads
+- Live FFI tests against drand APIs
+- Dedicated LibBLS coverage via harness tests
 
-```
- t0: open()   → pins revealRound (future, not yet signed by drand)
-                pins entrants, locks further changes
- t1: drand network produces round N (independent of our chain)
-     signature becomes publicly available at api.drand.sh
- t2: anyone   → settle(sig) → oracle.verifyNormalized(round, sig)
-                BLS pairing check onchain → r is the canonical random
-                winner = entrants[uint256(r) % entrants.length]
-```
+---
 
-## The contract
+## FFI note
 
-Full source in `src/DrandLotteryDemo.sol`.
-Key invariants:
+`foundry.toml` enables `ffi = true` for live tests (`curl` + local conversion helpers). In CI/security-sensitive environments, disable or gate FFI appropriately.
 
-- `open` computes `revealRound` from the future publish window and requires `publishTime > block.timestamp`.
-- `settle` requires `block.timestamp >= publishTime` so an early submission cannot succeed by accident.
-- `settle` requires the oracle's pairing check to pass — only one signature per round is valid, so the wrong signature reverts.
-- Entrants are frozen at `open` time; no input used in winner selection can be changed after the commit.
-- `settle` flips `settled = true` before the external oracle call (checks-effects-interactions).
-
-```solidity
-function settle(bytes calldata sig) external {
-    require(revealRound != 0 && !settled, "not settlable");
-    uint256 publishTime_ = GENESIS + uint256(revealRound - 1) * PERIOD;
-    require(block.timestamp >= publishTime_, "round not yet published");
-
-    settled = true; // checks-effects-interactions: flip state before the external call
-
-    (bool ok, bytes32 r,) = oracle.verifyNormalized(revealRound, sig);
-    require(ok, "bad signature");
-
-    uint256 idx = uint256(r) % entrants.length;
-    randomness = r;
-    winner = entrants[idx];
-    emit LotterySettled(revealRound, winner, idx, r);
-}
-```
-
-## Testing with a mock oracle
-
-`test/DrandLotteryDemo.t.sol` exercises the commit-reveal flow against a `MockOracleQuicknet` that returns caller-chosen results.
-This decouples the lottery logic from the real BLS verifier so unit tests stay fast and deterministic.
-
-```bash
-forge test -vv
-```
-
-The suite covers:
-
-- `open` commits a future round, rejects empty entrants, rejects re-open while in flight.
-- `settle` reverts before `publishTime`, reverts on bad signature, reverts on replay.
-- Winner selection is deterministic given the oracle's normalized hash.
-- After `settle`, `open` can start a fresh round.
-
-For integration-style testing against the real verifier on a forked MegaETH Testnet, use `forge test --fork-url $RPC_URL` with the already-deployed oracle address.
-
-## Adversarial paths
-
-The contract rejects both of the obvious attacks.
-These are also covered by `DrandLotteryDemoTest`.
-
-Settling before the target round has been produced:
-
-```bash
-cast call $LOTTERY_ADDRESS "settle(bytes)" "0x<any_sig>" --rpc-url $RPC_URL
-# execution reverted: round not yet published
-```
-
-Submitting a valid signature for a different round:
-
-```bash
-# Known-good signature for round 20791007, submitted against a different revealRound
-cast call $LOTTERY_ADDRESS "settle(bytes)" "0x8d2c8bbc37…198ac5" --rpc-url $RPC_URL
-# execution reverted: bad signature
-```
-
-The oracle's pairing check binds signature validity to the specific round hash, so a signature from any other round fails verification.
-
-## Gas profile
-
-Observed on MegaETH Testnet at the time of deployment.
-
-| Operation                             | Gas used    |
-| ------------------------------------- | ----------- |
-| Deploy `DrandOracleQuicknet` (14.6KB) | 151,323,053 |
-| Deploy `DrandLotteryDemo` (6.2KB)     | 56,047,921  |
-| `open(entrants, delay)` first call    | 236,106     |
-| `open(entrants, delay)` subsequent    | 113,069     |
-| `settle(sig)`                         | 442,690     |
-
-{% hint style="warning" %}
-Deployments are dominated by MegaETH's storage gas.
-`forge script`'s local simulation understates the cost by ~50×; always query `eth_estimateGas` on a MegaETH RPC endpoint before setting `--gas-limit` for non-trivial deploys.
-`script/deploy-lottery.sh` does this for you.
-See [Gas Estimation](../../send-tx/gas-estimation.md) for details.
-{% endhint %}
-
-`settle` is the only hot-path cost at runtime; everything inside `verifyNormalized` is a fixed-cost pairing check plus hash-to-G1, independent of entrant count.
-
-## Security considerations
-
-{% hint style="danger" %}
-The verifier contract is stateless.
-It does not track freshness, replay, or commitment.
-Every consumer must enforce those policies itself.
-{% endhint %}
-
-Checklist for a production integration:
-
-- **Commit before the signature exists.** The target round must satisfy `publishTime > block.timestamp` at the commit transaction.
-- **Freeze every input that can bias the outcome** at commit time.
-  Entrant set, bet amounts, tier selection, anything downstream of `r` must be fixed in the commit transaction.
-- **Pin an exact round.** Never accept "any round >= committedRound"; the submitter would pick the most favorable one.
-- **Prevent replay.** Mark the commitment settled before any external calls, including the oracle call.
-- **Handle drand stalls.** The network can miss rounds. Define fallback behavior (secondary round, expiry, refund path) rather than deadlocking the contract.
-- **Pick one signature encoding.** Compressed (48 bytes) and uncompressed (96 bytes) G1 points hash to different values if you derive randomness from raw bytes. Use `verifyNormalized` — it returns the canonical point bytes and avoids this footgun.
+---
+
+## Operational caveats
+
+- Both oracle contracts are stateless verifiers only (no freshness tracking or replay prevention).
+- Both rely on target-chain support for required BLS12-381 precompiles included in the Pectra hard fork.
+- Quicknet and Default use different precompile paths. Chain compatibility must be validated for your deployment target.
+- For state-changing use, caller contracts should define freshness/replay policy explicitly.
+
+---
+
+## Normalized randomness outputs
+
+`verify(...)` only answers signature validity. If an app derives randomness directly from raw signature bytes, compressed and uncompressed encodings of the same valid point hash to different values. To avoid that integration footgun, `verifyNormalized(...)` verifies first, then hashes the canonical signature point bytes plus `round`.
+
+Both oracles return:
+
+- `normalizedRoundHash = keccak256(canonicalSignaturePoint || round)`
+- `chainScopedHash = keccak256(keccak256("DRAND_NORMALIZED_CHAIN_V1") || normalizedRoundHash || address(this) || block.chainid)`
+
+This gives one consistent random value (`normalizedRoundHash`) and one chain/contract-scoped value (`chainScopedHash`).
+
+---
+
+## Why this works technically (and what assumptions you are taking)
+
+### Why BLS threshold signatures make this verifiable onchain
+
+drand nodes collectively produce threshold BLS signatures for each round. Anyone who has the network root-of-trust parameters (public key, period, genesis, scheme) can verify a beacon signature. Onchain, this contract family checks the same signature validity that offchain clients check.
+
+This gives public verifiability without trusting a single node or a private API response. The critical assumption is threshold honesty: drand’s security model states malicious control must stay below threshold for unpredictability; if an attacker controls at least threshold shares, they can derive future chain beacons, while randomness remains unbiasable. Because multiple parties are involved in signing, it is impossible for any single party to influence the final signature.
+
+### Quicknet vs Default: security and integration shape
+
+- **Quicknet (`bls-unchained-g1-rfc9380`)**: unchained mode, signatures on G1, 3s period, and per-round verification without needing previous signature bytes.
+- **Default (`pedersen-bls-chained`)**: chained mode, signatures on G2, 30s period, and verification depends on `previous_signature` linkage.
+
+Both can serve as onchain randomness sources; the practical choice is mostly integration shape and cadence: Quicknet is usually simpler/faster for new apps, while Default is chosen for chained-scheme compatibility requirements.
+
+In this repo that means:
+
+- `DrandOracleQuicknet` verifies a round with `(round, signature)` via the `DrandVerifierQuicknet` library.
+- `DrandOracleDefault` verifies with `(round, previousSignature, signature)` via the `DrandVerifierDefault` library and enforces `previousSignature.length == 96`.
+
+### drand vs Chainlink VRF vs `block.prevrandao` (practical model differences)
+
+| Dimension         | drand (this repo’s model)                                                    | Chainlink VRF                                                               | `block.prevrandao`                                                      |
+| ----------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Delivery pattern  | Public beacon + user/relayer submits                                         | Oracle callback fulfillment                                                 | Native block field                                                      |
+| Cost shape        | Gas for your call + verification, no VRF premium/subscription flow           | Gas + VRF premium + callback path, subscription/funding management          | Minimal read cost                                                       |
+| Influence surface | External threshold network, unpredictability requires < threshold corruption | Validator reorg/re-roll considerations + callback ordering/funding concerns | Proposer has bounded influence per slot (EIP-4399)                      |
+| Commitment style  | Clean when app commits to specific future round before reveal                | Request/fulfill lifecycle, asynchronous callback semantics                  | Must use lookahead/cutoff discipline to reduce predictability/bias risk |
+
+### Integration caveats that matter in production
+
+- If your app uses drand, commit to the target round before reveal and stop accepting user inputs that could be adapted after commitment.
+- Treat validator influence as mostly a **timing/censorship** issue on submission, not direct control of drand beacon value itself.
+- Enforce freshness/replay policy in your stateful consumer contract (these verifier contracts are intentionally stateless).
+- Handle round progression explicitly: drand can stall and later recover, and applications should define behavior for delayed/missed target rounds.
+- Verify chain compatibility up front: this repo’s verifiers use BLS12-381 precompile paths, while drand `evmnet` exists specifically for BN254 EVM-precompile compatibility. These verifiers do not implement drand's `evmnet` scheme.
+- Either enforce use of either compressed or uncompressed signatures, as either form will derive different random values, or used `verifyNormalized` to ensure you get a consistent result.
+
+---
+
+## Deployments
+
+### MegaETH testnet (chain id `6343`)
+
+| Contract                                                               | Address                                                                                                                     |
+| ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `DrandOracleQuicknet`                                                  | [`0x4e1673dcAA38136b5032F27ef93423162aF977Cc`](https://megaexplorer.xyz/address/0x4e1673dcAA38136b5032F27ef93423162aF977Cc) |
+| `DrandLotteryDemo` (example consumer at `script/DrandLotteryDemo.sol`) | [`0x0Eed2baF5a317D8C20a20dc51E6a6BBb8390f4e5`](https://megaexplorer.xyz/address/0x0Eed2baF5a317D8C20a20dc51E6a6BBb8390f4e5) |
+
+Note: MegaETH's multi-dimensional gas returns a much larger `eth_estimateGas` than local `forge` simulation. For non-trivial deploys, query the node's estimate directly and set `--gas-limit` above that rather than trusting `forge script`'s default gas estimator.
+
+---
+
+## Dependencies
+
+- `lib/bls-solidity` (still used directly by Quicknet verifier and BLS2 types)
+- `lib/forge-std`
+- `lib/solady` (JSON parsing in verifier `verifyAPI(...)` helpers and FFI live tests)
+
+---
 
 ## References
 
-- [DrandVerifier repository](https://github.com/Zodomo/DrandVerifier) — source, tests, gas snapshot for the underlying verifier
-- [drand developer docs](https://docs.drand.love/developer/) — protocol spec, beacon format, security model
-- [EIP-2537: BLS12-381 curve operations](https://eips.ethereum.org/EIPS/eip-2537) — precompile reference
-- `src/DrandLotteryDemo.sol` — the demo contract
-- `test/DrandLotteryDemo.t.sol` — mock-oracle unit tests
+- [drand: Why decentralized randomness is important](https://drand.love/about/#why-decentralized-randomness-is-important)
+- [drand developer docs](https://docs.drand.love/developer/)
+- [drand security model](https://docs.drand.love/docs/security-model/)
+- [drand protocol specification](https://docs.drand.love/docs/specification/)
+- [drand timelock encryption](https://docs.drand.love/docs/timelock-encryption/)
+- [Chainlink VRF security considerations](https://docs.chain.link/vrf/v2-5/security)
+- [Chainlink VRF billing](https://docs.chain.link/vrf/v2-5/billing)
+- [EIP-4399 (`PREVRANDAO`)](https://eips.ethereum.org/EIPS/eip-4399)
+- [randa-mu/bls-solidity](https://github.com/randa-mu/bls-solidity)
+
+## License
+
+VPL

@@ -23,7 +23,6 @@ echo "revealRound: $ROUND"
 echo "publishTime: $PUBLISH"
 echo "now:         $(date +%s)"
 
-# Wait for the target round to be producible.
 while [ "$(date +%s)" -lt "$PUBLISH" ]; do sleep 1; done
 
 URL="https://api.drand.sh/v2/chains/$QUICKNET_HASH/rounds/$ROUND"

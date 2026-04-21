@@ -1,7 +1,14 @@
-out/
+# Compiler files
 cache/
-broadcast/
-lib/
-dependencies/
-.drandverifier/
+out/
+
+# Ignores development broadcast logs
+!/broadcast
+/broadcast/*/31337/
+/broadcast/**/dry-run/
+
+# Docs
+docs/
+
+# Dotenv file
 .env

@@ -1,2 +1,5 @@
 .sisyphus/
 node_modules/
+# Vendored dependencies of embedded Foundry example projects.
+docs/**/examples/**/lib/
+docs/**/examples/**/dependencies/

@@ -1,8 +1,11 @@
 #!/usr/bin/env bash
 #
-# Deploy DrandOracleQuicknet from the upstream DrandVerifier repo and write
-# its address into .env. Optional — reuse the pre-deployed oracle listed in
-# .env.example if you don't need your own instance.
+# Deploy DrandOracleQuicknet from the in-tree source.
+#
+# MegaETH's dual-gas model charges materially more for contract creation than
+# local Foundry simulation, so we query eth_estimateGas on the node and set
+# --gas-limit above that. Using `forge create` with its default estimator
+# reverts out-of-gas.
 #
 # Env (or .env): RPC_URL, PRIVATE_KEY
 
@@ -13,25 +16,10 @@ cd "$(dirname "$0")/.."
 : "${RPC_URL:?}"
 : "${PRIVATE_KEY:?}"
 
-REPO_URL="${DRAND_VERIFIER_REPO:-https://github.com/Zodomo/DrandVerifier.git}"
-REPO_REF="${DRAND_VERIFIER_REF:-main}"
-CACHE_DIR=".drandverifier"
+echo "building…"
+forge build --silent
 
-if [ ! -d "$CACHE_DIR" ]; then
-  echo "cloning $REPO_URL ($REPO_REF)…"
-  git clone --recursive --branch "$REPO_REF" --depth 1 "$REPO_URL" "$CACHE_DIR"
-else
-  echo "reusing cached $CACHE_DIR (delete to refresh)"
-fi
-
-echo "building DrandVerifier…"
-( cd "$CACHE_DIR" && forge build --silent )
-
-ARTIFACT="$CACHE_DIR/out/DrandOracleQuicknet.sol/DrandOracleQuicknet.json"
-if [ ! -f "$ARTIFACT" ]; then
-  echo "artifact not found at $ARTIFACT" >&2
-  exit 1
-fi
+ARTIFACT=out/DrandOracleQuicknet.sol/DrandOracleQuicknet.json
 BYTECODE=$(jq -r '.bytecode.object' "$ARTIFACT")
 
 FROM=$(cast wallet address --private-key "$PRIVATE_KEY")
@@ -57,7 +45,6 @@ if [ "$RESULT" != "true" ]; then
   echo "WARNING: chain may be missing EIP-2537 BLS12-381 precompiles." >&2
 fi
 
-# Patch .env so subsequent scripts pick up the new oracle.
 if [ -f .env ]; then
   if grep -q '^ORACLE_ADDRESS=' .env; then
     sed -i.bak "s|^ORACLE_ADDRESS=.*|ORACLE_ADDRESS=$ADDR|" .env && rm -f .env.bak
