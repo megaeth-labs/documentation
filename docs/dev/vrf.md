@@ -224,6 +224,10 @@ Clone it if you want something you can run immediately.
 Everything else — when to consume it, which round to use, how to lock application inputs — is your contract's responsibility.
 Get these three things right and you're safe; get any one wrong and the cryptography cannot save you.
 
+The caveats below cover **integration-level** concerns — what your consuming contract must do to make drand randomness safe to use.
+For **protocol-level** concerns that sit below our layer — drand's threshold-honesty assumption, front-running by malicious drand nodes, DoS and liveness bounds, DKG assumptions — see drand's own [Security Model](https://docs.drand.love/docs/security-model/).
+Your contract inherits those assumptions by consuming drand; they are not things `DrandOracleQuicknet` can enforce.
+
 ### 1. Commit to a future round and lock every outcome-relevant input at commit time
 
 {% hint style="danger" %}
@@ -256,6 +260,7 @@ A contract that waits forever for a stalled round is a bricked contract.
 
 Add an expiry or fallback path so the game can resolve if the beacon never arrives.
 For example, a cancel-and-refund function gated by `block.timestamp >= publishTime + STALL_WINDOW`, or retry against a later round.
+See the [DoS scenarios](https://docs.drand.love/docs/security-model/#dos-the-drand-network) in drand's security model for how long such stalls can plausibly last.
 
 ## References
 
