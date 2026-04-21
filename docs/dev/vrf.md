@@ -1,24 +1,21 @@
 ---
-description: Verifiable onchain randomness on MegaETH via DrandOracleQuicknet — a preinstalled, stateless BLS12-381 verifier for the public drand quicknet beacon. No subscription, no oracle callback, no trusted operator.
+description: Verifiable onchain randomness on MegaETH via DrandOracleQuicknet — a preinstalled, stateless BLS12-381 verifier for the public drand quicknet beacon.
 ---
 
 # Verifiable Randomness (VRF)
 
-MegaETH ships with a preinstalled verifiable random function (VRF) service: `DrandOracleQuicknet`, a stateless BLS12-381 signature verifier deployed at a fixed address on each MegaETH network.
+MegaETH ships with a preinstalled verifiable random function (VRF) service: [DrandOracleQuicknet](https://github.com/Zodomo/DrandVerifier), a stateless BLS12-381 signature verifier deployed at a fixed address on each MegaETH network.
 Any contract can consume it.
-Randomness comes from the [drand](https://drand.love) public randomness beacon — independently produced by a global network of participants and freely downloadable over HTTP — so there is no trusted oracle operator, no subscription, and no callback flow.
+The randomness itself comes from [drand](https://drand.love), a public randomness beacon independently produced by a global network of participants and freely downloadable over HTTP.
 
 At the highest level:
 
 1. Your app commits to a specific future drand round.
-2. Anyone (user, relayer, keeper, bot) fetches that round's signature from the public `api.drand.sh` once it's published.
+2. Anyone — user, relayer, keeper, bot — fetches that round's signature from the public `api.drand.sh` once it's published.
 3. They submit it in a transaction; `DrandOracleQuicknet.verifyNormalized(round, sig)` checks the BLS pairing onchain and returns a canonical 32-byte random value.
 
-You pay normal transaction gas. You don't pay a VRF premium. You don't wait for a callback.
-
 {% hint style="info" %}
-This page is a developer reference.
-For a complete worked example — contract, tests, and end-to-end shell demo — see the [Drand VRF Lottery](examples/vrf-drand-quicknet-lottery/README.md) example.
+For a complete worked example — contract, tests, and an end-to-end shell demo — see the [Drand VRF Lottery](examples/vrf-drand-quicknet-lottery/README.md).
 {% endhint %}
 
 ## What is VRF?
@@ -29,23 +26,14 @@ A verifiable random function is a primitive for producing a random value togethe
 - The value is the **unique** random output for the given input.
 - No party — including the key holder — could have biased the output.
 
-For onchain use the property that matters is _public verifiability_: given a public input and a proof, any verifier (including a smart contract) can confirm the value without trusting the producer.
-This is strictly stronger than "a trusted oracle sends you a random number".
-
-Three families of onchain randomness show up in practice:
-
-| Source                       | Trust model                                          | Delivery                        | Cost                        |
-| ---------------------------- | ---------------------------------------------------- | ------------------------------- | --------------------------- |
-| `block.prevrandao`           | Block proposer; bounded validator influence per slot | Native block field              | Minimal                     |
-| Oracle VRF (e.g. Chainlink)  | Single oracle network + subscription + callback      | Push — oracle fulfills request  | Gas + VRF premium           |
-| **drand beacon** (this page) | Threshold of independent orgs (drand consortium)     | Pull — anyone submits the proof | Gas + onchain pairing check |
-
-The drand model fits MegaETH's ethos well: no centralized service has to be kept alive for your dapp to function, because drand already publishes beacons for the whole world at a fixed cadence regardless of any single consumer.
+For onchain use the property that matters is _public verifiability_: given a public input and a proof, a smart contract can confirm the value without trusting the producer.
 
 ## The VRF service on MegaETH
 
-MegaETH networks come with `DrandOracleQuicknet` pre-deployed at a known address.
+`DrandOracleQuicknet` is pre-deployed at a known address on each MegaETH network.
 Treat it the way you'd treat `ecrecover` — a stateless verification function your contract can call without owning or operating anything.
+
+Source and full ABI: [Zodomo/DrandVerifier](https://github.com/Zodomo/DrandVerifier).
 
 ### Addresses
 
@@ -99,9 +87,9 @@ Details on protocol variants are in the [drand protocol specification](https://d
 
 ## How to use `DrandOracleQuicknet`
 
-### API surface
+Source, full ABI, and test vectors live at [Zodomo/DrandVerifier](https://github.com/Zodomo/DrandVerifier) — start there if you need anything beyond the summary below.
 
-A short list — everything you need to consume randomness.
+### API surface
 
 | Function                                                               | Purpose                                                                                                                                                                |
 | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -115,7 +103,7 @@ A short list — everything you need to consume randomness.
 
 {% hint style="success" %}
 For randomness consumption, use `verifyNormalized`.
-It returns a canonical random value independent of whether the submitter handed you compressed or uncompressed signature bytes, which sidesteps a common integration footgun.
+It returns a canonical random value independent of whether the submitter handed you compressed or uncompressed signature bytes.
 {% endhint %}
 
 ### Minimal pattern
@@ -232,101 +220,65 @@ Given a Unix timestamp `t`, the in-flight round is:
 round = ((t - GENESIS_TIMESTAMP) / PERIOD_SECONDS) + 1
 ```
 
-Conversely, the publish time of round N is:
+Conversely, the publish time of round `N` is:
 
 ```
 publish_time(N) = GENESIS_TIMESTAMP + (N - 1) * PERIOD_SECONDS
 ```
 
-For Testnet / Mainnet the constants match drand quicknet: `GENESIS_TIMESTAMP = 1692803367`, `PERIOD_SECONDS = 3`.
+These formulas are specified by drand, not by MegaETH.
+See the ["Beacon timing" section of the drand protocol specification](https://docs.drand.love/docs/specification/) for the authoritative definition.
+For quicknet the constants match what `DrandOracleQuicknet` exposes: `GENESIS_TIMESTAMP = 1692803367`, `PERIOD_SECONDS = 3`.
 
 ### Worked example
 
-The [Drand VRF Lottery](examples/vrf-drand-quicknet-lottery/README.md) example is a complete Foundry project — `src/DrandLottery.sol`, test suite, deploy scripts, and an `./script/demo.sh` that drives the full lifecycle end-to-end against a real MegaETH network.
+The [Drand VRF Lottery](examples/vrf-drand-quicknet-lottery/README.md) is a complete Foundry project — `src/DrandLottery.sol`, test suite, deploy scripts, and an `./script/demo.sh` that drives the full lifecycle end-to-end against a real MegaETH network.
 Clone it if you want something you can run immediately.
 
-## Pitfalls and security caveats
+## Core pitfalls
 
 `DrandOracleQuicknet` answers exactly one question: "is this a valid drand beacon for this round?".
 Everything else — when to consume it, which round to use, how to lock application inputs — is your contract's responsibility.
-Getting that discipline wrong is how integrations get drained even when the cryptography is perfect.
+Get these three things right and you're safe; get any one wrong and the cryptography cannot save you.
 
-### Commit before the signature exists
+### 1. Commit to a future round and lock every outcome-relevant input at commit time
 
 {% hint style="danger" %}
-The round you consume must be **one that drand has not yet signed** at commit time.
-If you pick the current round, an attacker can read the public beacon offchain and only submit when the result favors them.
+The round you consume must be one drand has **not yet signed** at commit time, and the entrant set, stakes, tier choices, or anything else that affects the outcome must all be pinned in the same transaction.
 {% endhint %}
 
-Always derive `revealRound` from `block.timestamp + delay` with a delay large enough that the round's publish time is in the future:
+drand beacons are public.
+If you pick the current round, or leave any outcome-relevant input mutable after commit, the submitter can read the beacon offchain and only proceed when the result favors them.
+Derive `revealRound` from `block.timestamp + delay` with `publish_time(revealRound) > block.timestamp`, reject any signature whose round doesn't match the committed one exactly, and freeze application state in the same commit transaction.
 
-```solidity
-revealRound = uint64((block.timestamp + DELAY - GENESIS) / PERIOD + 1);
-require(GENESIS + uint256(revealRound - 1) * PERIOD > block.timestamp, "round already known");
-```
+### 2. Own the state the verifier doesn't
 
-### Freeze every outcome-relevant input at commit
+{% hint style="danger" %}
+`DrandOracleQuicknet` is stateless by design.
+Replay prevention, freshness checks, and encoding canonicalization are all on your consuming contract.
+{% endhint %}
 
-If `commit()` only pins the round but leaves entrant selection, bet amounts, or tier choice mutable, the adversary can wait until the beacon publishes and then adjust those inputs.
-Lock _everything_ that affects the outcome at commit time, not just the round.
+Three things your contract must do that the verifier will not:
 
-### Pin an exact round — don't accept "a later one"
+- **Freshness:** require `block.timestamp >= publish_time(revealRound)` in `reveal` so a premature submission cannot succeed by accident.
+- **Replay:** flip a `settled` / `consumed` storage flag before the external verify call (checks-effects-interactions), so the same beacon cannot be consumed twice.
+- **Encoding:** use `verifyNormalized`. The same valid G1 point can be encoded as 48 bytes (compressed) or 96 bytes (uncompressed); if you hash raw signature bytes yourself, the submitter gets to choose between two different random values. `verifyNormalized` hashes the canonical uncompressed point so both encodings produce the same output.
 
-A submitter-chosen round is equivalent to a submitter-chosen outcome.
-Reject any signature whose round doesn't match the committed one exactly.
+### 3. Handle drand stalls explicitly
 
-### Enforce freshness on reveal
+{% hint style="warning" %}
+drand can miss a round — network outages and DKG incidents happen.
+A contract that waits forever for a stalled round is a bricked contract.
+{% endhint %}
 
-Check `block.timestamp >= publish_time(revealRound)` in `reveal()`.
-Without it, a delayed reveal could be confused with a premature one.
-
-### Prevent replay
-
-Flip a `settled` / `consumed` flag in storage before the external verify call.
-This both plays nicely with checks-effects-interactions and prevents a second reveal from redoing winner selection with stale state.
-
-### Handle drand stalls gracefully
-
-drand can miss a round (network outage, DKG incident).
-If round N never publishes, a naive contract deadlocks because `settle()` cannot proceed.
-Define an expiry or secondary-round fallback in production contracts:
-
-```solidity
-function cancel() external {
-    require(block.timestamp >= publishTime + STALL_WINDOW, "not stalled");
-    // refund stakes, reset state
-}
-```
-
-### Use `verifyNormalized` for randomness outputs
-
-The same valid G1 point can be encoded as 48 bytes (compressed) or 96 bytes (uncompressed).
-If you hash the raw signature bytes, those two encodings produce different random values — giving the submitter a choice of outcome.
-`verifyNormalized` derives randomness over the canonical uncompressed point bytes, which removes that knob.
-
-### Verify chain compatibility
-
-`DrandOracleQuicknet` relies on the BLS12-381 precompiles introduced in EIP-2537 (Pectra).
-MegaETH Mainnet and Testnet support them.
-If you port consumer code to another chain, confirm EIP-2537 availability first, or `verify` will revert on every call.
-
-### The verifier is stateless, on purpose
-
-Don't rely on `DrandOracleQuicknet` for:
-
-- Commitment tracking.
-- Replay prevention.
-- Freshness windows.
-- Round scheduling.
-
-None of these exist in the verifier; every one of them has to live in your consuming contract.
+Add an expiry or fallback path so the game can resolve if the beacon never arrives.
+For example, a cancel-and-refund function gated by `block.timestamp >= publishTime + STALL_WINDOW`, or retry against a later round.
 
 ## References
 
 - [Drand VRF Lottery example](examples/vrf-drand-quicknet-lottery/README.md) — runnable consumer contract with deploy scripts and an end-to-end shell demo
-- [DrandVerifier repository](https://github.com/Zodomo/DrandVerifier) — source of `DrandOracleQuicknet`, full test suite, gas snapshot
+- [Zodomo/DrandVerifier](https://github.com/Zodomo/DrandVerifier) — source of `DrandOracleQuicknet`, full test suite, gas snapshot
 - [drand developer docs](https://docs.drand.love/developer/)
+- [drand protocol specification](https://docs.drand.love/docs/specification/) — including beacon timing
 - [drand security model](https://docs.drand.love/docs/security-model/)
-- [drand protocol specification](https://docs.drand.love/docs/specification/)
 - [EIP-2537 — BLS12-381 curve operations](https://eips.ethereum.org/EIPS/eip-2537)
-- [EIP-4399 — `PREVRANDAO`](https://eips.ethereum.org/EIPS/eip-4399) for contrast with the block-level randomness source
