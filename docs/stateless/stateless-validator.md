@@ -148,11 +148,31 @@ Do the [First run](#first-run) step manually once to set the anchor, then hand o
 ```bash
 sudo useradd --system --home /home/blockchain --shell /usr/sbin/nologin blockchain
 sudo mkdir -p /home/blockchain/stateless-validator/logs
-sudo chown -R blockchain:blockchain /home/blockchain
 sudo install -m 755 ./target/release/stateless-validator /usr/local/bin/
+sudo install -m 644 -o blockchain -g blockchain ./test_data/mainnet/genesis.json /home/blockchain/stateless-validator/genesis.json
+sudo chown -R blockchain:blockchain /home/blockchain
 ```
 
-### 2. Write the environment file
+### 2. Bootstrap the anchor (first run only)
+
+The systemd env file intentionally omits `STATELESS_VALIDATOR_START_BLOCK` — the validator re-anchors the database whenever `--start-block` is set, so leaving it for systemd would wipe validated state on every restart.
+Run the validator manually once as the `blockchain` user to write the initial anchor, then stop it:
+
+```bash
+sudo -u blockchain /usr/local/bin/stateless-validator \
+  --data-dir /home/blockchain/stateless-validator \
+  --rpc-endpoint https://mainnet.megaeth.com/rpc \
+  --witness-endpoint https://mainnet.megaeth.com/rpc \
+  --genesis-file /home/blockchain/stateless-validator/genesis.json \
+  --start-block 0xff061a29416ffe4486924a5e8e0df95de5db5d77589ab4d58fb00e3b6ddb8b40
+```
+
+Wait for the log line `[Main] Successfully initialized from start block`, then press **Ctrl+C** to stop.
+This creates `/home/blockchain/stateless-validator/validator.redb`, a [redb](https://github.com/cberner/redb) database holding the trusted anchor, the recent canonical chain, cached contract bytecode, and the genesis config.
+Every subsequent run — manual or under systemd — resumes from this file, which is why `--start-block` must stay out of the systemd env (re-supplying it would wipe the db).
+Re-supplying `--genesis-file` is harmless — the validator just re-stores the same config — so the env file below keeps it as a belt-and-suspenders fallback if the db is ever rebuilt.
+
+### 3. Write the environment file
 
 Store all configuration in `/etc/stateless-validator.env` so the service unit stays generic:
 
@@ -176,13 +196,7 @@ sudo chmod 600 /etc/stateless-validator.env
 sudo chown root:root /etc/stateless-validator.env
 ```
 
-{% hint style="warning" %}
-Do **not** put `STATELESS_VALIDATOR_START_BLOCK` in the env file.
-The validator re-anchors the database whenever `--start-block` is set, so leaving it in systemd would wipe validated state on every restart.
-Set it only for the manual first-run bootstrap.
-{% endhint %}
-
-### 3. Install the service unit
+### 4. Install the service unit
 
 `/etc/systemd/system/stateless-validator.service`:
 
@@ -212,7 +226,7 @@ ReadWritePaths=/home/blockchain/stateless-validator
 WantedBy=multi-user.target
 ```
 
-### 4. Enable and start
+### 5. Enable and start
 
 ```bash
 sudo systemctl daemon-reload
@@ -229,6 +243,19 @@ sudo journalctl -u stateless-validator -f       # follow journal (stdout + stder
 tail -f /home/blockchain/stateless-validator/logs/stateless-validator.log
 ```
 
+### Uninstall
+
+To tear down the deployment — useful for clean-room testing or decommissioning a host:
+
+```bash
+sudo systemctl disable --now stateless-validator
+sudo rm /etc/systemd/system/stateless-validator.service
+sudo rm /etc/stateless-validator.env
+sudo rm /usr/local/bin/stateless-validator
+sudo systemctl daemon-reload
+sudo userdel -r blockchain    # removes the user and /home/blockchain (validator DB, logs, genesis)
+```
+
 ## Monitoring
 
 ### Checking validation progress
@@ -238,13 +265,16 @@ Three gauges tell you whether the validator is keeping up:
 
 ```bash
 curl -s http://localhost:9090/metrics | grep -E 'chain_height|validation_lag'
-# stateless_validator_local_chain_height   13592258
-# stateless_validator_remote_chain_height  13592262
-# stateless_validator_validation_lag       4
+stateless_validator_local_chain_height   12649974
+stateless_validator_remote_chain_height  13977051
+stateless_validator_validation_lag       1327077
 ```
 
-`validation_lag` is the number of blocks the validator is behind the remote tip.
-A healthy validator hovers near zero and briefly spikes during bursty periods.
+`validation_lag` is the number of blocks the validator is behind the remote tip (`remote_chain_height − local_chain_height`).
+Interpret it in two phases:
+
+- **During initial catch-up**, `validation_lag` starts large and shrinks over time — a validator anchored at block 12.6M with remote tip at 14M begins at ~1.4M blocks behind and walks forward at its throughput rate. A large lag here is expected, not a symptom.
+- **Once caught up**, the gauge hovers near zero and briefly spikes during bursty periods. Persistent non-zero lag at this point means the validator can't keep pace with the sequencer — investigate per the [Troubleshooting](#troubleshooting) section.
 
 The [`scripts/validator-status.sh`](https://github.com/megaeth-labs/stateless-validator/blob/main/scripts/validator-status.sh) helper in the repo renders these metrics as a formatted dashboard.
 
