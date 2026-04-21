@@ -146,7 +146,9 @@ contract RandomizedApp {
 
         settled = true; // checks-effects-interactions: flip before external call.
 
-        (bool ok, bytes32 r,) = VRF.verifyNormalized(revealRound, sig);
+        // We take the 3rd return (chainScopedHash): chain- and contract-bound,
+        // so the same beacon can't be replayed across chains or contracts.
+        (bool ok,, bytes32 r) = VRF.verifyNormalized(revealRound, sig);
         require(ok, "bad signature");
 
         randomness = r;
