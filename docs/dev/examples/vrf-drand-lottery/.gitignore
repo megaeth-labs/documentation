@@ -2,4 +2,5 @@ out/
 cache/
 broadcast/
 lib/
+dependencies/
 .env
