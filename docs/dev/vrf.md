@@ -212,24 +212,6 @@ await walletClient.writeContract({
 
 The drand quicknet chain hash `52db9ba7…0c84e971` is fixed — don't change it.
 
-### Round-time math
-
-Given a Unix timestamp `t`, the in-flight round is:
-
-```
-round = ((t - GENESIS_TIMESTAMP) / PERIOD_SECONDS) + 1
-```
-
-Conversely, the publish time of round `N` is:
-
-```
-publish_time(N) = GENESIS_TIMESTAMP + (N - 1) * PERIOD_SECONDS
-```
-
-These formulas are specified by drand, not by MegaETH.
-See the ["Beacon timing" section of the drand protocol specification](https://docs.drand.love/docs/specification/) for the authoritative definition.
-For quicknet the constants match what `DrandOracleQuicknet` exposes: `GENESIS_TIMESTAMP = 1692803367`, `PERIOD_SECONDS = 3`.
-
 ### Worked example
 
 The [Drand VRF Lottery](examples/vrf-drand-quicknet-lottery/README.md) is a complete Foundry project — `src/DrandLottery.sol`, test suite, deploy scripts, and an `./script/demo.sh` that drives the full lifecycle end-to-end against a real MegaETH network.
