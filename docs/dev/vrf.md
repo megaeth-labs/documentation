@@ -217,7 +217,7 @@ The drand quicknet chain hash `52db9ba7…0c84e971` is fixed — don't change it
 The [Drand VRF Lottery](examples/vrf-drand-quicknet-lottery/README.md) is a complete Foundry project — `src/DrandLottery.sol`, test suite, deploy scripts, and an `./script/demo.sh` that drives the full lifecycle end-to-end against a real MegaETH network.
 Clone it if you want something you can run immediately.
 
-## Core pitfalls
+## Security caveats
 
 `DrandOracleQuicknet` answers exactly one question: "is this a valid drand beacon for this round?".
 Everything else — when to consume it, which round to use, how to lock application inputs — is your contract's responsibility.
