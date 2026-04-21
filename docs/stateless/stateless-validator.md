@@ -73,7 +73,7 @@ Once the database is initialized, omit `--genesis-file` and `--start-block` — 
 stateless-validator \
   --data-dir ./validator-data \
   --rpc-endpoint https://mainnet.megaeth.com/rpc \
-  --witness-endpoint https://mainnet.megaeth.com/rpc \
+  --witness-endpoint https://mainnet.megaeth.com/rpc
 ```
 
 If the remote chain has reorged past your local tip, the validator detects the divergence, rolls back to the common ancestor, and continues from there.
@@ -101,7 +101,7 @@ Witness endpoints are tried front-to-back on each request, returning on the firs
 
 Every flag has an equivalent environment variable, convenient for systemd units and Docker.
 Command-line flags take precedence over environment variables.
-Boolean flags (e.g. `--metrics-enabled`) accept `true` or `false` via their env var — set `STATELESS_VALIDATOR_METRICS_ENABLED=true` to turn the endpoint on from a unit file.
+Boolean flags (e.g., `--metrics-enabled`) accept `true` or `false` via their env var — set `STATELESS_VALIDATOR_METRICS_ENABLED=true` to turn the endpoint on from a unit file.
 
 ### Core flags
 
@@ -354,7 +354,7 @@ If `reorgs_detected_total` climbs fast, double-check that your RPC endpoint is f
 The reorg exceeds the 1000-block canonical history the validator keeps, so no common ancestor is reachable in the local db.
 Restart with `--start-block <NEW_HASH>`, picking a recent trusted block past the reorg — this re-anchors the db to that block.
 
-## Related Pages
+## Related pages
 
 - [Architecture](../architecture.md) — how transactions flow through MegaETH and where validators fit in
 - [stateless-validator source](https://github.com/megaeth-labs/stateless-validator) — Rust client source code
