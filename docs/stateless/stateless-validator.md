@@ -7,15 +7,15 @@ description: Run a stateless validator to independently verify every MegaETH blo
 The **stateless validator** is a Rust client that independently verifies every MegaETH block without maintaining full chain state.
 Instead of replaying blocks against a locally-stored state trie, it re-executes each block against a compact cryptographic witness supplied by the network, then checks that the resulting post-state matches the commitments in the block header.
 
-This design lets you keep the sequencer honest on commodity hardware — a laptop-class machine can verify MegaETH Mainnet in real time.
+This design enables independent verification of sequencer execution on commodity hardware — a laptop-class machine can verify MegaETH Mainnet in real time.
 For how validators fit into the broader network, see [Architecture](../architecture.md).
 
 ## Why run a stateless validator
 
 - **Independent verification** — you re-execute the state transition function (STF) of every block yourself, rather than trusting an RPC provider to tell you the truth.
-- **Low hardware cost** — thanks to [SALT (Small Authentication Large Trie)](https://github.com/megaeth-labs/salt) witnesses, proof data per block is significantly smaller than traditional Merkle Patricia Tree or Verkle tree approaches, so validators do not need sequencer-class hardware.
+- **Low hardware cost** — thanks to [SALT (Small Authentication Large Trie)](https://github.com/megaeth-labs/salt) witnesses, proof data per block is significantly smaller than traditional Merkle Patricia Trie or Verkle tree approaches, so validators do not need sequencer-class hardware.
 - **Parallel-friendly** — validation workers are embarrassingly parallel; throughput scales linearly with CPU cores.
-- **Auditable TCB** — the validator is built on a vanilla Revm interpreter with an in-memory backend, keeping the trusted computing base small and reviewable.
+- **Auditable TCB** — the validator is built on a vanilla revm interpreter with an in-memory backend, keeping the trusted computing base small and reviewable.
 
 ## Installation
 
@@ -32,10 +32,10 @@ cd stateless-validator
 cargo build --release --bin stateless-validator
 ```
 
+The project pins a specific nightly Rust toolchain via `rust-toolchain.toml`, so `cargo build` downloads it automatically on first run.
+
 The compiled binary lives at `./target/release/stateless-validator`.
 Copy it onto your `PATH` if you plan to invoke it directly.
-
-The project pins a specific nightly Rust toolchain via `rust-toolchain.toml`, so `cargo build` downloads it automatically on first run.
 
 ## Quick start
 
@@ -44,19 +44,19 @@ The project pins a specific nightly Rust toolchain via `rust-toolchain.toml`, so
 On the first launch, the validator needs two pieces of bootstrap information:
 
 1. **`--genesis-file`** — the MegaETH genesis JSON, which encodes the chain ID and hardfork activation schedule.
-   Obtain it from the [MegaETH repository](https://github.com/megaeth-labs) or the docs release page.
+   Use [`test_data/mainnet/genesis.json`](https://github.com/megaeth-labs/stateless-validator/blob/main/test_data/mainnet/genesis.json) from the stateless-validator repo.
+   The `alloc` list is stripped from this file — the validator never reads initial balances, so only the chain config is needed.
 2. **`--start-block`** — a **trusted block hash** that anchors your local chain.
-   Pick any recent block hash you trust (e.g. copied from a known explorer or from another operator already running the validator).
    The validator begins verification from this anchor and walks forward.
+   For a quick test you can use MegaETH Mainnet block [`0xc0ffee`](https://mega.etherscan.io/block/12648430) (hash `0xff061a29416ffe4486924a5e8e0df95de5db5d77589ab4d58fb00e3b6ddb8b40`); in production, pick a recent block hash you've independently verified on an explorer.
 
 ```bash
-stateless-validator \
+./target/release/stateless-validator \
   --data-dir ./validator-data \
   --rpc-endpoint https://mainnet.megaeth.com/rpc \
   --witness-endpoint https://mainnet.megaeth.com/rpc \
-  --genesis-file ./genesis.json \
-  --start-block 0x1234567890abcdef... \
-  --metrics-enabled
+  --genesis-file ./test_data/mainnet/genesis.json \
+  --start-block 0xff061a29416ffe4486924a5e8e0df95de5db5d77589ab4d58fb00e3b6ddb8b40
 ```
 
 On start, the validator:
@@ -74,14 +74,20 @@ stateless-validator \
   --data-dir ./validator-data \
   --rpc-endpoint https://mainnet.megaeth.com/rpc \
   --witness-endpoint https://mainnet.megaeth.com/rpc \
-  --metrics-enabled
 ```
 
 If the remote chain has reorged past your local tip, the validator detects the divergence, rolls back to the common ancestor, and continues from there.
 
+{% hint style="warning" %}
+The validator keeps only the most recent **1000 blocks** of canonical chain history (`DEFAULT_MAX_CHAIN_LENGTH`); older entries are pruned inline as the chain advances.
+A reorg deeper than the retained history can't find a common ancestor locally — the validator halts with a `Catastrophic reorg: earliest local block ... hash mismatch` error and requires manual restart with a fresh `--start-block` past the reorg.
+{% endhint %}
+
 ### Multiple RPC endpoints
 
-Both `--rpc-endpoint` and `--witness-endpoint` accept multiple endpoints as repeated flags or a comma-separated list — the validator tries them in order on failure, with retry-and-backoff per provider.
+Both `--rpc-endpoint` and `--witness-endpoint` accept multiple endpoints as repeated flags or a comma-separated list.
+Data endpoints are load-balanced round-robin with per-provider exponential backoff, cycling to the next provider after retries exhaust.
+Witness endpoints are tried front-to-back on each request, returning on the first success.
 
 ```bash
 # Repeated flags
@@ -95,21 +101,22 @@ Both `--rpc-endpoint` and `--witness-endpoint` accept multiple endpoints as repe
 
 Every flag has an equivalent environment variable, convenient for systemd units and Docker.
 Command-line flags take precedence over environment variables.
+Boolean flags (e.g. `--metrics-enabled`) accept `true` or `false` via their env var — set `STATELESS_VALIDATOR_METRICS_ENABLED=true` to turn the endpoint on from a unit file.
 
 ### Core flags
 
-| Flag                               | Env variable                                        | Required? | Description                                                                                            |
-| ---------------------------------- | --------------------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------ |
-| `--data-dir`                       | `STATELESS_VALIDATOR_DATA_DIR`                      | Yes       | Directory holding the validator database and any cached data.                                          |
-| `--rpc-endpoint`                   | `STATELESS_VALIDATOR_RPC_ENDPOINT`                  | Yes       | JSON-RPC endpoint(s) for block headers and bodies. Repeat the flag or pass a comma-separated list.     |
-| `--witness-endpoint`               | `STATELESS_VALIDATOR_WITNESS_ENDPOINT`              | Yes       | MegaETH JSON-RPC endpoint(s) for SALT witnesses (`mega_getBlockWitness`). Multiple endpoints accepted. |
-| `--genesis-file`                   | `STATELESS_VALIDATOR_GENESIS_FILE`                  | First run | Path to the genesis JSON. Stored in the database after the first run.                                  |
-| `--start-block`                    | `STATELESS_VALIDATOR_START_BLOCK`                   | First run | Trusted block hash used as the validation anchor.                                                      |
-| `--report-validation-endpoint`     | `STATELESS_VALIDATOR_REPORT_VALIDATION_ENDPOINT`    | No        | RPC endpoint that receives `mega_setValidatedBlocks` callbacks for validated blocks.                   |
-| `--metrics-enabled`                | `STATELESS_VALIDATOR_METRICS_ENABLED`               | No        | Expose a Prometheus `/metrics` endpoint.                                                               |
-| `--metrics-port`                   | `STATELESS_VALIDATOR_METRICS_PORT`                  | No        | Port for the metrics endpoint. Default: `9090`.                                                        |
-| `--data-max-concurrent-requests`   | `STATELESS_VALIDATOR_DATA_MAX_CONCURRENT_REQUESTS`  | No        | Cap on concurrent in-flight data requests (blocks, headers, code, tx). Omit for unlimited.             |
-| `--witness-max-concurrent-requests` | `STATELESS_VALIDATOR_WITNESS_MAX_CONCURRENT_REQUESTS` | No      | Cap on concurrent in-flight witness fetches, independent of the data cap. Omit for unlimited.          |
+| Flag                                | Env variable                                          | Required? | Description                                                                                                                             |
+| ----------------------------------- | ----------------------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `--data-dir`                        | `STATELESS_VALIDATOR_DATA_DIR`                        | Yes       | Directory holding the validator database and any cached data.                                                                           |
+| `--rpc-endpoint`                    | `STATELESS_VALIDATOR_RPC_ENDPOINT`                    | Yes       | JSON-RPC endpoint(s) for block headers and bodies. Repeat the flag or pass a comma-separated list.                                      |
+| `--witness-endpoint`                | `STATELESS_VALIDATOR_WITNESS_ENDPOINT`                | Yes       | MegaETH JSON-RPC endpoint(s) for SALT witnesses (`mega_getBlockWitness`). Multiple endpoints accepted.                                  |
+| `--genesis-file`                    | `STATELESS_VALIDATOR_GENESIS_FILE`                    | First run | Path to the genesis JSON. Stored in the database after the first run.                                                                   |
+| `--start-block`                     | `STATELESS_VALIDATOR_START_BLOCK`                     | First run | Trusted block hash used as the validation anchor.                                                                                       |
+| `--report-validation-endpoint`      | `STATELESS_VALIDATOR_REPORT_VALIDATION_ENDPOINT`      | No        | RPC endpoint that receives `mega_setValidatedBlocks` callbacks for validated blocks. If not provided, validation reporting is disabled. |
+| `--metrics-enabled`                 | `STATELESS_VALIDATOR_METRICS_ENABLED`                 | No        | Expose a Prometheus `/metrics` endpoint.                                                                                                |
+| `--metrics-port`                    | `STATELESS_VALIDATOR_METRICS_PORT`                    | No        | Port for the metrics endpoint. Default: `9090`.                                                                                         |
+| `--data-max-concurrent-requests`    | `STATELESS_VALIDATOR_DATA_MAX_CONCURRENT_REQUESTS`    | No        | Cap on concurrent in-flight data requests (blocks, headers, code, tx). Omit for unlimited.                                              |
+| `--witness-max-concurrent-requests` | `STATELESS_VALIDATOR_WITNESS_MAX_CONCURRENT_REQUESTS` | No        | Cap on concurrent in-flight witness fetches, independent of the data cap. Omit for unlimited.                                           |
 
 ### Logging flags
 
@@ -133,57 +140,100 @@ Legacy `STATELESS_VALIDATOR_LOG_*` env vars are migrated to `STATELESS_LOG_*` au
 
 ## Running in the background
 
-For long-lived deployments, run the validator under a supervisor (systemd, Docker, or a PID-file script).
-A minimal launcher looks like this — substitute the variables at the top for your deployment paths:
+For long-lived deployments, run the validator under **systemd** — it gives you automatic restarts on crash, clean journal logs, and process isolation.
+Do the [First run](#first-run) step manually once to set the anchor, then hand off to systemd for ongoing operation.
+
+### 1. Create a dedicated user and directories
 
 ```bash
-#!/bin/bash
-# Launch stateless-validator in the background under a PID file.
-set -euo pipefail
-
-BINARY=/path/to/stateless-validator
-DATA_DIR=/path/to/validator-data
-GENESIS_FILE=/path/to/genesis.json
-LOG_DIR=/path/to/logs
-RPC_ENDPOINT=https://mainnet.megaeth.com/rpc
-WITNESS_ENDPOINT=https://mainnet.megaeth.com/rpc
-PID_FILE="$DATA_DIR/stateless-validator.pid"
-
-if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
-    echo "validator already running (pid $(cat "$PID_FILE"))"
-    exit 1
-fi
-
-mkdir -p "$DATA_DIR" "$LOG_DIR"
-
-nohup "$BINARY" \
-    --data-dir "$DATA_DIR" \
-    --rpc-endpoint "$RPC_ENDPOINT" \
-    --witness-endpoint "$WITNESS_ENDPOINT" \
-    --genesis-file "$GENESIS_FILE" \
-    --log.file-directory "$LOG_DIR" \
-    --metrics-enabled \
-    >/dev/null 2>&1 &
-
-echo $! > "$PID_FILE"
+sudo useradd --system --home /home/blockchain --shell /usr/sbin/nologin blockchain
+sudo mkdir -p /home/blockchain/stateless-validator/logs
+sudo chown -R blockchain:blockchain /home/blockchain
+sudo install -m 755 ./target/release/stateless-validator /usr/local/bin/
 ```
 
-Stop the validator with:
+### 2. Write the environment file
+
+Store all configuration in `/etc/stateless-validator.env` so the service unit stays generic:
 
 ```bash
-kill "$(cat "$DATA_DIR/stateless-validator.pid")" && rm "$DATA_DIR/stateless-validator.pid"
+# /etc/stateless-validator.env
+STATELESS_VALIDATOR_DATA_DIR=/home/blockchain/stateless-validator
+STATELESS_VALIDATOR_RPC_ENDPOINT=https://mainnet.megaeth.com/rpc
+STATELESS_VALIDATOR_WITNESS_ENDPOINT=https://mainnet.megaeth.com/rpc
+STATELESS_VALIDATOR_GENESIS_FILE=/home/blockchain/stateless-validator/genesis.json
+STATELESS_VALIDATOR_METRICS_ENABLED=true
+STATELESS_VALIDATOR_METRICS_PORT=9090
+STATELESS_LOG_FILE_DIRECTORY=/home/blockchain/stateless-validator/logs
+STATELESS_LOG_FILE=debug
+STATELESS_LOG_STDOUT=info
 ```
 
-{% hint style="info" %}
-For production, prefer a proper service manager.
-A systemd unit that invokes the binary directly (no `nohup`) gives you automatic restarts and clean journal logs.
+Lock it down:
+
+```bash
+sudo chmod 600 /etc/stateless-validator.env
+sudo chown root:root /etc/stateless-validator.env
+```
+
+{% hint style="warning" %}
+Do **not** put `STATELESS_VALIDATOR_START_BLOCK` in the env file.
+The validator re-anchors the database whenever `--start-block` is set, so leaving it in systemd would wipe validated state on every restart.
+Set it only for the manual first-run bootstrap.
 {% endhint %}
+
+### 3. Install the service unit
+
+`/etc/systemd/system/stateless-validator.service`:
+
+```ini
+[Unit]
+Description=MegaETH stateless validator
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=blockchain
+Group=blockchain
+EnvironmentFile=/etc/stateless-validator.env
+ExecStart=/usr/local/bin/stateless-validator
+Restart=on-failure
+RestartSec=5s
+LimitNOFILE=65535
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/blockchain/stateless-validator
+
+[Install]
+WantedBy=multi-user.target
+```
+
+### 4. Enable and start
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now stateless-validator
+sudo systemctl status stateless-validator
+```
+
+Common operations:
+
+```bash
+sudo systemctl restart stateless-validator      # restart after config change
+sudo systemctl stop stateless-validator         # stop cleanly
+sudo journalctl -u stateless-validator -f       # follow journal (stdout + stderr)
+tail -f /home/blockchain/stateless-validator/logs/stateless-validator.log
+```
 
 ## Monitoring
 
 ### Checking validation progress
 
-With metrics enabled, the validator exposes a Prometheus endpoint at `http://0.0.0.0:9090/metrics`.
+With metrics enabled, the validator binds a Prometheus endpoint on `0.0.0.0:9090` (reachable as `http://<host>:9090/metrics`, or `http://localhost:9090/metrics` from the same machine).
 Three gauges tell you whether the validator is keeping up:
 
 ```bash
@@ -200,25 +250,37 @@ The [`scripts/validator-status.sh`](https://github.com/megaeth-labs/stateless-va
 
 ### Useful metrics
 
-| Metric                                                  | Type      | What it tells you                                    |
-| ------------------------------------------------------- | --------- | ---------------------------------------------------- |
-| `stateless_validator_local_chain_height`                | Gauge     | Local chain tip.                                     |
-| `stateless_validator_remote_chain_height`               | Gauge     | Remote chain tip reported by the RPC endpoint.       |
-| `stateless_validator_validation_lag`                    | Gauge     | Blocks behind the remote tip (target: ≈ 0).          |
-| `stateless_validator_block_validation_time_seconds`     | Histogram | End-to-end time to validate a block.                 |
-| `stateless_validator_witness_verification_time_seconds` | Histogram | Time spent verifying SALT witnesses.                 |
-| `stateless_validator_block_replay_time_seconds`         | Histogram | EVM execution time per block.                        |
-| `stateless_validator_salt_update_time_seconds`          | Histogram | Time to apply post-state deltas to the SALT trie.    |
-| `stateless_validator_transactions_total`                | Counter   | Total transactions validated.                        |
-| `stateless_validator_gas_used_total`                    | Counter   | Total gas used in validated blocks.                  |
-| `stateless_validator_reorgs_detected_total`             | Counter   | Number of reorgs handled.                            |
-| `stateless_validator_reorg_depth`                       | Histogram | Depth of chain reorganizations.                      |
-| `stateless_validator_rpc_requests_total{method=...}`    | Counter   | RPC requests made, labelled by method.               |
-| `stateless_validator_rpc_errors_total{method=...}`      | Counter   | RPC failures, labelled by method.                    |
-| `stateless_validator_contract_cache_hits_total`         | Counter   | Bytecode served from the local cache.                |
-| `stateless_validator_contract_cache_misses_total`       | Counter   | Bytecode fetched from RPC on miss.                   |
-| `stateless_validator_worker_tasks_completed_total`      | Counter   | Tasks completed per worker (label: `worker_id`).     |
-| `stateless_validator_worker_tasks_failed_total`         | Counter   | Tasks failed per worker (label: `worker_id`).        |
+| Metric                                                     | Type      | What it tells you                                                  |
+| ---------------------------------------------------------- | --------- | ------------------------------------------------------------------ |
+| `stateless_validator_local_chain_height`                   | Gauge     | Local chain tip.                                                   |
+| `stateless_validator_remote_chain_height`                  | Gauge     | Remote chain tip reported by the RPC endpoint.                     |
+| `stateless_validator_validation_lag`                       | Gauge     | Blocks behind the remote tip (target: ≈ 0).                        |
+| `stateless_validator_block_validation_time_seconds`        | Histogram | End-to-end time to validate a block.                               |
+| `stateless_validator_witness_verification_time_seconds`    | Histogram | Time spent verifying SALT witnesses.                               |
+| `stateless_validator_block_replay_time_seconds`            | Histogram | EVM execution time per block.                                      |
+| `stateless_validator_salt_update_time_seconds`             | Histogram | Time to apply post-state deltas to the SALT trie.                  |
+| `stateless_validator_block_state_reads`                    | Histogram | KV reads per block (diagnoses I/O-bound slowdown).                 |
+| `stateless_validator_block_state_writes`                   | Histogram | KV writes per block.                                               |
+| `stateless_validator_transactions_total`                   | Counter   | Total transactions validated.                                      |
+| `stateless_validator_gas_used_total`                       | Counter   | Total gas used in validated blocks.                                |
+| `stateless_validator_reorgs_detected_total`                | Counter   | Number of reorgs handled.                                          |
+| `stateless_validator_reorg_depth`                          | Histogram | Depth of chain reorganizations.                                    |
+| `stateless_validator_rpc_requests_total{method=...}`       | Counter   | RPC requests made (one per logical call), labelled by method.      |
+| `stateless_validator_rpc_errors_total{method=...}`         | Counter   | RPC final failures (not retried attempts), labelled by method.     |
+| `stateless_validator_rpc_retry_attempts_total{method=...}` | Counter   | Transient retry attempts before final outcome, labelled by method. |
+| `stateless_validator_block_fetch_time_seconds`             | Histogram | Per-call `eth_getBlockByNumber` / `eth_getBlockByHash` latency.    |
+| `stateless_validator_code_fetch_time_seconds`              | Histogram | Per-call `eth_getCodeByHash` latency.                              |
+| `stateless_validator_witness_fetch_rpc_time_seconds`       | Histogram | Per-call `mega_getBlockWitness` latency.                           |
+| `stateless_validator_contract_cache_hits_total`            | Counter   | Bytecode served from the local cache.                              |
+| `stateless_validator_contract_cache_misses_total`          | Counter   | Bytecode fetched from RPC on miss.                                 |
+| `stateless_validator_salt_witness_size_bytes`              | Histogram | Serialized SALT witness size per block.                            |
+| `stateless_validator_salt_witness_keys`                    | Histogram | Key count in each SALT witness.                                    |
+| `stateless_validator_salt_witness_kvs_size_bytes`          | Histogram | KV payload size inside each SALT witness.                          |
+| `stateless_validator_mpt_witness_size_bytes`               | Histogram | Serialized MPT withdrawals-witness size per block.                 |
+| `stateless_validator_worker_tasks_completed_total`         | Counter   | Tasks completed per worker (label: `worker_id`).                   |
+| `stateless_validator_worker_tasks_failed_total`            | Counter   | Tasks failed per worker (label: `worker_id`).                      |
+
+For the complete list, see [`metrics.rs`](https://github.com/megaeth-labs/stateless-validator/blob/main/bin/stateless-validator/src/metrics.rs) in the upstream repo.
 
 ### Logs
 
@@ -258,9 +320,12 @@ Histograms like `block_validation_time_seconds` break down where time is being s
 A handful of reorgs per day is normal on any L2.
 If `reorgs_detected_total` climbs fast, double-check that your RPC endpoint is following the canonical chain — a misconfigured provider may be serving a stale fork.
 
+**`Catastrophic reorg: earliest local block … hash mismatch`.**
+The reorg exceeds the 1000-block canonical history the validator keeps, so no common ancestor is reachable in the local db.
+Restart with `--start-block <NEW_HASH>`, picking a recent trusted block past the reorg — this re-anchors the db to that block.
+
 ## Related Pages
 
 - [Architecture](../architecture.md) — how transactions flow through MegaETH and where validators fit in
-- [Mini-Blocks](../mini-block.md) — the two block types the validator re-executes
 - [stateless-validator source](https://github.com/megaeth-labs/stateless-validator) — Rust client source code
 - [SALT](https://github.com/megaeth-labs/salt) — MegaETH's state trie and witness format

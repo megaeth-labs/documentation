@@ -40,4 +40,4 @@
 
 ## Stateless Validator
 
-- [Overview](stateless/stateless-validator.md)
+- [Stateless Validator](stateless/stateless-validator.md)
