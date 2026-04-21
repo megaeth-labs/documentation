@@ -35,7 +35,7 @@ For routine transactions, submit normally through your wallet.
 Go to the OptimismPortal contract for your network and open the **Write as Proxy** tab:
 
 - **Mainnet:** [0x7f82f57F0Dd546519324392e408b01fcC7D709e8](https://etherscan.io/address/0x7f82f57F0Dd546519324392e408b01fcC7D709e8#writeProxyContract) on Etherscan
-- **Testnet (Sepolia):** [0xf68d900e1cdec64a8f5dc0ee873a9e2879256b10](https://sepolia.etherscan.io/address/0xf68d900e1cdec64a8f5dc0ee873a9e2879256b10#writeProxyContract) on Sepolia Etherscan
+- **Testnet (Sepolia):** [0xF68D900e1Cdec64a8f5Dc0Ee873A9E2879256b10](https://sepolia.etherscan.io/address/0xF68D900e1Cdec64a8f5Dc0Ee873A9E2879256b10#writeProxyContract) on Sepolia Etherscan
 
 Click the **Write as Proxy** tab near the top of the contract page.
 
@@ -53,7 +53,7 @@ Make sure your wallet is set to the correct network — Ethereum Mainnet for pro
 ### Fill in the depositTransaction fields
 
 Scroll to **depositTransaction** in the list and expand it.
-Fill in the five fields:
+Fill in the six fields:
 
 | Field | What to enter |
 | ----- | ------------- |
@@ -62,11 +62,11 @@ Fill in the five fields:
 | `_value (uint256)` | The same amount as `payableAmount`, converted to wei. For 0.001 ETH enter `1000000000000000`. Enter `0` if sending no ETH. |
 | `_gasLimit (uint64)` | Gas budget for L2 execution. Use `100000` for a plain ETH transfer. |
 | `_isCreation (bool)` | `false` — leave this as false unless you are deploying a new contract on MegaETH. |
-| `_data (bytes)` | `0x` for a plain ETH transfer. For a contract call, paste the hex-encoded calldata here. |
+| `_data (bytes)` | `0x` for a plain ETH transfer. For a contract call, paste the encoded function call data here. |
 
 {% hint style="info" %}
-`_gasLimit` is paid upfront on Ethereum and is **not refunded**, even if the MegaETH transaction uses less.
-Set it generously — if it is too low, the transaction fails on MegaETH but the ETH is still spent.
+If `_gasLimit` is too low, the L2 transaction will revert on MegaETH — but your ETH is still delivered to `_to` even on failure.
+The L1 gas fee for submitting the deposit is non-refundable regardless.
 100 000 is a safe amount for a plain ETH transfer.
 {% endhint %}
 
