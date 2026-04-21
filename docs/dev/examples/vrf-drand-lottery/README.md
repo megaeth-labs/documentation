@@ -75,11 +75,12 @@ function settle(bytes calldata sig) external {
     uint256 publishTime_ = GENESIS + uint256(revealRound - 1) * PERIOD;
     require(block.timestamp >= publishTime_, "round not yet published");
 
+    settled = true; // checks-effects-interactions: flip state before the external call
+
     (bool ok, bytes32 r,) = oracle.verifyNormalized(revealRound, sig);
     require(ok, "bad signature");
 
     uint256 idx = uint256(r) % entrants.length;
-    settled = true;
     randomness = r;
     winner = entrants[idx];
     emit LotterySettled(revealRound, winner, idx, r);
@@ -232,8 +233,14 @@ cast send --private-key $PRIVATE_KEY --rpc-url $RPC_URL \
 Record the returned `contractAddress`.
 Sanity-check the deployment by verifying a known-good vector:
 
+`verify(uint64,bytes)` is a companion method on `DrandOracleQuicknet` that returns `bool` only (no randomness), intended for sanity checks like this one.
+It is distinct from `verifyNormalized` used in the contract above, which returns the canonical random value.
+Both run the same pairing check, so either proves the precompiles are wired up correctly.
+
 ```bash
 ORACLE=0x...
+# verify() is a separate helper on DrandOracleQuicknet — not part of the minimal
+# interface declared at the top of DrandLotteryDemo.sol.
 cast call $ORACLE "verify(uint64,bytes)(bool)" 20791007 \
   0x8d2c8bbc37170dbacc5e280a21d4e195cff5f32a19fd6a58633fa4e4670478b5fb39bc13dd8f8c4372c5a76191198ac5 \
   --rpc-url $RPC_URL

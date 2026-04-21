@@ -57,16 +57,20 @@ contract DrandLotteryDemo {
     }
 
     /// @notice Reveal: submit the drand signature for the committed round.
+    /// @dev Follows checks-effects-interactions: `settled` is set before the external
+    /// oracle call. `verifyNormalized` is `view`-only today, but modeling the pattern
+    /// matches the advice in the accompanying security checklist.
     function settle(bytes calldata sig) external {
         require(revealRound != 0 && !settled, "not settlable");
         uint256 publishTime_ = GENESIS + uint256(revealRound - 1) * PERIOD;
         require(block.timestamp >= publishTime_, "round not yet published");
 
+        settled = true;
+
         (bool ok, bytes32 r,) = oracle.verifyNormalized(revealRound, sig);
         require(ok, "bad signature");
 
         uint256 idx = uint256(r) % entrants.length;
-        settled = true;
         randomness = r;
         winner = entrants[idx];
         emit LotterySettled(revealRound, winner, idx, r);
