@@ -55,14 +55,14 @@ Make sure your wallet is set to the correct network — Ethereum Mainnet for pro
 Scroll to **depositTransaction** in the list and expand it.
 Fill in the six fields:
 
-| Field | What to enter |
-| ----- | ------------- |
-| `payableAmount (ETH)` | Amount of ETH to send to MegaETH (e.g. `0.001`). Enter `0` if you are only calling a contract with no ETH attached. |
-| `_to (address)` | The destination address on MegaETH — your wallet address for a plain ETH transfer. |
-| `_value (uint256)` | The same amount as `payableAmount`, converted to wei. For 0.001 ETH enter `1000000000000000`. Enter `0` if sending no ETH. |
-| `_gasLimit (uint64)` | Gas budget for L2 execution. Use `100000` for a plain ETH transfer. |
-| `_isCreation (bool)` | `false` — leave this as false unless you are deploying a new contract on MegaETH. |
-| `_data (bytes)` | `0x` for a plain ETH transfer. For a contract call, paste the encoded function call data here. |
+| Field                 | What to enter                                                                                                              |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `payableAmount (ETH)` | Amount of ETH to send to MegaETH (e.g. `0.001`). Enter `0` if you are only calling a contract with no ETH attached.        |
+| `_to (address)`       | The destination address on MegaETH — your wallet address for a plain ETH transfer.                                         |
+| `_value (uint256)`    | The same amount as `payableAmount`, converted to wei. For 0.001 ETH enter `1000000000000000`. Enter `0` if sending no ETH. |
+| `_gasLimit (uint64)`  | Gas budget for L2 execution. Use `100000` for a plain ETH transfer.                                                        |
+| `_isCreation (bool)`  | `false` — leave this as false unless you are deploying a new contract on MegaETH.                                          |
+| `_data (bytes)`       | `0x` for a plain ETH transfer. For a contract call, paste the encoded function call data here.                             |
 
 {% hint style="info" %}
 If `_gasLimit` is too low, the L2 transaction will revert on MegaETH — but your ETH is still delivered to `_to` even on failure.
