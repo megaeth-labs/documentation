@@ -20,13 +20,14 @@ For a complete worked example — contract, tests, and an end-to-end shell demo 
 
 ## What is VRF?
 
-A verifiable random function is a primitive for producing a random value together with a **proof** that lets anyone independently check:
+A verifiable random function produces a random value together with a **proof** of its validity.
+Given the proof and a public verification key, anyone can independently check three properties:
 
-- The value was produced by the intended key holder.
-- The value is the **unique** random output for the given input.
-- No party — including the key holder — could have biased the output.
+- **Correctness.** The value was produced according to the VRF's public rules — no one can forge it.
+- **Uniqueness.** For any given input, there is exactly one valid output. The producer cannot choose among alternatives to bias the result.
+- **Unpredictability.** Before the proof is published, the value is indistinguishable from random.
 
-For onchain use the property that matters is _public verifiability_: given a public input and a proof, a smart contract can confirm the value without trusting the producer.
+For onchain use, the property that matters most is _public verifiability_: the proof is small enough that a smart contract can check it directly, without trusting the producer.
 
 ## The VRF service on MegaETH
 
