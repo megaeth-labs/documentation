@@ -1,15 +1,15 @@
-# drand-lottery-demo
+---
+description: A minimal commit-reveal lottery using drand quicknet randomness on MegaETH — full Foundry project with contract, tests, deploy scripts, and an end-to-end shell demo.
+---
 
-A minimal commit-reveal lottery that consumes
-[DrandOracleQuicknet](https://github.com/Zodomo/DrandVerifier) to draw a fair
-winner using drand quicknet randomness.
+# Drand VRF Lottery
 
-The whole point of this demo is to show what a _consumer_ contract has to add
-around the stateless drand verifier to make randomness safely usable. The
-verifier answers one question — "is this a valid drand beacon?" — and nothing
-else. Everything about **when** to consume it, **which round** to use, and
-**how to lock inputs** is the application's responsibility. This contract
-shows the minimum correct discipline.
+A minimal commit-reveal lottery that consumes [DrandOracleQuicknet](https://github.com/Zodomo/DrandVerifier) to draw a fair winner using drand quicknet randomness.
+
+The whole point of this demo is to show what a _consumer_ contract has to add around the stateless drand verifier to make randomness safely usable.
+The verifier answers one question — "is this a valid drand beacon?" — and nothing else.
+Everything about **when** to consume it, **which round** to use, and **how to lock inputs** is the application's responsibility.
+This contract shows the minimum correct discipline.
 
 ## Contracts
 
@@ -20,7 +20,7 @@ shows the minimum correct discipline.
 
 ## Flow
 
-```
+```text
  open() ─▶ enter()×N ─▶ close() ─▶ (wait until revealRound published) ─▶ settle(sig)
                            │                                                  │
                            │                                                  ├─ verify BLS sig via DrandOracleQuicknet
@@ -50,10 +50,8 @@ See the DrandVerifier README (§ "Integration caveats") for the reasoning behind
 
 ### Dev-account cheat sheet
 
-All examples below assume standard hardhat test accounts (mnemonic
-`test test test test test test test test test test test junk`), which most
-devnets (including the MegaETH op-stack devnet) pre-fund at genesis. The
-first four:
+All examples below assume standard hardhat test accounts (mnemonic `test test test test test test test test test test test junk`), which most devnets (including the MegaETH op-stack devnet) pre-fund at genesis.
+The first four:
 
 | #   | Address                                      | Private key                                                          |
 | --- | -------------------------------------------- | -------------------------------------------------------------------- |
@@ -62,13 +60,12 @@ first four:
 | 2   | `0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC` | `0x5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a` |
 | 3   | `0x90F79bf6EB2c4f870365E785982E1f101E93b906` | `0x7c852118294e51e653712a81e05800f419141751be58f605c371e15141b007a6` |
 
-`script/demo.sh` hard-codes #0–#3, so if you're running against a chain that
-doesn't fund those, edit the script. On real networks, supply your own
-`PRIVATE_KEY` via env.
+`script/demo.sh` hard-codes #0–#3, so if you're running against a chain that doesn't fund those, edit the script.
+On real networks, supply your own `PRIVATE_KEY` via env.
 
 ## Layout
 
-```
+```text
 drand-lottery-demo/
 ├── src/DrandLottery.sol              # consumer contract
 ├── script/
@@ -85,13 +82,11 @@ drand-lottery-demo/
         └── lib/{bls-solidity,solady,forge-std}/    # DrandVerifier's own nested submodules
 ```
 
-Why two mechanisms? `forge-std` is on Soldeer so we install it there — no git
-churn. DrandVerifier isn't on Soldeer (and `randa-mu/bls-solidity`, which it
-depends on, is also not there), so that one is a git submodule. Both land in
-`dependencies/` (Foundry's default now that this project has a `[dependencies]`
-table). DrandVerifier's own source imports `../../lib/bls-solidity/...` and
-`../../lib/solady/...` as relative paths, so its _nested_ submodules are what
-resolve those — we don't need to install bls-solidity or solady at our level.
+Why two mechanisms?
+`forge-std` is on Soldeer so we install it there — no git churn.
+DrandVerifier isn't on Soldeer (and `randa-mu/bls-solidity`, which it depends on, is also not there), so that one is a git submodule.
+Both land in `dependencies/` (Foundry's default now that this project has a `[dependencies]` table).
+DrandVerifier's own source imports `../../lib/bls-solidity/...` and `../../lib/solady/...` as relative paths, so its _nested_ submodules are what resolve those — we don't need to install bls-solidity or solady at our level.
 
 ## Setup (first clone)
 
@@ -114,15 +109,13 @@ forge build
 forge test -vv
 ```
 
-Tests use `vm.warp` to jump chain time to the quicknet genesis + round math so
-the canonical vector (round 20791007) becomes the "future" round picked by
-`close()`. No network required.
+Tests use `vm.warp` to jump chain time to the quicknet genesis + round math so the canonical vector (round 20791007) becomes the "future" round picked by `close()`.
+No network required.
 
 ## Deploy
 
-Two steps: `DrandOracleQuicknet` first, then the lottery pointed at it. Skip
-step 1 if you already have a `DrandOracleQuicknet` on the target chain — just
-set `ORACLE_ADDRESS` directly.
+Two steps: `DrandOracleQuicknet` first, then the lottery pointed at it.
+Skip step 1 if you already have a `DrandOracleQuicknet` on the target chain — just set `ORACLE_ADDRESS` directly.
 
 ### 1. Deploy DrandOracleQuicknet (once per chain)
 
@@ -135,9 +128,7 @@ forge create dependencies/DrandVerifier/src/oracles/DrandOracleQuicknet.sol:Dran
   --broadcast --legacy --gas-limit 500000000                                      # MegaETH note below
 ```
 
-Or, equivalently, via `forge script` — note you need `--gas-estimate-multiplier`,
-not `--gas-limit`, because `forge script` ignores `--gas-limit` in broadcast
-mode and drives gas from the estimate:
+Or, equivalently, via `forge script` — note you need `--gas-estimate-multiplier`, not `--gas-limit`, because `forge script` ignores `--gas-limit` in broadcast mode and drives gas from the estimate:
 
 ```bash
 forge script script/DeployOracle.s.sol \
@@ -168,25 +159,18 @@ forge script script/DeployLottery.s.sol \
 
 ### MegaETH gas note
 
-MegaETH's multi-dimensional gas model meters contract creation more
-expensively than stock EVM. `DrandOracleQuicknet` costs ~150 M gas to deploy;
-`DrandLottery` costs ~25 M. Two footguns to know about:
+MegaETH's multi-dimensional gas model meters contract creation more expensively than stock EVM.
+`DrandOracleQuicknet` costs ~150 M gas to deploy; `DrandLottery` costs ~25 M.
+Two footguns to know about:
 
-- `forge create --gas-limit <N>` is honored verbatim — set it high (500 M for
-  `DrandOracleQuicknet`, 200 M for the lottery). This is the reliable path on
-  MegaETH.
-- `forge script --gas-limit <N>` is **silently ignored** in broadcast mode.
-  The effective gas is `estimate × multiplier`, and the default multiplier of
-  1.3 drastically undershoots MegaETH's real cost. Use
-  `--gas-estimate-multiplier 5000` (or similar) instead.
+- `forge create --gas-limit <N>` is honored verbatim — set it high (500 M for `DrandOracleQuicknet`, 200 M for the lottery). This is the reliable path on MegaETH.
+- `forge script --gas-limit <N>` is **silently ignored** in broadcast mode. The effective gas is `estimate × multiplier`, and the default multiplier of 1.3 drastically undershoots MegaETH's real cost. Use `--gas-estimate-multiplier 5000` (or similar) instead.
 
-On Ethereum mainnet and other Pectra chains, normal estimation is fine and
-you can drop the gas overrides entirely.
+On Ethereum mainnet and other Pectra chains, normal estimation is fine and you can drop the gas overrides entirely.
 
 ## End-to-end demo
 
-Once both contracts are deployed, run the full commit-reveal flow against live
-drand:
+Once both contracts are deployed, run the full commit-reveal flow against live drand:
 
 ```bash
 export RPC_URL=http://localhost:9545
@@ -207,7 +191,7 @@ The script:
 
 Expected output:
 
-```
+```text
 ==== 5. Settle -- verify sig on-chain, pick winner, pay out ====
   winner = 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
   pot    = 300000000000000000 wei

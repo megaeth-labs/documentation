@@ -156,6 +156,7 @@ contract DrandLottery {
     }
 
     function publishTimeOf(uint64 round) public view returns (uint64) {
+        if (round == 0) return 0;
         return oracle.GENESIS_TIMESTAMP() + (round - 1) * oracle.PERIOD_SECONDS();
     }
 }
