@@ -37,4 +37,5 @@
 - [Build with AI](dev/build-with-ai.md)
 - [Tooling & Infrastructure](dev/tooling.md)
 - [Verifiable Randomness (VRF)](dev/vrf.md)
+  - [Drand VRF Lottery](dev/examples/vrf-drand-quicknet-lottery/README.md)
 - [Developer FAQ](dev/faq.md)
