@@ -264,7 +264,7 @@ With metrics enabled, the validator binds a Prometheus endpoint on `0.0.0.0:9090
 Three gauges tell you whether the validator is keeping up:
 
 ```bash
-curl -s http://localhost:9090/metrics | grep -E 'chain_height|validation_lag'
+curl -s http://localhost:9090/metrics | grep -v '^#' | grep -E 'chain_height|validation_lag'
 stateless_validator_local_chain_height   12649974
 stateless_validator_remote_chain_height  13977051
 stateless_validator_validation_lag       1327077
