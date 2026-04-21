@@ -169,7 +169,7 @@ Otherwise, an attacker can read the public beacon offchain and choose whether to
 
 ## The contract
 
-Full source in [`src/DrandLotteryDemo.sol`](src/DrandLotteryDemo.sol).
+Full source in `src/DrandLotteryDemo.sol`.
 Key invariants:
 
 - `open` computes `revealRound` from the future publish window and requires `publishTime > block.timestamp`.
@@ -198,7 +198,7 @@ function settle(bytes calldata sig) external {
 
 ## Testing with a mock oracle
 
-[`test/DrandLotteryDemo.t.sol`](test/DrandLotteryDemo.t.sol) exercises the commit-reveal flow against a `MockOracleQuicknet` that returns caller-chosen results.
+`test/DrandLotteryDemo.t.sol` exercises the commit-reveal flow against a `MockOracleQuicknet` that returns caller-chosen results.
 This decouples the lottery logic from the real BLS verifier so unit tests stay fast and deterministic.
 
 ```bash
@@ -304,5 +304,5 @@ Point `ORACLE_ADDRESS` in `.env` at the returned address and re-run `script/depl
 - [DrandVerifier repository](https://github.com/Zodomo/DrandVerifier) — source, tests, gas snapshot for the underlying verifier
 - [drand developer docs](https://docs.drand.love/developer/) — protocol spec, beacon format, security model
 - [EIP-2537: BLS12-381 curve operations](https://eips.ethereum.org/EIPS/eip-2537) — precompile reference
-- [`src/DrandLotteryDemo.sol`](src/DrandLotteryDemo.sol) — the demo contract
-- [`test/DrandLotteryDemo.t.sol`](test/DrandLotteryDemo.t.sol) — mock-oracle unit tests
+- `src/DrandLotteryDemo.sol` — the demo contract
+- `test/DrandLotteryDemo.t.sol` — mock-oracle unit tests
