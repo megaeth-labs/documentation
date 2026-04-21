@@ -23,7 +23,7 @@ shows the minimum correct discipline.
 ```
  open() ─▶ enter()×N ─▶ close() ─▶ (wait until revealRound published) ─▶ settle(sig)
                            │                                                  │
-                           │                                                  ├─ verify BLS sig via oracle
+                           │                                                  ├─ verify BLS sig via DrandOracleQuicknet
                            │                                                  ├─ derive canonical randomness
                            │                                                  └─ pay winner = entrants[r % n]
                            │
@@ -73,7 +73,7 @@ drand-lottery-demo/
 ├── src/DrandLottery.sol              # consumer contract
 ├── script/
 │   ├── DeployOracle.s.sol            # forge script: deploy DrandOracleQuicknet
-│   ├── DeployLottery.s.sol           # forge script: deploy DrandLottery, wires oracle by env var
+│   ├── DeployLottery.s.sol           # forge script: deploy DrandLottery, wires DrandOracleQuicknet by env var
 │   └── demo.sh                       # end-to-end shell demo against live drand
 ├── test/DrandLottery.t.sol           # 5 unit tests, uses canonical vector
 ├── foundry.toml                      # remappings + [dependencies] block
@@ -120,11 +120,11 @@ the canonical vector (round 20791007) becomes the "future" round picked by
 
 ## Deploy
 
-Two steps: oracle first, then the lottery pointed at it. Skip step 1 if you
-already have a `DrandOracleQuicknet` on the target chain — just set
-`ORACLE_ADDRESS` directly.
+Two steps: `DrandOracleQuicknet` first, then the lottery pointed at it. Skip
+step 1 if you already have a `DrandOracleQuicknet` on the target chain — just
+set `ORACLE_ADDRESS` directly.
 
-### 1. Deploy the oracle (once per chain)
+### 1. Deploy DrandOracleQuicknet (once per chain)
 
 ```bash
 export RPC_URL=http://localhost:9545                                              # your chain's RPC
@@ -150,7 +150,7 @@ Grab the address from the output and export it:
 export ORACLE_ADDRESS=0x...
 ```
 
-### 2. Deploy the lottery wired to the oracle
+### 2. Deploy the lottery wired to DrandOracleQuicknet
 
 ```bash
 forge create src/DrandLottery.sol:DrandLottery \
@@ -173,7 +173,8 @@ expensively than stock EVM. `DrandOracleQuicknet` costs ~150 M gas to deploy;
 `DrandLottery` costs ~25 M. Two footguns to know about:
 
 - `forge create --gas-limit <N>` is honored verbatim — set it high (500 M for
-  the oracle, 200 M for the lottery). This is the reliable path on MegaETH.
+  `DrandOracleQuicknet`, 200 M for the lottery). This is the reliable path on
+  MegaETH.
 - `forge script --gas-limit <N>` is **silently ignored** in broadcast mode.
   The effective gas is `estimate × multiplier`, and the default multiplier of
   1.3 drastically undershoots MegaETH's real cost. Use

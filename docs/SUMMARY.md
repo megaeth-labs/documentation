@@ -37,5 +37,5 @@
 - [Build with AI](dev/build-with-ai.md)
 - [Tooling & Infrastructure](dev/tooling.md)
 - Examples
-  - [Drand VRF Lottery](dev/examples/vrf-drand-lottery/README.md)
+  - [Drand VRF Lottery](dev/examples/vrf-drand-quicknet-lottery/README.md)
 - [Developer FAQ](dev/faq.md)
