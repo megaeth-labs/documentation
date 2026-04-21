@@ -1,0 +1,3 @@
+[submodule "dependencies/DrandVerifier"]
+	path = dependencies/DrandVerifier
+	url = https://github.com/Zodomo/DrandVerifier

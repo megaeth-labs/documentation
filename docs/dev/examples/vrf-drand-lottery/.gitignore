@@ -1,14 +1,13 @@
-# Compiler files
-cache/
 out/
-
-# Ignores development broadcast logs
-!/broadcast
-/broadcast/*/31337/
-/broadcast/**/dry-run/
-
-# Docs
-docs/
-
-# Dotenv file
+cache/
+broadcast/
 .env
+
+# Soldeer-managed deps are restored from soldeer.lock via `forge soldeer install`.
+# Only the submodule entry (dependencies/DrandVerifier) should be tracked.
+dependencies/*
+!dependencies/DrandVerifier
+
+# Soldeer regenerates this on every `forge soldeer install`; real remappings
+# live in foundry.toml.
+remappings.txt

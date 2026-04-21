@@ -22,5 +22,5 @@ exclude_path = [
   ".claude/",
   ".sisyphus/",
   # Vendored dependencies of embedded Foundry example projects.
-  "docs/dev/examples/vrf-drand-lottery/lib/",
+  "docs/dev/examples/vrf-drand-lottery/dependencies/",
 ]
