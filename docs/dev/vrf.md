@@ -229,14 +229,14 @@ A single VRF cycle walks through four stages:
 | Stage              | Happens at                             | Typical wait                           |
 | ------------------ | -------------------------------------- | -------------------------------------- |
 | Commit tx included | `t₀` — your dapp picks `revealRound`   | one MegaETH mini-block (~10 ms)        |
-| Round produced     | `t₁ = GENESIS + (revealRound − 1)·3 s` | up to one drand period (0–3 s from t₀) |
+| Round produced     | `t₁ = GENESIS + (revealRound − 1)·3 s` | 1–2 drand periods (3–6 s from t₀)     |
 | Beacon live on API | `t₂ ≈ t₁ + <1 s`                       | threshold BLS aggregation latency      |
 | Reveal tx included | `t₃` — submitter sends `reveal(sig)`   | one MegaETH mini-block (~10 ms)        |
 
 #### Minimum realistic VRF time
 
-With `revealRound = currentRound + 2` (the default in the [Drand VRF Lottery](https://github.com/megaeth-labs/documentation/blob/main/docs/dev/examples/vrf-drand-quicknet-lottery/README.md)), end-to-end is **~6–10 s** from commit to settled randomness.
-The wide range comes from where in a 3-second round your commit tx lands: commit just before a round boundary and you wait nearly 6 s; commit just after and you wait nearly 9 s.
+With `revealRound = currentRound + 2` (the default in the [Drand VRF Lottery](https://github.com/megaeth-labs/documentation/blob/main/docs/dev/examples/vrf-drand-quicknet-lottery/README.md)), end-to-end is **~4–7 s** from commit to settled randomness.
+The wide range comes from where in a 3-second round your commit tx lands: commit just before a round boundary and you wait nearly 3 s (one period); commit just after and you wait nearly 6 s (two periods).
 
 {% hint style="warning" %}
 Don't set `revealRound = currentRound + 1`.
