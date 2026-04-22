@@ -225,8 +225,9 @@ A single VRF cycle walks through four stages:
 | Beacon live on API | `t₂ ≈ t₁ + <1 s`                       | threshold BLS aggregation latency      |
 | Reveal tx included | `t₃` — submitter sends `reveal(sig)`   | one MegaETH mini-block (~10 ms)        |
 
-**Minimum realistic VRF time.**
-With `revealRound = currentRound + 2` (the default in the [DrandLottery example](https://github.com/megaeth-labs/documentation/blob/main/docs/dev/examples/vrf-drand-quicknet-lottery/README.md)), end-to-end is **~6–10 s** from commit to settled randomness.
+#### Minimum realistic VRF time
+
+With `revealRound = currentRound + 2` (the default in the [Drand VRF Lottery](https://github.com/megaeth-labs/documentation/blob/main/docs/dev/examples/vrf-drand-quicknet-lottery/README.md)), end-to-end is **~6–10 s** from commit to settled randomness.
 The wide range comes from where in a 3-second round your commit tx lands: commit just before a round boundary and you wait nearly 6 s; commit just after and you wait nearly 9 s.
 
 {% hint style="warning" %}
