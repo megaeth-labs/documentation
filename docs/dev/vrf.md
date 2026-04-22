@@ -133,9 +133,10 @@ contract RandomizedApp {
         uint64 currentRound = uint64((block.timestamp - genesis) / period) + 1;
         revealRound = currentRound + MIN_FUTURE_ROUNDS;
 
-        // Loud failure — see Security caveats §1. Without this, a stale or
-        // manipulated block.timestamp can silently produce a revealRound that
-        // drand has already signed, breaking the "future round" property.
+        // Defensive tripwire: always holds while MIN_FUTURE_ROUNDS >= 1, but
+        // reverts visibly if the constant is ever lowered to 0 or if someone
+        // refactors the offset formula into a buggy state. See Security
+        // caveats §1.
         uint256 publishTime = genesis + uint256(revealRound - 1) * period;
         require(publishTime > block.timestamp, "round already producible");
 
@@ -283,7 +284,8 @@ Three concrete rules your commit logic must enforce:
 
 - **Pin an exact round, not "≥ committedRound".** Reject any reveal whose round argument doesn't match the stored `revealRound` exactly; otherwise the submitter gets to pick among several already-produced rounds.
 
-And **freeze application state** — entrant set, stakes, tier choices, any outcome-relevant input — in the same commit transaction. An input that can still move after commit gives the submitter adaptivity even if the round itself is properly pinned.
+And **freeze application state** — entrant set, stakes, tier choices, any outcome-relevant input — in the same commit transaction.
+An input that can still move after commit gives the submitter adaptivity even if the round itself is properly pinned.
 
 ### 2. Own the state the verifier doesn't
 
