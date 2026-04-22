@@ -15,7 +15,7 @@ At the highest level:
 3. They submit it in a transaction; `DrandOracleQuicknet.verifyNormalized(round, sig)` checks the BLS pairing onchain and returns a canonical 32-byte random value.
 
 {% hint style="info" %}
-For a complete worked example — contract, tests, and an end-to-end shell demo — see the [Drand VRF Lottery](examples/vrf-drand-quicknet-lottery/README.md).
+For a complete worked example — contract, tests, and an end-to-end shell demo — see the [Drand VRF Lottery](https://github.com/megaeth-labs/documentation/blob/main/docs/dev/examples/vrf-drand-quicknet-lottery/README.md).
 {% endhint %}
 
 ## What is VRF?
@@ -212,7 +212,7 @@ The drand quicknet chain hash `52db9ba7…0c84e971` is fixed — don't change it
 
 ### Worked example
 
-The [Drand VRF Lottery](examples/vrf-drand-quicknet-lottery/README.md) is a complete Foundry project — `src/DrandLottery.sol`, test suite, deploy scripts, and an `./script/demo.sh` that drives the full lifecycle end-to-end against a real MegaETH network.
+The [Drand VRF Lottery](https://github.com/megaeth-labs/documentation/blob/main/docs/dev/examples/vrf-drand-quicknet-lottery/README.md) is a complete Foundry project — `src/DrandLottery.sol`, test suite, deploy scripts, and an `./script/demo.sh` that drives the full lifecycle end-to-end against a real MegaETH network.
 Clone it if you want something you can run immediately.
 
 ## Security caveats
@@ -261,7 +261,7 @@ See the [DoS scenarios](https://docs.drand.love/docs/security-model/#dos-the-dra
 
 ## References
 
-- [Drand VRF Lottery example](examples/vrf-drand-quicknet-lottery/README.md) — runnable consumer contract with deploy scripts and an end-to-end shell demo
+- [Drand VRF Lottery example](https://github.com/megaeth-labs/documentation/blob/main/docs/dev/examples/vrf-drand-quicknet-lottery/README.md) — runnable consumer contract with deploy scripts and an end-to-end shell demo
 - [Zodomo/DrandVerifier](https://github.com/Zodomo/DrandVerifier) — source of `DrandOracleQuicknet`, full test suite, gas snapshot
 - [drand developer docs](https://docs.drand.love/developer/)
 - [drand protocol specification](https://docs.drand.love/docs/specification/) — including beacon timing
