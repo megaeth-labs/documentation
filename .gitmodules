@@ -1,0 +1,3 @@
+[submodule "docs/dev/examples/vrf-drand-quicknet-lottery/dependencies/DrandVerifier"]
+	path = docs/dev/examples/vrf-drand-quicknet-lottery/dependencies/DrandVerifier
+	url = https://github.com/Zodomo/DrandVerifier

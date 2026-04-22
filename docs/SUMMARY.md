@@ -36,4 +36,5 @@
   - [System Contracts](dev/execution/system-contracts.md)
 - [Build with AI](dev/build-with-ai.md)
 - [Tooling & Infrastructure](dev/tooling.md)
+- [Verifiable Randomness (VRF)](dev/vrf.md)
 - [Developer FAQ](dev/faq.md)

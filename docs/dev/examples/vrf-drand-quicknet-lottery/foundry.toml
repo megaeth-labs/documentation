@@ -1,0 +1,20 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["dependencies"]
+solc = "0.8.34"
+ffi = true
+
+remappings = [
+    "forge-std/=dependencies/forge-std-1.15.0/src/",
+    "drand-verifier/=dependencies/DrandVerifier/src/",
+    # The two below satisfy relative imports inside the DrandVerifier submodule.
+    # DrandVerifier's own source uses `../../lib/bls-solidity/...` and `../../lib/solady/...`,
+    # so its nested submodules (restored by `git submodule update --init --recursive`)
+    # are what actually resolve these imports.
+    "bls-solidity/=dependencies/DrandVerifier/lib/bls-solidity/src/",
+    "solady/=dependencies/DrandVerifier/lib/solady/src/",
+]
+
+[dependencies]
+forge-std = "1.15.0"
