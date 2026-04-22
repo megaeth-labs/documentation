@@ -226,12 +226,12 @@ This cadence is fixed — there is no faster round under quicknet, so 3 s is the
 
 A single VRF cycle walks through four stages:
 
-| Stage              | Happens at                             | Typical wait                           |
-| ------------------ | -------------------------------------- | -------------------------------------- |
-| Commit tx included | `t₀` — your dapp picks `revealRound`   | one MegaETH mini-block (~10 ms)        |
-| Round produced     | `t₁ = GENESIS + (revealRound − 1)·3 s` | 1–2 drand periods (3–6 s from t₀)     |
-| Beacon live on API | `t₂ ≈ t₁ + <1 s`                       | threshold BLS aggregation latency      |
-| Reveal tx included | `t₃` — submitter sends `reveal(sig)`   | one MegaETH mini-block (~10 ms)        |
+| Stage              | Happens at                             | Typical wait                      |
+| ------------------ | -------------------------------------- | --------------------------------- |
+| Commit tx included | `t₀` — your dapp picks `revealRound`   | one MegaETH mini-block (~10 ms)   |
+| Round produced     | `t₁ = GENESIS + (revealRound − 1)·3 s` | 1–2 drand periods (3–6 s from t₀) |
+| Beacon live on API | `t₂ ≈ t₁ + <1 s`                       | threshold BLS aggregation latency |
+| Reveal tx included | `t₃` — submitter sends `reveal(sig)`   | one MegaETH mini-block (~10 ms)   |
 
 #### Minimum realistic VRF time
 
