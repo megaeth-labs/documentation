@@ -126,7 +126,7 @@ export AMOUNT=...       # amount in wei
 # Testnet
 export PORTAL=0xF68D900e1Cdec64a8f5Dc0Ee873A9E2879256b10
 export L1_RPC=https://ethereum-sepolia-rpc.publicnode.com
-export L2_RPC=https://carrot.megaeth.com/rpc
+export L2_RPC=https://carrot.megaeth.com/rpc  # see Connect page for all RPC options
 
 # Mainnet
 # export PORTAL=0x7f82f57F0Dd546519324392e408b01fcC7D709e8
@@ -164,10 +164,10 @@ GAS_LIMIT=$(( GAS_EST * 120 / 100 ))
 echo "estimate: $GAS_EST   limit: $GAS_LIMIT"
 ```
 
-For a standard ERC-20 `transfer()` on MegaETH the estimate is approximately 54 000 gas; a limit of 65 000 is sufficient.
+For a standard ERC-20 `transfer()` on MegaETH the estimate is approximately 54,000 gas; a limit of 65,000 is sufficient.
 
 {% hint style="warning" %}
-The portal enforces a minimum `_gasLimit` based on calldata length (~26 500 for a `transfer()` call).
+The portal enforces a minimum `_gasLimit` based on calldata length (~26,500 for a `transfer()` call).
 Values below the minimum revert with `SmallGasLimit`.
 {% endhint %}
 
@@ -287,7 +287,7 @@ cast call $TOKEN "balanceOf(address)(uint256)" $RECIPIENT --rpc-url $L2_RPC
 1. `depositTransaction` emits `TransactionDeposited(address indexed from, address indexed to, uint256 indexed version, bytes opaqueData)` on L1.
 2. MegaETH watches for these events and converts each one into a deposited transaction (type `0x7E`) to execute on L2.
 3. The deposited transaction runs on L2 with your L1 wallet address as the sender (no address transformation is applied for regular wallets).
-4. `_gasLimit` is pre-paid on L1 and is not refunded even if unused.
+4. `_gasLimit` caps L2 execution gas. If unused, it is not refunded, but no ETH is charged on L1 for it — only the standard Ethereum gas fee for calling `depositTransaction` applies.
 5. Setting `_value` forwards ETH to `_to`; it must equal `msg.value`.
 
 For the formal deposit specification, see [Deposits](https://specs.optimism.io/protocol/deposits.html) in the OP Stack spec.
