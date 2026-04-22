@@ -9,7 +9,7 @@
 - [Get Started](user/get-started.md)
 - [Connect to MegaETH](user/connect.md)
 - [Get Funds on Mainnet](user/bridge.md)
-- [Force-Include a Transaction](user/force-inclusion.md)
+- [Force-include a transaction](user/force-inclusion.md)
 - [Get ETH on Testnet](user/faucet.md)
 - [Featured Apps](user/apps.md)
 - [User FAQ](user/faq.md)
