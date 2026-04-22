@@ -38,9 +38,10 @@ For routine transactions, submit normally through your wallet or RPC.
 {% endtab %}
 {% endtabs %}
 
-## Using Etherscan
+## Quick path — Etherscan
 
-The easiest way to submit a force-inclusion transaction without any tooling.
+No tooling required.
+Use this if you have a browser wallet and want the simplest approach.
 You need a browser wallet (MetaMask, Rabby, etc.) funded with ETH on Ethereum Mainnet or Sepolia.
 
 {% stepper %}
@@ -104,10 +105,10 @@ After 1–2 minutes, check your balance or transaction on the block explorer:
 {% endstep %}
 {% endstepper %}
 
-## Using cast or forge
+## Advanced path — cast or forge
 
-For scripted or programmatic force inclusion using [Foundry](https://getfoundry.sh/).
-The L1 sender address equals `msg.sender` on L2 — no aliasing applies for EOA callers — so the same private key that holds tokens on MegaETH signs the L1 transaction.
+Use this for scripted, automated, or repeatable force inclusion with [Foundry](https://getfoundry.sh/).
+Your L1 wallet address is preserved as the sender on MegaETH — so the same private key that holds tokens on MegaETH signs the L1 transaction.
 
 {% stepper %}
 {% step %}
@@ -173,8 +174,8 @@ Values below the minimum revert with `SmallGasLimit`.
 
 ### Encode the calldata
 
-The `_data` field passed to `depositTransaction` is the ABI-encoded function call to execute on L2.
-Use `cast calldata` to encode it:
+The `_data` field passed to `depositTransaction` is the function call you want to execute on L2, serialized into bytes (ABI-encoded).
+Use `cast calldata` to produce it:
 
 ```bash
 CALLDATA=$(cast calldata "transfer(address,uint256)" $RECIPIENT $AMOUNT)
@@ -253,8 +254,6 @@ contract ForceInclude is Script {
 ```
 
 ```bash
-export GAS_LIMIT=$GAS_LIMIT
-
 forge script script/ForceInclude.s.sol \
   --rpc-url $L1_RPC \
   --broadcast \
@@ -284,8 +283,8 @@ cast call $TOKEN "balanceOf(address)(uint256)" $RECIPIENT --rpc-url $L2_RPC
 ## How it works
 
 1. `depositTransaction` emits `TransactionDeposited(address indexed from, address indexed to, uint256 indexed version, bytes opaqueData)` on L1.
-2. The MegaETH derivation pipeline converts the event into a type-`0x7E` deposited transaction.
-3. The deposited transaction executes on L2 with `msg.sender` equal to the L1 sender (no aliasing for EOA).
+2. MegaETH watches for these events and converts each one into a deposited transaction (type `0x7E`) to execute on L2.
+3. The deposited transaction runs on L2 with your L1 wallet address as the sender (no address transformation is applied for regular wallets).
 4. `_gasLimit` is pre-paid on L1 and is not refunded even if unused.
 5. Setting `_value` forwards ETH to `_to`; it must equal `msg.value`.
 
