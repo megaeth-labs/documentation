@@ -79,7 +79,7 @@ GAS_EST=$(cast estimate $TOKEN \
   --from $SENDER \
   --rpc-url $L2_RPC)
 
-GAS_LIMIT=$(( GAS_EST * 120 / 100 ))
+export GAS_LIMIT=$(( GAS_EST * 120 / 100 ))
 echo "estimate: $GAS_EST   limit: $GAS_LIMIT"
 ```
 
