@@ -38,6 +38,8 @@ For routine transactions, submit normally through your wallet or RPC.
 {% endtab %}
 {% endtabs %}
 
+Use the **quick path** unless you need to automate or script the submission.
+
 ## Quick path — Etherscan
 
 No tooling required.
@@ -51,8 +53,8 @@ You need a browser wallet (MetaMask, Rabby, etc.) funded with ETH on Ethereum Ma
 
 Go to the OptimismPortal contract for your network and open the **Write as Proxy** tab:
 
-- **Mainnet:** [0x7f82f57F0Dd546519324392e408b01fcC7D709e8](https://etherscan.io/address/0x7f82f57F0Dd546519324392e408b01fcC7D709e8#writeProxyContract) on Etherscan
-- **Testnet (Sepolia):** [0xF68D900e1Cdec64a8f5Dc0Ee873A9E2879256b10](https://sepolia.etherscan.io/address/0xF68D900e1Cdec64a8f5Dc0Ee873A9E2879256b10#writeProxyContract) on Sepolia Etherscan
+- **Mainnet:** [OptimismPortal on Etherscan](https://etherscan.io/address/0x7f82f57F0Dd546519324392e408b01fcC7D709e8#writeProxyContract) (`0x7f82f57F0Dd546519324392e408b01fcC7D709e8`)
+- **Testnet (Sepolia):** [OptimismPortal on Sepolia Etherscan](https://sepolia.etherscan.io/address/0xF68D900e1Cdec64a8f5Dc0Ee873A9E2879256b10#writeProxyContract) (`0xF68D900e1Cdec64a8f5Dc0Ee873A9E2879256b10`)
 
 {% endstep %}
 {% step %}
