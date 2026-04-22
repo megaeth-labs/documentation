@@ -210,6 +210,33 @@ await walletClient.writeContract({
 
 The drand quicknet chain hash `52db9ba7…0c84e971` is fixed — don't change it.
 
+### Timing
+
+drand quicknet publishes a **new beacon every 3 seconds**, deterministically.
+Round `N` becomes signable at `GENESIS_TIMESTAMP + (N - 1) * 3` seconds (Unix), where `GENESIS_TIMESTAMP = 1692803367`.
+This cadence is fixed — there is no faster round under quicknet, so 3 s is the irreducible unit of VRF latency.
+
+A single VRF cycle walks through four stages:
+
+| Stage              | Happens at                             | Typical wait                           |
+| ------------------ | -------------------------------------- | -------------------------------------- |
+| Commit tx included | `t₀` — your dapp picks `revealRound`   | one MegaETH mini-block (~10 ms)        |
+| Round produced     | `t₁ = GENESIS + (revealRound − 1)·3 s` | up to one drand period (0–3 s from t₀) |
+| Beacon live on API | `t₂ ≈ t₁ + <1 s`                       | threshold BLS aggregation latency      |
+| Reveal tx included | `t₃` — submitter sends `reveal(sig)`   | one MegaETH mini-block (~10 ms)        |
+
+**Minimum realistic VRF time.**
+With `revealRound = currentRound + 2` (the default in the [DrandLottery example](https://github.com/megaeth-labs/documentation/blob/main/docs/dev/examples/vrf-drand-quicknet-lottery/README.md)), end-to-end is **~6–10 s** from commit to settled randomness.
+The wide range comes from where in a 3-second round your commit tx lands: commit just before a round boundary and you wait nearly 6 s; commit just after and you wait nearly 9 s.
+
+{% hint style="warning" %}
+Don't set `revealRound = currentRound + 1`.
+If your commit tx lands in the tail of the current round, drand may have already signed the next one by the time it's confirmed on MegaETH — defeating the "future round" property.
+`revealRound ≥ currentRound + 2` gives you a full round of slack against timestamp races and mini-block reordering.
+{% endhint %}
+
+For apps that don't need low latency (weekly draws, cross-epoch reveals, cooldown periods) set `revealRound` further out to buy larger safety margins, at a direct 3-seconds-per-round cost.
+
 ### Worked example
 
 The [Drand VRF Lottery](https://github.com/megaeth-labs/documentation/blob/main/docs/dev/examples/vrf-drand-quicknet-lottery/README.md) is a complete Foundry project — `src/DrandLottery.sol`, test suite, deploy scripts, and an `./script/demo.sh` that drives the full lifecycle end-to-end against a real MegaETH network.
