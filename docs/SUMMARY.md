@@ -21,6 +21,7 @@
   - [Contracts & Tokens](dev/send-tx/contracts.md)
   - [Gas Estimation](dev/send-tx/gas-estimation.md)
   - [Debugging Transactions](dev/send-tx/debugging.md)
+  - [Force Inclusion — Foundry](dev/send-tx/force-inclusion.md)
 - [Read from MegaETH](dev/read/overview.md)
   - [Realtime API](dev/read/realtime-api.md)
   - RPC Reference
