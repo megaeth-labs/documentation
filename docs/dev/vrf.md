@@ -123,14 +123,22 @@ contract RandomizedApp {
     bool public settled;
     bytes32 public randomness;
 
-    uint64 constant MIN_DELAY_SECONDS = 30;
+    uint64 constant MIN_FUTURE_ROUNDS = 2; // on MegaETH; larger on slower chains
 
     /// Step 1: commit to a drand round that has NOT YET been signed.
     function commit() external {
         require(revealRound == 0 || settled, "in flight");
         uint64 period = VRF.PERIOD_SECONDS();
         uint64 genesis = VRF.GENESIS_TIMESTAMP();
-        revealRound = uint64((block.timestamp + MIN_DELAY_SECONDS - genesis) / period + 1);
+        uint64 currentRound = uint64((block.timestamp - genesis) / period) + 1;
+        revealRound = currentRound + MIN_FUTURE_ROUNDS;
+
+        // Loud failure — see Security caveats §1. Without this, a stale or
+        // manipulated block.timestamp can silently produce a revealRound that
+        // drand has already signed, breaking the "future round" property.
+        uint256 publishTime = genesis + uint256(revealRound - 1) * period;
+        require(publishTime > block.timestamp, "round already producible");
+
         settled = false;
 
         // Any app input that influences the outcome MUST be locked here too.
@@ -261,7 +269,21 @@ The round you consume must be one drand has **not yet signed** at commit time, a
 
 drand beacons are public.
 If you pick the current round, or leave any outcome-relevant input mutable after commit, the submitter can read the beacon offchain and only proceed when the result favors them.
-Derive `revealRound` from `block.timestamp + delay` with `publish_time(revealRound) > block.timestamp`, reject any signature whose round doesn't match the committed one exactly, and freeze application state in the same commit transaction.
+Three concrete rules your commit logic must enforce:
+
+- **Derive `revealRound` from `block.timestamp + safety margin`.** Use `currentRound + MIN_FUTURE_ROUNDS` with `MIN_FUTURE_ROUNDS ≥ 2` on MegaETH (larger on slower chains — see [Timing](#timing)).
+- **Make failure loud with an explicit require.** Inside `commit`, after computing `revealRound`, assert:
+
+  ```solidity
+  uint256 publishTime = GENESIS + uint256(revealRound - 1) * PERIOD;
+  require(publishTime > block.timestamp, "round already producible");
+  ```
+
+  Without this check, a stale or adversarial `block.timestamp` (miner drift, reorg, arithmetic edge case) can silently produce a `revealRound` that drand has already signed — the tx succeeds, no revert, but an attacker watching `api.drand.sh` has already seen the outcome. The `require` turns a silent security break into a visible revert.
+
+- **Pin an exact round, not "≥ committedRound".** Reject any reveal whose round argument doesn't match the stored `revealRound` exactly; otherwise the submitter gets to pick among several already-produced rounds.
+
+And **freeze application state** — entrant set, stakes, tier choices, any outcome-relevant input — in the same commit transaction. An input that can still move after commit gives the submitter adaptivity even if the round itself is properly pinned.
 
 ### 2. Own the state the verifier doesn't
 
