@@ -18,11 +18,11 @@ Default (no arguments): last 14 days, all in-scope repos discovered from session
 
 ## Scope
 
-The caller provides the set of repos to scan by making them accessible to the session — typically as the working directory and/or `--add-dir` paths. Discover this set at runtime rather than hardcoding repo names:
+The caller provides the set of repos to scan by making them accessible to the Claude Code session — through the session's working directory and any additional paths granted via the Claude Code CLI flag `--add-dir` (`claude --add-dir /path/to/repo …`, repeatable). The skill itself does not receive these paths as arguments; it discovers them from the filesystem at runtime, rather than hardcoding repo names:
 
-1. Treat every directory that contains a `.git` entry (within the working directory and every `--add-dir` path) as a candidate repo.
+1. Treat every directory that contains a `.git` entry (within the working directory and every additional path granted to the session) as a candidate repo.
 2. For each candidate, derive the GitHub slug from `git remote get-url origin`.
-3. Classify each candidate by role using the table below, based on its README, top-level file layout, and recent PR titles. A repo may fit more than one role.
+3. Classify each candidate by role using the table below, based on its README, top-level file layout, and recent PR titles. A repo may fit more than one role. If none of the roles clearly applies, classify it as `unknown` and still include it in the scan — but do not apply any role-specific gating (Phase 1.5) to it.
 4. If the caller passed an explicit repo filter in `$ARGUMENTS`, restrict to matching names only.
 
 If no repos are accessible beyond the documentation repo itself, ask the caller to re-run with the relevant source repos added.
