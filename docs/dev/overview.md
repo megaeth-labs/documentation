@@ -37,7 +37,7 @@ Currently, it runs OP Stack's [Standard Bridge](https://docs.optimism.io/app-dev
 ### Simple bridge (native transfer)
 
 The easiest way to bridge Ether to MegaETH is sending Ether to the bridge address on Ethereum Mainnet in a plain native transfer.
-The same amount of Ether sans gas fees will appear in sender's address on MegaETH within 5–20 minutes of the Ethereum transaction being finalized.
+The same amount of Ether sans gas fees will appear in sender's address on MegaETH after the transfer is finalized on Ethereum Mainnet.
 
 ### Advanced bridge (depositETH)
 
