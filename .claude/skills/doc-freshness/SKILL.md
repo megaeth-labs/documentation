@@ -12,35 +12,45 @@ Parse the arguments to determine the time window. Accepted inputs:
 - A duration (e.g., `7d`, `14d`, `30d`) — check merged PRs in that window.
 - A date (e.g., `2025-03-01`) — check merged PRs since that date.
 - A git ref or tag (e.g., `v0.5.0`, `rex3-release`) — check merged PRs since that ref.
-- A repo filter (e.g., `mega-evm only`, `mega-reth mega-rpc`) — restrict to specific repos.
+- A repo filter (e.g., a single repo name, or a space-separated list) — restrict to specific repos.
 
-Default (no arguments): last 14 days, all tracked repos.
+Default (no arguments): last 14 days, all in-scope repos discovered from session context (see below).
 
-## Tracked Repos
+## Scope
 
-These are the repos whose changes may require documentation updates.
+The caller provides the set of repos to scan by making them accessible to the session — typically as the working directory and/or `--add-dir` paths. Discover this set at runtime rather than hardcoding repo names:
 
-| Repo                     | GitHub                                  | What doc-worthy changes look like                                                                                                                                                                                                                                                                                                                                                                                                   |
-| ------------------------ | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| mega-evm                 | `megaeth-labs/mega-evm`                 | New spec, gas constant changes, new/modified system contracts, opcode behavior changes, new resource limits                                                                                                                                                                                                                                                                                                                         |
-| mega-reth                | `megaeth-labs/mega-reth`                | New RPC methods, changed RPC behavior, new config flags, block execution changes, new node features                                                                                                                                                                                                                                                                                                                                 |
-| mega-rpc                 | `megaeth-labs/mega-rpc`                 | New routes, changed caching/routing behavior, new error codes, rate limit changes, WebSocket changes. **Note**: mega-rpc implements the MegaETH public endpoint only. Method availability and restrictions found here may not apply to managed RPC providers (e.g., Alchemy), which have their own configurations. When reporting gaps, distinguish between "unavailable on public endpoint" and "unsupported by MegaETH entirely." |
-| devops-ansible-inventory | `megaeth-labs/devops-ansible-inventory` | Network parameter changes (chain IDs, RPC URLs, explorer URLs), new network deployments, config changes                                                                                                                                                                                                                                                                                                                             |
-| mega-op-contracts        | `megaeth-labs/mega-op-contracts`        | Bridge contract changes, L1/L2 interface changes, system config changes, new dispute game types                                                                                                                                                                                                                                                                                                                                     |
-| mega-optimism            | `megaeth-labs/mega-optimism`            | Sequencer behavior changes, payload building changes, L1 settlement changes                                                                                                                                                                                                                                                                                                                                                         |
-| dist-docs                | `megaeth-labs/dist-docs`                | Release notes and hardfork schedules — determines which mega-reth changes are released (via merged `chore: release vX.Y.Z` PRs) and which mega-evm hardforks are active (via genesis config timestamps). Not scanned for code changes.                                                                                                                                                                                              |
+1. Treat every directory that contains a `.git` entry (within the working directory and every `--add-dir` path) as a candidate repo.
+2. For each candidate, derive the GitHub slug from `git remote get-url origin`.
+3. Classify each candidate by role using the table below, based on its README, top-level file layout, and recent PR titles. A repo may fit more than one role.
+4. If the caller passed an explicit repo filter in `$ARGUMENTS`, restrict to matching names only.
+
+If no repos are accessible beyond the documentation repo itself, ask the caller to re-run with the relevant source repos added.
+
+### Roles and doc-worthy change patterns
+
+| Role                 | What doc-worthy changes look like                                                                                                                                                                                                                                                                          |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| EVM / protocol spec  | New spec, gas constant changes, new or modified system contracts, opcode behavior changes, new resource limits                                                                                                                                                                                             |
+| Execution client     | New RPC methods, changed RPC behavior, new config flags, block execution changes, new node features                                                                                                                                                                                                        |
+| Public RPC gateway   | New routes, changed caching or routing behavior, new error codes, rate-limit changes, WebSocket changes. **Note**: a public-endpoint gateway only reflects what MegaETH itself exposes — managed RPC providers (e.g., Alchemy) have their own configurations. Distinguish "unavailable on public endpoint" from "unsupported by MegaETH entirely." |
+| Network infra config | Network parameter changes (chain IDs, RPC URLs, explorer URLs), new network deployments, config changes                                                                                                                                                                                                    |
+| L1 / bridge contracts | Bridge contract changes, L1/L2 interface changes, system config changes, new dispute game types                                                                                                                                                                                                           |
+| Sequencer / L2 coordinator | Sequencer behavior changes, payload building changes, L1 settlement changes                                                                                                                                                                                                                          |
+| Token registry       | New tokens added, token address changes, bridge-mechanic or OFT configuration changes                                                                                                                                                                                                                      |
+| Release packaging    | Release notes and hardfork schedules — determines which execution-client changes are released (via merged `chore: release vX.Y.Z` PRs) and which spec hardforks are active (via genesis config timestamps). Not scanned for code changes.                                                                  |
 
 ## Workflow
 
 ### Phase 1: Collect Recent Changes
 
-For each tracked repo, collect merged PRs in the time window.
+For each in-scope repo (discovered per the Scope section), collect merged PRs in the time window.
 
 ```bash
-gh pr list --repo megaeth-labs/{repo} --state merged --search "merged:>={since_date}" --json number,title,url,mergedAt,labels,body --limit 100
+gh pr list --repo {org}/{repo} --state merged --search "merged:>={since_date}" --json number,title,url,mergedAt,labels,body --limit 100
 ```
 
-If `gh` is not available or the repo is not accessible, fall back to local git log:
+Derive `{org}/{repo}` from each repo's `git remote get-url origin`. If `gh` is not available or the repo is not accessible, fall back to local git log:
 
 ```bash
 git log --oneline --since="{since_date}" --merges -- .
@@ -55,51 +65,53 @@ For each PR, record:
 
 ### Phase 1.5: Determine Release Status
 
-#### Part A: Latest Released mega-reth Version
+If the in-scope set includes an execution-client repo and a release-packaging repo (per the role table), apply the gating rules below. If either is absent, skip this phase and treat changes as continuously deployed.
 
-Check mega-reth GitHub Releases for the latest version and release date:
+#### Part A: Latest Released Execution-Client Version
 
-```bash
-gh release list --repo megaeth-labs/mega-reth --limit 5
-```
-
-Cross-reference with dist-docs to confirm the release has been announced to external partners:
+Check the execution-client repo's GitHub Releases for the latest version and release date:
 
 ```bash
-gh pr list --repo megaeth-labs/dist-docs --state merged --search "release {version} in:title" --json number,title,mergedAt --limit 1
+gh release list --repo {execution-client-slug} --limit 5
 ```
 
-If a mega-reth release exists but has no corresponding dist-docs PR, note it as "Released but not yet announced — pending dist-docs release note."
-Only mega-reth changes included in a version that has been both released **and** announced via dist-docs should be considered doc-worthy.
+Cross-reference with the release-packaging repo to confirm the release has been announced to external partners:
+
+```bash
+gh pr list --repo {release-packaging-slug} --state merged --search "release {version} in:title" --json number,title,mergedAt --limit 1
+```
+
+If an execution-client release exists but has no corresponding release-packaging PR, note it as "Released but not yet announced — pending release note."
+Only execution-client changes included in a version that has been both released **and** announced should be considered doc-worthy.
 PRs merged after the latest announced release should be excluded and noted as "Unreleased — pending next release."
 
-As a fallback, dist-docs version files follow the naming pattern `versions/{date}-v{version}.m4` and can be listed via:
+As a fallback, release-packaging version files typically follow a `versions/{date}-v{version}.m4` naming pattern and can be listed via:
 
 ```bash
-gh api repos/megaeth-labs/dist-docs/contents/versions --jq '.[].name' | sort | tail -5
+gh api repos/{release-packaging-slug}/contents/versions --jq '.[].name' | sort | tail -5
 ```
 
 #### Part B: Hardfork Activation Gating
 
-Some mega-evm spec changes are tied to a named hardfork and should only be made public in documentation after the hardfork activates on mainnet.
+Some spec changes are tied to a named hardfork and should only be made public in documentation after the hardfork activates on mainnet.
 
-1. **Check dist-docs release notes** for hardfork mentions:
+1. **Check release-packaging release notes** for hardfork mentions:
 
    ```bash
-   gh pr list --repo megaeth-labs/dist-docs --state merged --search "hardfork in:body" --json number,title,body,mergedAt --limit 5
+   gh pr list --repo {release-packaging-slug} --state merged --search "hardfork in:body" --json number,title,body,mergedAt --limit 5
    ```
 
 2. **Extract the hardfork name and mainnet activation timestamp** from the release note body.
 
 3. **Compare activation timestamp against current time**:
-   - If **activated** (timestamp in the past): mega-evm spec changes for this hardfork are doc-worthy and can be made public.
+   - If **activated** (timestamp in the past): spec changes for this hardfork are doc-worthy and can be made public.
    - If **not yet activated** (timestamp in the future): note as "Hardfork {name} not yet active — activates {date}. Defer public documentation."
 
-#### Scope
+#### Gating summary
 
-- **mega-reth**: gated by mega-reth GitHub Releases + dist-docs announcement to external partners.
-- **mega-evm**: spec changes tied to a named hardfork are gated by hardfork activation time; tooling changes (like mega-evme CLI flags) are doc-worthy regardless of hardfork status.
-- **mega-rpc**: deployed continuously, not gated.
+- **Execution client**: gated by its GitHub Releases plus a release-packaging announcement.
+- **EVM / protocol spec**: spec changes tied to a named hardfork are gated by activation time; tooling changes (like CLI flags) are doc-worthy regardless of hardfork status.
+- **Public RPC gateway, token registry, network infra**: deployed continuously, not gated.
 
 ---
 
@@ -188,14 +200,10 @@ Produce the report in the output format below.
 
 ## Summary
 
-| Repo                     | PRs | Doc-worthy | Covered | Gaps |
-| ------------------------ | --- | ---------- | ------- | ---- |
-| mega-evm                 | N   | N          | N       | N    |
-| mega-reth                | N   | N          | N       | N    |
-| mega-rpc                 | N   | N          | N       | N    |
-| devops-ansible-inventory | N   | N          | N       | N    |
-| mega-op-contracts        | N   | N          | N       | N    |
-| mega-optimism            | N   | N          | N       | N    |
+| Repo        | PRs | Doc-worthy | Covered | Gaps |
+| ----------- | --- | ---------- | ------- | ---- |
+| {repo slug} | N   | N          | N       | N    |
+| ...         | ... | ...        | ...     | ...  |
 
 ## Gaps (ordered by priority)
 
