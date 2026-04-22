@@ -6,7 +6,7 @@ description: How to force-include a transaction on MegaETH by submitting it dire
 
 Force inclusion submits a transaction directly to the L1 OptimismPortal, bypassing the sequencer.
 Once submitted on Ethereum, MegaETH is required to include it on L2 within 12 hours.
-Under normal conditions it lands in about 1–2 minutes.
+Under normal conditions it lands in about 5–20 minutes.
 
 {% hint style="warning" %}
 This is an advanced operation.
@@ -99,7 +99,7 @@ Save the Ethereum transaction hash to track the deposit.
 
 ### Verify on MegaETH
 
-After 1–2 minutes, check your balance or transaction on the block explorer:
+After 5–20 minutes, check your balance or transaction on the block explorer:
 
 - **Mainnet:** [megaeth.blockscout.com](https://megaeth.blockscout.com)
 - **Testnet:** [megaeth-testnet-v2.blockscout.com](https://megaeth-testnet-v2.blockscout.com)
@@ -273,7 +273,7 @@ Save the transaction hash to track the deposit.
 
 ### Verify on L2
 
-After 1–2 minutes, confirm the recipient's balance increased.
+After 5–20 minutes, confirm the recipient's balance increased.
 
 ```bash
 cast call $TOKEN "balanceOf(address)(uint256)" $RECIPIENT --rpc-url $L2_RPC
