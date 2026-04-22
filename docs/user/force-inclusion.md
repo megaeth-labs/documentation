@@ -93,3 +93,5 @@ Search by your wallet address or the Ethereum transaction hash.
 
 {% endstep %}
 {% endstepper %}
+
+For programmatic force inclusion using `cast` or `forge`, see the [Developer Guide](../dev/force-inclusion.md).

@@ -17,6 +17,7 @@
 ## Developer Docs
 
 - [Overview](dev/overview.md)
+- [Force-Include a Transaction](dev/force-inclusion.md)
 - [Send Transaction](dev/send-tx/overview.md)
   - [Contracts & Tokens](dev/send-tx/contracts.md)
   - [Gas Estimation](dev/send-tx/gas-estimation.md)
