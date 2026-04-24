@@ -9,6 +9,7 @@
 - [Get Started](user/get-started.md)
 - [Connect to MegaETH](user/connect.md)
 - [Get Funds on Mainnet](user/bridge.md)
+- [Force-include a transaction](user/force-inclusion.md)
 - [Get ETH on Testnet](user/faucet.md)
 - [Featured Apps](user/apps.md)
 - [User FAQ](user/faq.md)
@@ -21,6 +22,7 @@
   - [Contracts & Tokens](dev/send-tx/contracts.md)
   - [Gas Estimation](dev/send-tx/gas-estimation.md)
   - [Debugging Transactions](dev/send-tx/debugging.md)
+  - [Force Inclusion — Foundry](dev/send-tx/force-inclusion.md)
 - [Read from MegaETH](dev/read/overview.md)
   - [Realtime API](dev/read/realtime-api.md)
   - RPC Reference
