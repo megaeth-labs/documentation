@@ -276,7 +276,9 @@ Three concrete rules your commit logic must enforce:
 - **Make failure loud with an explicit require.** Inside `commit`, after computing `revealRound`, assert:
 
   ```solidity
-  uint256 publishTime = GENESIS + uint256(revealRound - 1) * PERIOD;
+  uint64 genesis = VRF.GENESIS_TIMESTAMP();
+  uint64 period = VRF.PERIOD_SECONDS();
+  uint256 publishTime = genesis + uint256(revealRound - 1) * period;
   require(publishTime > block.timestamp, "round already producible");
   ```
 
