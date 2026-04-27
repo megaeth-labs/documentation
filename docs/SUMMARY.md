@@ -40,3 +40,7 @@
 - [Tooling & Infrastructure](dev/tooling.md)
 - [Verifiable Randomness (VRF)](dev/vrf.md)
 - [Developer FAQ](dev/faq.md)
+
+## Node Operation
+
+- [Stateless Validation](stateless/stateless-validator.md)
