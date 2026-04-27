@@ -200,10 +200,6 @@ Logging is configured via `--log.*` flags, mirrored by `STATELESS_LOG_*` environ
 | `--log.file-max-size`  | `STATELESS_LOG_FILE_MAX_SIZE`  | `200`                     | Max log file size (MB) before rotation.                            |
 | `--log.file-max-files` | `STATELESS_LOG_FILE_MAX_FILES` | `5`                       | Number of rotated log files to keep.                               |
 
-{% hint style="info" %}
-Legacy `STATELESS_VALIDATOR_LOG_*` env vars are migrated to `STATELESS_LOG_*` automatically at startup for backwards compatibility.
-{% endhint %}
-
 ## Monitoring
 
 ### Checking validation progress
@@ -282,16 +278,26 @@ tail -f "$STATELESS_LOG_FILE_DIRECTORY/stateless-validator.log"
 The stateless validator is an **execution client**: it verifies that every block's state transition was applied correctly and that commitments in the block header match the resulting post-state.
 It does **not** decide which chain is canonical — it validates whatever sequence of blocks you feed it.
 
-If you trust the RPC endpoint you point it at, the validator detects any block whose post-state does not match the header commitments — including any execution mistake by the sequencer.
+If you trust the data endpoint (`--rpc-endpoint`) to serve the canonical block sequence the sequencer produced, the validator detects any block whose post-state does not match the header commitments — including any execution mistake by the sequencer.
+The witness endpoint (`--witness-endpoint`) does not need to be trusted for correctness: witness contents are cryptographically verified against the previous block's state root, so a faulty or malicious witness endpoint can only stall progress, not produce a false validation.
+
+{% hint style="warning" %}
+The stateless validator currently does **not** check that the blocks it validates are consistent with the L2 rollup batch posted to L1.
+A sequencer that posts a different sequence of blocks to L1 than it serves over RPC would not be detected by the validator alone.
+End-to-end batch-consistency checking is work in progress.
+{% endhint %}
 
 For a fully trust-minimized setup, pair the stateless validator with:
 
 - **`op-node`** to derive the canonical L2 chain from L1 and the data availability layer.
 - **A MegaETH replica node** that follows the derived chain and serves blocks locally.
 
-(Operator documentation for `op-node` and the replica node is in progress.)
-
 In that configuration, you rely only on L1's security and your own software — no external RPC is in the trusted path.
+
+{% hint style="info" %}
+The MegaETH replica node is currently permissioned — the binary is not generally available.
+If you want to run a replica alongside the stateless validator, [contact the MegaETH team](https://megaeth.com) to request access.
+{% endhint %}
 
 ## Troubleshooting
 
