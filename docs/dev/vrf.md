@@ -123,14 +123,23 @@ contract RandomizedApp {
     bool public settled;
     bytes32 public randomness;
 
-    uint64 constant MIN_DELAY_SECONDS = 30;
+    uint64 constant MIN_FUTURE_ROUNDS = 2; // on MegaETH; larger on slower chains
 
     /// Step 1: commit to a drand round that has NOT YET been signed.
     function commit() external {
         require(revealRound == 0 || settled, "in flight");
         uint64 period = VRF.PERIOD_SECONDS();
         uint64 genesis = VRF.GENESIS_TIMESTAMP();
-        revealRound = uint64((block.timestamp + MIN_DELAY_SECONDS - genesis) / period + 1);
+        uint64 currentRound = uint64((block.timestamp - genesis) / period) + 1;
+        revealRound = currentRound + MIN_FUTURE_ROUNDS;
+
+        // Defensive tripwire: always holds while MIN_FUTURE_ROUNDS >= 1, but
+        // reverts visibly if the constant is ever lowered to 0 or if someone
+        // refactors the offset formula into a buggy state. See Security
+        // caveats §1.
+        uint256 publishTime = genesis + uint256(revealRound - 1) * period;
+        require(publishTime > block.timestamp, "round already producible");
+
         settled = false;
 
         // Any app input that influences the outcome MUST be locked here too.
@@ -210,6 +219,34 @@ await walletClient.writeContract({
 
 The drand quicknet chain hash `52db9ba7…0c84e971` is fixed — don't change it.
 
+### Timing
+
+drand quicknet publishes a **new beacon every 3 seconds**, deterministically.
+Round `N` becomes signable at `GENESIS_TIMESTAMP + (N - 1) * 3` seconds (Unix), where `GENESIS_TIMESTAMP = 1692803367`.
+This cadence is fixed — there is no faster round under quicknet, so 3 s is the irreducible unit of VRF latency.
+
+A single VRF cycle walks through four stages:
+
+| Stage              | Happens at                             | Typical wait                      |
+| ------------------ | -------------------------------------- | --------------------------------- |
+| Commit tx included | `t₀` — your dapp picks `revealRound`   | one MegaETH mini-block (~10 ms)   |
+| Round produced     | `t₁ = GENESIS + (revealRound − 1)·3 s` | 1–2 drand periods (3–6 s from t₀) |
+| Beacon live on API | `t₂ ≈ t₁ + <1 s`                       | threshold BLS aggregation latency |
+| Reveal tx included | `t₃` — submitter sends `reveal(sig)`   | one MegaETH mini-block (~10 ms)   |
+
+#### Minimum realistic VRF time
+
+With `revealRound = currentRound + 2` (the default in the [Drand VRF Lottery](https://github.com/megaeth-labs/documentation/blob/main/docs/dev/examples/vrf-drand-quicknet-lottery/README.md)), end-to-end is **~4–7 s** from commit to settled randomness.
+The wide range comes from where in a 3-second round your commit tx lands: commit just before a round boundary and you wait nearly 3 s (one period); commit just after and you wait nearly 6 s (two periods).
+
+{% hint style="warning" %}
+Don't set `revealRound = currentRound + 1`.
+If your commit tx lands in the tail of the current round, drand may have already signed the next one by the time it's confirmed on MegaETH — defeating the "future round" property.
+`revealRound ≥ currentRound + 2` gives you a full round of slack against timestamp races and mini-block reordering.
+{% endhint %}
+
+For apps that don't need low latency (weekly draws, cross-epoch reveals, cooldown periods) set `revealRound` further out to buy larger safety margins, at a direct 3-seconds-per-round cost.
+
 ### Worked example
 
 The [Drand VRF Lottery](https://github.com/megaeth-labs/documentation/blob/main/docs/dev/examples/vrf-drand-quicknet-lottery/README.md) is a complete Foundry project — `src/DrandLottery.sol`, test suite, deploy scripts, and an `./script/demo.sh` that drives the full lifecycle end-to-end against a real MegaETH network.
@@ -233,7 +270,24 @@ The round you consume must be one drand has **not yet signed** at commit time, a
 
 drand beacons are public.
 If you pick the current round, or leave any outcome-relevant input mutable after commit, the submitter can read the beacon offchain and only proceed when the result favors them.
-Derive `revealRound` from `block.timestamp + delay` with `publish_time(revealRound) > block.timestamp`, reject any signature whose round doesn't match the committed one exactly, and freeze application state in the same commit transaction.
+Three concrete rules your commit logic must enforce:
+
+- **Derive `revealRound` from `block.timestamp + safety margin`.** Use `currentRound + MIN_FUTURE_ROUNDS` with `MIN_FUTURE_ROUNDS ≥ 2` on MegaETH (larger on slower chains — see [Timing](#timing)).
+- **Make failure loud with an explicit require.** Inside `commit`, after computing `revealRound`, assert:
+
+  ```solidity
+  uint64 genesis = VRF.GENESIS_TIMESTAMP();
+  uint64 period = VRF.PERIOD_SECONDS();
+  uint256 publishTime = genesis + uint256(revealRound - 1) * period;
+  require(publishTime > block.timestamp, "round already producible");
+  ```
+
+  Without this check, a stale or adversarial `block.timestamp` (miner drift, reorg, arithmetic edge case) can silently produce a `revealRound` that drand has already signed — the tx succeeds, no revert, but an attacker watching `api.drand.sh` has already seen the outcome. The `require` turns a silent security break into a visible revert.
+
+- **Pin an exact round, not "≥ committedRound".** Reject any reveal whose round argument doesn't match the stored `revealRound` exactly; otherwise the submitter gets to pick among several already-produced rounds.
+
+And **freeze application state** — entrant set, stakes, tier choices, any outcome-relevant input — in the same commit transaction.
+An input that can still move after commit gives the submitter adaptivity even if the round itself is properly pinned.
 
 ### 2. Own the state the verifier doesn't
 
