@@ -38,6 +38,6 @@
 - [Tooling & Infrastructure](dev/tooling.md)
 - [Developer FAQ](dev/faq.md)
 
-## Node Operator
+## Node Operation
 
 - [Stateless Validation](stateless/stateless-validator.md)
