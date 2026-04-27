@@ -49,8 +49,22 @@ On the first launch, the validator needs two pieces of bootstrap information:
 2. **`--start-block`** — a **trusted block hash** that anchors your local chain.
    The validator fetches this block's header and stores its `block_number`, `block_hash`, `state_root`, and `withdrawals_root` as the anchor — the anchor itself is **not** re-executed and its values are taken on faith.
    Verification starts from the **next** block: its `parent_hash` must equal the anchor's `block_hash`, and its witness must declare a `pre_state_root` / `pre_withdrawals_root` matching the anchor's roots; otherwise the pipeline halts.
-   For a quick test you can use MegaETH Mainnet [block 12,648,430](https://mega.etherscan.io/block/12648430) — its hash is `0xff061a29416ffe4486924a5e8e0df95de5db5d77589ab4d58fb00e3b6ddb8b40`, which is the value `--start-block` expects (`--start-block` takes the **hash**, not the number).
-   In production, pick any block hash you've independently verified on an explorer — it does not have to be recent, but the older it is the more blocks the validator must re-check to catch up to the tip.
+
+   The simplest way to get a usable anchor is to fetch the latest **finalized** header from the same RPC you'll point the validator at, then cross-check the returned hash against an independent source (a block explorer, a second RPC provider):
+
+   ```bash
+   curl -sX POST https://mainnet.megaeth.com/rpc \
+     -H 'Content-Type: application/json' \
+     -d '{"jsonrpc":"2.0","method":"eth_getHeaderByNumber","params":["finalized"],"id":1}' \
+     | jq -r '.result.hash'
+   # 0xb330cd7319a3f9ba7ab0753381a0024684554d9b4ede2a22d1a4f86ac3c1a8c1
+   ```
+
+   Pass that hash to `--start-block`. An older anchor is also valid, but the validator must then re-check every block between the anchor and the tip before going live.
+
+   {% hint style="warning" %}
+   `--start-block` takes a block **hash** (`0x` + 64 hex chars), not a block number. Always verify the hash against at least one independent source before passing it — the anchor is the single point of trust the rest of the chain hangs from.
+   {% endhint %}
 
 ```bash
 ./target/release/stateless-validator \
@@ -58,14 +72,15 @@ On the first launch, the validator needs two pieces of bootstrap information:
   --rpc-endpoint https://mainnet.megaeth.com/rpc \
   --witness-endpoint https://mainnet.megaeth.com/rpc \
   --genesis-file ./test_data/mainnet/genesis.json \
-  --start-block 0xff061a29416ffe4486924a5e8e0df95de5db5d77589ab4d58fb00e3b6ddb8b40 \
+  --start-block <ANCHOR_HASH_FROM_CURL_ABOVE> \
+  --log.file-directory ./validator-data \
   --data-max-concurrent-requests 4 \
   --witness-max-concurrent-requests 4
 ```
 
 {% hint style="info" %}
-The `--data-max-concurrent-requests` / `--witness-max-concurrent-requests` caps above keep the public mainnet RPC from rate-limiting (HTTP 429) the validator into zero forward progress.
-If you operate your own RPC, you can raise these or omit them entirely for unlimited concurrency.
+`--data-max-concurrent-requests` and `--witness-max-concurrent-requests` are independent semaphores guarding the data path (`eth_get*`) and the witness path (`mega_getBlockWitness`) respectively — keeping them separate prevents a burst on one path from starving the other.
+The values shown (`4` / `4`) are tuned for the public mainnet RPC at `mainnet.megaeth.com/rpc`: unbounded concurrency may trigger HTTP 429 rate-limiting and stall the validator's forward progress.
 {% endhint %}
 
 On start, the validator:
@@ -74,15 +89,37 @@ On start, the validator:
 2. Fetches the header for `--start-block` and installs it as the trusted anchor.
 3. Begins the fetch → process → advance pipeline, verifying every new block.
 
+`--log.file-directory` writes a rotated `stateless-validator.log` into the directory you pass it (`./validator-data` in the example above).
+Tail it from another terminal to watch the pipeline make progress:
+
+```bash
+tail -f ./validator-data/stateless-validator.log
+```
+
+Healthy output looks like this — `Replay block`, `Successfully validated block`, and `Chain advanced` lines marching forward:
+
+```text
+DEBUG stateless_core::executor: Replay block: block_number=14471126, block_hash=0xfda1cc..., hardfork=Some(Rex4)
+DEBUG stateless_validator::chain_sync: Successfully validated block block_number=14471126
+DEBUG stateless_core::pipeline::advancer: Chain advanced tip=14471126 advanced=1 buffered=0
+```
+
+File logs are at `debug` level by default; console output stays at `info`.
+See [Logging flags](#logging-flags) to tune levels, formats, and rotation.
+
 ### Subsequent runs
 
-Once the database is initialized, omit `--genesis-file` and `--start-block` — the validator resumes from the last validated block:
+Once the database is initialized, omit `--genesis-file` and `--start-block` — the validator resumes from the last validated block.
+All other operational flags (logging, concurrency caps) are **not** persisted to the database, so re-supply them on every run:
 
 ```bash
 ./target/release/stateless-validator \
   --data-dir ./validator-data \
   --rpc-endpoint https://mainnet.megaeth.com/rpc \
-  --witness-endpoint https://mainnet.megaeth.com/rpc
+  --witness-endpoint https://mainnet.megaeth.com/rpc \
+  --log.file-directory ./validator-data \
+  --data-max-concurrent-requests 4 \
+  --witness-max-concurrent-requests 4
 ```
 
 If the remote chain has reorged past your local tip, the validator detects the divergence, rolls back to the common ancestor, and continues from there.
@@ -377,10 +414,6 @@ The validator retries fetch failures automatically, so you will see warnings in 
 **`validation_lag` keeps growing.**
 Either the remote RPC is throttling witness fetches (look for `mega_getBlockWitness` errors in `stateless_validator_rpc_errors_total`) or the machine is under-provisioned.
 Histograms like `block_validation_time_seconds` break down where time is being spent.
-
-**`Catastrophic reorg: earliest local block … hash mismatch`.**
-The reorg exceeds the canonical-chain history retained by the validator (default 1000 blocks; see `--canonical-chain-max-length`), so no common ancestor is reachable in the local db.
-Restart with `--start-block <NEW_HASH>`, picking a recent trusted block past the reorg — this re-anchors the db to that block.
 
 ## Related pages
 
