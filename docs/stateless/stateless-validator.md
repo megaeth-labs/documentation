@@ -270,7 +270,7 @@ Rotation is size-based (`--log.file-max-size`, default 200 MB), keeping `--log.f
 Console output honors `--log.stdout-filter`.
 
 ```bash
-tail -f "$STATELESS_LOG_FILE_DIRECTORY/stateless-validator.log"
+tail -f ./validator-data/logs/stateless-validator.log
 ```
 
 ## Trust model
