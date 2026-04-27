@@ -125,13 +125,6 @@ All other operational flags (logging, concurrency caps) are **not** persisted to
   --witness-max-concurrent-requests 4
 ```
 
-If the remote chain has reorged past your local tip, the validator detects the divergence, rolls back to the common ancestor, and continues from there.
-
-{% hint style="warning" %}
-By default the validator keeps the most recent **1000 blocks** of canonical chain history (`DEFAULT_MAX_CHAIN_LENGTH`, tunable via `--canonical-chain-max-length`); older entries are pruned inline as the chain advances.
-A reorg deeper than the retained history can't find a common ancestor locally — the validator halts with a `Catastrophic reorg: earliest local block ... hash mismatch` error and requires manual restart with a fresh `--start-block` past the reorg.
-{% endhint %}
-
 ### Multiple RPC endpoints
 
 Both `--rpc-endpoint` and `--witness-endpoint` accept multiple endpoints as repeated flags or a comma-separated list.
