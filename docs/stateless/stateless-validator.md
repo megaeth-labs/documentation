@@ -47,8 +47,10 @@ On the first launch, the validator needs two pieces of bootstrap information:
    Use [`test_data/mainnet/genesis.json`](https://github.com/megaeth-labs/stateless-validator/blob/main/test_data/mainnet/genesis.json) from the stateless-validator repo.
    The `alloc` list is stripped from this file — the validator never reads initial balances, so only the chain config is needed.
 2. **`--start-block`** — a **trusted block hash** that anchors your local chain.
-   The validator begins verification from this anchor and walks forward.
-   For a quick test you can use MegaETH Mainnet block [`0xc0ffee`](https://mega.etherscan.io/block/12648430) (hash `0xff061a29416ffe4486924a5e8e0df95de5db5d77589ab4d58fb00e3b6ddb8b40`); in production, pick a recent block hash you've independently verified on an explorer.
+   The validator fetches this block's header and stores its `block_number`, `block_hash`, `state_root`, and `withdrawals_root` as the anchor — the anchor itself is **not** re-executed and its values are taken on faith.
+   Verification starts from the **next** block: its `parent_hash` must equal the anchor's `block_hash`, and its witness must declare a `pre_state_root` / `pre_withdrawals_root` matching the anchor's roots; otherwise the pipeline halts.
+   For a quick test you can use MegaETH Mainnet [block 12,648,430](https://mega.etherscan.io/block/12648430) — its hash is `0xff061a29416ffe4486924a5e8e0df95de5db5d77589ab4d58fb00e3b6ddb8b40`, which is the value `--start-block` expects (`--start-block` takes the **hash**, not the number).
+   In production, pick any block hash you've independently verified on an explorer — it does not have to be recent, but the older it is the more blocks the validator must re-check to catch up to the tip.
 
 ```bash
 ./target/release/stateless-validator \
@@ -56,8 +58,15 @@ On the first launch, the validator needs two pieces of bootstrap information:
   --rpc-endpoint https://mainnet.megaeth.com/rpc \
   --witness-endpoint https://mainnet.megaeth.com/rpc \
   --genesis-file ./test_data/mainnet/genesis.json \
-  --start-block 0xff061a29416ffe4486924a5e8e0df95de5db5d77589ab4d58fb00e3b6ddb8b40
+  --start-block 0xff061a29416ffe4486924a5e8e0df95de5db5d77589ab4d58fb00e3b6ddb8b40 \
+  --data-max-concurrent-requests 4 \
+  --witness-max-concurrent-requests 4
 ```
+
+{% hint style="info" %}
+The `--data-max-concurrent-requests` / `--witness-max-concurrent-requests` caps above keep the public mainnet RPC from rate-limiting (HTTP 429) the validator into zero forward progress.
+If you operate your own RPC, you can raise these or omit them entirely for unlimited concurrency.
+{% endhint %}
 
 On start, the validator:
 
@@ -70,7 +79,7 @@ On start, the validator:
 Once the database is initialized, omit `--genesis-file` and `--start-block` — the validator resumes from the last validated block:
 
 ```bash
-stateless-validator \
+./target/release/stateless-validator \
   --data-dir ./validator-data \
   --rpc-endpoint https://mainnet.megaeth.com/rpc \
   --witness-endpoint https://mainnet.megaeth.com/rpc
@@ -86,8 +95,13 @@ A reorg deeper than the retained history can't find a common ancestor locally �
 ### Multiple RPC endpoints
 
 Both `--rpc-endpoint` and `--witness-endpoint` accept multiple endpoints as repeated flags or a comma-separated list.
-Data endpoints are load-balanced round-robin with per-provider exponential backoff, cycling to the next provider after retries exhaust.
-Witness endpoints are tried front-to-back on each request, returning on the first success.
+Both share the same retry primitive: each "round" attempts every provider once in order (no inter-provider sleep), and only when an entire round has failed does the client sleep for **round-level** exponential backoff (initial → 2× → 4× …, capped at `--rpc-max-backoff-ms`, with up to 50% jitter) before starting the next round. Without a deadline, retries are unbounded.
+The two paths only differ in which provider each round starts at:
+
+- **`--rpc-endpoint` (data: blocks / headers / code / tx)** — round-robin load balancing. The starting provider rotates per call via an atomic counter, so healthy endpoints share traffic evenly; within a round the order is fixed (`start → start+1 → …`).
+- **`--witness-endpoint`** — primary-failover. Every round starts from provider 0, so the first endpoint takes all traffic while healthy and later endpoints only see traffic when the primary is failing. This keeps the primary cache-hot.
+
+The two paths have independent concurrency caps (`--data-max-concurrent-requests`, `--witness-max-concurrent-requests`) so a burst on one cannot starve the other.
 
 ```bash
 # Repeated flags
@@ -105,30 +119,30 @@ Boolean flags (e.g., `--metrics-enabled`) accept `true` or `false` via their env
 
 ### Core flags
 
-| Flag                                | Env variable                                          | Required? | Description                                                                                                                             |
-| ----------------------------------- | ----------------------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `--data-dir`                        | `STATELESS_VALIDATOR_DATA_DIR`                        | Yes       | Directory holding the validator database and any cached data.                                                                           |
-| `--rpc-endpoint`                    | `STATELESS_VALIDATOR_RPC_ENDPOINT`                    | Yes       | JSON-RPC endpoint(s) for block headers and bodies. Repeat the flag or pass a comma-separated list.                                      |
-| `--witness-endpoint`                | `STATELESS_VALIDATOR_WITNESS_ENDPOINT`                | Yes       | MegaETH JSON-RPC endpoint(s) for SALT witnesses (`mega_getBlockWitness`). Multiple endpoints accepted.                                  |
-| `--genesis-file`                    | `STATELESS_VALIDATOR_GENESIS_FILE`                    | First run | Path to the genesis JSON. Stored in the database after the first run.                                                                   |
-| `--start-block`                     | `STATELESS_VALIDATOR_START_BLOCK`                     | First run | Trusted block hash used as the validation anchor.                                                                                       |
-| `--report-validation-endpoint`      | `STATELESS_VALIDATOR_REPORT_VALIDATION_ENDPOINT`      | No        | RPC endpoint that receives `mega_setValidatedBlocks` callbacks for validated blocks. If not provided, validation reporting is disabled. |
-| `--metrics-enabled`                 | `STATELESS_VALIDATOR_METRICS_ENABLED`                 | No        | Expose a Prometheus `/metrics` endpoint.                                                                                                |
-| `--metrics-port`                    | `STATELESS_VALIDATOR_METRICS_PORT`                    | No        | Port for the metrics endpoint. Default: `9090`.                                                                                         |
-| `--data-max-concurrent-requests`    | `STATELESS_VALIDATOR_DATA_MAX_CONCURRENT_REQUESTS`    | No        | Cap on concurrent in-flight data requests (blocks, headers, code, tx). Omit for unlimited.                                              |
-| `--witness-max-concurrent-requests` | `STATELESS_VALIDATOR_WITNESS_MAX_CONCURRENT_REQUESTS` | No        | Cap on concurrent in-flight witness fetches, independent of the data cap. Omit for unlimited.                                           |
+| Flag                           | Env variable                                     | Required? | Description                                                                                                                             |
+| ------------------------------ | ------------------------------------------------ | --------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `--data-dir`                   | `STATELESS_VALIDATOR_DATA_DIR`                   | Yes       | Directory holding the validator database and any cached data.                                                                           |
+| `--rpc-endpoint`               | `STATELESS_VALIDATOR_RPC_ENDPOINT`               | Yes       | JSON-RPC endpoint(s) for block headers and bodies. Repeat the flag or pass a comma-separated list.                                      |
+| `--witness-endpoint`           | `STATELESS_VALIDATOR_WITNESS_ENDPOINT`           | Yes       | MegaETH JSON-RPC endpoint(s) for SALT witnesses (`mega_getBlockWitness`). Multiple endpoints accepted.                                  |
+| `--genesis-file`               | `STATELESS_VALIDATOR_GENESIS_FILE`               | First run | Path to the genesis JSON. Stored in the database after the first run.                                                                   |
+| `--start-block`                | `STATELESS_VALIDATOR_START_BLOCK`                | First run | Trusted block hash used as the validation anchor.                                                                                       |
+| `--report-validation-endpoint` | `STATELESS_VALIDATOR_REPORT_VALIDATION_ENDPOINT` | No        | RPC endpoint that receives `mega_setValidatedBlocks` callbacks for validated blocks. If not provided, validation reporting is disabled. |
+| `--metrics-enabled`            | `STATELESS_VALIDATOR_METRICS_ENABLED`            | No        | Expose a Prometheus `/metrics` endpoint.                                                                                                |
+| `--metrics-port`               | `STATELESS_VALIDATOR_METRICS_PORT`               | No        | Port for the metrics endpoint. Default: `9090`.                                                                                         |
 
 ### Advanced tuning
 
 These flags override pipeline and RPC retry defaults — most operators can leave them unset.
 
-| Flag                           | Env variable                                     | Default            | Description                                                                                                                                   |
-| ------------------------------ | ------------------------------------------------ | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `--poll-interval-ms`           | `STATELESS_VALIDATOR_POLL_INTERVAL_MS`           | pipeline default   | Fetcher caught-up poll interval (ms). Also rate-limits `eth_blockNumber`. Lower values reduce tip-following lag.                              |
-| `--error-restart-delay-ms`     | `STATELESS_VALIDATOR_ERROR_RESTART_DELAY_MS`     | pipeline default   | Pipeline restart delay (ms) after a transient cycle error.                                                                                    |
-| `--rpc-initial-backoff-ms`     | `STATELESS_VALIDATOR_RPC_INITIAL_BACKOFF_MS`     | RPC client default | Initial round-level RPC retry backoff (ms). Applied after every provider in a round has failed; doubles each round.                           |
-| `--rpc-max-backoff-ms`         | `STATELESS_VALIDATOR_RPC_MAX_BACKOFF_MS`         | RPC client default | Cap on round-level RPC retry backoff (ms).                                                                                                    |
-| `--canonical-chain-max-length` | `STATELESS_VALIDATOR_CANONICAL_CHAIN_MAX_LENGTH` | `1000`             | Soft cap on canonical-chain rows retained locally. Larger values widen the reorg-lookup window; smaller values reduce db growth. Must be ≥ 1. |
+| Flag                                | Env variable                                          | Default   | Description                                                                                                                                   |
+| ----------------------------------- | ----------------------------------------------------- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--data-max-concurrent-requests`    | `STATELESS_VALIDATOR_DATA_MAX_CONCURRENT_REQUESTS`    | unlimited | Cap on concurrent in-flight data requests (blocks, headers, code, tx). Omit for unlimited.                                                    |
+| `--witness-max-concurrent-requests` | `STATELESS_VALIDATOR_WITNESS_MAX_CONCURRENT_REQUESTS` | unlimited | Cap on concurrent in-flight witness fetches, independent of the data cap. Omit for unlimited.                                                 |
+| `--poll-interval-ms`                | `STATELESS_VALIDATOR_POLL_INTERVAL_MS`                | `100`     | Fetcher caught-up poll interval (ms). Also rate-limits `eth_blockNumber`. Lower values reduce tip-following lag.                              |
+| `--error-restart-delay-ms`          | `STATELESS_VALIDATOR_ERROR_RESTART_DELAY_MS`          | `1000`    | Pipeline restart delay (ms) after a transient cycle error.                                                                                    |
+| `--rpc-initial-backoff-ms`          | `STATELESS_VALIDATOR_RPC_INITIAL_BACKOFF_MS`          | `500`     | Initial round-level RPC retry backoff (ms). Applied after every provider in a round has failed; doubles each round.                           |
+| `--rpc-max-backoff-ms`              | `STATELESS_VALIDATOR_RPC_MAX_BACKOFF_MS`              | `30000`   | Cap on round-level RPC retry backoff (ms).                                                                                                    |
+| `--canonical-chain-max-length`      | `STATELESS_VALIDATOR_CANONICAL_CHAIN_MAX_LENGTH`      | `1000`    | Soft cap on canonical-chain rows retained locally. Larger values widen the reorg-lookup window; smaller values reduce db growth. Must be ≥ 1. |
 
 ### Logging flags
 
@@ -168,7 +182,11 @@ sudo chown -R blockchain:blockchain /home/blockchain
 ### 2. Bootstrap the anchor (first run only)
 
 The systemd env file intentionally omits `STATELESS_VALIDATOR_START_BLOCK` — the validator re-anchors the database whenever `--start-block` is set, so leaving it for systemd would wipe validated state on every restart.
-Run the validator manually once as the `blockchain` user to write the initial anchor, then stop it:
+Run the validator manually once as the `blockchain` user to write the initial anchor, then stop it.
+
+{% hint style="warning" %}
+Replace `--start-block` below with a block hash **you have independently verified** on a block explorer (per the [First run](#first-run) guidance). The value shown is only an example for the quick-start walkthrough; reusing it blindly means anchoring your validator to a block someone else picked.
+{% endhint %}
 
 ```bash
 sudo -u blockchain /usr/local/bin/stateless-validator \
@@ -176,10 +194,10 @@ sudo -u blockchain /usr/local/bin/stateless-validator \
   --rpc-endpoint https://mainnet.megaeth.com/rpc \
   --witness-endpoint https://mainnet.megaeth.com/rpc \
   --genesis-file /home/blockchain/stateless-validator/genesis.json \
-  --start-block 0xff061a29416ffe4486924a5e8e0df95de5db5d77589ab4d58fb00e3b6ddb8b40
+  --start-block <YOUR_TRUSTED_BLOCK_HASH>
 ```
 
-Wait for the log line `[Main] Successfully initialized from start block`, then press **Ctrl+C** to stop.
+Wait for the log line `Successfully initialized from start block`, then press **Ctrl+C** to stop.
 This creates `/home/blockchain/stateless-validator/validator.redb`, a [redb](https://github.com/cberner/redb) database holding the trusted anchor, the recent canonical chain, cached contract bytecode, and the genesis config.
 Every subsequent run — manual or under systemd — resumes from this file, which is why `--start-block` must stay out of the systemd env (re-supplying it would wipe the db).
 Re-supplying `--genesis-file` is harmless — the validator just re-stores the same config — so the env file below keeps it as a belt-and-suspenders fallback if the db is ever rebuilt.
@@ -285,8 +303,10 @@ stateless_validator_validation_lag       1327077
 `validation_lag` is the number of blocks the validator is behind the remote tip (`remote_chain_height − local_chain_height`).
 Interpret it in two phases:
 
-- **During initial catch-up**, `validation_lag` starts large and shrinks over time — a validator anchored at block 12.6M with remote tip at 14M begins at ~1.4M blocks behind and walks forward at its throughput rate. A large lag here is expected, not a symptom.
-- **Once caught up**, the gauge hovers near zero and briefly spikes during bursty periods. Persistent non-zero lag at this point means the validator can't keep pace with the sequencer — investigate per the [Troubleshooting](#troubleshooting) section.
+- **During initial catch-up**, `validation_lag` starts large and shrinks over time — a validator anchored at block 12.6M with remote tip at 14M begins at ~1.4M blocks behind and walks forward at its throughput rate.
+  A large lag here is expected, not a symptom.
+- **Once caught up**, the gauge hovers near zero and briefly spikes during bursty periods.
+  Persistent non-zero lag at this point means the validator can't keep pace with the sequencer — investigate per the [Troubleshooting](#troubleshooting) section.
 
 The [`scripts/validator-status.sh`](https://github.com/megaeth-labs/stateless-validator/blob/main/scripts/validator-status.sh) helper in the repo renders these metrics as a formatted dashboard.
 
@@ -331,7 +351,7 @@ Rotation is size-based (`--log.file-max-size`, default 200 MB), keeping `--log.f
 Console output honors `--log.stdout-filter`.
 
 ```bash
-tail -f "$LOG_DIR/stateless-validator.log"
+tail -f "$STATELESS_LOG_FILE_DIRECTORY/stateless-validator.log"
 ```
 
 ## Trust model
@@ -357,10 +377,6 @@ The validator retries fetch failures automatically, so you will see warnings in 
 **`validation_lag` keeps growing.**
 Either the remote RPC is throttling witness fetches (look for `mega_getBlockWitness` errors in `stateless_validator_rpc_errors_total`) or the machine is under-provisioned.
 Histograms like `block_validation_time_seconds` break down where time is being spent.
-
-**Reorg loops.**
-A handful of reorgs per day is normal on any L2.
-If `reorgs_detected_total` climbs fast, double-check that your RPC endpoint is following the canonical chain — a misconfigured provider may be serving a stale fork.
 
 **`Catastrophic reorg: earliest local block … hash mismatch`.**
 The reorg exceeds the canonical-chain history retained by the validator (default 1000 blocks; see `--canonical-chain-max-length`), so no common ancestor is reachable in the local db.
