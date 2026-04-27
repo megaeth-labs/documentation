@@ -79,7 +79,7 @@ Replace `<ANCHOR_HASH_FROM_CURL_ABOVE>` below with the hash returned by the `cur
   --witness-endpoint https://mainnet.megaeth.com/rpc \
   --genesis-file ./test_data/mainnet/genesis.json \
   --start-block <ANCHOR_HASH_FROM_CURL_ABOVE> \
-  --log.file-directory ./validator-data \
+  --log.file-directory ./validator-data/logs \
   --data-max-concurrent-requests 4 \
   --witness-max-concurrent-requests 4
 ```
@@ -95,11 +95,11 @@ On start, the validator:
 2. Fetches the header for `--start-block` and installs it as the trusted anchor.
 3. Begins the fetch → process → advance pipeline, verifying every new block.
 
-`--log.file-directory` writes a rotated `stateless-validator.log` into the directory you pass it (`./validator-data` in the example above).
+`--log.file-directory` writes a rotated `stateless-validator.log` into the directory you pass it (`./validator-data/logs` in the example above).
 Tail it from another terminal to watch the pipeline make progress:
 
 ```bash
-tail -f ./validator-data/stateless-validator.log
+tail -f ./validator-data/logs/stateless-validator.log
 ```
 
 Healthy output looks like this — `Replay block`, `Successfully validated block`, and `Chain advanced` lines marching forward:
@@ -123,7 +123,7 @@ All other operational flags (logging, concurrency caps) are **not** persisted to
   --data-dir ./validator-data \
   --rpc-endpoint https://mainnet.megaeth.com/rpc \
   --witness-endpoint https://mainnet.megaeth.com/rpc \
-  --log.file-directory ./validator-data \
+  --log.file-directory ./validator-data/logs \
   --data-max-concurrent-requests 4 \
   --witness-max-concurrent-requests 4
 ```
