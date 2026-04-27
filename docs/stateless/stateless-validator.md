@@ -222,7 +222,7 @@ The systemd env file intentionally omits `STATELESS_VALIDATOR_START_BLOCK` — t
 Run the validator manually once as the `blockchain` user to write the initial anchor, then stop it.
 
 {% hint style="warning" %}
-Replace `--start-block` below with a block hash **you have independently verified** on a block explorer (per the [First run](#first-run) guidance). The value shown is only an example for the quick-start walkthrough.
+Replace `<YOUR_TRUSTED_BLOCK_HASH>` below with a block hash **you have independently verified** on a block explorer (per the [First run](#first-run) guidance).
 {% endhint %}
 
 ```bash
@@ -337,9 +337,9 @@ curl -s http://localhost:9090/metrics | grep -v '^#' | grep -E 'chain_height|val
 ```
 
 ```text
-stateless_validator_remote_chain_height 14478803
-stateless_validator_local_chain_height  14476971
-stateless_validator_validation_lag      1832
+stateless_validator_remote_chain_height 14479507
+stateless_validator_local_chain_height  14479502
+stateless_validator_validation_lag      5
 ```
 
 `validation_lag` is the number of blocks the validator is behind the remote tip (`remote_chain_height − local_chain_height`).
