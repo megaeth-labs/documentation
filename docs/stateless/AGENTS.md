@@ -33,7 +33,7 @@ Readers are comfortable on the Linux command line, know how to read a systemd un
 - Use `{% hint style="info" %}` for optional guidance (e.g., "prefer systemd over `nohup`").
 - Use `{% hint style="warning" %}` for operator-facing hazards (e.g., resetting the anchor wipes the DB).
 - Use tables for every flag / env-var / metric reference.
-- Use fenced code blocks with language identifiers (` ```bash `, ` ```toml `, ` ```ini `).
+- Use fenced code blocks with language identifiers (` ```bash `, ` ```ini `, ` ```text `).
 
 ## Before Changing a Flag, Env Var, or Metric
 

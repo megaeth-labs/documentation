@@ -13,13 +13,13 @@ For how validators fit into the broader network, see [Architecture](../architect
 ## Why run a stateless validator
 
 - **Independent verification** — you re-execute the state transition function (STF) of every block yourself, rather than trusting an RPC provider to tell you the truth.
-- **Low hardware cost** — thanks to [SALT (Small Authentication Large Trie)](https://github.com/megaeth-labs/salt) witnesses, proof data per block is significantly smaller than traditional Merkle Patricia Trie or Verkle tree approaches, so validators do not need sequencer-class hardware.
+- **Low hardware cost** — thanks to [SALT (Small Authentication Large Trie)](https://github.com/megaeth-labs/salt) witnesses, proof data per block is significantly smaller than Merkle Patricia Trie witnesses, so validators do not need sequencer-class hardware.
 - **Parallel-friendly** — validation workers are embarrassingly parallel; throughput scales linearly with CPU cores.
-- **Auditable TCB** — the validator is built on a vanilla revm interpreter with an in-memory backend, keeping the trusted computing base small and reviewable.
+- **Auditable trusted computing base (TCB)** — the validator is built on the upstream Rust EVM interpreter [revm](https://github.com/bluealloy/revm) with an in-memory backend, keeping the TCB small and reviewable.
 
 ## Installation
 
-The validator is distributed as source.
+The validator is distributed as source only — there are no prebuilt binaries today.
 Install the Rust toolchain and build the release binary:
 
 ```bash
@@ -47,8 +47,11 @@ On the first launch, the validator needs two pieces of bootstrap information:
    Use [`test_data/mainnet/genesis.json`](https://github.com/megaeth-labs/stateless-validator/blob/main/test_data/mainnet/genesis.json) from the stateless-validator repo.
    The `alloc` list is stripped from this file — the validator never reads initial balances, so only the chain config is needed.
 2. **`--start-block`** — a **trusted block hash** that anchors your local chain.
-   The validator fetches this block's header and stores its `block_number`, `block_hash`, `state_root`, and `withdrawals_root` as the anchor — the anchor itself is **not** re-executed and its values are taken on faith.
-   Verification starts from the **next** block: its `parent_hash` must equal the anchor's `block_hash`, and its witness must declare a `pre_state_root` / `pre_withdrawals_root` matching the anchor's roots; otherwise the pipeline halts.
+   The validator fetches this block's header and stores its `block_number`, `block_hash`, `state_root`, and `withdrawals_root` as the anchor.
+   The anchor itself is **not** re-executed; its values are taken on faith.
+   Verification starts from the **next** block, which must satisfy both invariants below or the pipeline halts:
+   - `parent_hash` equals the anchor's `block_hash`.
+   - witness `pre_state_root` / `pre_withdrawals_root` match the anchor's `state_root` / `withdrawals_root`.
 
    The simplest way to get a usable anchor is to fetch the latest **finalized** header from the same RPC you'll point the validator at, then cross-check the returned hash against an independent source (a block explorer, a second RPC provider):
 
@@ -67,7 +70,7 @@ On the first launch, the validator needs two pieces of bootstrap information:
    `--start-block` takes a block **hash** (`0x` + 64 hex chars), not a block number. Always verify the hash against at least one independent source before passing it — the anchor is the single point of trust the rest of the chain hangs from.
    {% endhint %}
 
-Replace `<ANCHOR_HASH_FROM_CURL_ABOVE>` below with the hash returned by the `curl` command above, then launch:
+Replace `<ANCHOR_HASH_FROM_CURL_ABOVE>` below with the hash returned by the `curl` command above, then launch from the cloned `stateless-validator` directory (so `./target/release/...` and `./test_data/...` resolve):
 
 ```bash
 ./target/release/stateless-validator \
@@ -129,7 +132,7 @@ All other operational flags (logging, concurrency caps) are **not** persisted to
 
 Both `--rpc-endpoint` and `--witness-endpoint` accept multiple endpoints as repeated flags or a comma-separated list.
 Both share the same retry primitive: each "round" attempts every provider once in order (no inter-provider sleep), and only when an entire round has failed does the client sleep for **round-level** exponential backoff (initial → 2× → 4× …, capped at `--rpc-max-backoff-ms`, with up to 50% jitter) before starting the next round.
-Without a deadline, retries are unbounded.
+There is no global retry cap — rounds repeat indefinitely until a request succeeds.
 The two paths only differ in which provider each round starts at:
 
 - **`--rpc-endpoint` (data: blocks / headers / code / tx)** — round-robin load balancing.
@@ -144,7 +147,7 @@ The two paths have independent concurrency caps (`--data-max-concurrent-requests
 # Repeated flags
 --rpc-endpoint https://a.example/rpc --rpc-endpoint https://b.example/rpc
 
-# Comma-separated (also accepted by the env var)
+# Comma-separated (the env var also accepts this form)
 --rpc-endpoint https://a.example/rpc,https://b.example/rpc
 ```
 
@@ -164,7 +167,7 @@ Boolean flags (e.g., `--metrics-enabled`) accept `true` or `false` via their env
 | `--genesis-file`               | `STATELESS_VALIDATOR_GENESIS_FILE`               | First run | Path to the genesis JSON. Stored in the database after the first run.                                                                   |
 | `--start-block`                | `STATELESS_VALIDATOR_START_BLOCK`                | First run | Trusted block hash used as the validation anchor.                                                                                       |
 | `--report-validation-endpoint` | `STATELESS_VALIDATOR_REPORT_VALIDATION_ENDPOINT` | No        | RPC endpoint that receives `mega_setValidatedBlocks` callbacks for validated blocks. If not provided, validation reporting is disabled. |
-| `--metrics-enabled`            | `STATELESS_VALIDATOR_METRICS_ENABLED`            | No        | Expose a Prometheus `/metrics` endpoint.                                                                                                |
+| `--metrics-enabled`            | `STATELESS_VALIDATOR_METRICS_ENABLED`            | No        | Expose a Prometheus `/metrics` endpoint. Default: `false` (endpoint not bound).                                                         |
 | `--metrics-port`               | `STATELESS_VALIDATOR_METRICS_PORT`               | No        | Port for the metrics endpoint. Default: `9090`.                                                                                         |
 
 ### Advanced tuning
@@ -348,7 +351,7 @@ Interpret it in two phases:
 - **During initial catch-up** (only if you anchored at an older block), `validation_lag` starts large and shrinks as the validator replays history to reach the tip.
   A large lag here is expected, not a symptom.
 - **Once caught up**, the gauge sits around `3–5` and briefly spikes during bursty periods.
-  This floor is intentional: the validator hardcodes `tip_buffer = 3`, refusing to fetch any block within 3 of the remote tip so the upstream witness generator has headroom to finish.
+  This floor is intentional: the validator currently buffers 3 blocks below the remote tip, refusing to fetch any block within that window so the upstream witness generator has headroom to finish.
   Add the 100 ms poll cadence and one RPC round-trip and a steady-state lag of a few blocks is expected, not a symptom.
   Persistent lag much above that range means the validator can't keep pace with the sequencer — investigate per the [Troubleshooting](#troubleshooting) section.
 
@@ -403,24 +406,28 @@ tail -f "$STATELESS_LOG_FILE_DIRECTORY/stateless-validator.log"
 The stateless validator is an **execution client**: it verifies that every block's state transition was applied correctly and that commitments in the block header match the resulting post-state.
 It does **not** decide which chain is canonical — it validates whatever sequence of blocks you feed it.
 
-If you trust the RPC endpoint you point it at, the validator gives you strong guarantees that the sequencer is executing blocks correctly.
+If you trust the RPC endpoint you point it at, the validator detects any block whose post-state does not match the header commitments — including any execution mistake by the sequencer.
 
 For a fully trust-minimized setup, pair the stateless validator with:
 
 - **`op-node`** to derive the canonical L2 chain from L1 and the data availability layer.
 - **A MegaETH replica node** that follows the derived chain and serves blocks locally.
 
+(Operator documentation for `op-node` and the replica node is in progress.)
+
 In that configuration, you rely only on L1's security and your own software — no external RPC is in the trusted path.
 
 ## Troubleshooting
 
 **The validator can't find the start block.**
+You will see warnings like `WARN ...: failed to fetch start block ...` repeating in the log.
 Check that `--rpc-endpoint` is reachable and that the block hash in `--start-block` exists on that endpoint.
-The validator retries fetch failures automatically, so you will see warnings in the log before it succeeds.
+The validator retries fetch failures automatically, so the warnings clear once the RPC starts responding.
 
 **`validation_lag` keeps growing.**
 Either the remote RPC is throttling witness fetches (look for `mega_getBlockWitness` errors in `stateless_validator_rpc_errors_total`) or the machine is under-provisioned.
-Histograms like `block_validation_time_seconds` break down where time is being spent.
+Compare `stateless_validator_block_validation_time_seconds` p99 against the chain's block period — if validation time exceeds the period, the validator cannot keep pace at all and you need either faster hardware or fewer worker tasks.
+Histograms like `block_validation_time_seconds`, `witness_verification_time_seconds`, and `block_replay_time_seconds` break down where time is being spent.
 
 ## Related pages
 
