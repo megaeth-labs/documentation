@@ -228,7 +228,7 @@ Interpret it in two phases:
   A large lag here is expected, not a symptom.
 - **Once caught up**, the gauge sits around `3–5` and briefly spikes during bursty periods.
   This floor is intentional: the validator currently buffers 3 blocks below the remote tip, refusing to fetch any block within that window so the upstream witness generator has headroom to finish.
-  Add the 100 ms poll cadence and one RPC round-trip and a steady-state lag of a few blocks is expected, not a symptom.
+  Factor in the 100 ms poll cadence and one RPC round-trip, and a steady-state lag of a few blocks is expected — not a symptom.
   Persistent lag much above that range means the validator can't keep pace with the sequencer — investigate per the [Troubleshooting](#troubleshooting) section.
 
 The [`scripts/validator-status.sh`](https://github.com/megaeth-labs/stateless-validator/blob/main/scripts/validator-status.sh) helper in the repo renders these metrics as a formatted dashboard.
