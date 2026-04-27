@@ -79,7 +79,7 @@ stateless-validator \
 If the remote chain has reorged past your local tip, the validator detects the divergence, rolls back to the common ancestor, and continues from there.
 
 {% hint style="warning" %}
-The validator keeps only the most recent **1000 blocks** of canonical chain history (`DEFAULT_MAX_CHAIN_LENGTH`); older entries are pruned inline as the chain advances.
+By default the validator keeps the most recent **1000 blocks** of canonical chain history (`DEFAULT_MAX_CHAIN_LENGTH`, tunable via `--canonical-chain-max-length`); older entries are pruned inline as the chain advances.
 A reorg deeper than the retained history can't find a common ancestor locally — the validator halts with a `Catastrophic reorg: earliest local block ... hash mismatch` error and requires manual restart with a fresh `--start-block` past the reorg.
 {% endhint %}
 
@@ -117,6 +117,18 @@ Boolean flags (e.g., `--metrics-enabled`) accept `true` or `false` via their env
 | `--metrics-port`                    | `STATELESS_VALIDATOR_METRICS_PORT`                    | No        | Port for the metrics endpoint. Default: `9090`.                                                                                         |
 | `--data-max-concurrent-requests`    | `STATELESS_VALIDATOR_DATA_MAX_CONCURRENT_REQUESTS`    | No        | Cap on concurrent in-flight data requests (blocks, headers, code, tx). Omit for unlimited.                                              |
 | `--witness-max-concurrent-requests` | `STATELESS_VALIDATOR_WITNESS_MAX_CONCURRENT_REQUESTS` | No        | Cap on concurrent in-flight witness fetches, independent of the data cap. Omit for unlimited.                                           |
+
+### Advanced tuning
+
+These flags override pipeline and RPC retry defaults — most operators can leave them unset.
+
+| Flag                            | Env variable                                      | Default                    | Description                                                                                                              |
+| ------------------------------- | ------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `--poll-interval-ms`            | `STATELESS_VALIDATOR_POLL_INTERVAL_MS`            | pipeline default           | Fetcher caught-up poll interval (ms). Also rate-limits `eth_blockNumber`. Lower values reduce tip-following lag.         |
+| `--error-restart-delay-ms`      | `STATELESS_VALIDATOR_ERROR_RESTART_DELAY_MS`      | pipeline default           | Pipeline restart delay (ms) after a transient cycle error.                                                               |
+| `--rpc-initial-backoff-ms`      | `STATELESS_VALIDATOR_RPC_INITIAL_BACKOFF_MS`      | RPC client default         | Initial round-level RPC retry backoff (ms). Applied after every provider in a round has failed; doubles each round.      |
+| `--rpc-max-backoff-ms`          | `STATELESS_VALIDATOR_RPC_MAX_BACKOFF_MS`          | RPC client default         | Cap on round-level RPC retry backoff (ms).                                                                               |
+| `--canonical-chain-max-length`  | `STATELESS_VALIDATOR_CANONICAL_CHAIN_MAX_LENGTH`  | `1000`                     | Soft cap on canonical-chain rows retained locally. Larger values widen the reorg-lookup window; smaller values reduce db growth. Must be ≥ 1. |
 
 ### Logging flags
 
@@ -351,7 +363,7 @@ A handful of reorgs per day is normal on any L2.
 If `reorgs_detected_total` climbs fast, double-check that your RPC endpoint is following the canonical chain — a misconfigured provider may be serving a stale fork.
 
 **`Catastrophic reorg: earliest local block … hash mismatch`.**
-The reorg exceeds the 1000-block canonical history the validator keeps, so no common ancestor is reachable in the local db.
+The reorg exceeds the canonical-chain history retained by the validator (default 1000 blocks; see `--canonical-chain-max-length`), so no common ancestor is reachable in the local db.
 Restart with `--start-block <NEW_HASH>`, picking a recent trusted block past the reorg — this re-anchors the db to that block.
 
 ## Related pages

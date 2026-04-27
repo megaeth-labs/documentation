@@ -7,7 +7,7 @@ Readers are comfortable on the Linux command line, know how to read a systemd un
 
 - **Reference tone.** Short declarative sentences, facts first.
 - **Copy-pasteable commands.** Every shell block should run as shown against a real deployment (modulo placeholders).
-- **Verify against source.** Every CLI flag, env var, default value, and metric name must match the upstream repo. Before editing the flag or metric tables, fetch the current `bin/stateless-validator/src/main.rs`, `crates/stateless-common/src/logging.rs`, and `bin/stateless-validator/src/metrics.rs` and compare.
+- **Verify against source.** Every CLI flag, env var, default value, and metric name must match the upstream repo. Before editing the flag or metric tables, fetch the current `bin/stateless-validator/src/app.rs` (where `CommandLineArgs` is defined), `crates/stateless-common/src/logging.rs`, and `bin/stateless-validator/src/metrics.rs` and compare.
 - **Placeholders use angle brackets.** `<TRUSTED_BLOCK_HASH>`, `<HOST>` — not `0x1234...` or `...`.
 - **No marketing.** State what the validator does; skip "honest", "trust-minimized", "fastest".
 
