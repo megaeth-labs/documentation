@@ -153,9 +153,9 @@ The two paths have independent concurrency caps (`--data-max-concurrent-requests
 
 ## Command-line options
 
-Every flag has an equivalent environment variable, convenient for systemd units and Docker.
+Every flag has an equivalent environment variable, convenient for service managers and containerized deployments.
 Command-line flags take precedence over environment variables.
-Boolean flags (e.g., `--metrics-enabled`) accept `true` or `false` via their env var — set `STATELESS_VALIDATOR_METRICS_ENABLED=true` to turn the endpoint on from a unit file.
+Boolean flags (e.g., `--metrics-enabled`) accept `true` or `false` via their env var — set `STATELESS_VALIDATOR_METRICS_ENABLED=true` to turn the endpoint on without command-line arguments.
 
 ### Core flags
 
@@ -203,130 +203,6 @@ Logging is configured via `--log.*` flags, mirrored by `STATELESS_LOG_*` environ
 {% hint style="info" %}
 Legacy `STATELESS_VALIDATOR_LOG_*` env vars are migrated to `STATELESS_LOG_*` automatically at startup for backwards compatibility.
 {% endhint %}
-
-## Running in the background
-
-For long-lived deployments, run the validator under **systemd** — it gives you automatic restarts on crash, clean journal logs, and process isolation.
-Do the [First run](#first-run) step manually once to set the anchor, then hand off to systemd for ongoing operation.
-
-### 1. Create a dedicated user and directories
-
-```bash
-sudo useradd --system --home /home/blockchain --shell /usr/sbin/nologin blockchain
-sudo mkdir -p /home/blockchain/stateless-validator/logs
-sudo install -m 755 ./target/release/stateless-validator /usr/local/bin/
-sudo install -m 644 -o blockchain -g blockchain ./test_data/mainnet/genesis.json /home/blockchain/stateless-validator/genesis.json
-sudo chown -R blockchain:blockchain /home/blockchain
-```
-
-### 2. Bootstrap the anchor (first run only)
-
-The systemd env file intentionally omits `STATELESS_VALIDATOR_START_BLOCK` — the validator re-anchors the database whenever `--start-block` is set, so leaving it for systemd would wipe validated state on every restart.
-Run the validator manually once as the `blockchain` user to write the initial anchor, then stop it.
-
-{% hint style="warning" %}
-Replace `<YOUR_TRUSTED_BLOCK_HASH>` below with a block hash **you have independently verified** on a block explorer (per the [First run](#first-run) guidance).
-{% endhint %}
-
-```bash
-sudo -u blockchain /usr/local/bin/stateless-validator \
-  --data-dir /home/blockchain/stateless-validator \
-  --rpc-endpoint https://mainnet.megaeth.com/rpc \
-  --witness-endpoint https://mainnet.megaeth.com/rpc \
-  --genesis-file /home/blockchain/stateless-validator/genesis.json \
-  --start-block <YOUR_TRUSTED_BLOCK_HASH>
-```
-
-Wait for the log line `Successfully initialized from start block`, then press **Ctrl+C** to stop.
-This creates `/home/blockchain/stateless-validator/validator.redb`, a [redb](https://github.com/cberner/redb) database holding the trusted anchor, the recent canonical chain, cached contract bytecode, and the genesis config.
-Every subsequent run — manual or under systemd — resumes from this file, which is why `--start-block` must stay out of the systemd env (re-supplying it would wipe the db).
-Re-supplying `--genesis-file` is harmless — the validator just re-stores the same config — so the env file below keeps it as a belt-and-suspenders fallback if the db is ever rebuilt.
-
-### 3. Write the environment file
-
-Store all configuration in `/etc/stateless-validator.env` so the service unit stays generic:
-
-```bash
-# /etc/stateless-validator.env
-STATELESS_VALIDATOR_DATA_DIR=/home/blockchain/stateless-validator
-STATELESS_VALIDATOR_RPC_ENDPOINT=https://mainnet.megaeth.com/rpc
-STATELESS_VALIDATOR_WITNESS_ENDPOINT=https://mainnet.megaeth.com/rpc
-STATELESS_VALIDATOR_GENESIS_FILE=/home/blockchain/stateless-validator/genesis.json
-STATELESS_VALIDATOR_METRICS_ENABLED=true
-STATELESS_VALIDATOR_METRICS_PORT=9090
-STATELESS_VALIDATOR_DATA_MAX_CONCURRENT_REQUESTS=4
-STATELESS_VALIDATOR_WITNESS_MAX_CONCURRENT_REQUESTS=4
-STATELESS_LOG_FILE_DIRECTORY=/home/blockchain/stateless-validator/logs
-STATELESS_LOG_FILE=debug
-STATELESS_LOG_STDOUT=info
-```
-
-Lock it down:
-
-```bash
-sudo chmod 600 /etc/stateless-validator.env
-sudo chown root:root /etc/stateless-validator.env
-```
-
-### 4. Install the service unit
-
-`/etc/systemd/system/stateless-validator.service`:
-
-```ini
-[Unit]
-Description=MegaETH stateless validator
-After=network-online.target
-Wants=network-online.target
-
-[Service]
-Type=simple
-User=blockchain
-Group=blockchain
-EnvironmentFile=/etc/stateless-validator.env
-ExecStart=/usr/local/bin/stateless-validator
-Restart=on-failure
-RestartSec=5s
-LimitNOFILE=65535
-
-NoNewPrivileges=true
-PrivateTmp=true
-ProtectSystem=strict
-ProtectHome=read-only
-ReadWritePaths=/home/blockchain/stateless-validator
-
-[Install]
-WantedBy=multi-user.target
-```
-
-### 5. Enable and start
-
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable --now stateless-validator
-sudo systemctl status stateless-validator
-```
-
-Common operations:
-
-```bash
-sudo systemctl restart stateless-validator      # restart after config change
-sudo systemctl stop stateless-validator         # stop cleanly
-sudo journalctl -u stateless-validator -f       # follow journal (stdout + stderr)
-tail -f /home/blockchain/stateless-validator/logs/stateless-validator.log
-```
-
-### Uninstall
-
-To tear down the deployment — useful for clean-room testing or decommissioning a host:
-
-```bash
-sudo systemctl disable --now stateless-validator
-sudo rm /etc/systemd/system/stateless-validator.service
-sudo rm /etc/stateless-validator.env
-sudo rm /usr/local/bin/stateless-validator
-sudo systemctl daemon-reload
-sudo userdel -r blockchain    # removes the user and /home/blockchain (validator DB, logs, genesis)
-```
 
 ## Monitoring
 
