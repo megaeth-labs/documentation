@@ -2,7 +2,7 @@
 description: Run a stateless validator to independently verify every MegaETH block on commodity hardware using SALT witnesses.
 ---
 
-# Stateless validator
+# Stateless Validation
 
 The **stateless validator** is a Rust client that independently verifies every MegaETH block without maintaining full chain state.
 Instead of replaying blocks against a locally-stored state trie, it re-executes each block against a compact cryptographic witness supplied by the network, then checks that the resulting post-state matches the commitments in the block header.
