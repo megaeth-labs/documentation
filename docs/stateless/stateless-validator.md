@@ -60,7 +60,8 @@ On the first launch, the validator needs two pieces of bootstrap information:
    # 0xb330cd7319a3f9ba7ab0753381a0024684554d9b4ede2a22d1a4f86ac3c1a8c1
    ```
 
-   Pass that hash to `--start-block`. An older anchor is also valid, but the validator must then re-check every block between the anchor and the tip before going live.
+   Pass that hash to `--start-block`.
+   An older anchor is also valid, but the validator must then re-check every block between the anchor and the tip before going live.
 
    {% hint style="warning" %}
    `--start-block` takes a block **hash** (`0x` + 64 hex chars), not a block number. Always verify the hash against at least one independent source before passing it — the anchor is the single point of trust the rest of the chain hangs from.
@@ -132,11 +133,15 @@ A reorg deeper than the retained history can't find a common ancestor locally �
 ### Multiple RPC endpoints
 
 Both `--rpc-endpoint` and `--witness-endpoint` accept multiple endpoints as repeated flags or a comma-separated list.
-Both share the same retry primitive: each "round" attempts every provider once in order (no inter-provider sleep), and only when an entire round has failed does the client sleep for **round-level** exponential backoff (initial → 2× → 4× …, capped at `--rpc-max-backoff-ms`, with up to 50% jitter) before starting the next round. Without a deadline, retries are unbounded.
+Both share the same retry primitive: each "round" attempts every provider once in order (no inter-provider sleep), and only when an entire round has failed does the client sleep for **round-level** exponential backoff (initial → 2× → 4× …, capped at `--rpc-max-backoff-ms`, with up to 50% jitter) before starting the next round.
+Without a deadline, retries are unbounded.
 The two paths only differ in which provider each round starts at:
 
-- **`--rpc-endpoint` (data: blocks / headers / code / tx)** — round-robin load balancing. The starting provider rotates per call via an atomic counter, so healthy endpoints share traffic evenly; within a round the order is fixed (`start → start+1 → …`).
-- **`--witness-endpoint`** — primary-failover. Every round starts from provider 0, so the first endpoint takes all traffic while healthy and later endpoints only see traffic when the primary is failing. This keeps the primary cache-hot.
+- **`--rpc-endpoint` (data: blocks / headers / code / tx)** — round-robin load balancing.
+  The starting provider rotates per call via an atomic counter, so healthy endpoints share traffic evenly; within a round the order is fixed (`start → start+1 → …`).
+- **`--witness-endpoint`** — primary-failover.
+  Every round starts from provider 0, so the first endpoint takes all traffic while healthy and later endpoints only see traffic when the primary is failing.
+  This keeps the primary cache-hot.
 
 The two paths have independent concurrency caps (`--data-max-concurrent-requests`, `--witness-max-concurrent-requests`) so a burst on one cannot starve the other.
 
@@ -251,6 +256,8 @@ STATELESS_VALIDATOR_WITNESS_ENDPOINT=https://mainnet.megaeth.com/rpc
 STATELESS_VALIDATOR_GENESIS_FILE=/home/blockchain/stateless-validator/genesis.json
 STATELESS_VALIDATOR_METRICS_ENABLED=true
 STATELESS_VALIDATOR_METRICS_PORT=9090
+STATELESS_VALIDATOR_DATA_MAX_CONCURRENT_REQUESTS=4
+STATELESS_VALIDATOR_WITNESS_MAX_CONCURRENT_REQUESTS=4
 STATELESS_LOG_FILE_DIRECTORY=/home/blockchain/stateless-validator/logs
 STATELESS_LOG_FILE=debug
 STATELESS_LOG_STDOUT=info
