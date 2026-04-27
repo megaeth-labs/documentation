@@ -351,8 +351,10 @@ Interpret it in two phases:
 
 - **During initial catch-up**, `validation_lag` starts large and shrinks over time — a validator anchored at block 12.6M with remote tip at 14M begins at ~1.4M blocks behind and walks forward at its throughput rate.
   A large lag here is expected, not a symptom.
-- **Once caught up**, the gauge hovers near zero and briefly spikes during bursty periods.
-  Persistent non-zero lag at this point means the validator can't keep pace with the sequencer — investigate per the [Troubleshooting](#troubleshooting) section.
+- **Once caught up**, the gauge sits around `3–5` and briefly spikes during bursty periods.
+  This floor is intentional: the validator hardcodes `tip_buffer = 3`, refusing to fetch any block within 3 of the remote tip so the upstream witness generator has headroom to finish.
+  Add the 100 ms poll cadence and one RPC round-trip and a steady-state lag of a few blocks is expected, not a symptom.
+  Persistent lag much above that range means the validator can't keep pace with the sequencer — investigate per the [Troubleshooting](#troubleshooting) section.
 
 The [`scripts/validator-status.sh`](https://github.com/megaeth-labs/stateless-validator/blob/main/scripts/validator-status.sh) helper in the repo renders these metrics as a formatted dashboard.
 
@@ -362,7 +364,7 @@ The [`scripts/validator-status.sh`](https://github.com/megaeth-labs/stateless-va
 | ---------------------------------------------------------- | --------- | ------------------------------------------------------------------ |
 | `stateless_validator_local_chain_height`                   | Gauge     | Local chain tip.                                                   |
 | `stateless_validator_remote_chain_height`                  | Gauge     | Remote chain tip reported by the RPC endpoint.                     |
-| `stateless_validator_validation_lag`                       | Gauge     | Blocks behind the remote tip (target: ≈ 0).                        |
+| `stateless_validator_validation_lag`                       | Gauge     | Blocks behind the remote tip (steady-state floor ≈ 3–5).           |
 | `stateless_validator_block_validation_time_seconds`        | Histogram | End-to-end time to validate a block.                               |
 | `stateless_validator_witness_verification_time_seconds`    | Histogram | Time spent verifying SALT witnesses.                               |
 | `stateless_validator_block_replay_time_seconds`            | Histogram | EVM execution time per block.                                      |
