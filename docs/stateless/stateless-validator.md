@@ -341,15 +341,18 @@ Three gauges tell you whether the validator is keeping up:
 
 ```bash
 curl -s http://localhost:9090/metrics | grep -v '^#' | grep -E 'chain_height|validation_lag'
-stateless_validator_local_chain_height   12649974
-stateless_validator_remote_chain_height  13977051
-stateless_validator_validation_lag       1327077
+```
+
+```text
+stateless_validator_remote_chain_height 14478803
+stateless_validator_local_chain_height  14476971
+stateless_validator_validation_lag      1832
 ```
 
 `validation_lag` is the number of blocks the validator is behind the remote tip (`remote_chain_height − local_chain_height`).
 Interpret it in two phases:
 
-- **During initial catch-up**, `validation_lag` starts large and shrinks over time — a validator anchored at block 12.6M with remote tip at 14M begins at ~1.4M blocks behind and walks forward at its throughput rate.
+- **During initial catch-up** (only if you anchored at an older block), `validation_lag` starts large and shrinks as the validator replays history to reach the tip.
   A large lag here is expected, not a symptom.
 - **Once caught up**, the gauge sits around `3–5` and briefly spikes during bursty periods.
   This floor is intentional: the validator hardcodes `tip_buffer = 3`, refusing to fetch any block within 3 of the remote tip so the upstream witness generator has headroom to finish.
