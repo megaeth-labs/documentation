@@ -122,13 +122,13 @@ Boolean flags (e.g., `--metrics-enabled`) accept `true` or `false` via their env
 
 These flags override pipeline and RPC retry defaults — most operators can leave them unset.
 
-| Flag                            | Env variable                                      | Default                    | Description                                                                                                              |
-| ------------------------------- | ------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `--poll-interval-ms`            | `STATELESS_VALIDATOR_POLL_INTERVAL_MS`            | pipeline default           | Fetcher caught-up poll interval (ms). Also rate-limits `eth_blockNumber`. Lower values reduce tip-following lag.         |
-| `--error-restart-delay-ms`      | `STATELESS_VALIDATOR_ERROR_RESTART_DELAY_MS`      | pipeline default           | Pipeline restart delay (ms) after a transient cycle error.                                                               |
-| `--rpc-initial-backoff-ms`      | `STATELESS_VALIDATOR_RPC_INITIAL_BACKOFF_MS`      | RPC client default         | Initial round-level RPC retry backoff (ms). Applied after every provider in a round has failed; doubles each round.      |
-| `--rpc-max-backoff-ms`          | `STATELESS_VALIDATOR_RPC_MAX_BACKOFF_MS`          | RPC client default         | Cap on round-level RPC retry backoff (ms).                                                                               |
-| `--canonical-chain-max-length`  | `STATELESS_VALIDATOR_CANONICAL_CHAIN_MAX_LENGTH`  | `1000`                     | Soft cap on canonical-chain rows retained locally. Larger values widen the reorg-lookup window; smaller values reduce db growth. Must be ≥ 1. |
+| Flag                           | Env variable                                     | Default            | Description                                                                                                                                   |
+| ------------------------------ | ------------------------------------------------ | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--poll-interval-ms`           | `STATELESS_VALIDATOR_POLL_INTERVAL_MS`           | pipeline default   | Fetcher caught-up poll interval (ms). Also rate-limits `eth_blockNumber`. Lower values reduce tip-following lag.                              |
+| `--error-restart-delay-ms`     | `STATELESS_VALIDATOR_ERROR_RESTART_DELAY_MS`     | pipeline default   | Pipeline restart delay (ms) after a transient cycle error.                                                                                    |
+| `--rpc-initial-backoff-ms`     | `STATELESS_VALIDATOR_RPC_INITIAL_BACKOFF_MS`     | RPC client default | Initial round-level RPC retry backoff (ms). Applied after every provider in a round has failed; doubles each round.                           |
+| `--rpc-max-backoff-ms`         | `STATELESS_VALIDATOR_RPC_MAX_BACKOFF_MS`         | RPC client default | Cap on round-level RPC retry backoff (ms).                                                                                                    |
+| `--canonical-chain-max-length` | `STATELESS_VALIDATOR_CANONICAL_CHAIN_MAX_LENGTH` | `1000`             | Soft cap on canonical-chain rows retained locally. Larger values widen the reorg-lookup window; smaller values reduce db growth. Must be ≥ 1. |
 
 ### Logging flags
 
