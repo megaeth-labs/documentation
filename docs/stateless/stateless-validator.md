@@ -57,7 +57,7 @@ On the first launch, the validator needs two pieces of bootstrap information:
      -H 'Content-Type: application/json' \
      -d '{"jsonrpc":"2.0","method":"eth_getHeaderByNumber","params":["finalized"],"id":1}' \
      | jq -r '.result.hash'
-   # 0xb330cd7319a3f9ba7ab0753381a0024684554d9b4ede2a22d1a4f86ac3c1a8c1
+   # Output: a 0x-prefixed 64-hex-char string.
    ```
 
    Pass that hash to `--start-block`.
@@ -66,6 +66,8 @@ On the first launch, the validator needs two pieces of bootstrap information:
    {% hint style="warning" %}
    `--start-block` takes a block **hash** (`0x` + 64 hex chars), not a block number. Always verify the hash against at least one independent source before passing it — the anchor is the single point of trust the rest of the chain hangs from.
    {% endhint %}
+
+Replace `<ANCHOR_HASH_FROM_CURL_ABOVE>` below with the hash returned by the `curl` command above, then launch:
 
 ```bash
 ./target/release/stateless-validator \
@@ -227,7 +229,7 @@ The systemd env file intentionally omits `STATELESS_VALIDATOR_START_BLOCK` — t
 Run the validator manually once as the `blockchain` user to write the initial anchor, then stop it.
 
 {% hint style="warning" %}
-Replace `--start-block` below with a block hash **you have independently verified** on a block explorer (per the [First run](#first-run) guidance). The value shown is only an example for the quick-start walkthrough; reusing it blindly means anchoring your validator to a block someone else picked.
+Replace `--start-block` below with a block hash **you have independently verified** on a block explorer (per the [First run](#first-run) guidance). The value shown is only an example for the quick-start walkthrough.
 {% endhint %}
 
 ```bash
