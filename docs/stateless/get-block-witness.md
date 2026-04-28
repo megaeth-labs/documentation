@@ -1,0 +1,279 @@
+---
+description: mega_getBlockWitness — fetch the SALT + MPT witness needed to stateless-verify a MegaETH block.
+---
+
+# Get Block Witness
+
+`mega_getBlockWitness` returns the cryptographic witness for a single MegaETH block.
+The witness contains the subset of state the block reads or writes, packaged with proofs against the previous block's state root, so that a stateless verifier can re-execute the block without holding any chain state locally.
+
+The endpoint is served at the public MegaETH RPC:
+
+```text
+https://mainnet.megaeth.com/rpc
+```
+
+The witness JSON-RPC method is the same logical service that powers the [stateless validator](stateless-validator.md)'s `--witness-endpoint`.
+Any client — an operator running [`stateless-validator`](https://github.com/megaeth-labs/stateless-validator), an `op-node` derivation pipeline, or a custom verifier — can call it directly.
+
+## Request
+
+| Field | Method                 | Params                            |
+| ----- | ---------------------- | --------------------------------- |
+| Value | `mega_getBlockWitness` | `[<keys>]` — single-element array |
+
+`<keys>` is a JSON object that identifies the block.
+`blockNumber` is always required; the other fields select between three lookup modes.
+
+| Field            | Type              | Required | Description                                                                                                                 |
+| ---------------- | ----------------- | -------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `blockNumber`    | `Quantity` (hex)  | Yes      | Block number, 0x-prefixed lowercase hex (e.g. `"0x7fd"`).                                                                   |
+| `blockHash`      | `Data` (32 bytes) | No       | Selects the witness for the block whose hash matches. EIP-234-style filter; pinned by hash, so reorg-safe.                  |
+| `parentHash`     | `Data` (32 bytes) | No       | OP-stack lookup. Used together with `attributesHash` to identify a block by its derivation inputs rather than its own hash. |
+| `attributesHash` | `Data` (32 bytes) | No       | OP-stack payload-attributes hash. Must be paired with `parentHash`.                                                         |
+
+All hex strings (`blockHash`, `parentHash`, `attributesHash`) are 0x-prefixed and lowercase.
+
+### Lookup modes
+
+The combination of fields chosen determines the lookup mode.
+**Always pass a hash — `blockHash` or the `parentHash` + `attributesHash` pair — when one is available.** The `blockNumber`-only mode does not pin the result to a specific block and can return a witness for the wrong fork.
+
+| Mode                                            | Recommendation | When to use                                                                                                                                                                                                                                                                                                   |
+| ----------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `blockNumber` + `blockHash`                     | **Preferred**  | The caller already knows the canonical block hash (e.g. fetched from `eth_getBlockByNumber` first). The witness is pinned to that exact block, so the result is reorg-safe.                                                                                                                                   |
+| `blockNumber` + `parentHash` + `attributesHash` | OK             | OP-stack derivation. The caller is producing the block locally and only knows its derivation inputs, not its hash yet. The pair uniquely identifies a block, so the result is still pinned.                                                                                                                   |
+| `blockNumber`                                   | **Avoid**      | Last-resort convenience. The backend prefix-lists every stored witness at that height in Workers KV and returns the first match it encounters — there is **no guarantee** the returned witness is for the block you expect. Only use when you cannot obtain a hash and can independently verify the response. |
+
+{% hint style="warning" %}
+Calling `mega_getBlockWitness` with `blockNumber` only is unsafe for any caller that needs a specific block.
+The server resolves it by listing all stored `witness:block:<prefix>/<blockNumber>.<hash>` keys for that height and returning the first one — which is non-deterministic, may correspond to a non-canonical fork at that height, and may change between calls.
+Always pair `blockNumber` with a hash unless you are willing to validate the response yourself (e.g. by re-deriving the block hash from the returned witness against an independently-trusted header).
+{% endhint %}
+
+### Examples
+
+**Mode 1 — by block hash:**
+
+```json
+[
+  {
+    "blockNumber": "0x7fd",
+    "blockHash": "0x23758c4dc5fcb1a2f0e64b811e71e3d414fb1c128e2f8df265b0ecc62728eed6"
+  }
+]
+```
+
+**Mode 2 — by OP-stack derivation inputs:**
+
+```json
+[
+  {
+    "blockNumber": "0x806",
+    "parentHash": "0xb8bac22d405ded8a9d028f9b1baf96b01a2e8f3aa981b5d7d4bc01830a4744c5",
+    "attributesHash": "0x5c98bc00472644511d66fa1610861d22dcf76185720aed70604e1b6b1b1d5b39"
+  }
+]
+```
+
+**Mode 3 — by block number only:**
+
+```json
+[{ "blockNumber": "0x7fd" }]
+```
+
+## Response
+
+The response `result` is a single string of the form `<version>:<base64-payload>`.
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": "v0:KLUv/QBgBeMB/H8DYwBWAAAAABLVAAE..."
+}
+```
+
+| Field     | Description                                                                                                          |
+| --------- | -------------------------------------------------------------------------------------------------------------------- |
+| `version` | Encoding version. Currently `v0`. Bumped if the witness payload format ever changes — clients must check the prefix. |
+| `payload` | Base64-encoded, Zstd-compressed [bincode](https://docs.rs/bincode) tuple `(SaltWitness, MptWitness)`.                |
+
+### Decoding pipeline
+
+To turn the response string back into a witness, apply these steps in order:
+
+1. Split on the first `:` and verify the prefix is `v0`.
+2. Base64-decode the payload (standard alphabet, padded).
+3. Zstd-decompress the result.
+4. Bincode-deserialize using the **legacy** config (fixed-int encoding, little-endian) into `(SaltWitness, MptWitness)`.
+
+A reference Rust implementation lives in the upstream stateless validator at [`fetch_witness_raw`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-common/src/rpc_client.rs):
+
+```rust
+let b64 = encoded.strip_prefix("v0:").ok_or("missing v0 prefix")?;
+let compressed = BASE64.decode(b64)?;
+let decompressed = zstd::decode_all(compressed.as_slice())?;
+let (salt_witness, mpt_witness): (SaltWitness, MptWitness) =
+    bincode::serde::decode_from_slice(&decompressed, bincode::config::legacy())?.0;
+```
+
+### Errors
+
+| Code     | Cause                                                                             |
+| -------- | --------------------------------------------------------------------------------- |
+| `-32602` | Invalid params — malformed JSON, missing `blockNumber`, or unparseable hex.       |
+| `-32000` | Witness not found — no witness stored for the requested keys.                     |
+| `-32001` | Decompression failed — stored payload is corrupted (server-side issue).           |
+| `-32002` | Reference dangling — OP-stack reference key resolved to a missing primary record. |
+
+A 404-equivalent (`-32000`) is returned when no witness exists for the keys.
+Witnesses are immutable once written: a successful response can be cached indefinitely (the upstream RPC layer sets `Cache-Control: public, max-age=31536000, immutable`).
+
+## Witness data structure
+
+The decoded payload is a 2-tuple — one component per state surface the validator must check.
+Every type below is given as the upstream Rust definition with its source location, so a third-party decoder in another language can reproduce the byte layout exactly.
+
+### `SaltWitness` — main state trie
+
+Carries the subset of [SALT](https://github.com/megaeth-labs/salt) key-value pairs the block touches, plus a single multi-point IPA proof binding them to the previous block's state root.
+
+Defined at [`salt/src/proof/salt_witness.rs:46`](https://github.com/megaeth-labs/salt/blob/main/salt/src/proof/salt_witness.rs#L46):
+
+```rust
+pub struct SaltWitness {
+    pub kvs:   BTreeMap<SaltKey, Option<SaltValue>>,
+    pub proof: SaltProof,
+}
+```
+
+| Field   | Description                                                                                                                                                      |
+| ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `kvs`   | Witnessed slots. `Some(v)` means the slot is occupied with value `v`; `None` means the slot is proven empty; an absent key is **unknown** (verifier must error). |
+| `proof` | IPA multi-point proof + the path commitments needed to authenticate every entry in `kvs` against the state root.                                                 |
+
+A verifier uses the witness as a `StateReader` / `TrieReader`: every state read during block re-execution falls through to `kvs` (existence-proven) or errors (unknown).
+The three-state distinction (existing / proven-empty / unknown) is what blocks a malicious witness server from hiding state by omission — see the security model in the upstream `SaltWitness` doc-comment.
+For the trie design this witness proves against, see the [SALT README](https://github.com/megaeth-labs/salt#design).
+
+#### `SaltKey`
+
+Defined at [`salt/src/types.rs:198`](https://github.com/megaeth-labs/salt/blob/main/salt/src/types.rs#L198):
+
+```rust
+pub struct SaltKey(pub u64);
+```
+
+The `u64` packs the SALT trie address into two fields:
+
+| Bits      | Field       | Range          | Meaning                                                                             |
+| --------- | ----------- | -------------- | ----------------------------------------------------------------------------------- |
+| `63..=40` | `bucket_id` | 24 bits (~16M) | Index into the static main trie. Buckets `0..NUM_META_BUCKETS` are bucket-metadata. |
+| `39..=0`  | `slot_id`   | 40 bits (~1T)  | Slot offset inside the bucket's SHI hash table.                                     |
+
+Use `bucket_id = key >> 40` and `slot_id = key & ((1<<40) - 1)` to unpack.
+Bincode-legacy serializes `SaltKey` as a fixed 8-byte little-endian `u64`.
+
+#### `SaltValue`
+
+Defined at [`salt/src/types.rs:274`](https://github.com/megaeth-labs/salt/blob/main/salt/src/types.rs#L274):
+
+```rust
+pub const MAX_SALT_VALUE_BYTES: usize = 94;
+
+pub struct SaltValue {
+    pub data: [u8; MAX_SALT_VALUE_BYTES],  // serialized as a fixed 94-byte array
+}
+```
+
+`data` holds a length-prefixed key-value blob:
+
+| Offset                           | Size        | Field       |
+| -------------------------------- | ----------- | ----------- |
+| `0`                              | 1 byte      | `key_len`   |
+| `1`                              | 1 byte      | `value_len` |
+| `2..2+key_len`                   | `key_len`   | `key`       |
+| `2+key_len..2+key_len+value_len` | `value_len` | `value`     |
+| `2+key_len+value_len..94`        | remainder   | zero-padded |
+
+Three `SaltValue` flavors share this encoding:
+
+| Kind         | `key_len` | `value_len`              | Used bytes | Notes                                                                                                   |
+| ------------ | --------- | ------------------------ | ---------- | ------------------------------------------------------------------------------------------------------- |
+| `Account`    | 20        | 40 (EOA) / 72 (contract) | 62 / 94    | Key is the 20-byte address; value is the encoded account body.                                          |
+| `Storage`    | 52        | 32                       | 86         | Key is `address(20) ++ storage_slot(32)`; value is the 32-byte slot value.                              |
+| `BucketMeta` | 12        | 0                        | 14         | Reserved for the metadata buckets — `BucketMeta` is fully encoded into the 12-byte key, value is empty. |
+
+#### `SaltProof`
+
+Defined at [`salt/src/proof/prover.rs:103`](https://github.com/megaeth-labs/salt/blob/main/salt/src/proof/prover.rs#L103):
+
+```rust
+pub struct SaltProof {
+    pub parents_commitments: BTreeMap<NodeId, SerdeCommitment>,
+    pub proof:               SerdeMultiPointProof,
+    pub levels:              FxHashMap<BucketId, u8>,
+}
+```
+
+| Field                 | Type                                | Description                                                                                                                                                                         |
+| --------------------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `parents_commitments` | `BTreeMap<NodeId, SerdeCommitment>` | Commitment for every trie node on the path from a witnessed bucket up to the root. Lookups by `NodeId = u64` (a flat trie-node index) — the verifier walks these to the root.       |
+| `proof`               | `SerdeMultiPointProof`              | The IPA multi-point opening proof over the Banderwagon scalar field. Serialized via `MultiPointProof::to_bytes`; deserialize with `MultiPointProof::from_bytes(&buf, DOMAIN_SIZE)`. |
+| `levels`              | `FxHashMap<BucketId, u8>`           | Number of subtree levels for each bucket present in the proof. Required because the verifier doesn't always know a bucket's capacity from the witness alone.                        |
+
+`SerdeCommitment` wraps a Banderwagon group `Element`; `SerdeMultiPointProof` wraps an `ipa_multipoint::MultiPointProof`.
+Both serialize to opaque byte vectors via the IPA crate's encoding.
+
+### `MptWitness` — withdrawals storage trie
+
+A small Merkle Patricia Trie witness covering the storage trie of the L2-to-L1 message-passer contract (`0x4200000000000000000000000000000000000016`), so the validator can recompute `withdrawals_root` after applying the block's withdrawal-message writes.
+
+Defined at [`stateless-core/src/withdrawals.rs:49`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/withdrawals.rs#L49):
+
+```rust
+pub struct MptWitness {
+    pub storage_root: B256,         // 32-byte fixed array
+    pub state:        Vec<Bytes>,   // length-prefixed list of RLP-encoded trie nodes
+}
+```
+
+| Field          | Type         | Description                                                                                                                                             |
+| -------------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `storage_root` | `B256`       | Pre-state storage root of the L2ToL1MessagePasser contract. Serialized as 32 raw bytes.                                                                 |
+| `state`        | `Vec<Bytes>` | RLP-encoded MPT trie nodes that authenticate the storage slots the block's withdrawal writes will touch. Each `Bytes` is a length-prefixed byte string. |
+
+This is intentionally an MPT (not SALT) witness: withdrawals are committed to the standard Ethereum withdrawals MPT root for L1 compatibility, so the slice of state needed to maintain it is proved separately from the SALT-backed account/storage state.
+
+## Example
+
+Fetch the witness for a known block and pipe it through the decode pipeline.
+Replace `<BLOCK_NUMBER_HEX>` and `<BLOCK_HASH>` with values from `eth_getBlockByNumber`:
+
+```bash
+curl -sS https://mainnet.megaeth.com/rpc \
+  -X POST -H 'Content-Type: application/json' \
+  -d '{
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "mega_getBlockWitness",
+    "params": [{
+      "blockNumber": "<BLOCK_NUMBER_HEX>",
+      "blockHash": "<BLOCK_HASH>"
+    }]
+  }' \
+  | jq -r '.result' \
+  | sed 's/^v0://' \
+  | base64 -d \
+  | zstd -d \
+  > witness.bincode
+```
+
+`witness.bincode` is a Zstd-decompressed bincode tuple — feed it into a Rust deserializer (using the snippet under [Decoding pipeline](#decoding-pipeline)) to obtain `(SaltWitness, MptWitness)`.
+
+## Related pages
+
+- [Stateless Validation](stateless-validator.md) — the operator guide for the reference client that consumes this RPC.
+- [stateless-validator source](https://github.com/megaeth-labs/stateless-validator) — Rust implementation of the witness fetcher and verifier.
+- [SALT](https://github.com/megaeth-labs/salt) — the authenticated key-value store that produces `SaltWitness`.

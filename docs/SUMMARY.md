@@ -44,3 +44,4 @@
 ## Node Operation
 
 - [Stateless Validation](stateless/stateless-validator.md)
+  - [Get Block Witness](stateless/get-block-witness.md)
