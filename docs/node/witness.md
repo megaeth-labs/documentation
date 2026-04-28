@@ -4,7 +4,7 @@ description: mega_getBlockWitness — fetch the SALT + MPT witness needed to sta
 
 # Get block witness
 
-MegaETH defines `mega_getBlockWitness` RPC method to return the cryptographic witness for a single MegaETH block.
+MegaETH defines a `mega_getBlockWitness` RPC method to return the cryptographic witness for a single MegaETH block.
 The witness contains the subset of state the block reads or writes, packaged with proofs against the previous block's state root, so that a stateless verifier can re-execute the block without holding any chain state locally.
 
 The RPC method is served at the public MegaETH RPC endpoint:
@@ -84,10 +84,10 @@ The response `result` is a single string of the form `<version>:<base64-payload>
 }
 ```
 
-| Field     | Description                                                                                                                                                                                   |
-| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `version` | Encoding version. Currently `v0`. Bumped if the witness payload format ever changes — clients must check the prefix.                                                                          |
-| `payload` | Base64-encoded, Zstd-compressed [bincode](https://docs.rs/bincode/2.0.1/bincode) tuple ([`SaltWitness`](#saltwitness-main-state-trie), [`MptWitness`](#mptwitness-withdrawals-storage-trie)). |
+| Field     | Description                                                                                                                                                                                     |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `version` | Encoding version. Currently `v0`. Bumped if the witness payload format ever changes — clients must check the prefix.                                                                            |
+| `payload` | Base64-encoded, Zstd-compressed [bincode](https://docs.rs/bincode/2.0.1/bincode) tuple ([`SaltWitness`](#saltwitness--main-state-trie), [`MptWitness`](#mptwitness--withdrawals-storage-trie)). |
 
 ### Errors
 
