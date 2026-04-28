@@ -25,9 +25,9 @@ Any client — an operator running [`stateless-validator`](https://github.com/me
 `<keys>` is a JSON object that identifies the block.
 `blockNumber` is always required; pair it with `blockHash` to pin the witness to a specific block.
 
-| Field         | Type              | Required | Description                                                                                              |
-| ------------- | ----------------- | -------- | -------------------------------------------------------------------------------------------------------- |
-| `blockNumber` | `Quantity` (hex)  | Yes      | Block number, 0x-prefixed lowercase hex (e.g. `"0x7fd"`).                                                |
+| Field         | Type              | Required | Description                                                                                             |
+| ------------- | ----------------- | -------- | ------------------------------------------------------------------------------------------------------- |
+| `blockNumber` | `Quantity` (hex)  | Yes      | Block number, 0x-prefixed lowercase hex (e.g. `"0x7fd"`).                                               |
 | `blockHash`   | `Data` (32 bytes) | No       | 0x-prefixed lowercase hash of the block to fetch the witness for. Pins the result, so it is reorg-safe. |
 
 ### Lookup modes
@@ -36,10 +36,10 @@ The combination of fields chosen determines the lookup mode.
 **Always pass `blockHash` when one is available.**
 The `blockNumber`-only mode does not pin the result to a specific block and can return a witness for the wrong fork.
 
-| Mode                        | Recommendation | When to use                                                                                                                                                                                                                                                                          |
-| --------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `blockNumber` + `blockHash` | **Preferred**  | The caller already knows the canonical block hash (e.g. fetched from `eth_getBlockByNumber` first). The witness is pinned to that exact block, so the result is reorg-safe.                                                                                                          |
-| `blockNumber`               | **Avoid**      | Last-resort convenience. The backend returns the first stored witness it finds at that height — there is **no guarantee** the returned witness is for the block you expect. Only use when you cannot obtain a hash and can independently verify the response.                       |
+| Mode                        | Recommendation | When to use                                                                                                                                                                                                                                                   |
+| --------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `blockNumber` + `blockHash` | **Preferred**  | The caller already knows the canonical block hash (e.g. fetched from `eth_getBlockByNumber` first). The witness is pinned to that exact block, so the result is reorg-safe.                                                                                   |
+| `blockNumber`               | **Avoid**      | Last-resort convenience. The backend returns the first stored witness it finds at that height — there is **no guarantee** the returned witness is for the block you expect. Only use when you cannot obtain a hash and can independently verify the response. |
 
 {% hint style="warning" %}
 Calling `mega_getBlockWitness` with `blockNumber` only is unsafe for any caller that needs a specific block.
@@ -51,20 +51,24 @@ Always pair `blockNumber` with `blockHash` unless you are willing to validate th
 
 {% tabs %}
 {% tab title="Preferred — by block number and hash" %}
+
 ```json
 [
   {
     "blockNumber": "0x7fd",
-    "blockHash": "0x23758c4dc5fcb1a2f0e64b811e71e3d414fb1c128e2f8df265b0ecc62728eed6"
+    "blockHash": "0x262206173864c1e597ab9fcf2f718f95f942907207f4fed97dda66d272c5d4a6"
   }
 ]
 ```
+
 {% endtab %}
 
 {% tab title="By block number only (unsafe)" %}
+
 ```json
 [{ "blockNumber": "0x7fd" }]
 ```
+
 {% endtab %}
 {% endtabs %}
 
@@ -80,9 +84,9 @@ The response `result` is a single string of the form `<version>:<base64-payload>
 }
 ```
 
-| Field     | Description                                                                                                          |
-| --------- | -------------------------------------------------------------------------------------------------------------------- |
-| `version` | Encoding version. Currently `v0`. Bumped if the witness payload format ever changes — clients must check the prefix. |
+| Field     | Description                                                                                                                                                                                   |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `version` | Encoding version. Currently `v0`. Bumped if the witness payload format ever changes — clients must check the prefix.                                                                          |
 | `payload` | Base64-encoded, Zstd-compressed [bincode](https://docs.rs/bincode/2.0.1/bincode) tuple ([`SaltWitness`](#saltwitness-main-state-trie), [`MptWitness`](#mptwitness-withdrawals-storage-trie)). |
 
 ### Errors
