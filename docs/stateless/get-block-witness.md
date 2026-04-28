@@ -97,7 +97,7 @@ The response `result` is a single string of the form `<version>:<base64-payload>
 | Field     | Description                                                                                                          |
 | --------- | -------------------------------------------------------------------------------------------------------------------- |
 | `version` | Encoding version. Currently `v0`. Bumped if the witness payload format ever changes — clients must check the prefix. |
-| `payload` | Base64-encoded, Zstd-compressed [bincode](https://docs.rs/bincode) tuple `(SaltWitness, MptWitness)`.                |
+| `payload` | Base64-encoded, Zstd-compressed [bincode](https://docs.rs/bincode/2.0.1/bincode) tuple `(SaltWitness, MptWitness)`.  |
 
 ### Decoding pipeline
 
@@ -108,7 +108,7 @@ To turn the response string back into a witness, apply these steps in order:
 3. Zstd-decompress the result.
 4. Bincode-deserialize using the **legacy** config (fixed-int encoding, little-endian) into `(SaltWitness, MptWitness)`.
 
-A reference Rust implementation lives in the upstream stateless validator at [`fetch_witness_raw`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-common/src/rpc_client.rs):
+A reference Rust implementation lives in the upstream stateless validator at [`fetch_witness_raw`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-common/src/rpc_client.rs#L978):
 
 ```rust
 let b64 = encoded.strip_prefix("v0:").ok_or("missing v0 prefix")?;
