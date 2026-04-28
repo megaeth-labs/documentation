@@ -313,6 +313,7 @@ Histograms like `block_validation_time_seconds`, `witness_verification_time_seco
 
 ## Related pages
 
+- [Get Block Witness](witness.md) — `mega_getBlockWitness` RPC reference and witness data layout
 - [Architecture](../architecture.md) — how transactions flow through MegaETH and where validators fit in
 - [stateless-validator source](https://github.com/megaeth-labs/stateless-validator) — Rust client source code
 - [SALT](https://github.com/megaeth-labs/salt) — MegaETH's state trie and witness format
