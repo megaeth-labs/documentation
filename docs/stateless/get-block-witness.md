@@ -273,7 +273,7 @@ curl -sS https://mainnet.megaeth.com/rpc \
   }' \
   | jq -r '.result' \
   | sed 's/^v0://' \
-  | base64 -d \
+  | base64 --decode \
   | zstd -d \
   > witness.bincode
 ```
