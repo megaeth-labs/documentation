@@ -16,7 +16,7 @@ The site is organized into layers, each targeting a different audience:
 | ----------------------- | --------------------------------------------------------- | ------------------------------- | ---------------------------------- |
 | **User Guide**          | `docs/user/`                                              | End users (wallets, DeFi users) | Plain language, no code            |
 | **Developer Docs**      | `docs/dev/`                                               | Dapp/contract builders          | Practical guidance, code examples  |
-| **Stateless Validator** | `docs/stateless/`                                         | Node operators                  | Reference, copy-paste commands     |
+| **Stateless Validator** | `docs/node/`                                              | Node operators                  | Reference, copy-paste commands     |
 | **Specification**       | [mega-evm repo](https://github.com/megaeth-labs/mega-evm) | Protocol implementers, auditors | Normative (MUST/SHALL), exhaustive |
 
 Each layer has its own `AGENTS.md` with layer-specific writing rules.
@@ -43,8 +43,8 @@ It does not live in this repo — do not create or edit `docs/spec/` files here.
 │   │   ├── read/              # Reading from MegaETH (RPC, realtime API)
 │   │   │   └── rpc/           # RPC method reference pages
 │   │   └── execution/         # EVM differences, gas model, resource limits
-│   └── stateless/             # Stateless Validator layer
-│       ├── AGENTS.md          # Stateless layer writing rules
+│   └── node/                  # Stateless Validator layer
+│       ├── AGENTS.md          # Node layer writing rules
 │       └── *.md
 ├── .sisyphus/plans/           # Restructure planning docs
 └── .github/workflows/

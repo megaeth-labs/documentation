@@ -4,17 +4,17 @@ description: mega_getBlockWitness — fetch the SALT + MPT witness needed to sta
 
 # Get block witness
 
-`mega_getBlockWitness` returns the cryptographic witness for a single MegaETH block.
+MegaETH defines `mega_getBlockWitness` RPC method to return the cryptographic witness for a single MegaETH block.
 The witness contains the subset of state the block reads or writes, packaged with proofs against the previous block's state root, so that a stateless verifier can re-execute the block without holding any chain state locally.
 
-The endpoint is served at the public MegaETH RPC:
+The RPC method is served at the public MegaETH RPC endpoint:
 
 ```text
 https://mainnet.megaeth.com/rpc
 ```
 
-The witness JSON-RPC method is the same logical service that powers the [stateless validator](stateless-validator.md)'s `--witness-endpoint`.
-Any client — an operator running [`stateless-validator`](https://github.com/megaeth-labs/stateless-validator), an `op-node` derivation pipeline, or a custom verifier — can call it directly.
+The witness JSON-RPC method is the same logical service that powers the [stateless validator](stateless-validation.md)'s `--witness-endpoint`.
+Any client — an operator running [`stateless-validator`](https://github.com/megaeth-labs/stateless-validator) or a custom verifier — can call it directly.
 
 ## Request
 
@@ -23,39 +23,34 @@ Any client — an operator running [`stateless-validator`](https://github.com/me
 | Value | `mega_getBlockWitness` | `[<keys>]` — single-element array |
 
 `<keys>` is a JSON object that identifies the block.
-`blockNumber` is always required; the other fields select between three lookup modes.
+`blockNumber` is always required; pair it with `blockHash` to pin the witness to a specific block.
 
-| Field            | Type              | Required | Description                                                                                                                 |
-| ---------------- | ----------------- | -------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `blockNumber`    | `Quantity` (hex)  | Yes      | Block number, 0x-prefixed lowercase hex (e.g. `"0x7fd"`).                                                                   |
-| `blockHash`      | `Data` (32 bytes) | No       | Selects the witness for the block whose hash matches. EIP-234-style filter; pinned by hash, so reorg-safe.                  |
-| `parentHash`     | `Data` (32 bytes) | No       | OP-stack lookup. Used together with `attributesHash` to identify a block by its derivation inputs rather than its own hash. |
-| `attributesHash` | `Data` (32 bytes) | No       | OP-stack payload-attributes hash. Must be paired with `parentHash`.                                                         |
-
-All hex strings (`blockHash`, `parentHash`, `attributesHash`) are 0x-prefixed and lowercase.
+| Field         | Type              | Required | Description                                                                                              |
+| ------------- | ----------------- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `blockNumber` | `Quantity` (hex)  | Yes      | Block number, 0x-prefixed lowercase hex (e.g. `"0x7fd"`).                                                |
+| `blockHash`   | `Data` (32 bytes) | No       | 0x-prefixed lowercase hash of the block to fetch the witness for. Pins the result, so it is reorg-safe. |
 
 ### Lookup modes
 
 The combination of fields chosen determines the lookup mode.
-**Always pass a hash — `blockHash` or the `parentHash` + `attributesHash` pair — when one is available.**
+**Always pass `blockHash` when one is available.**
 The `blockNumber`-only mode does not pin the result to a specific block and can return a witness for the wrong fork.
 
-| Mode                                            | Recommendation | When to use                                                                                                                                                                                                                                                                                                   |
-| ----------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `blockNumber` + `blockHash`                     | **Preferred**  | The caller already knows the canonical block hash (e.g. fetched from `eth_getBlockByNumber` first). The witness is pinned to that exact block, so the result is reorg-safe.                                                                                                                                   |
-| `blockNumber` + `parentHash` + `attributesHash` | OK             | OP-stack derivation. The caller is producing the block locally and only knows its derivation inputs, not its hash yet. The pair uniquely identifies a block, so the result is still pinned.                                                                                                                   |
-| `blockNumber`                                   | **Avoid**      | Last-resort convenience. The backend prefix-lists every stored witness at that height in Workers KV and returns the first match it encounters — there is **no guarantee** the returned witness is for the block you expect. Only use when you cannot obtain a hash and can independently verify the response. |
+| Mode                        | Recommendation | When to use                                                                                                                                                                                                                                                                          |
+| --------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `blockNumber` + `blockHash` | **Preferred**  | The caller already knows the canonical block hash (e.g. fetched from `eth_getBlockByNumber` first). The witness is pinned to that exact block, so the result is reorg-safe.                                                                                                          |
+| `blockNumber`               | **Avoid**      | Last-resort convenience. The backend returns the first stored witness it finds at that height — there is **no guarantee** the returned witness is for the block you expect. Only use when you cannot obtain a hash and can independently verify the response.                       |
 
 {% hint style="warning" %}
 Calling `mega_getBlockWitness` with `blockNumber` only is unsafe for any caller that needs a specific block.
-The server resolves it by listing all stored `witness:block:<prefix>/<blockNumber>.<hash>` keys for that height and returning the first one — which is non-deterministic, may correspond to a non-canonical fork at that height, and may change between calls.
-Always pair `blockNumber` with a hash unless you are willing to validate the response yourself (e.g. by re-deriving the block hash from the returned witness against an independently-trusted header).
+The server returns the first witness it finds at that height, which is non-deterministic, may correspond to a non-canonical fork, and may change between calls.
+Always pair `blockNumber` with `blockHash` unless you are willing to validate the response yourself (e.g. by re-deriving the block hash from the returned witness against an independently-trusted header).
 {% endhint %}
 
 ### Examples
 
-**Mode 1 — by block hash:**
-
+{% tabs %}
+{% tab title="Preferred — by block number and hash" %}
 ```json
 [
   {
@@ -64,24 +59,14 @@ Always pair `blockNumber` with a hash unless you are willing to validate the res
   }
 ]
 ```
+{% endtab %}
 
-**Mode 2 — by OP-stack derivation inputs:**
-
-```json
-[
-  {
-    "blockNumber": "0x806",
-    "parentHash": "0xb8bac22d405ded8a9d028f9b1baf96b01a2e8f3aa981b5d7d4bc01830a4744c5",
-    "attributesHash": "0x5c98bc00472644511d66fa1610861d22dcf76185720aed70604e1b6b1b1d5b39"
-  }
-]
-```
-
-**Mode 3 — by block number only:**
-
+{% tab title="By block number only (unsafe)" %}
 ```json
 [{ "blockNumber": "0x7fd" }]
 ```
+{% endtab %}
+{% endtabs %}
 
 ## Response
 
@@ -98,7 +83,19 @@ The response `result` is a single string of the form `<version>:<base64-payload>
 | Field     | Description                                                                                                          |
 | --------- | -------------------------------------------------------------------------------------------------------------------- |
 | `version` | Encoding version. Currently `v0`. Bumped if the witness payload format ever changes — clients must check the prefix. |
-| `payload` | Base64-encoded, Zstd-compressed [bincode](https://docs.rs/bincode/2.0.1/bincode) tuple `(SaltWitness, MptWitness)`.  |
+| `payload` | Base64-encoded, Zstd-compressed [bincode](https://docs.rs/bincode/2.0.1/bincode) tuple ([`SaltWitness`](#saltwitness-main-state-trie), [`MptWitness`](#mptwitness-withdrawals-storage-trie)). |
+
+### Errors
+
+| Code     | Cause                                                                       |
+| -------- | --------------------------------------------------------------------------- |
+| `-32602` | Invalid params — malformed JSON, missing `blockNumber`, or unparseable hex. |
+| `-32000` | Witness not found — no witness stored for the requested keys.               |
+| `-32001` | Decompression failed — stored payload is corrupted (server-side issue).     |
+
+The server returns `-32000` (a 404 equivalent) when no witness exists for the requested keys.
+The RPC layer in front of the witness service may also return standard JSON-RPC transport codes: `-32700` (parse error), `-32600` (invalid request), `-32603` (internal error).
+Witnesses are immutable once written: the upstream RPC layer sets `Cache-Control: public, max-age=31536000, immutable`, so clients can cache successful responses indefinitely.
 
 ### Decoding pipeline
 
@@ -112,25 +109,23 @@ To turn the response string back into a witness, apply these steps in order:
 A reference Rust implementation lives in the upstream stateless validator at [`fetch_witness_raw`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-common/src/rpc_client.rs#L978):
 
 ```rust
+use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
+use bincode::{config, serde::decode_from_slice};
+use salt::SaltWitness;
+use stateless_core::withdrawals::MptWitness;
+use zstd;
+
 let b64 = encoded.strip_prefix("v0:").ok_or("missing v0 prefix")?;
 let compressed = BASE64.decode(b64)?;
 let decompressed = zstd::decode_all(compressed.as_slice())?;
 let (salt_witness, mpt_witness): (SaltWitness, MptWitness) =
-    bincode::serde::decode_from_slice(&decompressed, bincode::config::legacy())?.0;
+    decode_from_slice(&decompressed, config::legacy())?.0;
 ```
 
-### Errors
-
-| Code     | Cause                                                                             |
-| -------- | --------------------------------------------------------------------------------- |
-| `-32602` | Invalid params — malformed JSON, missing `blockNumber`, or unparseable hex.       |
-| `-32000` | Witness not found — no witness stored for the requested keys.                     |
-| `-32001` | Decompression failed — stored payload is corrupted (server-side issue).           |
-| `-32002` | Reference dangling — OP-stack reference key resolved to a missing primary record. |
-
-The server returns `-32000` (a 404 equivalent) when no witness exists for the requested keys.
-The RPC layer in front of the witness service may also return standard JSON-RPC transport codes: `-32700` (parse error), `-32600` (invalid request), `-32603` (internal error).
-Witnesses are immutable once written: the upstream RPC layer sets `Cache-Control: public, max-age=31536000, immutable`, so clients can cache successful responses indefinitely.
+{% hint style="info" %}
+`SaltWitness` is defined in the [`salt`](https://github.com/megaeth-labs/salt) crate; `MptWitness` is defined in the `stateless-core` crate of the [`stateless-validator`](https://github.com/megaeth-labs/stateless-validator) repository.
+Add both as Cargo dependencies (via a git or path source) before compiling this snippet.
+{% endhint %}
 
 ## Witness data structure
 
@@ -282,6 +277,6 @@ curl -sS https://mainnet.megaeth.com/rpc \
 
 ## Related pages
 
-- [Stateless Validation](stateless-validator.md) — the operator guide for the reference client that consumes this RPC.
+- [Stateless Validation](stateless-validation.md) — the operator guide for the reference client that consumes this RPC.
 - [stateless-validator source](https://github.com/megaeth-labs/stateless-validator) — Rust implementation of the witness fetcher and verifier.
 - [SALT](https://github.com/megaeth-labs/salt) — the authenticated key-value store that produces `SaltWitness`.
