@@ -2,7 +2,7 @@
 description: mega_getBlockWitness — fetch the SALT + MPT witness needed to stateless-verify a MegaETH block.
 ---
 
-# Get Block Witness
+# Get block witness
 
 `mega_getBlockWitness` returns the cryptographic witness for a single MegaETH block.
 The witness contains the subset of state the block reads or writes, packaged with proofs against the previous block's state root, so that a stateless verifier can re-execute the block without holding any chain state locally.
@@ -37,7 +37,8 @@ All hex strings (`blockHash`, `parentHash`, `attributesHash`) are 0x-prefixed an
 ### Lookup modes
 
 The combination of fields chosen determines the lookup mode.
-**Always pass a hash — `blockHash` or the `parentHash` + `attributesHash` pair — when one is available.** The `blockNumber`-only mode does not pin the result to a specific block and can return a witness for the wrong fork.
+**Always pass a hash — `blockHash` or the `parentHash` + `attributesHash` pair — when one is available.**
+The `blockNumber`-only mode does not pin the result to a specific block and can return a witness for the wrong fork.
 
 | Mode                                            | Recommendation | When to use                                                                                                                                                                                                                                                                                                   |
 | ----------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -90,7 +91,7 @@ The response `result` is a single string of the form `<version>:<base64-payload>
 {
   "jsonrpc": "2.0",
   "id": 1,
-  "result": "v0:KLUv/QBgBeMB/H8DYwBWAAAAABLVAAE..."
+  "result": "v0:<base64 payload>"
 }
 ```
 
@@ -103,7 +104,7 @@ The response `result` is a single string of the form `<version>:<base64-payload>
 
 To turn the response string back into a witness, apply these steps in order:
 
-1. Split on the first `:` and verify the prefix is `v0`.
+1. Verify the string starts with the literal prefix `v0:` and strip it.
 2. Base64-decode the payload (standard alphabet, padded).
 3. Zstd-decompress the result.
 4. Bincode-deserialize using the **legacy** config (fixed-int encoding, little-endian) into `(SaltWitness, MptWitness)`.
@@ -127,8 +128,9 @@ let (salt_witness, mpt_witness): (SaltWitness, MptWitness) =
 | `-32001` | Decompression failed — stored payload is corrupted (server-side issue).           |
 | `-32002` | Reference dangling — OP-stack reference key resolved to a missing primary record. |
 
-A 404-equivalent (`-32000`) is returned when no witness exists for the keys.
-Witnesses are immutable once written: a successful response can be cached indefinitely (the upstream RPC layer sets `Cache-Control: public, max-age=31536000, immutable`).
+The server returns `-32000` (a 404 equivalent) when no witness exists for the requested keys.
+The RPC layer in front of the witness service may also return standard JSON-RPC transport codes: `-32700` (parse error), `-32600` (invalid request), `-32603` (internal error).
+Witnesses are immutable once written: the upstream RPC layer sets `Cache-Control: public, max-age=31536000, immutable`, so clients can cache successful responses indefinitely.
 
 ## Witness data structure
 
@@ -167,10 +169,10 @@ pub struct SaltKey(pub u64);
 
 The `u64` packs the SALT trie address into two fields:
 
-| Bits      | Field       | Range          | Meaning                                                                             |
-| --------- | ----------- | -------------- | ----------------------------------------------------------------------------------- |
-| `63..=40` | `bucket_id` | 24 bits (~16M) | Index into the static main trie. Buckets `0..NUM_META_BUCKETS` are bucket-metadata. |
-| `39..=0`  | `slot_id`   | 40 bits (~1T)  | Slot offset inside the bucket's SHI hash table.                                     |
+| Bits      | Field       | Range          | Meaning                                                                                       |
+| --------- | ----------- | -------------- | --------------------------------------------------------------------------------------------- |
+| `63..=40` | `bucket_id` | 24 bits (~16M) | Index into the static main trie. The first `NUM_META_BUCKETS = 65_536` buckets hold metadata. |
+| `39..=0`  | `slot_id`   | 40 bits (~1T)  | Slot offset inside the bucket's SHI hash table.                                               |
 
 Use `bucket_id = key >> 40` and `slot_id = key & ((1<<40) - 1)` to unpack.
 Bincode-legacy serializes `SaltKey` as a fixed 8-byte little-endian `u64`.
@@ -217,14 +219,19 @@ pub struct SaltProof {
 }
 ```
 
-| Field                 | Type                                | Description                                                                                                                                                                         |
-| --------------------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `parents_commitments` | `BTreeMap<NodeId, SerdeCommitment>` | Commitment for every trie node on the path from a witnessed bucket up to the root. Lookups by `NodeId = u64` (a flat trie-node index) — the verifier walks these to the root.       |
-| `proof`               | `SerdeMultiPointProof`              | The IPA multi-point opening proof over the Banderwagon scalar field. Serialized via `MultiPointProof::to_bytes`; deserialize with `MultiPointProof::from_bytes(&buf, DOMAIN_SIZE)`. |
-| `levels`              | `FxHashMap<BucketId, u8>`           | Number of subtree levels for each bucket present in the proof. Required because the verifier doesn't always know a bucket's capacity from the witness alone.                        |
+| Field                 | Type                                | Description                                                                                                                                                                                                                                                                     |
+| --------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `parents_commitments` | `BTreeMap<NodeId, SerdeCommitment>` | Commitment for every trie node on the path from a witnessed bucket up to the root. Lookups by `NodeId = u64` (a flat trie-node index) — the verifier walks these to the root.                                                                                                   |
+| `proof`               | `SerdeMultiPointProof`              | The IPA multi-point opening proof over the Banderwagon scalar field. Serialized via `MultiPointProof::to_bytes`; deserialize with `MultiPointProof::from_bytes(&buf, DOMAIN_SIZE)` where `DOMAIN_SIZE = 256` (the IPA polynomial degree, matching SALT's 256-ary trie fan-out). |
+| `levels`              | `FxHashMap<BucketId, u8>`           | Number of subtree levels for each bucket present in the proof. Required because the verifier doesn't always know a bucket's capacity from the witness alone.                                                                                                                    |
 
 `SerdeCommitment` wraps a Banderwagon group `Element`; `SerdeMultiPointProof` wraps an `ipa_multipoint::MultiPointProof`.
 Both serialize to opaque byte vectors via the IPA crate's encoding.
+
+{% hint style="info" %}
+**Map encoding order.** `kvs` and `parents_commitments` are `BTreeMap`, so bincode emits their entries in canonical (sorted) key order — wire output is byte-stable for re-implementors that want to round-trip-compare.
+`levels` is an `FxHashMap`, whose iteration order depends on the hasher; do not assume a fixed order when re-encoding.
+{% endhint %}
 
 ### `MptWitness` — withdrawals storage trie
 
@@ -249,7 +256,8 @@ This is intentionally an MPT (not SALT) witness: withdrawals are committed to th
 ## Example
 
 Fetch the witness for a known block and pipe it through the decode pipeline.
-Replace `<BLOCK_NUMBER_HEX>` and `<BLOCK_HASH>` with values from `eth_getBlockByNumber`:
+Replace `<BLOCK_NUMBER>` (0x-prefixed lowercase hex) and `<BLOCK_HASH>` with values from `eth_getBlockByNumber`.
+The pipeline below assumes `jq` and `zstd` are on `PATH` — install them via `brew install jq zstd` on macOS or `apt install jq zstd` on Debian/Ubuntu.
 
 ```bash
 curl -sS https://mainnet.megaeth.com/rpc \
@@ -259,7 +267,7 @@ curl -sS https://mainnet.megaeth.com/rpc \
     "id": 1,
     "method": "mega_getBlockWitness",
     "params": [{
-      "blockNumber": "<BLOCK_NUMBER_HEX>",
+      "blockNumber": "<BLOCK_NUMBER>",
       "blockHash": "<BLOCK_HASH>"
     }]
   }' \
