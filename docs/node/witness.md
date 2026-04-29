@@ -99,7 +99,8 @@ The response `result` is a single string of the form `<version>:<base64-payload>
 
 The server returns `-32000` (a 404 equivalent) when no witness exists for the requested keys.
 The RPC layer in front of the witness service may also return standard JSON-RPC transport codes: `-32700` (parse error), `-32600` (invalid request), `-32603` (internal error).
-Witnesses are immutable once written: the upstream RPC layer sets `Cache-Control: public, max-age=31536000, immutable`, so clients can cache successful responses indefinitely.
+Witnesses are immutable once written: the same block number and hash will always return the same witness.
+Do not rely on HTTP caching — the endpoint currently returns `Cache-Control: no-store`.
 
 ### Decoding pipeline
 
