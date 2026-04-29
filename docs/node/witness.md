@@ -18,9 +18,10 @@ Any client — an operator running [`stateless-validator`](https://github.com/me
 
 ## Request
 
-| Field | Method                 | Params                            |
-| ----- | ---------------------- | --------------------------------- |
-| Value | `mega_getBlockWitness` | `[<keys>]` — single-element array |
+|        | Value                             |
+| ------ | --------------------------------- |
+| Method | `mega_getBlockWitness`            |
+| Params | `[<keys>]` — single-element array |
 
 `<keys>` is a JSON object that identifies the block.
 `blockNumber` is always required; pair it with `blockHash` to pin the witness to a specific block.
