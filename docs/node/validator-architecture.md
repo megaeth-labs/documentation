@@ -20,8 +20,33 @@ It holds **no chain state of its own** — a fresh witness arrives with each blo
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Input       | A `(block, witness)` pair fetched per height. The witness is the response of [`mega_getBlockWitness`](witness.md).                                              |
 | Output      | A locally-persisted record that the block validates, plus optional `mega_setValidatedBlocks` callbacks to a downstream service.                                 |
-| Trust input | One **anchor**: a block hash and the chain's genesis config, supplied at startup. The next block must extend the anchor exactly.                                |
+| Trust input | Two values supplied at startup: a **genesis JSON** (chain ID + hardfork schedule) and an **anchor block hash** (the chain head the next block must extend).     |
 | Non-goal    | Picking the canonical fork. The validator validates whatever block sequence it is fed; pair it with a consensus client (e.g. `op-node`) to derive canonicality. |
+
+## Genesis configuration
+
+The genesis JSON is the validator's primary configuration anchor.
+Misconfigure it and every subsequent fork-conditional check silently runs against the wrong rules — the validator will produce mismatched roots with no "wrong chain" error to point you at the cause.
+Treat it like a chain-identity contract: load it once, persist it, and never edit it.
+
+The reference client loads genesis via `--genesis-file` on first run, stores it in the local database with [`store_genesis`](https://github.com/megaeth-labs/stateless-validator/blob/main/bin/stateless-validator/src/validator_db.rs#L88), and re-reads the stored copy on every subsequent boot.
+
+Despite the file carrying the full Genesis schema (allocations, gas limit, timestamp, base fee, ...), the validator consumes only two pieces of state from it:
+
+| Derived value     | Source in `config`                    | Use during validation                                                                                                                                                                              |
+| ----------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Chain ID          | `chainId`                             | Drives the EVM `CHAINID` opcode and EIP-155 transaction-signature checks.                                                                                                                          |
+| Hardfork schedule | `<fork>Block` and `<fork>Time` fields | Activates Ethereum (Cancun, Shanghai, ...), OP-Stack (Ecotone, Granite, Holocene, Isthmus, ...), and MegaETH (MiniRex, MiniRex1-2, Rex, Rex1-5) at their pre-declared block numbers or timestamps. |
+
+The genesis `alloc`, `gasLimit`, `baseFeePerGas`, and other initial-state fields are **not** consumed — initial state arrives via the witness, not from genesis.
+
+Reference: [`ChainSpec::from_genesis`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/chain_spec.rs#L59) reads `genesis.config.chain_id` directly, hands the full `Genesis` to `OpChainSpec::from_genesis` to extract Ethereum and OP-Stack fork conditions, and pulls MegaETH-specific forks via [`MegaethGenesisHardforks::extract_from`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/chain_spec.rs#L123).
+The three sets are merged into a single ordered hardfork schedule that drives every fork-conditional code path: opcode availability, gas-cost tables, system-contract pre/post-block hooks, and resource limits.
+
+{% hint style="warning" %}
+All replicas of the chain MUST use byte-identical genesis JSON.
+A divergence in any single hardfork timestamp produces a fork that the rest of the network will reject — and because the divergence only manifests as a `state_root` mismatch on the first affected block, it is hard to attribute after the fact.
+{% endhint %}
 
 ## Reference architecture
 
@@ -240,7 +265,11 @@ If `block_replay_time_seconds` (in the reference client) exceeds the chain's blo
 
 ## Trust model and reorgs
 
-The validator's **only** trust input is the anchor block hash supplied at startup; the genesis JSON, hardfork schedule, and chain ID are derived from it together with the operator-provided genesis file.
+The validator has two trust inputs, both supplied at startup:
+
+- The **genesis JSON** — supplies the chain ID and hardfork schedule (see [Genesis configuration](#genesis-configuration)). Persisted on first run; reused thereafter.
+- The **anchor block hash** — pins the chain head. The next validated block's `parent_hash` must equal this value.
+
 Everything downstream is verified:
 
 - The witness is verified cryptographically against the parent's state root before replay.
