@@ -188,7 +188,6 @@ Two layers run in order:
    - **MiniRex** — deploy the oracle contract and the high-precision timestamp oracle contract.
    - **Rex2** — deploy the keyless-deploy contract.
    - **Rex4** — deploy the access-control contract and the `MegaLimitControl` contract.
-   - **Rex5** — deploy `SequencerRegistry` (first-activation block only) and apply any pending role changes that are due.
 
 The L1-attributes deposit is **not** a pre-block hook: it is the block's first transaction and runs in the regular tx loop in step 7.
 
@@ -338,7 +337,8 @@ Everything downstream is verified:
 
 The validator does **not** verify:
 
-- **Block canonicity.** The validator validates whatever block sequence is fed to it; it does not decide which fork is canonical. To derive canonicality from L1 instead of trusting the upstream RPC, pair the validator with `op-node`, which derives the canonical block sequence directly from L1, and the replica feeds those blocks to the validator.
+- **Block canonicity.** The validator validates whatever block sequence is fed to it; it does not decide which fork is canonical.
+  To derive canonicality from L1 instead of trusting the upstream RPC, pair the validator with `op-node`, which derives the canonical block sequence directly from L1, and the replica feeds those blocks to the validator.
 
 Reorgs are detected when a freshly validated block's `parent_hash` does not match the local tip.
 The chain advancer truncates back to the divergence height and re-validates the new branch from there; the canonical-chain row cap (`canonical-chain-max-length`) bounds how far back this can reach.
