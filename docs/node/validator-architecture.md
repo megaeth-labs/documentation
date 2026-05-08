@@ -33,9 +33,9 @@ The reference client loads genesis via `--genesis-file` on first run, stores it 
 
 Despite the file carrying the full Genesis schema (allocations, gas limit, timestamp, base fee, ...), the validator consumes only two pieces of state from it:
 
-| Derived value     | Source in `config`                    | Use during validation                                                                                                                                                                              |
-| ----------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Chain ID          | `chainId`                             | Drives the EVM `CHAINID` opcode and EIP-155 transaction-signature checks.                                                                                                                          |
+| Derived value     | Source in `config`                    | Use during validation                                                                                                                                                                                                      |
+| ----------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Chain ID          | `chainId`                             | Drives the EVM `CHAINID` opcode and EIP-155 transaction-signature checks.                                                                                                                                                  |
 | Hardfork schedule | `<fork>Block` and `<fork>Time` fields | Activates Ethereum (Cancun, Shanghai, ...), OP-Stack (Ecotone, Granite, Holocene, Isthmus, ...), and MegaETH (MiniRex, MiniRex1, MiniRex2, Rex, Rex1, Rex2, Rex3, Rex4) at their pre-declared block numbers or timestamps. |
 
 The genesis `alloc`, `gasLimit`, `baseFeePerGas`, and other initial-state fields are **not** consumed — initial state arrives via the witness, not from genesis.
