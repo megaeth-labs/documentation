@@ -36,7 +36,7 @@ Despite the file carrying the full Genesis schema (allocations, gas limit, times
 | Derived value     | Source in `config`                    | Use during validation                                                                                                                                                                              |
 | ----------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Chain ID          | `chainId`                             | Drives the EVM `CHAINID` opcode and EIP-155 transaction-signature checks.                                                                                                                          |
-| Hardfork schedule | `<fork>Block` and `<fork>Time` fields | Activates Ethereum (Cancun, Shanghai, ...), OP-Stack (Ecotone, Granite, Holocene, Isthmus, ...), and MegaETH (MiniRex, MiniRex1-2, Rex, Rex1-5) at their pre-declared block numbers or timestamps. |
+| Hardfork schedule | `<fork>Block` and `<fork>Time` fields | Activates Ethereum (Cancun, Shanghai, ...), OP-Stack (Ecotone, Granite, Holocene, Isthmus, ...), and MegaETH (MiniRex, MiniRex1, MiniRex2, Rex, Rex1, Rex2, Rex3, Rex4) at their pre-declared block numbers or timestamps. |
 
 The genesis `alloc`, `gasLimit`, `baseFeePerGas`, and other initial-state fields are **not** consumed — initial state arrives via the witness, not from genesis.
 
@@ -152,8 +152,18 @@ Account entries in the witness carry the `codehash`, not the bytecode itself.
 This is intentional — bytecode is large, changes infrequently, and is content-addressed, so the witness only references it.
 
 Maintain a local cache keyed by `codehash`.
-On a miss, fetch via `eth_getCodeByHash` (or fall back to `eth_getCode` for a known holder address) and **verify** that `keccak256(code) == codehash` before installing it.
+On a miss, fetch via `eth_getCodeByHash` — a MegaETH RPC extension that takes a code hash and returns the bytecode whose `keccak256` equals that hash — and **verify** that `keccak256(code) == codehash` before installing it.
+If the endpoint does not support `eth_getCodeByHash`, fall back to `eth_getCode` against a known holder address and apply the same verification.
 A miss that cannot be resolved is a fatal error for the block being validated.
+
+{% endstep %}
+
+{% step %}
+
+### Apply pre-execution system updates
+
+Before the first transaction, apply OP-Stack pre-block hooks (e.g. L1-attributes deposit).
+The exact set is fixed by the active hardfork; mirror the reference client's `replay_block` to stay aligned.
 
 {% endstep %}
 
@@ -175,11 +185,10 @@ There is no separate "ancestor headers" field in the witness.
 
 {% step %}
 
-### Apply pre- and post-execution system updates
+### Apply post-execution system updates
 
-Before the first transaction, apply OP-Stack pre-block hooks (e.g. L1-attributes deposit).
-After the last transaction, apply post-block hooks (withdrawals processing on the L1 message-passer, beacon-root updates, etc.).
-The exact set is fixed by the active hardfork; mirror the reference client's `replay_block` to stay aligned.
+After the last transaction, apply OP-Stack post-block hooks: withdrawals processing on the L1 message-passer contract, beacon-root updates, and any hardfork-specific finalization.
+As with pre-execution, the exact set is fixed by the active hardfork.
 
 {% endstep %}
 
@@ -277,7 +286,7 @@ Everything downstream is verified:
 - The post-state is verified by recomputing every header commitment.
 
 The validator does **not** decide which fork is canonical.
-For a fully trust-minimized setup, pair it with `op-node` and a MegaETH replica that derive the canonical chain from L1 — see [Stateless Validation > Trust model](stateless-validation.md#trust-model).
+To derive canonicality from L1 instead of trusting the upstream RPC, pair it with `op-node` and a MegaETH replica — see [Stateless Validation > Trust model](stateless-validation.md#trust-model).
 
 Reorgs are detected when a freshly validated block's `parent_hash` does not match the local tip.
 The chain advancer truncates back to the divergence height and re-validates the new branch from there; the canonical-chain row cap (`canonical-chain-max-length`) bounds how far back this can reach.
