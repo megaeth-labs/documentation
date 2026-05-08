@@ -261,14 +261,14 @@ If the validated block's `parent_hash` does not match the previous tip, treat it
 A custom EVM must implement standard Cancun/Shanghai semantics **plus** the MegaEVM-specific extensions below.
 Each link points to the normative specification.
 
-| Topic             | Reference                                                                                                                      |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Dual gas model    | [Dual Gas Model](https://docs.megaeth.com/spec/megaevm/dual-gas-model) — compute gas vs. storage gas accounting per opcode.    |
-| Resource limits   | [Resource Limits](https://docs.megaeth.com/spec/megaevm/resource-limits) — per-block and per-transaction caps.                 |
-| System contracts  | [System Contracts](https://docs.megaeth.com/spec/system-contracts/overview) — addresses and behaviors that MUST be replicated. |
-| Precompiles       | [Precompiles](https://docs.megaeth.com/spec/megaevm/precompiles) — MegaETH-specific precompile semantics, if any.              |
-| Volatile data     | [Volatile Data Access](../dev/execution/volatile-data.md) — non-deterministic reads and how they are handled at re-execution.  |
-| Hardfork schedule | The genesis JSON the validator is started with. Mirror the same schedule in your own client.                                   |
+| Topic             | Reference                                                                                                                                                                                          |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dual gas model    | [Dual Gas Model](https://docs.megaeth.com/spec/megaevm/dual-gas-model) — compute gas vs. storage gas accounting per opcode.                                                                        |
+| Resource limits   | [Resource Limits](https://docs.megaeth.com/spec/megaevm/resource-limits) — per-block and per-transaction caps.                                                                                     |
+| System contracts  | [System Contracts](https://docs.megaeth.com/spec/system-contracts/overview) — addresses and behaviors that MUST be replicated.                                                                     |
+| Precompiles       | OP-Stack Isthmus set, with MegaETH gas-cost overrides at a few standard addresses. See [Precompiles](https://docs.megaeth.com/spec/megaevm/precompiles) for the full list and per-address details. |
+| Volatile data     | [Volatile Data Access](../dev/execution/volatile-data.md) — non-deterministic reads and how they are handled at re-execution.                                                                      |
+| Hardfork schedule | The genesis JSON the validator is started with. Mirror the same schedule in your own client.                                                                                                       |
 
 If `block_replay_time_seconds` (in the reference client) exceeds the chain's block period, you are not real-time — diagnose with the per-stage histograms in [Stateless Validation](stateless-validation.md#useful-metrics).
 
