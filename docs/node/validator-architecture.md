@@ -16,20 +16,27 @@ For the wire format of the witness, see [Get Block Witness](witness.md).
 A stateless validator independently re-executes every MegaETH block against a compact cryptographic witness, then checks that every commitment in the block header matches the resulting post-state.
 It holds **no chain state of its own** — a fresh witness arrives with each block and supplies just the slice of state that block touches.
 
-| Aspect      | Detail                                                                                                                                                          |
-| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Input       | A `(block, witness)` pair fetched per height. The witness is the response of [`mega_getBlockWitness`](witness.md).                                              |
-| Output      | A locally-persisted record that the block validates, plus optional `mega_setValidatedBlocks` callbacks to a downstream service.                                 |
-| Trust input | Two values supplied at startup: a **genesis JSON** (chain ID + hardfork schedule) and an **anchor block hash** (the chain head the next block must extend).     |
-| Non-goal    | Picking the canonical fork. The validator validates whatever block sequence it is fed; pair it with a consensus client (e.g. `op-node`) to derive canonicality. |
+| Aspect | Detail                                                                                                             |
+| ------ | ------------------------------------------------------------------------------------------------------------------ |
+| Input  | A `(block, witness)` pair fetched per height. The witness is the response of [`mega_getBlockWitness`](witness.md). |
+| Output | A locally-persisted record that the block validates.                                                               |
+
+The validator's only startup trust input is a **genesis JSON** (chain ID + hardfork schedule) and an **anchor block hash** that the next validated block must extend.
+Both are detailed in [Genesis configuration](#genesis-configuration) below.
+
+**Non-goal:** picking the canonical fork.
+The validator validates whatever block sequence it is fed; pair it with a consensus client (e.g. `op-node`) to derive canonicality.
 
 ## Genesis configuration
 
 The genesis JSON is the validator's primary configuration anchor.
-Misconfigure it and every subsequent fork-conditional check silently runs against the wrong rules — the validator will produce mismatched roots with no "wrong chain" error to point you at the cause.
-Treat it like a chain-identity contract: load it once, persist it, and never edit it.
+Misconfigure it and every subsequent fork-conditional check silently runs against the wrong rules — the validator will produce mismatched state roots with no "wrong chain" error to point you at the cause.
+Treat it like a chain-identity contract: load it once, persist it, and never edit it by hand.
+Find the canonical mainnet genesis at [`test_data/mainnet/genesis.json`](https://github.com/megaeth-labs/stateless-validator/blob/main/test_data/mainnet/genesis.json) in the stateless-validator repo, and pull the updated copy whenever a new hardfork is scheduled.
 
-The reference client loads genesis via `--genesis-file` on first run, stores it in the local database with [`store_genesis`](https://github.com/megaeth-labs/stateless-validator/blob/main/bin/stateless-validator/src/validator_db.rs#L88), and re-reads the stored copy on every subsequent boot.
+{% hint style="info" %}
+**Reference impl.** Loads genesis via `--genesis-file` on first run, stores it in the local database with [`store_genesis`](https://github.com/megaeth-labs/stateless-validator/blob/main/bin/stateless-validator/src/validator_db.rs#L88), and re-reads the stored copy on every subsequent boot.
+{% endhint %}
 
 Despite the file carrying the full Genesis schema (allocations, gas limit, timestamp, base fee, ...), the validator consumes only two pieces of state from it:
 
@@ -40,8 +47,10 @@ Despite the file carrying the full Genesis schema (allocations, gas limit, times
 
 The genesis `alloc`, `gasLimit`, `baseFeePerGas`, and other initial-state fields are **not** consumed — initial state arrives via the witness, not from genesis.
 
-Reference: [`ChainSpec::from_genesis`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/chain_spec.rs#L59) reads `genesis.config.chain_id` directly, hands the full `Genesis` to `OpChainSpec::from_genesis` to extract Ethereum and OP-Stack fork conditions, and pulls MegaETH-specific forks via [`MegaethGenesisHardforks::extract_from`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/chain_spec.rs#L123).
+{% hint style="info" %}
+**Reference impl.** [`ChainSpec::from_genesis`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/chain_spec.rs#L59) reads `genesis.config.chain_id` directly, hands the full `Genesis` to `OpChainSpec::from_genesis` to extract Ethereum and OP-Stack fork conditions, and pulls MegaETH-specific forks via [`MegaethGenesisHardforks::extract_from`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/chain_spec.rs#L123).
 The three sets are merged into a single ordered hardfork schedule that drives every fork-conditional code path: opcode availability, gas-cost tables, system-contract pre/post-block hooks, and resource limits.
+{% endhint %}
 
 {% hint style="warning" %}
 All replicas of the chain MUST use byte-identical genesis JSON.
@@ -50,7 +59,7 @@ A divergence in any single hardfork timestamp produces a fork that the rest of t
 
 ## Reference architecture
 
-The reference client is a three-stage async pipeline.
+The current implementation of stateless validator is a three-stage async pipeline.
 Each `(block, witness)` pair flows through the same stages; only the validator workers run in parallel.
 
 ```text
@@ -83,7 +92,8 @@ A custom implementation can collapse the pipeline into a single sequential loop 
 ## Validation pipeline
 
 The per-block sequence below is what `validate_block` performs.
-A re-implementation MUST run every numbered step; reorderings are allowed only where they preserve all stated invariants.
+A different implementation MUST run every numbered step.
+Reorderings are allowed only when they preserve the data dependencies between steps — most importantly, the SALT proof MUST verify (step 3) before any state is read (steps 4+), bytecode MUST be hash-verified before being installed in the cache, and each header recompute MUST include all the state changes it commits to.
 
 {% stepper %}
 
@@ -94,7 +104,9 @@ A re-implementation MUST run every numbered step; reorderings are allowed only w
 Call `eth_getBlockByHash` (or `eth_getBlockByNumber`) for the block, and [`mega_getBlockWitness`](witness.md) for the witness.
 Pin the witness call to `(blockNumber, blockHash)`; a `blockNumber`-only call is non-deterministic across forks.
 
-The reference client fetches both in parallel from independent RPC pools — see [`get_block`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-common/src/rpc_client.rs#L402) and [`get_witness`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-common/src/rpc_client.rs#L530).
+{% hint style="info" %}
+**Reference impl.** Fetches both in parallel from independent RPC pools — see [`get_block`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-common/src/rpc_client.rs#L402) and [`get_witness`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-common/src/rpc_client.rs#L530).
+{% endhint %}
 
 {% endstep %}
 
@@ -139,8 +151,11 @@ A malicious witness producer that left a key out (rather than proving it empty) 
 The verifier MUST treat "absent from `kvs`" as a fatal error, not as "empty".
 {% endhint %}
 
-In the reference client, this backend is [`WitnessDatabase`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/evm_database.rs#L64), which implements [`revm::DatabaseRef`](https://docs.rs/revm/latest/revm/trait.DatabaseRef.html).
 A custom implementation needs the equivalent surface for whatever EVM it embeds.
+
+{% hint style="info" %}
+**Reference impl.** This backend is [`WitnessDatabase`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/evm_database.rs#L64), which implements [`revm::DatabaseRef`](https://docs.rs/revm/latest/revm/trait.DatabaseRef.html).
+{% endhint %}
 
 {% endstep %}
 
@@ -152,7 +167,7 @@ Account entries in the witness carry the `codehash`, not the bytecode itself.
 This is intentional — bytecode is large, changes infrequently, and is content-addressed, so the witness only references it.
 
 Maintain a local cache keyed by `codehash`.
-On a miss, fetch via `eth_getCodeByHash` — a MegaETH RPC extension that takes a code hash and returns the bytecode whose `keccak256` equals that hash — and **verify** that `keccak256(code) == codehash` before installing it.
+On a miss, fetch via `eth_getCodeByHash` — a MegaETH RPC extension that takes a code hash and returns the bytecode whose `keccak256` equals that hash — and **verify** that `keccak256(code) == codehash` before using it.
 If the endpoint does not support `eth_getCodeByHash`, fall back to `eth_getCode` against a known holder address and apply the same verification.
 A miss that cannot be resolved is a fatal error for the block being validated.
 
@@ -162,8 +177,26 @@ A miss that cannot be resolved is a fatal error for the block being validated.
 
 ### Apply pre-execution system updates
 
-Before the first transaction, apply OP-Stack pre-block hooks (e.g. L1-attributes deposit).
-The exact set is fixed by the active hardfork; mirror the reference client's `replay_block` to stay aligned.
+Before the first transaction, apply hardfork-conditional system calls.
+Two layers run in order:
+
+1. **OP-Stack base hooks** (always active on MegaETH, since Isthmus is the floor):
+   - EIP-2935 history-storage contract update.
+   - EIP-4788 beacon root contract update.
+
+2. **MegaEVM system-contract deployments / updates**, gated by the active MegaETH hardfork:
+   - **MiniRex** — deploy the oracle contract and the high-precision timestamp oracle contract.
+   - **Rex2** — deploy the keyless-deploy contract.
+   - **Rex4** — deploy the access-control contract and the `MegaLimitControl` contract.
+   - **Rex5** — deploy `SequencerRegistry` (first-activation block only) and apply any pending role changes that are due.
+
+The L1-attributes deposit is **not** a pre-block hook: it is the block's first transaction and runs in the regular tx loop in step 7.
+
+The exact hook set is fixed by the active hardfork — see [System Contracts](https://docs.megaeth.com/spec/system-contracts/overview) for the canonical addresses and behaviors.
+
+{% hint style="info" %}
+**Reference impl.** [`apply_pre_execution_changes`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/executor.rs#L364) inside [`replay_block`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/executor.rs#L252) delegates to mega-evm's [`pre_execution_changes`](https://github.com/megaeth-labs/mega-evm/blob/main/crates/mega-evm/src/block/executor.rs#L172), which runs the OP-Stack base hooks followed by the MegaEVM-specific system-contract deployments listed above.
+{% endhint %}
 
 {% endstep %}
 
@@ -175,8 +208,11 @@ Execute every transaction with the chain's hardfork rules and accumulate state c
 
 A custom EVM must match MegaEVM's semantics exactly — see [Re-execution requirements](#re-execution-requirements).
 
-The reference client wires this through [`MegaBlockExecutorFactory` and `MegaEvmFactory`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/executor.rs#L273) from the [`mega-evm`](https://github.com/megaeth-labs/mega-evm) crate, which extends `revm` rather than forking it.
 Re-implementers can either link `mega-evm` directly or build a compatible EVM from the [Specification](https://docs.megaeth.com/spec/megaevm/dual-gas-model).
+
+{% hint style="info" %}
+**Reference impl.** Wires this through [`MegaBlockExecutorFactory` and `MegaEvmFactory`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/executor.rs#L273) from the [`mega-evm`](https://github.com/megaeth-labs/mega-evm) crate, which extends `revm` rather than forking it.
+{% endhint %}
 
 The `BLOCKHASH` opcode is served from the witnessed [EIP-2935](https://eips.ethereum.org/EIPS/eip-2935) history-storage contract entries — see [`evm_database.rs:149`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/evm_database.rs#L149).
 There is no separate "ancestor headers" field in the witness.
@@ -187,8 +223,13 @@ There is no separate "ancestor headers" field in the witness.
 
 ### Apply post-execution system updates
 
-After the last transaction, apply OP-Stack post-block hooks: withdrawals processing on the L1 message-passer contract, beacon-root updates, and any hardfork-specific finalization.
-As with pre-execution, the exact set is fixed by the active hardfork.
+After the last transaction, apply hardfork-conditional post-block system calls — including primarily EIP-7002 withdrawal-request and EIP-7251 consolidation-request processing on Isthmus+.
+The `withdrawals_root` is **not** computed here: it is recomputed separately in step 9 against the L1 message-passer storage trie.
+As with pre-execution, the exact hook set is fixed by the active hardfork.
+
+{% hint style="info" %}
+**Reference impl.** [`apply_post_execution_changes`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/executor.rs#L373) inside [`replay_block`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/executor.rs#L252) delegates to op-reth's `BlockExecutor` for the canonical hook list.
+{% endhint %}
 
 {% endstep %}
 
@@ -201,7 +242,9 @@ As with pre-execution, the exact set is fixed by the active hardfork.
 Apply the block's withdrawal-message writes against this trie, then recompute the root.
 This must match `block.withdrawals_root`.
 
-The reference path is [`MptWitness::verify`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/withdrawals.rs#L80).
+{% hint style="info" %}
+**Reference impl.** [`MptWitness::verify`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/withdrawals.rs#L80).
+{% endhint %}
 
 {% endstep %}
 
@@ -210,7 +253,10 @@ The reference path is [`MptWitness::verify`](https://github.com/megaeth-labs/sta
 ### Apply state changes to SALT and recompute `state_root`
 
 Flatten the EVM's collected state changes into `(SaltKey, SaltValue)` pairs.
-The reference client uses two intermediate types — `PlainKey` (account address or `address ++ slot`) and `PlainValue` (encoded account or 32-byte slot) — defined in [`crates/stateless-core/src/data_types.rs`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/data_types.rs).
+
+{% hint style="info" %}
+**Reference impl.** Uses two intermediate types — `PlainKey` (account address or `address ++ slot`) and `PlainValue` (encoded account or 32-byte slot) — defined in [`crates/stateless-core/src/data_types.rs`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/data_types.rs).
+{% endhint %}
 
 Encoding rules (mirrored on [Get Block Witness](witness.md#saltvalue) for the reverse direction):
 
@@ -240,7 +286,10 @@ The block validates only if **every** check below passes:
 | `gas_used`         | Cumulative gas counter from replay.                                |
 
 A single mismatch is a fatal error for the block — do **not** advance the local chain.
-The reference comparisons are at [`executor.rs:534-559`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/executor.rs#L534).
+
+{% hint style="info" %}
+**Reference impl.** Comparisons are at [`executor.rs:534-559`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/executor.rs#L534).
+{% endhint %}
 
 {% endstep %}
 
@@ -248,7 +297,7 @@ The reference comparisons are at [`executor.rs:534-559`](https://github.com/mega
 
 ### Advance the local chain
 
-If all checks pass, persist the block as the new tip and (optionally) report it via `mega_setValidatedBlocks`.
+If all checks pass, persist the block as the new tip.
 
 If the validated block's `parent_hash` does not match the previous tip, treat it as a reorg: walk back to the divergence and re-validate forward along the new branch.
 
@@ -270,7 +319,9 @@ Each link points to the normative specification.
 | Volatile data     | [Volatile Data Access](../dev/execution/volatile-data.md) — non-deterministic reads and how they are handled at re-execution.                                                                      |
 | Hardfork schedule | The genesis JSON the validator is started with. Mirror the same schedule in your own client.                                                                                                       |
 
-If `block_replay_time_seconds` (in the reference client) exceeds the chain's block period, you are not real-time — diagnose with the per-stage histograms in [Stateless Validation](stateless-validation.md#useful-metrics).
+{% hint style="info" %}
+**Reference impl.** If `block_replay_time_seconds` exceeds the chain's block period, you are not real-time — diagnose with the per-stage histograms in [Stateless Validation](stateless-validation.md#useful-metrics).
+{% endhint %}
 
 ## Trust model and reorgs
 
@@ -285,8 +336,9 @@ Everything downstream is verified:
 - Bytecode is verified by recomputing `keccak256(code)` on every cache miss.
 - The post-state is verified by recomputing every header commitment.
 
-The validator does **not** decide which fork is canonical.
-To derive canonicality from L1 instead of trusting the upstream RPC, pair it with `op-node` and a MegaETH replica — see [Stateless Validation > Trust model](stateless-validation.md#trust-model).
+The validator does **not** verify:
+
+- **Block canonicity.** The validator validates whatever block sequence is fed to it; it does not decide which fork is canonical. To derive canonicality from L1 instead of trusting the upstream RPC, pair the validator with `op-node`, which derives the canonical block sequence directly from L1, and the replica feeds those blocks to the validator. 
 
 Reorgs are detected when a freshly validated block's `parent_hash` does not match the local tip.
 The chain advancer truncates back to the divergence height and re-validates the new branch from there; the canonical-chain row cap (`canonical-chain-max-length`) bounds how far back this can reach.
