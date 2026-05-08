@@ -59,20 +59,20 @@ When in doubt: top-level pages prioritize readability, layer pages prioritize de
 
 Use these exact forms consistently. Do not alternate between variants.
 
-| Term                  | Correct                              | Incorrect                                                   |
-| --------------------- | ------------------------------------ | ----------------------------------------------------------- |
-| Project name          | MegaETH                              | megaETH, Mega ETH, megaeth, MEGAETH                         |
-| EVM implementation    | MegaEVM                              | MegaEvm, mega-evm, Mega EVM                                 |
-| Mainnet (proper noun) | MegaETH Mainnet                      | MegaETH mainnet, main net, main-net                         |
-| Testnet (proper noun) | MegaETH Testnet                      | MegaETH testnet, test net, test-net                         |
-| Currency ticker       | ETH                                  | eth, Eth                                                    |
-| Currency name         | ether                                | Ether, ETH (when referring to the currency, not the ticker) |
-| Block type            | mini-block                           | miniblock, mini block, MiniBlock                            |
-| Onchain / offchain    | onchain, offchain                    | on-chain, off-chain, on chain                               |
-| Smart contract        | smart contract                       | Smart Contract, smartcontract                               |
-| Gas dimensions        | compute gas, storage gas             | Compute Gas, Storage Gas, Compute gas                       |
-| Spec names            | MiniRex, Rex, Rex1, Rex2, Rex3, Rex4 | minirex, MINIREX, mini-rex, rex-3                           |
-| State trie            | SALT                                 | Salt, salt                                                  |
+| Term                  | Correct                                                  | Incorrect                                                   |
+| --------------------- | -------------------------------------------------------- | ----------------------------------------------------------- |
+| Project name          | MegaETH                                                  | megaETH, Mega ETH, megaeth, MEGAETH                         |
+| EVM implementation    | MegaEVM                                                  | MegaEvm, mega-evm, Mega EVM                                 |
+| Mainnet (proper noun) | MegaETH Mainnet                                          | MegaETH mainnet, main net, main-net                         |
+| Testnet (proper noun) | MegaETH Testnet                                          | MegaETH testnet, test net, test-net                         |
+| Currency ticker       | ETH                                                      | eth, Eth                                                    |
+| Currency name         | ether                                                    | Ether, ETH (when referring to the currency, not the ticker) |
+| Block type            | mini-block                                               | miniblock, mini block, MiniBlock                            |
+| Onchain / offchain    | onchain, offchain                                        | on-chain, off-chain, on chain                               |
+| Smart contract        | smart contract                                           | Smart Contract, smartcontract                               |
+| Gas dimensions        | compute gas, storage gas                                 | Compute Gas, Storage Gas, Compute gas                       |
+| Spec names            | MiniRex, MiniRex1, MiniRex2, Rex, Rex1, Rex2, Rex3, Rex4 | minirex, MINIREX, mini-rex, rex-3                           |
+| State trie            | SALT                                                     | Salt, salt                                                  |
 
 **Capitalization rules:**
 

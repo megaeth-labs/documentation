@@ -234,7 +234,7 @@ The block validates only if **every** check below passes:
 | Field              | Source                                                             |
 | ------------------ | ------------------------------------------------------------------ |
 | `state_root`       | Recomputed SALT root from the previous step.                       |
-| `withdrawals_root` | Recomputed MPT root from step 8.                                   |
+| `withdrawals_root` | Recomputed MPT root from step 9.                                   |
 | `receipts_root`    | Merkle root of the transactions' receipts collected during replay. |
 | `logs_bloom`       | Aggregated 256-byte bloom filter over emitted logs.                |
 | `gas_used`         | Cumulative gas counter from replay.                                |
