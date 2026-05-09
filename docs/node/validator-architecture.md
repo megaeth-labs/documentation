@@ -5,7 +5,7 @@ description: Architecture and implementation guide for building a MegaETH-compat
 # Validator architecture
 
 This page describes the reference architecture of MegaETH's stateless validator and the per-block validation pipeline it runs.
-It is written for engineers building a compatible validator from scratch — in another language, against a different EVM stack, or against a custom workload.
+It is written for engineers building a compatible validator from scratch — in another language or against a different EVM stack.
 
 The reference implementation lives at [`megaeth-labs/stateless-validator`](https://github.com/megaeth-labs/stateless-validator) and is used throughout this page as the source of truth.
 For day-to-day operation of that client, see [Stateless Validation](stateless-validation.md).
@@ -32,7 +32,8 @@ The validator validates whatever block sequence it is fed; pair it with a consen
 The genesis JSON is the validator's primary configuration anchor.
 Misconfigure it and every subsequent fork-conditional check silently runs against the wrong rules — the validator will produce mismatched state roots with no "wrong chain" error to point you at the cause.
 Treat it like a chain-identity contract: load it once, persist it, and never edit it by hand.
-Find the canonical mainnet genesis at [`test_data/mainnet/genesis.json`](https://github.com/megaeth-labs/stateless-validator/blob/main/test_data/mainnet/genesis.json) in the stateless-validator repo, and pull the updated copy whenever a new hardfork is scheduled.
+**Pull a fresh copy of the canonical mainnet genesis whenever a new hardfork is scheduled.**
+For the file layout (not a runtime artifact), see the schema-shaped sample at [`test_data/mainnet/genesis.json`](https://github.com/megaeth-labs/stateless-validator/blob/main/test_data/mainnet/genesis.json) — `alloc` is stripped to keep the repo small.
 
 {% hint style="info" %}
 **Reference impl.** Loads genesis via `--genesis-file` on first run, stores it in the local database with [`store_genesis`](https://github.com/megaeth-labs/stateless-validator/blob/main/bin/stateless-validator/src/validator_db.rs#L88), and re-reads the stored copy on every subsequent boot.
@@ -45,7 +46,7 @@ Despite the file carrying the full Genesis schema (allocations, gas limit, times
 | Chain ID          | `chainId`                             | Drives the EVM `CHAINID` opcode and EIP-155 transaction-signature checks.                                                                                                                                                  |
 | Hardfork schedule | `<fork>Block` and `<fork>Time` fields | Activates Ethereum (Cancun, Shanghai, ...), OP-Stack (Ecotone, Granite, Holocene, Isthmus, ...), and MegaETH (MiniRex, MiniRex1, MiniRex2, Rex, Rex1, Rex2, Rex3, Rex4) at their pre-declared block numbers or timestamps. |
 
-The genesis `alloc`, `gasLimit`, `baseFeePerGas`, and other initial-state fields are **not** consumed — initial state arrives via the witness, not from genesis.
+The genesis `alloc`, `gasLimit`, `baseFeePerGas`, and other initial-state fields are **not** consumed — once the chain has produced a single block, initial state is served by the witness, not by the genesis file.
 
 {% hint style="info" %}
 **Reference impl.** [`ChainSpec::from_genesis`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/chain_spec.rs#L59) reads `genesis.config.chain_id` directly, hands the full `Genesis` to `OpChainSpec::from_genesis` to extract Ethereum and OP-Stack fork conditions, and pulls MegaETH-specific forks via [`MegaethGenesisHardforks::extract_from`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/chain_spec.rs#L123).
@@ -188,7 +189,8 @@ Two layers run in order:
    - **MiniRex** — deploy the oracle contract and the high-precision timestamp oracle contract.
    - **Rex2** — deploy the keyless-deploy contract.
    - **Rex4** — deploy the access-control contract and the `MegaLimitControl` contract.
-   - **MiniRex1, MiniRex2, Rex, Rex1, Rex3** — no new system-contract deployments. The fork still gates EVM behavior changes; the pre-execution hook list is just empty.
+   - **MiniRex1, MiniRex2, Rex, Rex1, Rex3** — no new system-contract deployments.
+     The fork still gates EVM behavior changes; the pre-execution hook list is just empty.
 
 The L1-attributes deposit is **not** a pre-block hook: it is the block's first transaction and runs in the regular tx loop in step 7.
 
@@ -327,8 +329,10 @@ Each link points to the normative specification.
 
 The validator has two trust inputs, both supplied at startup:
 
-- The **genesis JSON** — supplies the chain ID and hardfork schedule (see [Genesis configuration](#genesis-configuration)). Persisted on first run; reused thereafter.
-- The **anchor block hash** — pins the chain head. The next validated block's `parent_hash` must equal this value.
+- The **genesis JSON** — supplies the chain ID and hardfork schedule (see [Genesis configuration](#genesis-configuration)).
+  Persisted on first run; reused thereafter.
+- The **anchor block hash** — pins the chain head.
+  The next validated block's `parent_hash` must equal this value.
 
 Everything downstream is verified:
 
@@ -358,7 +362,8 @@ The crates below are the entry points a re-implementation will most often want t
 
 Companion repositories:
 
-- [`megaeth-labs/salt`](https://github.com/megaeth-labs/salt) — the authenticated key-value store and IPA proof system. Defines [`SaltWitness`](https://github.com/megaeth-labs/salt/blob/main/salt/src/proof/salt_witness.rs#L46), [`SaltKey`](https://github.com/megaeth-labs/salt/blob/main/salt/src/types.rs#L198), [`SaltValue`](https://github.com/megaeth-labs/salt/blob/main/salt/src/types.rs#L274), and [`SaltProof`](https://github.com/megaeth-labs/salt/blob/main/salt/src/proof/prover.rs#L103).
+- [`megaeth-labs/salt`](https://github.com/megaeth-labs/salt) — the authenticated key-value store and IPA proof system.
+  Defines [`SaltWitness`](https://github.com/megaeth-labs/salt/blob/main/salt/src/proof/salt_witness.rs#L46), [`SaltKey`](https://github.com/megaeth-labs/salt/blob/main/salt/src/types.rs#L198), [`SaltValue`](https://github.com/megaeth-labs/salt/blob/main/salt/src/types.rs#L274), and [`SaltProof`](https://github.com/megaeth-labs/salt/blob/main/salt/src/proof/prover.rs#L103).
 - [`megaeth-labs/mega-evm`](https://github.com/megaeth-labs/mega-evm) — the MegaEVM execution layer, layered on top of `revm`.
 
 ## Related pages
