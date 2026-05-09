@@ -106,7 +106,7 @@ Call `eth_getBlockByHash` (or `eth_getBlockByNumber`) for the block, and [`mega_
 Pin the witness call to `(blockNumber, blockHash)`; a `blockNumber`-only call is non-deterministic across forks.
 
 {% hint style="info" %}
-**Reference impl.** Fetches both in parallel from independent RPC pools — see [`get_block`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-common/src/rpc_client.rs#L402) and [`get_witness`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-common/src/rpc_client.rs#L530).
+**Reference impl.** Fetches both in parallel from independent RPC pools — see [`get_block`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-common/src/rpc_client.rs#L430) and [`get_witness`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-common/src/rpc_client.rs#L558).
 {% endhint %}
 
 {% endstep %}
