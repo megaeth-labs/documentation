@@ -59,7 +59,7 @@ A divergence in any single hardfork timestamp produces a fork that the rest of t
 
 ## Reference architecture
 
-The current implementation of stateless validator is a three-stage async pipeline.
+The current implementation of the stateless validator is a three-stage async pipeline.
 Each `(block, witness)` pair flows through the same stages; only the validator workers run in parallel.
 
 ```text
@@ -188,6 +188,7 @@ Two layers run in order:
    - **MiniRex** — deploy the oracle contract and the high-precision timestamp oracle contract.
    - **Rex2** — deploy the keyless-deploy contract.
    - **Rex4** — deploy the access-control contract and the `MegaLimitControl` contract.
+   - **MiniRex1, MiniRex2, Rex, Rex1, Rex3** — no new system-contract deployments. The fork still gates EVM behavior changes; the pre-execution hook list is just empty.
 
 The L1-attributes deposit is **not** a pre-block hook: it is the block's first transaction and runs in the regular tx loop in step 7.
 
