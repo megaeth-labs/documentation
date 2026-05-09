@@ -168,8 +168,9 @@ Account entries in the witness carry the `codehash`, not the bytecode itself.
 This is intentional — bytecode is large, changes infrequently, and is content-addressed, so the witness only references it.
 
 Maintain a local cache keyed by `codehash`.
-On a miss, fetch via `eth_getCodeByHash` — a MegaETH RPC extension that takes a code hash and returns the bytecode whose `keccak256` equals that hash — and **verify** that `keccak256(code) == codehash` before using it.
-If the endpoint does not support `eth_getCodeByHash`, fall back to `eth_getCode` against a known holder address and apply the same verification.
+On a miss, fetch via [`eth_getCodeByHash`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-common/src/rpc_client.rs#L398) — a MegaETH RPC extension that takes a code hash and returns the bytecode whose `keccak256` equals that hash — and **verify** that `keccak256(code) == codehash` before using it.
+If the endpoint does not support `eth_getCodeByHash`, fall back to `eth_getCode` against a known holder address, and **always pin the call to the exact block at which the witness anchors** (the parent block's number).
+Apply the same `keccak256(code) == codehash` verification to the result.
 A miss that cannot be resolved is a fatal error for the block being validated.
 
 {% endstep %}
