@@ -85,7 +85,7 @@ Each `(block, witness)` pair flows through the same stages; only the validator w
 | Block fetcher    | Streams `(block, witness)` pairs from RPC. Independent semaphores cap data and witness concurrency. | [`crates/stateless-common/src/rpc_client.rs`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-common/src/rpc_client.rs)                         |
 | Validator worker | Verifies the witness, replays the block, computes post-state, compares against the header.          | [`crates/stateless-core/src/executor.rs:411`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/executor.rs#L411) (`validate_block`)     |
 | Chain advancer   | Reorders out-of-order results, detects reorgs by parent-hash mismatch, persists in height order.    | [`crates/stateless-core/src/pipeline/mod.rs:44`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/pipeline/mod.rs#L44) (`run_pipeline`) |
-| Contract cache   | Resolves contract bytecode by code hash with three tiers: in-memory → disk (redb) → RPC.            | `crates/stateless-db/`                                                                                                                                                         |
+| Contract cache   | Resolves contract bytecode by code hash with three tiers: in-memory → disk (redb) → RPC.            | [`crates/stateless-db/`](https://github.com/megaeth-labs/stateless-validator/tree/main/crates/stateless-db)                                                                    |
 
 Workers do not coordinate.
 A custom implementation can collapse the pipeline into a single sequential loop without changing correctness — parallelism is purely a throughput choice.
@@ -310,7 +310,7 @@ If the validated block's `parent_hash` does not match the previous tip, treat it
 
 ## Re-execution requirements
 
-A custom EVM must implement standard Cancun/Shanghai semantics **plus** the MegaEVM-specific extensions below.
+A custom EVM must implement [OP-Stack Isthmus](https://docs.megaeth.com/spec/overview) semantics — MegaETH's baseline, inherited unless explicitly overridden — **plus** the MegaEVM-specific extensions below.
 Each link points to the normative specification.
 
 | Topic             | Reference                                                                                                                                                                                          |
