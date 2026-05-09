@@ -208,7 +208,7 @@ Execute every transaction with the chain's hardfork rules and accumulate state c
 
 A custom EVM must match MegaEVM's semantics exactly — see [Re-execution requirements](#re-execution-requirements).
 
-Re-implementers can either link `mega-evm` directly or build a compatible EVM from the [Specification](https://docs.megaeth.com/spec/megaevm/dual-gas-model).
+Re-implementers can either link `mega-evm` directly or build a compatible EVM from the [MegaEVM specification — Dual Gas Model](https://docs.megaeth.com/spec/megaevm/dual-gas-model) and the related spec pages linked under [Re-execution requirements](#re-execution-requirements).
 
 {% hint style="info" %}
 **Reference impl.** Wires this through [`MegaBlockExecutorFactory` and `MegaEvmFactory`](https://github.com/megaeth-labs/stateless-validator/blob/main/crates/stateless-core/src/executor.rs#L273) from the [`mega-evm`](https://github.com/megaeth-labs/mega-evm) crate, which extends `revm` rather than forking it.
@@ -366,4 +366,4 @@ Companion repositories:
 - [Get Block Witness](witness.md) — wire format, decoding pipeline, and field-by-field type definitions for the witness payload.
 - [Stateless Validation](stateless-validation.md) — operator guide for running the reference client (CLI, metrics, anchoring, troubleshooting).
 - [Architecture](../architecture.md) — how transactions move through MegaETH and where validators fit in.
-- [Specification](https://docs.megaeth.com/spec/megaevm/dual-gas-model) — normative MegaEVM behavior.
+- [MegaEVM specification — Dual Gas Model](https://docs.megaeth.com/spec/megaevm/dual-gas-model) — normative MegaEVM behavior; entry point into the spec space.
