@@ -275,9 +275,9 @@ The contract bytecode cache is process-lifetime — chains with many deployed co
 **Slow trace requests.**
 Use Prometheus metrics to isolate the bottleneck:
 
-- `upstream_duration_seconds` high — upstream RPC is slow.
-- `evm_execution_seconds` high — the block has many or complex transactions.
-- `witness_bytes` large — witness payloads are large, causing slow fetches.
+- `debug_trace_upstream_duration_seconds` high — upstream RPC is slow.
+- `debug_trace_evm_execution_seconds` high — the block has many or complex transactions.
+- `debug_trace_witness_bytes` large — witness payloads are large, causing slow fetches.
 
 The server logs a warning (`slow stages detected`) for any request stage exceeding 1 second.
 
