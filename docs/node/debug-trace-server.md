@@ -132,7 +132,7 @@ Supported tracers:
 | 4-byte tracer           | `"4byteTracer"`    | Function selector frequency statistics.                                       |
 | Flat call tracer        | `"flatCallTracer"` | Parity-style flat list of all internal calls.                                 |
 | Noop tracer             | `"noopTracer"`     | No output — useful for benchmarking execution time.                           |
-| Mux tracer              | `"MuxTracer"`      | Run multiple tracers in a single pass.                                        |
+| Mux tracer              | `"muxTracer"`      | Run multiple tracers in a single pass.                                        |
 
 Custom JavaScript tracers are also supported.
 
@@ -236,43 +236,9 @@ Recommended production settings:
 --log.file-max-files 10
 ```
 
-## Deployment examples
+## Environment variables
 
-### systemd
-
-```ini
-[Unit]
-Description=MegaETH Debug Trace Server
-After=network.target
-
-[Service]
-Type=simple
-User=mega
-ExecStart=/opt/mega/bin/debug-trace-server \
-  --rpc-endpoint https://mainnet.megaeth.com/rpc \
-  --witness-endpoint https://mainnet.megaeth.com/rpc \
-  --data-dir /data/dts \
-  --blocks-to-keep 5000 \
-  --db-max-size 10GB \
-  --response-cache-max-size 2GB \
-  --metrics-enabled \
-  --log.stdout-format json \
-  --log.file-directory /var/log/dts \
-  --log.file-filter debug \
-  --log.file-max-size 500 \
-  --log.file-max-files 10
-
-Restart=always
-RestartSec=5
-LimitNOFILE=65536
-
-[Install]
-WantedBy=multi-user.target
-```
-
-### Environment variables
-
-All flags can be set via environment variables — convenient for container deployments:
+All flags can be set via environment variables — convenient for container or orchestrator-based deployments:
 
 ```bash
 DEBUG_TRACE_SERVER_ADDR=0.0.0.0:8545
