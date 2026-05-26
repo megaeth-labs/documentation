@@ -58,8 +58,8 @@ In the common case both flags point to the same URL.
 
 ```bash
 ./target/release/debug-trace-server \
-  --rpc-endpoint https://testnet.megaeth.com/rpc \
-  --witness-endpoint https://testnet.megaeth.com/rpc
+  --rpc-endpoint https://carrot.megaeth.com/rpc \
+  --witness-endpoint https://carrot.megaeth.com/rpc
 ```
 
 {% endtab %}
