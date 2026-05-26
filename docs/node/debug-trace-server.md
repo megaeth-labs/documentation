@@ -2,7 +2,7 @@
 description: Self-host debug_* and trace_* RPC methods for MegaETH by replaying blocks with SALT witnesses — no archive node required.
 ---
 
-# Debug Trace Server
+# Debug trace server
 
 The **debug-trace-server** provides `debug_*` and `trace_*` JSON-RPC methods for MegaETH.
 It re-executes blocks against [SALT](https://github.com/megaeth-labs/salt) witness data instead of a full state database, so it needs no archive node and runs on commodity hardware.
@@ -97,7 +97,7 @@ The server starts a background pipeline that pre-fetches blocks and witnesses in
 | `--response-cache-max-size 2GB` | Cache serialized trace responses in memory so repeated requests return instantly. |
 | `--metrics-enabled` | Expose a Prometheus `/metrics` endpoint on port 9090. |
 
-{% hint style="info" %}
+{% hint style="warning" %}
 On the first start with `--data-dir`, the server fetches the latest block from upstream as an anchor and begins syncing forward.
 To anchor at a specific block, pass `--start-block <BLOCK_HASH>` — this accepts a block **hash**, not a number.
 {% endhint %}
@@ -111,8 +111,9 @@ To anchor at a specific block, pass `--start-block <BLOCK_HASH>` — this accept
 | `debug_traceBlockByNumber` | Trace all transactions in a block, by number. |
 | `debug_traceBlockByHash` | Trace all transactions in a block, by hash. |
 | `debug_traceTransaction` | Trace a single transaction by hash. |
+| `debug_getCacheStatus` | Query current response cache statistics. |
 
-All three methods accept an optional second parameter with [Geth debug tracing options](https://geth.ethereum.org/docs/developers/evm-tracing/built-in-tracers):
+The trace methods accept an optional second parameter with [Geth debug tracing options](https://geth.ethereum.org/docs/developers/evm-tracing/built-in-tracers):
 
 ```json
 {
@@ -204,21 +205,20 @@ Entries are invalidated automatically on chain reorganization.
 | `--metrics-port` | `DEBUG_TRACE_SERVER_METRICS_PORT` | `9090` | Port for the metrics HTTP endpoint. |
 
 When enabled, scrape `http://<HOST>:9090/metrics`.
-All metric names carry the `debug_trace_` prefix.
 
 | Metric | Type | What it tells you |
 | --- | --- | --- |
-| `rpc_requests_total` | Counter | Total RPC requests, labelled by method. |
-| `rpc_errors_total` | Counter | Total RPC errors, labelled by method. |
-| `request_duration_seconds` | Histogram | End-to-end request latency. |
-| `inflight_requests` | Gauge | Currently in-flight requests. |
-| `cache_hits_total` / `cache_misses_total` | Counter | Response cache hit/miss. |
-| `evm_execution_seconds` | Histogram | EVM trace execution time per request. |
-| `upstream_duration_seconds` | Histogram | Upstream RPC latency, labelled by method. |
-| `witness_bytes` | Histogram | Witness payload size. |
-| `local_chain_height` | Gauge | Latest block in the local database. |
-| `db_size_bytes` | Gauge | Database file size on disk. |
-| `reorg_depth` | Histogram | Chain reorg depth detected by the sync pipeline. |
+| `debug_trace_rpc_requests_total` | Counter | Total RPC requests, labelled by method. |
+| `debug_trace_rpc_errors_total` | Counter | Total RPC errors, labelled by method. |
+| `debug_trace_request_duration_seconds` | Histogram | End-to-end request latency. |
+| `debug_trace_inflight_requests` | Gauge | Currently in-flight requests. |
+| `debug_trace_cache_hits_total` / `debug_trace_cache_misses_total` | Counter | Response cache hit/miss. |
+| `debug_trace_evm_execution_seconds` | Histogram | EVM trace execution time per request. |
+| `debug_trace_upstream_duration_seconds` | Histogram | Upstream RPC latency, labelled by method. |
+| `debug_trace_witness_bytes` | Histogram | Witness payload size. |
+| `debug_trace_local_chain_height` | Gauge | Latest block in the local database. |
+| `debug_trace_db_size_bytes` | Gauge | Database file size on disk. |
+| `debug_trace_reorg_depth` | Histogram | Chain reorg depth detected by the sync pipeline. |
 
 ### Logging
 
