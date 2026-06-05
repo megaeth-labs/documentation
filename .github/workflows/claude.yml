@@ -54,7 +54,9 @@ jobs:
       (github.event.action == 'opened' ||
        github.event.action == 'synchronize' ||
        github.event.action == 'ready_for_review' ||
-       github.event.action == 'reopened')
+       github.event.action == 'reopened') &&
+      (github.event.pull_request.user.type != 'Bot' ||
+       github.event.pull_request.user.login == 'mega-putin[bot]')
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
@@ -70,6 +72,10 @@ jobs:
       - uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # Use the workflow token for PR reviews so runs still work when this workflow file changes in the PR.
+          github_token: ${{ github.token }}
+          # Allow this repository's automation bot to trigger PR reviews without allowing all bots.
+          allowed_bots: "mega-putin[bot]"
           additional_permissions: |
             actions: read
           claude_args: |
@@ -89,4 +95,3 @@ jobs:
 
             Use `gh pr comment` for top-level feedback.
             Use `mcp__github_inline_comment__create_inline_comment` (with `confirmed: true`) to highlight specific code issues.
-
