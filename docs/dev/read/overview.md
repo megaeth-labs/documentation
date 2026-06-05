@@ -34,14 +34,14 @@ See [Debugging Transactions](../send-tx/debugging.md) for usage of debug methods
 | Method                                    | Availability   | Additional Restrictions                                           |
 | ----------------------------------------- | -------------- | ----------------------------------------------------------------- |
 | `debug_getRawBlock`                       | Managed only   |                                                                   |
-| `debug_getRawHeader`                      | Managed only   |                                                                   |
+| `debug_getRawHeader`                      | Available      |                                                                   |
 | `debug_getRawReceipts`                    | Managed only   |                                                                   |
 | `debug_getRawTransaction`                 | Managed only   |                                                                   |
 | `debug_replayBlock`                       | Managed only   |                                                                   |
 | `debug_traceBlock`                        | Managed only   |                                                                   |
 | `debug_traceBlockByHash`                  | Available      |                                                                   |
 | `debug_traceBlockByNumber`                | Available      |                                                                   |
-| `debug_traceCall`                         | Managed only   |                                                                   |
+| `debug_traceCall`                         | Available      |                                                                   |
 | `debug_traceCallMany`                     | Managed only   |                                                                   |
 | `debug_traceTransaction`                  | Available      |                                                                   |
 | `eth_accounts`                            | Available      |                                                                   |
@@ -94,14 +94,14 @@ See [Debugging Transactions](../send-tx/debugging.md) for usage of debug methods
 | `net_peerCount`                           | Available      |                                                                   |
 | `net_version`                             | Available      |                                                                   |
 | `realtime_sendRawTransaction`             | Available      |                                                                   |
-| `trace_block`                             | Managed only   |                                                                   |
-| `trace_call`                              | Managed only   |                                                                   |
+| `trace_block`                             | Available      |                                                                   |
+| `trace_call`                              | Available      |                                                                   |
 | `trace_callMany`                          | Managed only   |                                                                   |
 | `trace_get`                               | Managed only   |                                                                   |
 | `trace_rawTransaction`                    | Managed only   |                                                                   |
 | `trace_replayBlockTransactions`           | Managed only   |                                                                   |
 | `trace_replayTransaction`                 | Managed only   |                                                                   |
-| `trace_transaction`                       | Managed only   |                                                                   |
+| `trace_transaction`                       | Available      |                                                                   |
 | `txpool_content`                          | Unavailable    |                                                                   |
 | `txpool_contentFrom`                      | Unavailable    |                                                                   |
 | `txpool_inspect`                          | Unavailable    |                                                                   |

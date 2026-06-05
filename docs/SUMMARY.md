@@ -40,6 +40,7 @@
 - [Tooling & Infrastructure](dev/tooling.md)
 - [Verifiable Randomness (VRF)](dev/vrf.md)
 - [Developer FAQ](dev/faq.md)
+- [Security Advisory — 2026-06](dev/security-advisory-2026-06.md)
 
 ## Node Operation
 
