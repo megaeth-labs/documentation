@@ -54,7 +54,9 @@ jobs:
       (github.event.action == 'opened' ||
        github.event.action == 'synchronize' ||
        github.event.action == 'ready_for_review' ||
-       github.event.action == 'reopened')
+       github.event.action == 'reopened') &&
+      (github.event.pull_request.user.type != 'Bot' ||
+       github.event.pull_request.user.login == 'mega-putin[bot]')
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     permissions:
