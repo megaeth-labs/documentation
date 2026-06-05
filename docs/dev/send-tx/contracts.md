@@ -14,6 +14,13 @@ description: Key contract addresses and tokens on MegaETH and Ethereum Mainnet.
 | WETH | [`0x4200000000000000000000000000000000000006`](https://megaeth.blockscout.com/address/0x4200000000000000000000000000000000000006) | Wrapped Ether — an ERC-20 version of ETH for use in dApps. |
 | [Multicall3](https://multicall3.com) | [`0xcA11bde05977b3631167028862bE2a173976CA11`](https://megaeth.blockscout.com/address/0xcA11bde05977b3631167028862bE2a173976CA11) | Utility contract that batches multiple calls into one transaction. |
 {% endtab %}
+{% tab title="Testnet" %}
+| Token | Address | Description |
+| ----- | ------- | ----------- |
+| [MEGA](https://megaeth.com) | [`0xc903c68C1d389CEd76fEe0349067a4295828e6c2`](https://megaeth-testnet-v2.blockscout.com/address/0xc903c68C1d389CEd76fEe0349067a4295828e6c2) | MegaETH's native protocol token (testnet deployment). |
+| WETH | [`0x4200000000000000000000000000000000000006`](https://megaeth-testnet-v2.blockscout.com/address/0x4200000000000000000000000000000000000006) | Wrapped Ether — an ERC-20 version of ETH for use in dApps. |
+| [Multicall3](https://multicall3.com) | [`0xcA11bde05977b3631167028862bE2a173976CA11`](https://megaeth-testnet-v2.blockscout.com/address/0xcA11bde05977b3631167028862bE2a173976CA11) | Utility contract that batches multiple calls into one transaction. |
+{% endtab %}
 {% endtabs %}
 
 ## Stablecoins
@@ -65,7 +72,9 @@ description: Key contract addresses and tokens on MegaETH and Ethereum Mainnet.
 | Token | Address | Description |
 | ----- | ------- | ----------- |
 | CROWN | [`0xf7d2F0d0b0517CBDbf87C86910ce10FaAab3589D`](https://megaeth.blockscout.com/address/0xf7d2F0d0b0517CBDbf87C86910ce10FaAab3589D) | Crown Credits — a token native to MegaETH. |
+| [DIRTY](https://offshoreprotocol.xyz) | [`0xC2f34f8849a8607FD73E06D6849bDA07C2b7DE38`](https://megaeth.blockscout.com/address/0xC2f34f8849a8607FD73E06D6849bDA07C2b7DE38) | Dirty Money — game token of Offshore Protocol, an on-chain idle RPG. |
 | [MegaSIR](https://www.sir.trading) | [`0x9367A0c482703d8d9bda995B03f8E71056a72500`](https://megaeth.blockscout.com/address/0x9367A0c482703d8d9bda995B03f8E71056a72500) | SIR Trading token — a leverage protocol with no liquidations or funding fees. 12 decimals. |
+| [NXT](https://nxterminal.xyz) | [`0x2F55e14F0b2B2118d2026d20Ad2C39EAcBdCAc47`](https://megaeth.blockscout.com/address/0x2F55e14F0b2B2118d2026d20Ad2C39EAcBdCAc47) | NX Terminal Token — native utility token of NX Terminal: Protocol Wars. |
 | [WSOL](https://wormhole.com) | [`0x9a96E366F6b2ED5850A38B58D355a80aFD998411`](https://megaeth.blockscout.com/address/0x9a96E366F6b2ED5850A38B58D355a80aFD998411) | Solana's native SOL token bridged via Wormhole. 9 decimals. |
 
 {% hint style="info" %}
