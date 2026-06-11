@@ -98,6 +98,7 @@ Use `latest` or `pending` as the block tag and you get mini-block-level freshnes
 
 Mini-blocks carry the same preconfirmation guarantee as EVM blocks.
 The sequencer treats them identically — results returned by the Realtime API are not "tentative" or "unconfirmed."
+Each mini-block header is signed by the sequencer, making the commitment independently verifiable — see [Sequencer Signatures](../../mini-block.md#sequencer-signatures).
 
 ### Example: real-time balance query
 

@@ -118,16 +118,19 @@ Streams mini-blocks as they are produced by the sequencer.
 
 **Notification schema:**
 
-| Field                  | Type            | Notes                                                    |
-| ---------------------- | --------------- | -------------------------------------------------------- |
-| `block_number`         | `Quantity`      | EVM block number that this mini-block belongs to         |
-| `block_timestamp`      | `Quantity`      | EVM block timestamp                                      |
-| `index`                | `Quantity`      | Index of this mini-block within the EVM block            |
-| `mini_block_number`    | `Quantity`      | Global mini-block height                                 |
-| `mini_block_timestamp` | `Quantity`      | Creation timestamp (Unix microseconds)                   |
-| `gas_used`             | `Quantity`      | Gas consumed in this mini-block                          |
-| `transactions`         | `Transaction[]` | Transactions (same schema as `eth_getTransactionByHash`) |
-| `receipts`             | `Receipt[]`     | Receipts (same schema as `eth_getTransactionReceipt`)    |
+| Field                  | Type            | Notes                                                                                                                                                                                         |
+| ---------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `block_number`         | `Quantity`      | EVM block number that this mini-block belongs to                                                                                                                                              |
+| `block_timestamp`      | `Quantity`      | EVM block timestamp                                                                                                                                                                           |
+| `index`                | `Quantity`      | Index of this mini-block within the EVM block                                                                                                                                                 |
+| `mini_block_number`    | `Quantity`      | Global mini-block height                                                                                                                                                                      |
+| `mini_block_timestamp` | `Quantity`      | Creation timestamp (Unix microseconds)                                                                                                                                                        |
+| `gas_used`             | `Quantity`      | Gas consumed in this mini-block                                                                                                                                                               |
+| `transactions`         | `Transaction[]` | Transactions (same schema as `eth_getTransactionByHash`)                                                                                                                                      |
+| `receipts`             | `Receipt[]`     | Receipts (same schema as `eth_getTransactionReceipt`)                                                                                                                                         |
+| `transaction_root`     | `Hash`          | Merkle (MPT) root of `transactions`                                                                                                                                                           |
+| `receipt_root`         | `Hash`          | Merkle (MPT) root of `receipts`                                                                                                                                                               |
+| `signature`            | `Object`        | Sequencer's ECDSA signature over the header hash, as `r`, `s`, and `yParity` fields. Absent for pre-Rex5 mini-blocks. See [Sequencer Signatures](../../../mini-block.md#sequencer-signatures) |
 
 ### `newHeads`
 

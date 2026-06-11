@@ -131,6 +131,7 @@ Mini-blocks are intentionally compact and do not include the same metadata field
 
 Yes.
 Preconfirmation of mini-blocks by the sequencer has the same level of guarantees as that of EVM blocks.
+Every mini-block header is [signed by the sequencer](../mini-block.md#sequencer-signatures), so the preconfirmation is cryptographically verifiable.
 
 ### Does the performance dashboard (uptime.megaeth.com) display the block height in mini-blocks or EVM blocks?
 
