@@ -12,9 +12,16 @@ MegaETH provides system contracts that give transactions access to functionality
 | [KeylessDeploy](#keyless-deployment)                  | [`0x6342000000000000000000000000000000000003`](https://megaeth.blockscout.com/address/0x6342000000000000000000000000000000000003) | Deterministic cross-chain deployment (Nick's Method) |
 | [MegaAccessControl](#mega-access-control)             | [`0x6342000000000000000000000000000000000004`](https://megaeth.blockscout.com/address/0x6342000000000000000000000000000000000004) | Opt out of volatile data access detection            |
 | [MegaLimitControl](#mega-limit-control)               | [`0x6342000000000000000000000000000000000005`](https://megaeth.blockscout.com/address/0x6342000000000000000000000000000000000005) | Query remaining compute gas budget                   |
+| [SequencerRegistry](#sequencer-registry)              | [`0x6342000000000000000000000000000000000006`](https://megaeth.blockscout.com/address/0x6342000000000000000000000000000000000006) | System address and sequencer role registry           |
 
-MegaETH also runs protocol-facing system contracts that dapp code does not normally call.
-The _SequencerRegistry_ (`0x6342000000000000000000000000000000000006`, introduced in Rex5) tracks the system address (Oracle and system-transaction authority) and the sequencer (mini-block signing key).
+## Sequencer Registry
+
+Tracks the current system address (Oracle and system-transaction authority) and the current sequencer (mini-block signing key).
+Rex5 introduces this contract.
+Most dapp code does not call it directly, but contracts and tools can read it when they need the canonical onchain source for either role.
+
+**Address:** `0x6342000000000000000000000000000000000006`
+
 For the formal specification, see [SequencerRegistry (spec)](https://docs.megaeth.com/spec/system-contracts/sequencer-registry).
 
 ## High-Precision Timestamp
