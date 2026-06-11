@@ -13,6 +13,10 @@ MegaETH provides system contracts that give transactions access to functionality
 | [MegaAccessControl](#mega-access-control)             | [`0x6342000000000000000000000000000000000004`](https://megaeth.blockscout.com/address/0x6342000000000000000000000000000000000004) | Opt out of volatile data access detection            |
 | [MegaLimitControl](#mega-limit-control)               | [`0x6342000000000000000000000000000000000005`](https://megaeth.blockscout.com/address/0x6342000000000000000000000000000000000005) | Query remaining compute gas budget                   |
 
+MegaETH also runs protocol-facing system contracts that dapp code does not normally call.
+The _SequencerRegistry_ (`0x6342000000000000000000000000000000000006`, introduced in Rex5) tracks the system address (Oracle and system-transaction authority) and the sequencer (mini-block signing key).
+For the formal specification, see [SequencerRegistry (spec)](https://docs.megaeth.com/spec/system-contracts/sequencer-registry).
+
 ## High-Precision Timestamp
 
 Provides timestamps at microsecond resolution.
@@ -93,20 +97,43 @@ bytes memory originalTx = hex"f8a58085174876e800830186a08080b853604580600e...";
 
 **Preconditions:**
 
-- `keylessDeploymentTransaction` must be a valid RLP-encoded Nick's Method deployment transaction: pre-EIP-155, contract creation (`to` = null), nonce = 0.
+- `keylessDeploymentTransaction` must be a valid RLP-encoded Nick's Method deployment transaction: pre-EIP-155, contract creation (`to` = null), nonce = 0, with no trailing bytes after the signed payload.
 - `gasLimitOverride` must be ≥ the original transaction's gas limit.
 - The deployment address must not already contain code.
 - The call must carry zero ETH value.
+- The signer's balance must cover the inner transaction's `value` (zero for typical deployments) — the sandbox runs fee-free, so the signer needs no balance for gas.
 
 **Outcome:**
 
 - On success: returns `gasUsed`, `deployedAddress` (the deterministic address), and empty `errorData`.
-- On deployment failure (e.g., out of gas): the call **does not revert**. It returns `gasUsed`, `deployedAddress = 0x0`, and `errorData` describing the failure. State changes from the attempted deployment (including gas charges) are still applied.
+- On deployment failure (e.g., out of gas): the call **does not revert**. It returns `gasUsed`, `deployedAddress = 0x0`, and `errorData` describing the failure. State changes from the attempted deployment are still applied, and the gas it consumed is charged to the outer call.
+
+### Gas billing
+
+The outer transaction pays for everything the sandboxed deployment does:
+
+| Charge                | Amount                                         | When                                                            |
+| --------------------- | ----------------------------------------------- | ---------------------------------------------------------------- |
+| Dispatch overhead     | 100,000 compute gas                             | Always — retained even if the deployment is rejected             |
+| Sandbox gas           | Exact gas used by the re-executed deployment    | On every completed deployment attempt, success or failure        |
+| Signer materialization | New-account storage gas for the inner signer   | Only if the signer account does not exist yet (first attempt)    |
+
+Size the outer transaction's gas limit for `100,000 + sandbox gas used + signer materialization`, not just the inner deployment's own cost.
+`gasLimitOverride` is capped to the outer call's remaining gas, so the sandbox can never spend more than the outer transaction provides.
+The sandbox's resource usage (compute gas, data size, KV updates, and state growth) also counts toward the outer transaction's [resource limits](resource-limits.md).
+
+The inner signer pays no gas: the sandbox runs fee-free, so the signer address needs no ETH beyond the inner transaction's `value` (zero for typical Nick's Method deployments).
+A consequence is that the `GASPRICE` opcode reads `0` inside the deployed contract's constructor.
+
+{% hint style="danger" %}
+**Migration note (Rex5):** before Rex5, the outer call was charged only the 100,000 gas dispatch overhead.
+Rex5 charges the full sandbox gas to the outer transaction — for storage-heavy deployments this raises the relayer-side gas budget by 10–100×.
+{% endhint %}
 
 {% hint style="warning" %}
 Code deposit costs 10,000 storage gas per byte on MegaETH.
 A 24 KB contract costs roughly 240M storage gas.
-If `gasLimitOverride` is too low for this cost, the inner deployment will fail (out of gas) but the outer call still succeeds — check `errorData` and `deployedAddress`.
+If `gasLimitOverride` is too low for this cost, the inner deployment will fail (out of gas) but the outer call still succeeds — check `errorData` and `deployedAddress`, and note the outer call is still charged the gas the failed attempt consumed.
 Simulate the transaction with [`mega-evme`](../send-tx/debugging.md#simulating-a-new-transaction) to find the required gas — it has no gas cap and fully implements MegaETH's gas model.
 Alternatively, use `eth_estimateGas` on a MegaETH endpoint (subject to the [RPC compute gas cap](../send-tx/gas-estimation.md#the-rpc-compute-gas-cap)).
 {% endhint %}
@@ -203,3 +230,5 @@ uint64 remaining = limitControl.remainingComputeGas();
 - [KeylessDeploy (spec)](https://docs.megaeth.com/spec/system-contracts/keyless-deploy) — keyless deployment sandbox and validation rules
 - [MegaAccessControl (spec)](https://docs.megaeth.com/spec/system-contracts/mega-access-control) — volatile data access restriction mechanism
 - [MegaLimitControl (spec)](https://docs.megaeth.com/spec/system-contracts/mega-limit-control) — remaining compute gas query
+- [SequencerRegistry (spec)](https://docs.megaeth.com/spec/system-contracts/sequencer-registry) — system address and sequencer role registry
+- [Rex5 Upgrade (spec)](https://docs.megaeth.com/spec/upgrades/rex5) — full list of Rex5 behavior changes
