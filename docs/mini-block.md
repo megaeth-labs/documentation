@@ -70,14 +70,14 @@ Where they differ from EVM blocks:
 | Compatible with standard tools | Yes         | Requires [Realtime API](dev/read/realtime-api.md)                                                        |
 | Contains state root            | Yes         | No                                                                                                       |
 
-## Sequencer Signatures
+## Sequencer signatures
 
 The preconfirmation guarantee is not just a promise — it is cryptographically enforced.
 The sequencer signs every mini-block header with its sequencer key, and the signature is delivered alongside the mini-block in the [Realtime API](dev/read/realtime-api.md) stream.
 A signed mini-block is a binding commitment: if the sequencer ever sealed an EVM block that contradicts a mini-block it signed, anyone holding the signed header could prove the misbehavior.
 
-The signing key is registered on-chain in the [SequencerRegistry](https://docs.megaeth.com/spec/system-contracts/sequencer-registry) system contract at `0x6342000000000000000000000000000000000006`, introduced in Rex5.
-The key can be rotated by scheduling a change in the registry; rotations take effect at an EVM block boundary, and the full change history remains queryable on-chain.
+The signing key is registered onchain in the [SequencerRegistry](https://docs.megaeth.com/spec/system-contracts/sequencer-registry) system contract at `0x6342000000000000000000000000000000000006`, introduced in Rex5.
+The key can be rotated by scheduling a change in the registry; rotations take effect at an EVM block boundary, and the full change history remains queryable onchain.
 
 The signature is a standard secp256k1 ECDSA signature over `keccak256(rlp(header))`, where the header is the following eight fields of the [`miniBlocks` subscription payload](dev/read/rpc/eth_subscribe.md#miniblocks), RLP-encoded in this order:
 
@@ -93,16 +93,16 @@ The signature is a standard secp256k1 ECDSA signature over `keccak256(rlp(header
 | 8   | `receipt_root`         | 32-byte hash |
 
 Integers are RLP-encoded in their minimal big-endian form.
-The digest is signed directly — there is no [EIP-191](https://eips.ethereum.org/EIPS/eip-191) prefix — so the signature is verifiable on-chain with `ecrecover`.
+The digest is signed directly — there is no [EIP-191](https://eips.ethereum.org/EIPS/eip-191) prefix — so the signature is verifiable onchain with `ecrecover`.
 The `signature` field of the payload carries the components as an object: `r`, `s`, and `yParity`.
 
 {% hint style="info" %}
 Mini-blocks produced before Rex5 are unsigned — the `signature` field is absent from their payloads.
 {% endhint %}
 
-### Verifying a Mini-Block Signature
+### Verifying a mini-block signature
 
-To verify a mini-block, rebuild the header hash, recover the signer from the signature, and compare it against the sequencer key registered on-chain.
+To verify a mini-block, rebuild the header hash, recover the signer from the signature, and compare it against the sequencer key registered onchain.
 
 {% tabs %}
 {% tab title="TypeScript" %}
@@ -159,8 +159,8 @@ async function isSignedBySequencer(mb: any): Promise<boolean> {
 
 {% endtab %}
 {% tab title="Solidity" %}
-On-chain, recover the signer with `ecrecover` and compare it against the registry.
-Computing `headerHash` requires RLP-encoding the eight header fields, which is typically done off-chain.
+Onchain, recover the signer with `ecrecover` and compare it against the registry.
+Computing `headerHash` requires RLP-encoding the eight header fields, which is typically done offchain.
 
 ```solidity
 pragma solidity ^0.8.0;
@@ -233,4 +233,4 @@ Each notification delivers the mini-block's transactions, receipts, and state ch
 - [Realtime API](dev/read/realtime-api.md) — subscribe to mini-blocks and get execution results with minimum latency
 - [eth_subscribe](dev/read/rpc/eth_subscribe.md) — full reference of the `miniBlocks` subscription payload
 - [High-Precision Timestamp](dev/execution/system-contracts.md#high-precision-timestamp) — microsecond timestamps available within mini-blocks
-- [SequencerRegistry (spec)](https://docs.megaeth.com/spec/system-contracts/sequencer-registry) — on-chain registry of the sequencer signing key
+- [SequencerRegistry (spec)](https://docs.megaeth.com/spec/system-contracts/sequencer-registry) — onchain registry of the sequencer signing key
