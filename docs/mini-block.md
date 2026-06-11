@@ -104,8 +104,6 @@ Mini-blocks produced before Rex5 are unsigned — the `signature` field is absen
 
 To verify a mini-block, rebuild the header hash, recover the signer from the signature, and compare it against the sequencer key registered onchain.
 
-{% tabs %}
-{% tab title="TypeScript" %}
 The example below uses [viem](https://viem.sh) and takes a notification payload `mb` exactly as delivered by the [`miniBlocks` subscription](dev/read/rpc/eth_subscribe.md#miniblocks).
 
 ```typescript
@@ -156,40 +154,6 @@ async function isSignedBySequencer(mb: any): Promise<boolean> {
   return signer.toLowerCase() === sequencer.toLowerCase();
 }
 ```
-
-{% endtab %}
-{% tab title="Solidity" %}
-Onchain, recover the signer with `ecrecover` and compare it against the registry.
-Computing `headerHash` requires RLP-encoding the eight header fields, which is typically done offchain.
-
-```solidity
-pragma solidity ^0.8.0;
-
-interface ISequencerRegistry {
-    function currentSequencer() external view returns (address);
-    function sequencerAt(uint256 blockNumber) external view returns (address);
-}
-
-address constant SEQUENCER_REGISTRY = 0x6342000000000000000000000000000000000006;
-
-/// @param headerHash keccak256 of the RLP-encoded mini-block header
-/// @param blockNumber the mini-block's `block_number` field
-/// @param yParity the signature's `yParity` field (0 or 1)
-function isSignedBySequencer(
-    bytes32 headerHash,
-    uint256 blockNumber,
-    uint8 yParity,
-    bytes32 r,
-    bytes32 s
-) view returns (bool) {
-    address signer = ecrecover(headerHash, yParity + 27, r, s);
-    return signer != address(0) &&
-        signer == ISequencerRegistry(SEQUENCER_REGISTRY).sequencerAt(blockNumber);
-}
-```
-
-{% endtab %}
-{% endtabs %}
 
 When verifying historical mini-blocks, use `sequencerAt(blockNumber)` rather than `currentSequencer()` — the sequencer key can rotate, and the registry resolves which key was active at any block.
 `currentSequencer()` is sufficient when verifying live mini-blocks as they stream in.
