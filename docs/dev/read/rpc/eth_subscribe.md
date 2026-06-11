@@ -130,7 +130,7 @@ Streams mini-blocks as they are produced by the sequencer.
 | `receipts`             | `Receipt[]`     | Receipts (same schema as `eth_getTransactionReceipt`)                                                                                                                                         |
 | `transaction_root`     | `Hash`          | Merkle (MPT) root of `transactions`                                                                                                                                                           |
 | `receipt_root`         | `Hash`          | Merkle (MPT) root of `receipts`                                                                                                                                                               |
-| `signature`            | `Object`        | Sequencer's ECDSA signature over the header hash, as `r`, `s`, and `yParity` fields. Absent for pre-Rex5 mini-blocks. See [Sequencer Signatures](../../../mini-block.md#sequencer-signatures) |
+| `signature`            | `Object`        | Sequencer's ECDSA signature over the header hash, as `r`, `s`, and `yParity` fields. Absent for pre-Rex5 mini-blocks. See [Sequencer signatures](../../../mini-block.md#sequencer-signatures) |
 
 ### `newHeads`
 

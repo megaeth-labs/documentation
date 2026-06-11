@@ -93,7 +93,7 @@ The signature is a standard secp256k1 ECDSA signature over `keccak256(rlp(header
 | 8   | `receipt_root`         | 32-byte hash |
 
 Integers are RLP-encoded in their minimal big-endian form.
-The digest is signed directly — there is no [EIP-191](https://eips.ethereum.org/EIPS/eip-191) prefix — so the signature is verifiable onchain with `ecrecover`.
+The signature is verifiable onchain with `ecrecover`.
 The `signature` field of the payload carries the components as an object: `r`, `s`, and `yParity`.
 
 {% hint style="info" %}
