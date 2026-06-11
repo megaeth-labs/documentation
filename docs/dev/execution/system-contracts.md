@@ -112,11 +112,11 @@ bytes memory originalTx = hex"f8a58085174876e800830186a08080b853604580600e...";
 
 The outer transaction pays for everything the sandboxed deployment does:
 
-| Charge                 | Amount                                       | When                                                          |
-| ---------------------- | -------------------------------------------- | ------------------------------------------------------------- |
-| Dispatch overhead      | 100,000 compute gas                          | Always — retained even if the deployment is rejected          |
-| Sandbox gas            | Exact gas used by the re-executed deployment | On every completed deployment attempt, success or failure     |
-| Signer materialization | New-account storage gas for the inner signer | Only if the signer account does not exist yet (first attempt) |
+| Charge                 | Amount                                       | When                                                                        |
+| ---------------------- | -------------------------------------------- | --------------------------------------------------------------------------- |
+| Dispatch overhead      | 100,000 compute gas                          | Always — retained even if the deployment is rejected                        |
+| Sandbox gas            | Exact gas used by the re-executed deployment | On every completed deployment attempt, success or failure                   |
+| Signer materialization | New-account storage gas for the inner signer | Only if the signer account does not exist yet (one-time per signer address) |
 
 Size the outer transaction's gas limit for `100,000 + sandbox gas used + signer materialization`, not just the inner deployment's own cost.
 `gasLimitOverride` is capped to the outer call's remaining gas, so the sandbox can never spend more than the outer transaction provides.
