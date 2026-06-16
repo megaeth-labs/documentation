@@ -41,10 +41,10 @@ For the file layout (not a runtime artifact), see the schema-shaped sample at [`
 
 Despite the file carrying the full Genesis schema (allocations, gas limit, timestamp, base fee, ...), the validator consumes only two pieces of state from it:
 
-| Derived value     | Source in `config`                    | Use during validation                                                                                                                                                                                                      |
-| ----------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Chain ID          | `chainId`                             | Drives the EVM `CHAINID` opcode and EIP-155 transaction-signature checks.                                                                                                                                                  |
-| Hardfork schedule | `<fork>Block` and `<fork>Time` fields | Activates Ethereum (Cancun, Shanghai, ...), OP-Stack (Ecotone, Granite, Holocene, Isthmus, ...), and MegaETH (MiniRex, MiniRex1, MiniRex2, Rex, Rex1, Rex2, Rex3, Rex4) at their pre-declared block numbers or timestamps. |
+| Derived value     | Source in `config`                    | Use during validation                                                                                                                                                                                                            |
+| ----------------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Chain ID          | `chainId`                             | Drives the EVM `CHAINID` opcode and EIP-155 transaction-signature checks.                                                                                                                                                        |
+| Hardfork schedule | `<fork>Block` and `<fork>Time` fields | Activates Ethereum (Cancun, Shanghai, ...), OP-Stack (Ecotone, Granite, Holocene, Isthmus, ...), and MegaETH (MiniRex, MiniRex1, MiniRex2, Rex, Rex1, Rex2, Rex3, Rex4, Rex5) at their pre-declared block numbers or timestamps. |
 
 The genesis `alloc`, `gasLimit`, `baseFeePerGas`, and other initial-state fields are **not** consumed — once the chain has produced a single block, initial state is served by the witness, not by the genesis file.
 
@@ -190,6 +190,7 @@ Two layers run in order:
    - **MiniRex** — deploy the oracle contract and the high-precision timestamp oracle contract.
    - **Rex2** — deploy the keyless-deploy contract.
    - **Rex4** — deploy the access-control contract and the `MegaLimitControl` contract.
+   - **Rex5** — deploy the `SequencerRegistry` contract (`0x6342000000000000000000000000000000000006`) and upgrade the oracle to its dynamic-authority version. When a scheduled system-address or sequencer change is due, an additional pre-block system call to `applyPendingChanges()` is executed.
    - **MiniRex1, MiniRex2, Rex, Rex1, Rex3** — no new system-contract deployments.
      The fork still gates EVM behavior changes; the pre-execution hook list is just empty.
 
