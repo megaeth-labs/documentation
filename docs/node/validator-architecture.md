@@ -190,7 +190,8 @@ Two layers run in order:
    - **MiniRex** — deploy the oracle contract and the high-precision timestamp oracle contract.
    - **Rex2** — deploy the keyless-deploy contract.
    - **Rex4** — deploy the access-control contract and the `MegaLimitControl` contract.
-   - **Rex5** — deploy the `SequencerRegistry` contract (`0x6342000000000000000000000000000000000006`) and upgrade the oracle to its dynamic-authority version. When a scheduled system-address or sequencer change is due, an additional pre-block system call to `applyPendingChanges()` is executed.
+   - **Rex5** — deploy the `SequencerRegistry` contract (`0x6342000000000000000000000000000000000006`) and upgrade the oracle to its dynamic-authority version.
+     When a scheduled system-address or sequencer change is due, an additional pre-block system call to `applyPendingChanges()` is executed.
    - **MiniRex1, MiniRex2, Rex, Rex1, Rex3** — no new system-contract deployments.
      The fork still gates EVM behavior changes; the pre-execution hook list is just empty.
 
