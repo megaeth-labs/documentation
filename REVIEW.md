@@ -1,8 +1,10 @@
 # Review Guidelines
 
+The centralized `pr-review` action already applies the baseline rubric (review mindset, priority order, generic checks, the "what not to flag" list, the severity scale, and previous-thread triage). This file only adds the checks **specific to this docs repo**; defer to the baseline otherwise.
+
 ## Always check
 
-- Markdown files have YAML frontmatter with `description` field
+- Markdown files have YAML frontmatter with a `description` field
 - Internal links use correct relative paths with `.md` extensions
 - New pages are listed in `docs/SUMMARY.md`
 - One sentence per line (improves diff readability)
@@ -15,12 +17,6 @@
 - Code examples use appropriate language tags in fenced code blocks
 - Cross-references between layers use correct relative paths
 - External spec links use absolute GitBook URLs (not relative paths to `docs/spec/`)
-
-## Previous comments
-
-- Before writing new comments, check all previous review comments and threads on this PR
-- If a previous comment has been addressed by the latest changes, resolve that thread
-- Do not repeat feedback that has already been addressed
 
 ## Skip
 
