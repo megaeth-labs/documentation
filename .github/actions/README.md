@@ -87,3 +87,17 @@ jobs:
 > job once with `401 ... Workflow validation failed ...` (claude-code-action validates the
 > workflow against the default branch). This is expected and clears after the PR merges;
 > it does not affect consumers pinned to `@main` in normal operation.
+
+## Concurrency (pr-review)
+
+Consumers should give the `pr-review` job a job-level concurrency group with
+`cancel-in-progress: false`, so an in-progress review finishes instead of being cancelled
+mid-run (the action resolves threads and posts one consolidated review per round; cancelling
+can leave partial state):
+
+```yaml
+  pr-review:
+    concurrency:
+      group: claude-pr-review-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+```
