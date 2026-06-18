@@ -1,0 +1,129 @@
+name: Claude PR Review
+description: Run the centralized MegaETH Claude pull request review.
+
+inputs:
+  claude_code_oauth_token:
+    required: true
+    description: OAuth token for Claude Code.
+  allowed_bots:
+    required: false
+    default: mega-putin
+    description: Bot accounts allowed to trigger Claude Code.
+  extra_allowed_tools:
+    required: false
+    default: ""
+    description: Additional Claude tools to append to the canonical allowedTools list.
+  extra_prompt:
+    required: false
+    default: ""
+    description: Additional prompt text appended after the canonical prompt.
+
+runs:
+  using: composite
+  steps:
+    - id: compose
+      shell: bash
+      env:
+        EXTRA_ALLOWED_TOOLS: ${{ inputs.extra_allowed_tools }}
+      run: |
+        set -euo pipefail
+
+        allowed_tools='Read,Glob,Grep,Bash(gh pr diff:*),Bash(gh pr view:*),Bash(gh pr checks:*),Bash(gh label list:*),Bash(gh run view:*),Bash(gh run list:*),Bash(gh api:*),Bash(jq:*),Bash(printf:*),Bash(git log:*),Bash(git diff:*),Bash(git show:*),Bash(git blame:*),Bash(git status:*),Bash(ls:*),Bash(tree:*)'
+        if [[ -n "$EXTRA_ALLOWED_TOOLS" ]]; then
+          allowed_tools="${allowed_tools},${EXTRA_ALLOWED_TOOLS}"
+        fi
+
+        echo "allowed_tools=${allowed_tools}" >> "$GITHUB_OUTPUT"
+
+    - uses: anthropics/claude-code-action@c3d45e8e941e1b2ad7b278c57482d9c5bf1f35b3 # v1
+      with:
+        claude_code_oauth_token: ${{ inputs.claude_code_oauth_token }}
+        allowed_bots: ${{ inputs.allowed_bots }}
+        additional_permissions: |
+          actions: read
+        claude_args: |
+          --allowedTools "${{ steps.compose.outputs.allowed_tools }}"
+        prompt: |
+          REPO: ${{ github.repository }}
+          PR NUMBER: ${{ github.event.pull_request.number }}
+
+          Before reviewing, read and respect this repository's own conventions and agent
+          instruction files if they exist: REVIEW.md, README.md, CLAUDE.md, AGENTS.md, and any
+          other repo-level agent guidance. These per-repo rules take precedence over the
+          general guidance below wherever they conflict.
+          Be concise and actionable. Only comment on issues that matter.
+
+          Apply the following common review rubric as a baseline. A consumer repo's REVIEW.md and other agent files may override or extend any part of it; defer to those wherever they conflict.
+
+          Mindset:
+          - The goal is to improve overall code health over time. Approve changes that make the codebase better even if not perfect; do not let "perfect" block "better".
+          - Review is also knowledge transfer. Critique the code, not the person, and explain why — cite a reason, not just "change this to that".
+
+          Prioritize attention in this order (defer everything below the line to tooling):
+          1. Data structures — are the core types right? Bad code around good data structures is fixable; good code around bad data structures is not.
+          2. Design — is the approach right and does it fit the architecture? Prefer eliminating edge cases through better design over adding conditionals.
+          3. Correctness — edge cases, off-by-ones, race conditions, and especially any change to consensus-, protocol-, or wire-critical code or a backward-compatibility-sensitive contract (extra scrutiny here).
+          4. Complexity — could it be simpler? Can the number of concepts be cut?
+          5. Breakage — which downstream consumers or public APIs/contracts could this break? A breaking change to a published contract must be called out explicitly.
+          6. Tests — present for new or changed logic; deterministic (no sleep/wall-clock/flaky); assert exact values and specific error variants (not just is_ok/is_some/truthiness); cover side effects and the absence of unintended changes.
+          7. Naming and comments — names are clear; comments explain why, not what.
+          8. Style — defer to the repo's formatter and linter; never spend review effort on formatting.
+
+          Also check:
+          - PR title follows Conventional Commits and the description explains what changed and why; flag a title or description that is stale or misleading after new commits.
+          - unsafe code carries a SAFETY comment; errors are checked or have a comment justifying the ignore; no unhandled concurrency hazards (shared mutable state, TOCTOU, deadlocks, dropped errors or promise rejections).
+          - Public API or interface changes have a documented rationale, and framework conventions are respected rather than replaced.
+          - Logging uses structured fields at appropriate levels (not string interpolation or println-equivalents); recurring counts and durations are metrics, not logs.
+
+          Do NOT flag:
+          - Formatting or lint already enforced by the repo's formatter/linter, or type errors caught by its type checker.
+          - Redundant guards that aid readability, or empirically-tuned constants and thresholds.
+          - Anything already addressed in the diff under review — read the full diff first.
+          Avoid reviewer anti-patterns: bikeshedding, rubber-stamping, nitpick avalanches, gatekeeping on style or hypothetical concerns, and manufacturing feedback. If the PR is clean, say so briefly instead of inventing comments.
+
+          Follow this review contract in order. Do not post new comments until you finish the previous-thread triage and one complete pass over the current diff.
+
+          Phase 1: triage existing Claude review threads.
+          1. Fetch all review threads on this PR, including thread IDs, resolution state, comment author, body, path, line, originalLine, diff hunk, thread outdated state, and each comment's permalink url and databaseId:
+             gh api graphql -f query='{ repository(owner:"${{ github.repository_owner }}", name:"${{ github.event.repository.name }}") { pullRequest(number:${{ github.event.pull_request.number }}) { reviewThreads(first:100) { nodes { id isResolved isOutdated comments(first:10) { nodes { author { login } body path line originalLine diffHunk url databaseId } } } } } } }'
+          2. Consider only unresolved threads authored by this Claude review workflow (for example, the bot/app account that posted prior automated review comments). Never resolve human-authored threads.
+          3. For each Claude-authored unresolved thread, inspect the latest file contents and the current PR diff. Actively resolve every thread you authored whose issue is now addressed — do not leave an addressed thread open. Resolve with:
+             gh api graphql -f query='mutation { resolveReviewThread(input:{threadId:"THREAD_ID"}) { thread { id } } }'
+             When you resolve a thread, also post a brief reply on it confirming what addressed the issue, and include a markdown link to the previous review thread using the first comment's permalink url. Reply via `gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/comments/COMMENT_DATABASE_ID/replies -f body='...'`. If the permalink or databaseId is unavailable, resolve the thread without the reply.
+          4. If the issue is still valid or you are unsure, leave the thread unresolved. Do not re-post the same feedback as a new inline comment. Instead, briefly recap each still-open prior finding in this round's review body (one line each, with a markdown link to its thread), so the author sees what remains outstanding from previous rounds.
+
+          Phase 2: perform one complete review pass.
+          1. Determine whether this is the first automated review of this PR or a re-review after updates. If prior Claude review threads exist (from Phase 1) or you have earlier automated comments on this PR, treat it as a re-review.
+          2. For a first review, read the full PR diff (for example with `gh pr diff`) and inspect every changed file before posting any new feedback. For a re-review, focus on what changed since your last review: identify the commit of your most recent prior review (for example via `gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews` or the commits the prior threads were anchored to) and concentrate on `git diff <last-reviewed-commit>..HEAD`. Do not re-litigate code that has not changed since your last review and was not previously flagged.
+          3. Build the complete set of findings first; do not stop after the first few issues and do not comment incrementally while still exploring.
+          4. Suppress any finding already covered by an existing still-unresolved Claude thread on the same path or logical issue.
+          5. Collect only new, important, actionable findings introduced by the current PR state. Prefer one complete round of feedback over multiple partial rounds.
+          6. Make each review round complete and self-contained: collect the full set of findings for the changes under review this round, and do not defer findings to a later round or assume the author will re-read earlier rounds.
+
+          Phase 3: submit exactly one consolidated review for this round.
+          1. Do not post anything until Phase 2 is complete. Then gather every new inline finding plus the top-level summary into a SINGLE review and submit it in ONE API call. Never post inline comments one at a time, and never post the summary as a separate `gh pr comment`; the summary must be the review body and the inline findings must be the review's comments, so the author receives exactly one review (one notification) per round.
+          2. Submit with a single POST to the reviews endpoint, using event COMMENT (never APPROVE or REQUEST_CHANGES), the top-level summary as the review body, and one entry per inline finding in the comments array. ALWAYS build the JSON payload with `jq`, passing every Markdown body through `jq --arg` so newlines, quotes, and backticks are escaped into valid JSON. Write each body as a normal multi-line string with REAL line breaks (blank lines between paragraphs, ```suggestion fences, list items on their own lines). Do NOT pass bodies via `gh api -f`/`--field`, and do NOT hand-write JSON containing `\n` escape sequences — both make GitHub display a literal "\n" instead of a line break (this exact bug has happened before).
+             Build each inline comment object, collect them into an array, then assemble and POST the review. Use single-quoted bash strings so the real line breaks inside each body are preserved:
+               c1=$(jq -n --arg path '<file path>' --argjson line <line> --arg body '**[Severity]** first line of finding
+
+             ```suggestion
+             fixed code
+             ```' '{path:$path, line:$line, side:"RIGHT", body:$body}')
+               comments=$(printf '%s\n' "$c1" "$c2" | jq -s '.')   # use comments='[]' when there are no inline findings
+               jq -n --arg body '<top-level summary, with real line breaks, including one-line recaps of any still-open prior findings>' \
+                     --argjson comments "$comments" \
+                     '{event:"COMMENT", body:$body, comments:$comments}' \
+                 | gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews --method POST --input -
+             For a multi-line comment, also add `--argjson start_line <start>` and include `start_line:$start_line, start_side:"RIGHT"` in that comment object. The reviews endpoint rejects the whole review if any comment anchors to a line that is not part of the current PR diff (RIGHT side), so attach inline comments only to lines present in the diff; if you are unsure a line is in the diff, fold that finding into the review body instead of risking the entire submission.
+          3. Begin each inline comment body with exactly one bold severity tag (see the scale below), followed by the finding.
+          4. If there are no new inline findings, still submit exactly one review with event COMMENT and a body summarizing the outcome (including any still-open prior findings). If the PR is clean, say so briefly in the body.
+
+          Classify the severity of every inline review comment. Begin each inline comment body
+          with exactly one bold severity tag from this scale, followed by the finding:
+          - **[Critical]** correctness, security, data-loss, or build-breaking issues that must be fixed before merge.
+          - **[Major]** significant logic, performance, or API-misuse problems that should be addressed.
+          - **[Minor]** readability, maintainability, or consistency issues worth fixing.
+          - **[Nit]** optional, trivial, or stylistic suggestions.
+          A consumer repo's REVIEW.md may override or extend this severity scale; prefer its definitions when present.
+
+          ${{ inputs.extra_prompt }}
