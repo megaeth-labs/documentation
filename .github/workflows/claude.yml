@@ -69,7 +69,25 @@ jobs:
         with:
           fetch-depth: 1
 
+      - name: Detect claude workflow changes
+        id: workflow-change
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          if gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files \
+            --paginate \
+            --jq '.[] | select(.filename == ".github/workflows/claude.yml") | .filename' \
+            | grep -q .; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Skipping pr-review because this PR modifies .github/workflows/claude.yml."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: ./.github/actions/claude-pr-review
+        if: steps.workflow-change.outputs.skip != 'true'
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           allowed_bots: "mega-putin"

@@ -83,10 +83,12 @@ jobs:
             Add repository-specific review instructions here.
 ```
 
-> Note: a PR that _modifies the calling repo's own_ `claude.yml` will fail the `pr-review`
-> job once with `401 ... Workflow validation failed ...` (claude-code-action validates the
-> workflow against the default branch). This is expected and clears after the PR merges;
-> it does not affect consumers pinned to `@main` in normal operation.
+> Note: a PR that _modifies the calling repo's own_ `claude.yml` skips the `pr-review`
+> job.
+> `claude-code-action` validates that workflow against the default branch before it exchanges
+> its app token, so self-modifying PRs cannot run the review step safely.
+> This only affects the repo that changed its own workflow.
+> It does not affect consumers pinned to `@main` in normal operation.
 
 ## Concurrency (pr-review)
 
@@ -96,8 +98,8 @@ mid-run (the action resolves threads and posts one consolidated review per round
 can leave partial state):
 
 ```yaml
-  pr-review:
-    concurrency:
-      group: claude-pr-review-${{ github.event.pull_request.number }}
-      cancel-in-progress: false
+pr-review:
+  concurrency:
+    group: claude-pr-review-${{ github.event.pull_request.number }}
+    cancel-in-progress: false
 ```
