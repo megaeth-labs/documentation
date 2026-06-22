@@ -74,6 +74,8 @@ runs:
           - unsafe code carries a SAFETY comment; errors are checked or have a comment justifying the ignore; no unhandled concurrency hazards (shared mutable state, TOCTOU, deadlocks, dropped errors or promise rejections).
           - Public API or interface changes have a documented rationale, and framework conventions are respected rather than replaced.
           - Logging uses structured fields at appropriate levels (not string interpolation or println-equivalents); recurring counts and durations are metrics, not logs.
+          - Documentation proximity matches the scope of the fact being documented: implementation mechanics live inline with the code they describe, while separate design docs focus on architecture and rationale and link to code instead of restating details that will drift.
+          - Flag the same fact duplicated across inline docs and separate docs; pick one authoritative home and link from the other.
 
           Do NOT flag:
           - Formatting or lint already enforced by the repo's formatter/linter, or type errors caught by its type checker.
