@@ -36,8 +36,8 @@ description: Key contract addresses and tokens on MegaETH and Ethereum Mainnet.
 | [USDe](https://ethena.fi) | [`0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34`](https://megaeth.blockscout.com/address/0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34) | Synthetic dollar by Ethena Labs, backed by crypto assets and hedged with futures. |
 | [sUSDe](https://ethena.fi) | [`0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2`](https://megaeth.blockscout.com/address/0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2) | Staked USDe — grows in value over time as it earns Ethena protocol revenue. |
 | [USDT0](https://usdt0.to) | [`0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb`](https://megaeth.blockscout.com/address/0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb) | Cross-chain USDT by Tether and LayerZero, usable across 15+ blockchains. 6 decimals. |
-| [iTRY](https://try.finance) | [`0x996ce957408804fEC19237D866799d9C7076E48c`](https://megaeth.blockscout.com/address/0x996ce957408804fEC19237D866799d9C7076E48c) | Interest-bearing Turkish Lira stablecoin — earns yield from Turkish Lira reserves. OFT bridged from Ethereum. |
-| [wiTRY](https://try.finance) | [`0x15B271D9012b5820FC42b1c495B4C1e206547De5`](https://megaeth.blockscout.com/address/0x15B271D9012b5820FC42b1c495B4C1e206547De5) | Wrapped iTRY — non-rebasing version of iTRY for DeFi compatibility. OFT bridged from Ethereum. |
+| [iTRY](https://try.finance) | [`0x996ce957408804fEC19237D866799d9C7076E48c`](https://megaeth.blockscout.com/address/0x996ce957408804fEC19237D866799d9C7076E48c) | Interest-bearing Turkish Lira stablecoin — LayerZero OFT from Ethereum that earns yield from Turkish Lira reserves. |
+| [wiTRY](https://try.finance) | [`0x15B271D9012b5820FC42b1c495B4C1e206547De5`](https://megaeth.blockscout.com/address/0x15B271D9012b5820FC42b1c495B4C1e206547De5) | Wrapped iTRY — non-rebasing version of iTRY for DeFi compatibility, available on MegaETH as a LayerZero OFT from Ethereum. |
 {% endtab %}
 {% endtabs %}
 
