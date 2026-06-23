@@ -84,7 +84,7 @@ runs:
           - Anything already addressed in the diff under review — read the full diff first.
           Avoid reviewer anti-patterns: bikeshedding, rubber-stamping, nitpick avalanches, gatekeeping on style or hypothetical concerns, and manufacturing feedback. If the PR is clean, say so briefly instead of inventing comments.
 
-          Follow this review contract in order. Use the available multi-turn budget to be exhaustive, but do not post new review feedback until all analysis phases are complete and you are ready to submit one unified review.
+          Follow this review contract in order. Use the available multi-turn budget to be exhaustive. Treat Phases 1 through 5 as an iterative loop: after one pass, revisit the diff, checklist, local guidance, and prior threads again if you found any new risk area, uncertainty, or candidate finding. Keep iterating until a fresh pass produces no new actionable findings, or until you exhaust the turn budget. Do not post new review feedback until all analysis phases are complete and you are ready to submit one unified review.
 
           Phase 1: understand the full diff scope.
           1. Determine whether this is the first automated review of this PR or a re-review after updates. If prior Claude review threads exist or you have earlier automated comments on this PR, treat it as a re-review.
@@ -110,10 +110,11 @@ runs:
              When you resolve a thread, also post a brief reply on it confirming what addressed the issue, and include a markdown link to the previous review thread using the first comment's permalink url. Reply via `gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/comments/COMMENT_DATABASE_ID/replies -f body='...'`. If the permalink or databaseId is unavailable, resolve the thread without the reply.
           4. If the issue is still valid or you are unsure, leave the thread unresolved. Do not re-post the same feedback as a new inline comment. Instead, briefly recap each still-open prior finding in this round's review body (one line each, with a markdown link to its thread), so the author sees what remains outstanding from previous rounds.
 
-          Phase 5: build the complete review set.
+          Phase 5: build the complete review set and decide whether another analysis loop is needed.
           1. Suppress any finding already covered by an existing still-unresolved Claude thread on the same path or logical issue.
           2. Collect only new, important, actionable findings introduced by the current PR state. Prefer one complete round of feedback over multiple partial rounds.
           3. Make each review round complete and self-contained: collect the full set of findings for the changes under review this round, and do not defer findings to a later round or assume the author will re-read earlier rounds.
+          4. Before submitting, ask whether another pass over Phases 1 through 5 would likely uncover anything new. If yes, continue the loop instead of submitting. Submit only when you have converged on no more new actionable findings, or when the turn budget is exhausted and you must summarize the remaining uncertainty in the review body.
 
           Phase 6: submit exactly one consolidated review for this round.
           1. Do not post new review feedback until Phases 1 through 5 are complete. Then gather every new inline finding plus the top-level summary into a SINGLE review and submit it in ONE API call. Never post inline comments one at a time, and never post the summary as a separate `gh pr comment`; the summary must be the review body and the inline findings must be the review's comments, so the author receives exactly one review (one notification) per round.

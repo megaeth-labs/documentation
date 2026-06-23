@@ -31,7 +31,7 @@ other repo-level agent guidance), with those per-repo rules taking precedence ov
 canonical inline prompt. Use these files for repo-specific rules; reserve `extra_prompt` for
 small deltas that do not belong in a checked-in convention file.
 
-`pr-review` runs Claude with `--max-turns 20` so it can complete a multi-pass review before submission.
+`pr-review` runs Claude with `--max-turns 20` so it can iterate through multiple review passes before submission and stop only after it converges on no new actionable findings or exhausts the turn budget.
 It also tags every inline comment with a bold severity label (`**[Critical]**`, `**[Major]**`, `**[Minor]**`, `**[Nit]**`).
 A consumer repo's `REVIEW.md` may override or extend this severity scale.
 
