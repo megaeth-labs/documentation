@@ -31,9 +31,9 @@ other repo-level agent guidance), with those per-repo rules taking precedence ov
 canonical inline prompt. Use these files for repo-specific rules; reserve `extra_prompt` for
 small deltas that do not belong in a checked-in convention file.
 
-`pr-review` additionally tags every inline comment with a bold severity label
-(`**[Critical]**`, `**[Major]**`, `**[Minor]**`, `**[Nit]**`). A consumer repo's `REVIEW.md`
-may override or extend this severity scale.
+`pr-review` runs Claude with `--max-turns 20` so it can complete a multi-pass review before submission.
+It also tags every inline comment with a bold severity label (`**[Critical]**`, `**[Major]**`, `**[Minor]**`, `**[Nit]**`).
+A consumer repo's `REVIEW.md` may override or extend this severity scale.
 
 ## Consumer Requirements
 
@@ -92,13 +92,13 @@ jobs:
 
 ## Concurrency (pr-review)
 
-Consumers should give the `pr-review` job a job-level concurrency group with
-`cancel-in-progress: false`, so an in-progress review finishes instead of being cancelled
-mid-run (the action resolves threads and posts one consolidated review per round; cancelling
-can leave partial state):
+Consumers should give the `pr-review` job a `timeout-minutes` value of at least `25` plus a job-level concurrency group with `cancel-in-progress: false`.
+This helps an in-progress multi-turn review finish instead of being cancelled mid-run, because the action resolves threads and posts one consolidated review per round.
+Cancelling can leave partial state:
 
 ```yaml
 pr-review:
+  timeout-minutes: 25
   concurrency:
     group: claude-pr-review-${{ github.event.pull_request.number }}
     cancel-in-progress: false

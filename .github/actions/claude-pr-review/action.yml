@@ -43,6 +43,7 @@ runs:
           actions: read
         claude_args: |
           --allowedTools "${{ steps.compose.outputs.allowed_tools }}"
+          --max-turns 20
         prompt: |
           REPO: ${{ github.repository }}
           PR NUMBER: ${{ github.event.pull_request.number }}
@@ -83,9 +84,24 @@ runs:
           - Anything already addressed in the diff under review — read the full diff first.
           Avoid reviewer anti-patterns: bikeshedding, rubber-stamping, nitpick avalanches, gatekeeping on style or hypothetical concerns, and manufacturing feedback. If the PR is clean, say so briefly instead of inventing comments.
 
-          Follow this review contract in order. Do not post new comments until you finish the previous-thread triage and one complete pass over the current diff.
+          Follow this review contract in order. Use the available multi-turn budget to be exhaustive, but do not post new review feedback until all analysis phases are complete and you are ready to submit one unified review.
 
-          Phase 1: triage existing Claude review threads.
+          Phase 1: understand the full diff scope.
+          1. Determine whether this is the first automated review of this PR or a re-review after updates. If prior Claude review threads exist or you have earlier automated comments on this PR, treat it as a re-review.
+          2. For a first review, read the full PR diff (for example with `gh pr diff`) and inspect every changed file before posting any new feedback. For a re-review, focus on what changed since your last review: identify the commit of your most recent prior review (for example via `gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews` or the commits the prior threads were anchored to) and concentrate on `git diff <last-reviewed-commit>..HEAD`. Do not re-litigate code that has not changed since your last review and was not previously flagged.
+          3. Build a file-by-file map of the PR's intent, affected surfaces, and likely risk areas before evaluating individual findings.
+
+          Phase 2: check each changed file against the repo review checklist.
+          1. Read REVIEW.md when present and apply every repository-specific check that is relevant to the changed files.
+          2. Apply the common review rubric above after the repository-specific checklist, with special attention to correctness, breakage, and tests for code changes.
+          3. Track candidate findings privately; do not post comments while still exploring.
+
+          Phase 3: check content quality and local guidance.
+          1. Read the relevant AGENTS.md or CLAUDE.md files for the changed paths, including layer- or directory-specific guidance when present.
+          2. Re-check changed docs, prompts, workflow files, and examples against that local guidance and against the PR title and description.
+          3. Remove findings that are merely stylistic, speculative, already fixed in the current diff, or already enforced by tooling.
+
+          Phase 4: triage existing Claude review threads.
           1. Fetch all review threads on this PR, including thread IDs, resolution state, comment author, body, path, line, originalLine, diff hunk, thread outdated state, and each comment's permalink url and databaseId:
              gh api graphql -f query='{ repository(owner:"${{ github.repository_owner }}", name:"${{ github.event.repository.name }}") { pullRequest(number:${{ github.event.pull_request.number }}) { reviewThreads(first:100) { nodes { id isResolved isOutdated comments(first:10) { nodes { author { login } body path line originalLine diffHunk url databaseId } } } } } } }'
           2. Consider only unresolved threads authored by this Claude review workflow (for example, the bot/app account that posted prior automated review comments). Never resolve human-authored threads.
@@ -94,16 +110,13 @@ runs:
              When you resolve a thread, also post a brief reply on it confirming what addressed the issue, and include a markdown link to the previous review thread using the first comment's permalink url. Reply via `gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/comments/COMMENT_DATABASE_ID/replies -f body='...'`. If the permalink or databaseId is unavailable, resolve the thread without the reply.
           4. If the issue is still valid or you are unsure, leave the thread unresolved. Do not re-post the same feedback as a new inline comment. Instead, briefly recap each still-open prior finding in this round's review body (one line each, with a markdown link to its thread), so the author sees what remains outstanding from previous rounds.
 
-          Phase 2: perform one complete review pass.
-          1. Determine whether this is the first automated review of this PR or a re-review after updates. If prior Claude review threads exist (from Phase 1) or you have earlier automated comments on this PR, treat it as a re-review.
-          2. For a first review, read the full PR diff (for example with `gh pr diff`) and inspect every changed file before posting any new feedback. For a re-review, focus on what changed since your last review: identify the commit of your most recent prior review (for example via `gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews` or the commits the prior threads were anchored to) and concentrate on `git diff <last-reviewed-commit>..HEAD`. Do not re-litigate code that has not changed since your last review and was not previously flagged.
-          3. Build the complete set of findings first; do not stop after the first few issues and do not comment incrementally while still exploring.
-          4. Suppress any finding already covered by an existing still-unresolved Claude thread on the same path or logical issue.
-          5. Collect only new, important, actionable findings introduced by the current PR state. Prefer one complete round of feedback over multiple partial rounds.
-          6. Make each review round complete and self-contained: collect the full set of findings for the changes under review this round, and do not defer findings to a later round or assume the author will re-read earlier rounds.
+          Phase 5: build the complete review set.
+          1. Suppress any finding already covered by an existing still-unresolved Claude thread on the same path or logical issue.
+          2. Collect only new, important, actionable findings introduced by the current PR state. Prefer one complete round of feedback over multiple partial rounds.
+          3. Make each review round complete and self-contained: collect the full set of findings for the changes under review this round, and do not defer findings to a later round or assume the author will re-read earlier rounds.
 
-          Phase 3: submit exactly one consolidated review for this round.
-          1. Do not post anything until Phase 2 is complete. Then gather every new inline finding plus the top-level summary into a SINGLE review and submit it in ONE API call. Never post inline comments one at a time, and never post the summary as a separate `gh pr comment`; the summary must be the review body and the inline findings must be the review's comments, so the author receives exactly one review (one notification) per round.
+          Phase 6: submit exactly one consolidated review for this round.
+          1. Do not post new review feedback until Phases 1 through 5 are complete. Then gather every new inline finding plus the top-level summary into a SINGLE review and submit it in ONE API call. Never post inline comments one at a time, and never post the summary as a separate `gh pr comment`; the summary must be the review body and the inline findings must be the review's comments, so the author receives exactly one review (one notification) per round.
           2. Submit with a single POST to the reviews endpoint, using event COMMENT (never APPROVE or REQUEST_CHANGES), the top-level summary as the review body, and one entry per inline finding in the comments array. ALWAYS build the JSON payload with `jq`, passing every Markdown body through `jq --arg` so newlines, quotes, and backticks are escaped into valid JSON. Write each body as a normal multi-line string with REAL line breaks (blank lines between paragraphs, ```suggestion fences, list items on their own lines). Do NOT pass bodies via `gh api -f`/`--field`, and do NOT hand-write JSON containing `\n` escape sequences — both make GitHub display a literal "\n" instead of a line break (this exact bug has happened before).
              Build each inline comment object, collect them into an array, then assemble and POST the review. Use single-quoted bash strings so the real line breaks inside each body are preserved:
                c1=$(jq -n --arg path '<file path>' --argjson line <line> --arg body '**[Severity]** first line of finding
