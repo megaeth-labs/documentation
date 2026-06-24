@@ -31,8 +31,8 @@ other repo-level agent guidance), with those per-repo rules taking precedence ov
 canonical inline prompt. Use these files for repo-specific rules; reserve `extra_prompt` for
 small deltas that do not belong in a checked-in convention file.
 
-`pr-review` runs Claude with `--max-turns 20` so it can iterate through multiple review passes before submission and stop only after it converges on no new actionable findings or exhausts the turn budget.
-It also blocks the standalone inline-comment tool and requires new findings to be submitted through one batched GitHub review, so a completed review round should create one review notification.
+`pr-review` lets Claude iterate through multiple review passes before submission and stop only after it converges on no new actionable findings.
+It blocks the standalone inline-comment tool and requires new findings to be submitted through one pending GitHub review that is submitted once, so a completed review round should create one review notification.
 When old automated review threads are addressed, the action instructs Claude to resolve them silently instead of adding per-thread confirmation replies.
 It also tags every inline comment with a bold severity label (`**[Critical]**`, `**[Major]**`, `**[Minor]**`, `**[Nit]**`).
 A consumer repo's `REVIEW.md` may override or extend this severity scale.

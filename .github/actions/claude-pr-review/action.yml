@@ -44,7 +44,6 @@ runs:
         claude_args: |
           --allowedTools "${{ steps.compose.outputs.allowed_tools }}"
           --disallowedTools "mcp__github_inline_comment__create_inline_comment"
-          --max-turns 20
         prompt: |
           REPO: ${{ github.repository }}
           PR NUMBER: ${{ github.event.pull_request.number }}
@@ -85,7 +84,7 @@ runs:
           - Anything already addressed in the diff under review — read the full diff first.
           Avoid reviewer anti-patterns: bikeshedding, rubber-stamping, nitpick avalanches, gatekeeping on style or hypothetical concerns, and manufacturing feedback. If the PR is clean, say so briefly instead of inventing comments.
 
-          Follow this review contract in order. Use the available multi-turn budget to be exhaustive. Treat Phases 1 through 5 as an iterative loop: after one pass, revisit the diff, checklist, local guidance, and prior threads again if you found any new risk area, uncertainty, or candidate finding. Keep iterating until a fresh pass produces no new actionable findings, or until you exhaust the turn budget. Do not post new review feedback until all analysis phases are complete and you are ready to submit one unified review.
+          Follow this review contract in order. Be exhaustive before posting. Treat Phases 1 through 5 as an iterative loop: after one pass, revisit the diff, checklist, local guidance, and prior threads again if you found any new risk area, uncertainty, or candidate finding. Keep iterating until a fresh pass produces no new actionable findings. Do not post new review feedback until all analysis phases are complete and you are ready to submit one unified review.
 
           Phase 1: understand the full diff scope.
           1. Determine whether this is the first automated review of this PR or a re-review after updates. If prior Claude review threads exist or you have earlier automated comments on this PR, treat it as a re-review.
@@ -115,25 +114,37 @@ runs:
           1. Suppress any finding already covered by an existing still-unresolved Claude thread on the same path or logical issue.
           2. Collect only new, important, actionable findings introduced by the current PR state. Prefer one complete round of feedback over multiple partial rounds.
           3. Make each review round complete and self-contained: collect the full set of findings for the changes under review this round, and do not defer findings to a later round or assume the author will re-read earlier rounds.
-          4. Before submitting, ask whether another pass over Phases 1 through 5 would likely uncover anything new. If yes, continue the loop instead of submitting. Submit only when you have converged on no more new actionable findings, or when the turn budget is exhausted and you must summarize the remaining uncertainty in the review body.
+          4. Before submitting, ask whether another pass over Phases 1 through 5 would likely uncover anything new. If yes, continue the loop instead of submitting. Submit only when you have converged on no more new actionable findings.
 
           Phase 6: submit exactly one consolidated review for this round.
-          1. Do not post new review feedback until Phases 1 through 5 are complete. Then gather every new inline finding plus the top-level summary into a SINGLE review and submit it in ONE API call. Never post inline comments one at a time, never use an inline-comment helper/tool, and never post the summary as a separate `gh pr comment`; the summary must be the review body and the inline findings must be the review's comments, so the author receives exactly one review (one notification) per round.
-          2. Submit with a single POST to the reviews endpoint (`gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews --method POST --input -`), using event COMMENT (never APPROVE or REQUEST_CHANGES), the top-level summary as the review body, and one entry per inline finding in the comments array. This batch reviews endpoint is the only allowed path for new review feedback. Do not call `POST /pulls/${{ github.event.pull_request.number }}/comments`, because each standalone review comment becomes a separate GitHub review. ALWAYS build the JSON payload with `jq`, passing every Markdown body through `jq --arg` so newlines, quotes, and backticks are escaped into valid JSON. Write each body as a normal multi-line string with REAL line breaks (blank lines between paragraphs, ```suggestion fences, list items on their own lines). Do NOT pass bodies via `gh api -f`/`--field`, and do NOT hand-write JSON containing `\n` escape sequences — both make GitHub display a literal "\n" instead of a line break (this exact bug has happened before).
-             Build each inline comment object, collect them into an array, then assemble and POST the review. Use single-quoted bash strings so the real line breaks inside each body are preserved:
-               c1=$(jq -n --arg path '<file path>' --argjson line <line> --arg body '**[Severity]** first line of finding
+          1. You get exactly ONE review-delivery flow this round to deliver all new feedback. Assemble the entire review — the summary body plus every inline comment — before publishing it. After the review is submitted, you are forbidden from making any further review/comment/reply write call this round, even if you think of more findings. If you are about to make a second submitted review, a standalone comment, or a reply that adds a new finding, stop — you have already violated the contract.
+          2. Before building the payload, capture the exact set of commentable RIGHT-side lines from the diff you already fetched: record, per file, which new-side line numbers are present in a hunk. Keep a finding as an inline comment ONLY if its `(path, line)` is in that set. If the line is missing, outdated, on the LEFT side, or uncertain, move the finding into the summary body as a `path:line — finding` bullet. Pre-validating anchors removes the atomic-rejection reason to split feedback across multiple submitted reviews.
+          3. Use the pending-review API flow below for new feedback. This is the only allowed posting flow for Phase 6. It may use several API writes to assemble one pending review, but it must produce exactly one submitted GitHub review and one notification for the round. Never create a submitted summary review first and then add comments later.
+             First, create one pending review and capture its id:
+               review_id=$(jq -n '{}' \
+                 | gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews --method POST --input - --jq '.id')
+             Next, add each pre-validated inline finding to that pending review, and only to that pending review. ALWAYS build JSON with `jq`, passing every Markdown body through `jq --arg` so newlines, quotes, and backticks are escaped into valid JSON. Write each body as a normal multi-line string with REAL line breaks (blank lines between paragraphs, ```suggestion fences, list items on their own lines). Do NOT pass bodies via `gh api -f`/`--field`, and do NOT hand-write JSON containing `\n` escape sequences — both make GitHub display a literal "\n" instead of a line break (this exact bug has happened before). Use single-quoted bash strings so the real line breaks inside each body are preserved:
+               jq -n --arg path '<file path>' --argjson line <line> --arg body '**[Severity]** first line of finding
 
              ```suggestion
              fixed code
-             ```' '{path:$path, line:$line, side:"RIGHT", body:$body}')
-               comments=$(printf '%s\n' "$c1" "$c2" | jq -s '.')   # use comments='[]' when there are no inline findings
-               jq -n --arg body '<top-level summary, with real line breaks, including one-line recaps of any still-open prior findings>' \
-                     --argjson comments "$comments" \
-                     '{event:"COMMENT", body:$body, comments:$comments}' \
-                 | gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews --method POST --input -
-             For a multi-line comment, also add `--argjson start_line <start>` and include `start_line:$start_line, start_side:"RIGHT"` in that comment object. The reviews endpoint rejects the whole review if any comment anchors to a line that is not part of the current PR diff (RIGHT side), so attach inline comments only to lines present in the diff; if you are unsure a line is in the diff, fold that finding into the review body instead of risking the entire submission.
-          3. Begin each inline comment body with exactly one bold severity tag (see the scale below), followed by the finding.
-          4. If there are no new inline findings, still submit exactly one review with event COMMENT and a body summarizing the outcome (including any still-open prior findings). If the PR is clean, say so briefly in the body.
+             ```' '{path:$path, line:$line, side:"RIGHT", body:$body}' \
+                 | gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews/$review_id/comments --method POST --input -
+             For a multi-line comment, also add `--argjson start_line <start>` and include `start_line:$start_line, start_side:"RIGHT"` in that comment object. Because review submission is atomic, pre-validate every anchor as described above so the final submit succeeds. Atomicity is NOT a license to post the summary and inline comments in separate submitted reviews — that produces multiple reviews and is prohibited. It is always exactly one submitted review.
+             Finally, submit the pending review exactly once with the top-level summary body:
+               jq -n --arg body '<top-level summary, with real line breaks, including one-line recaps of any still-open prior findings and summary bullets for unanchorable findings>' \
+                     '{event:"COMMENT", body:$body}' \
+                 | gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews/$review_id/events --method POST --input -
+          4. Prohibited posting patterns — each produces multiple reviews/notifications and is a failure even though each individual call "works":
+             - Posting the summary review first, then adding inline comments in later calls.
+             - Looping over findings and creating a submitted review for each one.
+             - Calling `POST /pulls/${{ github.event.pull_request.number }}/comments` for any new finding; the only inline-comment endpoint allowed for new findings is `/pulls/${{ github.event.pull_request.number }}/reviews/$review_id/comments` while `$review_id` is still pending.
+             - Posting a thread reply to deliver a new finding.
+             - Calling `gh pr comment` to deliver review feedback.
+          5. If creating an inline comment on the pending review is rejected, do NOT fall back to posting it individually. Read the error, move that finding into the summary body as a `path:line — finding` bullet, and continue assembling the same pending review. If submitting the pending review is rejected, do NOT fall back to posting comments individually or opening another submitted review. Read the error to identify the offending comment(s), move them into the summary body, and submit the same pending review once after correction if GitHub permits; otherwise stop and report the failure without fragmenting the review.
+          6. Self-check immediately before submitting the pending review: (a) I have collected ALL findings for this round; (b) every remaining inline comment's `(path, line)` is in the diff set; (c) I am about to submit exactly one pending review containing the body and all accepted inline comments; (d) I will make no further review/comment/reply write call afterward. Only then submit.
+          7. Begin each inline comment body with exactly one bold severity tag (see the scale below), followed by the finding.
+          8. If there are no new inline findings, still submit exactly one review with event COMMENT and a body summarizing the outcome (including any still-open prior findings). If the PR is clean, say so briefly in the body.
 
           Classify the severity of every inline review comment. Begin each inline comment body
           with exactly one bold severity tag from this scale, followed by the finding:
