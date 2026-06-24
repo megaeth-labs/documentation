@@ -32,6 +32,8 @@ canonical inline prompt. Use these files for repo-specific rules; reserve `extra
 small deltas that do not belong in a checked-in convention file.
 
 `pr-review` runs Claude with `--max-turns 20` so it can iterate through multiple review passes before submission and stop only after it converges on no new actionable findings or exhausts the turn budget.
+It also blocks the standalone inline-comment tool and requires new findings to be submitted through one batched GitHub review, so a completed review round should create one review notification.
+When old automated review threads are addressed, the action instructs Claude to resolve them silently instead of adding per-thread confirmation replies.
 It also tags every inline comment with a bold severity label (`**[Critical]**`, `**[Major]**`, `**[Minor]**`, `**[Nit]**`).
 A consumer repo's `REVIEW.md` may override or extend this severity scale.
 
@@ -93,7 +95,7 @@ jobs:
 ## Concurrency (pr-review)
 
 Consumers should give the `pr-review` job a `timeout-minutes` value of at least `25` plus a job-level concurrency group with `cancel-in-progress: false`.
-This helps an in-progress multi-turn review finish instead of being cancelled mid-run, because the action resolves threads and posts one consolidated review per round.
+This helps an in-progress multi-turn review finish instead of being cancelled mid-run, because the action resolves addressed automated threads silently and posts one consolidated review per round.
 Cancelling can leave partial state:
 
 ```yaml
