@@ -130,7 +130,7 @@ runs:
              fixed code
              ```' '{path:$path, line:$line, side:"RIGHT", body:$body}' \
                  | gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews/$review_id/comments --method POST --input -
-             For a multi-line comment, also add `--argjson start_line <start>` and include `start_line:$start_line, start_side:"RIGHT"` in that comment object. Because review submission is atomic, pre-validate every anchor as described above so the final submit succeeds. Atomicity is NOT a license to post the summary and inline comments in separate submitted reviews — that produces multiple reviews and is prohibited. It is always exactly one submitted review.
+             For a multi-line comment, also add `--argjson start_line <start>` and include `start_line:$start_line, start_side:"RIGHT"` in that comment object. Pre-validate every anchor before the submit step so that final call succeeds. If the submit is rejected, move the offending finding into the summary body and submit the same pending review once after correction — never fragment findings across multiple submitted reviews.
              Finally, submit the pending review exactly once with the top-level summary body:
                jq -n --arg body '<top-level summary, with real line breaks, including one-line recaps of any still-open prior findings and summary bullets for unanchorable findings>' \
                      '{event:"COMMENT", body:$body}' \
