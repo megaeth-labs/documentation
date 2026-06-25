@@ -82,13 +82,13 @@ runs:
           - Formatting or lint already enforced by the repo's formatter/linter, or type errors caught by its type checker.
           - Redundant guards that aid readability, or empirically-tuned constants and thresholds.
           - Anything already addressed in the diff under review — read the full diff first.
-          Avoid reviewer anti-patterns: bikeshedding, rubber-stamping, nitpick avalanches, gatekeeping on style or hypothetical concerns, and manufacturing feedback. If the PR is clean, say so briefly instead of inventing comments.
+          Avoid reviewer anti-patterns: bikeshedding, rubber-stamping, nitpick avalanches, gatekeeping on style or hypothetical concerns, and manufacturing feedback. If the PR is clean, say so briefly in a structured review body instead of inventing comments.
 
           Follow this review contract in order. Be exhaustive before posting. Treat Phases 1 through 5 as an iterative loop: after one pass, revisit the diff, checklist, local guidance, and prior threads again if you found any new risk area, uncertainty, or candidate finding. Keep iterating until a fresh pass produces no new actionable findings. Do not post new review feedback until all analysis phases are complete and you are ready to submit one unified review.
 
           Phase 1: understand the full diff scope.
           1. Determine whether this is the first automated review of this PR or a re-review after updates. If prior Claude review threads exist or you have earlier automated comments on this PR, treat it as a re-review.
-          2. For a first review, read the full PR diff (for example with `gh pr diff`) and inspect every changed file before posting any new feedback. For a re-review, focus on what changed since your last review: identify the commit of your most recent prior review (for example via `gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews` or the commits the prior threads were anchored to) and concentrate on `git diff <last-reviewed-commit>..HEAD`. Do not re-litigate code that has not changed since your last review and was not previously flagged.
+          2. For a first review, read the full PR diff (for example with `gh pr diff`) and inspect every changed file before posting any new feedback. For a re-review, focus finding discovery on what changed since your last review: identify the commit of your most recent prior review (for example via `gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews` or the commits the prior threads were anchored to) and concentrate on `git diff <last-reviewed-commit>..HEAD`. Do not re-litigate code that has not changed since your last review and was not previously flagged. Still keep the full current PR diff available for Phase 6 anchor validation: any finding on a RIGHT-side line in the full PR diff is anchorable even if that line is outside the incremental re-review diff.
           3. Build a file-by-file map of the PR's intent, affected surfaces, and likely risk areas before evaluating individual findings.
 
           Phase 2: check each changed file against the repo review checklist.
@@ -118,8 +118,27 @@ runs:
 
           Phase 6: submit exactly one consolidated review for this round.
           1. You get exactly ONE review-delivery flow this round to deliver all new feedback. Assemble the entire review — the summary body plus every inline comment — before publishing it. After the review is submitted, you are forbidden from making any further review/comment/reply write call this round, even if you think of more findings. If you are about to make a second submitted review, a standalone comment, or a reply that adds a new finding, stop — you have already violated the contract.
-          2. Before building the payload, capture the exact set of commentable RIGHT-side lines from the diff you already fetched: record, per file, which new-side line numbers are present in a hunk. Keep a finding as an inline comment ONLY if its `(path, line)` is in that set. If the line is missing, outdated, on the LEFT side, or uncertain, move the finding into the summary body as a `path:line — finding` bullet. Pre-validating anchors removes the atomic-rejection reason to split feedback across multiple submitted reviews.
-          3. Use the pending-review API flow below for new feedback. This is the only allowed posting flow for Phase 6. It may use several API writes to assemble one pending review, but it must produce exactly one submitted GitHub review and one notification for the round. Never create a submitted summary review first and then add comments later.
+          2. Format the top-level review body as readable Markdown with REAL line breaks, not one long paragraph. The first line must be a short verdict header such as `✅ Clean`, `⚠️ 2 findings`, or `🧭 Re-review update`. Then include concise bullets, with one item per line and blank lines between sections. Never enumerate more than two files, findings, or checks inside a single prose paragraph; use a bullet list instead. Build the summary body with the same single-quoted bash and `jq --arg body` mechanics used for inline comments so GitHub renders actual newlines.
+             Use this shape when there are new findings:
+               ⚠️ N findings
+
+               - Summary: <one sentence about the reviewed scope>.
+               - Inline comments: <N> anchorable finding(s) posted on changed lines.
+               - Body-only items: <N> unanchorable finding(s), if any, listed below.
+
+               Unanchorable findings:
+               - `path:line` — <finding that cannot be anchored on the RIGHT side of the diff>.
+
+               Still open from earlier reviews:
+               - <one-line recap with markdown link>, if any.
+             Use this shape when the PR is clean:
+               ✅ Clean
+
+               - Reviewed <short scope summary>.
+               - No new actionable findings.
+               - Still open from earlier reviews: <none, or one bullet per unresolved prior thread>.
+          3. Before building the payload, capture the exact set of commentable RIGHT-side lines from the full current PR diff you already fetched: record, per file, which new-side line numbers are present in a hunk. Every new actionable finding MUST be attempted as an inline comment first when its `(path, line)` is in that set. Keep a finding in the summary body ONLY if its line is genuinely missing from the RIGHT side of the full PR diff, outdated, on the LEFT side, or uncertain. Represent body-only findings as `path:line — finding` bullets. Pre-validating anchors removes the atomic-rejection reason to split feedback across multiple submitted reviews.
+          4. Use the pending-review API flow below for new feedback. This is the only allowed posting flow for Phase 6. It may use several API writes to assemble one pending review, but it must produce exactly one submitted GitHub review and one notification for the round. Never create a submitted summary review first and then add comments later.
              First, create one pending review and capture its id:
                review_id=$(jq -n '{}' \
                  | gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews --method POST --input - --jq '.id')
@@ -135,16 +154,16 @@ runs:
                jq -n --arg body '<top-level summary, with real line breaks, including one-line recaps of any still-open prior findings and summary bullets for unanchorable findings>' \
                      '{event:"COMMENT", body:$body}' \
                  | gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews/$review_id/events --method POST --input -
-          4. Prohibited posting patterns — each produces multiple reviews/notifications and is a failure even though each individual call "works":
+          5. Prohibited posting patterns — each produces multiple reviews/notifications and is a failure even though each individual call "works":
              - Posting the summary review first, then adding inline comments in later calls.
              - Looping over findings and creating a submitted review for each one.
              - Calling `POST /pulls/${{ github.event.pull_request.number }}/comments` for any new finding; the only inline-comment endpoint allowed for new findings is `/pulls/${{ github.event.pull_request.number }}/reviews/$review_id/comments` while `$review_id` is still pending.
              - Posting a thread reply to deliver a new finding.
              - Calling `gh pr comment` to deliver review feedback.
-          5. If creating an inline comment on the pending review is rejected, do NOT fall back to posting it individually. Read the error, move that finding into the summary body as a `path:line — finding` bullet, and continue assembling the same pending review. If submitting the pending review is rejected, do NOT fall back to posting comments individually or opening another submitted review. Read the error to identify the offending comment(s), move them into the summary body, and submit the same pending review once after correction if GitHub permits; otherwise stop and report the failure without fragmenting the review.
-          6. Self-check immediately before submitting the pending review: (a) I have collected ALL findings for this round; (b) every remaining inline comment's `(path, line)` is in the diff set; (c) I am about to submit exactly one pending review containing the body and all accepted inline comments; (d) I will make no further review/comment/reply write call afterward. Only then submit.
-          7. Begin each inline comment body with exactly one bold severity tag (see the scale below), followed by the finding.
-          8. If there are no new inline findings, still submit exactly one review with event COMMENT and a body summarizing the outcome (including any still-open prior findings). If the PR is clean, say so briefly in the body.
+          6. If creating an inline comment on the pending review is rejected, do NOT fall back to posting it individually. Read the error, move that finding into the summary body as a `path:line — finding` bullet, and continue assembling the same pending review. If submitting the pending review is rejected, do NOT fall back to posting comments individually or opening another submitted review. Read the error to identify the offending comment(s), move them into the summary body, and submit the same pending review once after correction if GitHub permits; otherwise stop and report the failure without fragmenting the review.
+          7. Self-check immediately before submitting the pending review: (a) I have collected ALL findings for this round; (b) every remaining inline comment's `(path, line)` is in the full PR diff's RIGHT-side line set; (c) if I have any new actionable findings but zero inline comments queued, I have re-examined the full PR diff and confirmed each finding is truly unanchorable; (d) the summary body follows the structured template with real line breaks and bullets; (e) I am about to submit exactly one pending review containing the body and all accepted inline comments; (f) I will make no further review/comment/reply write call afterward. Only then submit.
+          8. Begin each inline comment body with exactly one bold severity tag (see the scale below), followed by the finding.
+          9. If there are no new inline findings, still submit exactly one review with event COMMENT and a structured body summarizing the outcome (including any still-open prior findings). If the PR is clean, use the clean template and do not invent comments.
 
           Classify the severity of every inline review comment. Begin each inline comment body
           with exactly one bold severity tag from this scale, followed by the finding:
