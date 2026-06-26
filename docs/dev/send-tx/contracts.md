@@ -74,6 +74,7 @@ description: Key contract addresses and tokens on MegaETH and Ethereum Mainnet.
 | Token | Address | Description |
 | ----- | ------- | ----------- |
 | CROWN | [`0xf7d2F0d0b0517CBDbf87C86910ce10FaAab3589D`](https://megaeth.blockscout.com/address/0xf7d2F0d0b0517CBDbf87C86910ce10FaAab3589D) | Crown Credits — a token native to MegaETH. |
+| [DCASH](https://app.offshoreprotocol.fun) | [`0x6691D67Ece85Ed950244c2CB5848d6498134321f`](https://megaeth.blockscout.com/address/0x6691D67Ece85Ed950244c2CB5848d6498134321f) | Dirty Cash — game token from Offshore Protocol. |
 | [DIRTY](https://offshoreprotocol.xyz) | [`0xC2f34f8849a8607FD73E06D6849bDA07C2b7DE38`](https://megaeth.blockscout.com/address/0xC2f34f8849a8607FD73E06D6849bDA07C2b7DE38) | Dirty Money — game token of Offshore Protocol, an on-chain idle RPG. |
 | [MegaSIR](https://www.sir.trading) | [`0x9367A0c482703d8d9bda995B03f8E71056a72500`](https://megaeth.blockscout.com/address/0x9367A0c482703d8d9bda995B03f8E71056a72500) | SIR Trading token — a leverage protocol with no liquidations or funding fees. 12 decimals. |
 | [NXT](https://nxterminal.xyz) | [`0x2F55e14F0b2B2118d2026d20Ad2C39EAcBdCAc47`](https://megaeth.blockscout.com/address/0x2F55e14F0b2B2118d2026d20Ad2C39EAcBdCAc47) | NX Terminal Token — native utility token of NX Terminal: Protocol Wars. |
