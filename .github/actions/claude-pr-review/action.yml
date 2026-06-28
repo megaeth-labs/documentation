@@ -19,10 +19,11 @@ inputs:
     description: Additional prompt text appended after the canonical prompt.
   model:
     required: false
-    default: ""
+    default: opus
     description: >
-      Model for the review agent, passed through to `claude --model`. Empty
-      uses the claude-code-action default. Example: `opus`.
+      Model for the review agent, passed through to `claude --model`. Defaults
+      to `opus`; set to another model id to override, or empty to fall through
+      to the claude-code-action / CLI default (Sonnet class).
   review_depth:
     required: false
     default: standard
