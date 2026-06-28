@@ -23,6 +23,11 @@ Prompt-bearing actions (`pr-review`, `label-check`, and `issue-triage`) also acc
 
 The `interactive` action does not accept `extra_prompt` because `@claude` is native.
 
+The `pr-review` action additionally accepts:
+
+- `model` - optional, defaults to `opus`. Passed through to `claude --model`. Set another model id to override, or empty to fall through to the Claude Code CLI default (Sonnet class). Note the `opus` default means every consumer runs reviews on Opus out of the box.
+- `review_depth` - optional, defaults to `standard` (single-agent review). Set to `deep` for multi-agent orchestration: the lead agent fans out one sub-agent per review dimension, adversarially verifies each finding, then converges on the same single consolidated review. `deep` costs more tokens and wall-clock, so raise the calling job's `timeout-minutes` (see Concurrency) and prefer gating it per-PR (e.g. a label) rather than enabling it for every review.
+
 ## Per-Repo Conventions
 
 The prompt-bearing actions instruct Claude to read and respect a consumer repo's own agent
