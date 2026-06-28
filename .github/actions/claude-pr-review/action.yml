@@ -17,6 +17,21 @@ inputs:
     required: false
     default: ""
     description: Additional prompt text appended after the canonical prompt.
+  model:
+    required: false
+    default: ""
+    description: >
+      Model for the review agent, passed through to `claude --model`. Empty
+      uses the claude-code-action default. Example: `opus`.
+  review_depth:
+    required: false
+    default: standard
+    description: >
+      `standard` = single-agent review (default). `deep` = multi-agent
+      orchestration: the lead agent fans out one sub-agent per review
+      dimension, adversarially verifies each finding, then converges on the
+      same single consolidated review. `deep` costs more tokens and wall-clock;
+      raise the calling job's timeout-minutes accordingly.
 
 runs:
   using: composite
@@ -25,6 +40,8 @@ runs:
       shell: bash
       env:
         EXTRA_ALLOWED_TOOLS: ${{ inputs.extra_allowed_tools }}
+        MODEL: ${{ inputs.model }}
+        REVIEW_DEPTH: ${{ inputs.review_depth }}
       run: |
         set -euo pipefail
 
@@ -33,7 +50,36 @@ runs:
           allowed_tools="${allowed_tools},${EXTRA_ALLOWED_TOOLS}"
         fi
 
+        # Path 1: optional model override (e.g. opus) for a deeper single pass.
+        model_flag=""
+        if [[ -n "$MODEL" ]]; then
+          model_flag="--model $MODEL"
+        fi
+
+        # Path 2: deep mode lets the lead agent spawn sub-agents, so Task must
+        # be allowed; the orchestration directive is injected into the prompt.
+        if [[ "$REVIEW_DEPTH" == "deep" ]]; then
+          allowed_tools="${allowed_tools},Task"
+        fi
+
         echo "allowed_tools=${allowed_tools}" >> "$GITHUB_OUTPUT"
+        echo "model_flag=${model_flag}" >> "$GITHUB_OUTPUT"
+
+        # Emit the depth-specific orchestration preamble as a multi-line output.
+        delim="ORCH_$RANDOM$RANDOM"
+        echo "orchestration<<$delim" >> "$GITHUB_OUTPUT"
+        if [[ "$REVIEW_DEPTH" == "deep" ]]; then
+          cat >> "$GITHUB_OUTPUT" <<'ORCH'
+          REVIEW DEPTH: deep (multi-agent). You are the LEAD reviewer. Run an orchestrated review BEFORE the posting contract below, then deliver exactly one consolidated review.
+
+          Orchestration (do this first):
+          1. Fan out: use the Task tool to spawn one sub-agent per review dimension, in parallel where possible. Default dimensions (skip any irrelevant to the diff): (a) correctness & edge cases; (b) breakage / backward-compat / public-API & wire/consensus impact; (c) tests — presence, determinism, exact-value assertions; (d) design & complexity; (e) docs, logging, and metrics conventions. Give each sub-agent the PR number, the full diff scope, REVIEW.md, and the relevant local guidance, and require it to return a structured finding list: each item as `path:line — [Severity] finding (one-line rationale)`, anchored to RIGHT-side diff lines where possible. Sub-agents discover and rank; they do NOT post anything.
+          2. Merge & dedup: collect all sub-agent findings, drop duplicates and anything already fixed in the diff, and reconcile overlaps across dimensions into one canonical finding.
+          3. Adversarially verify: for each surviving non-trivial finding, spawn a skeptic sub-agent whose job is to REFUTE it against the actual current file contents and diff (default to "refuted" when uncertain). Keep a finding only if it survives refutation; demote or drop the rest. Record the verified set.
+          4. Hand the verified, deduplicated finding set into the standard contract below as your candidate findings. The Phase 4-6 triage, convergence, and single-review posting rules apply UNCHANGED: the lead posts exactly ONE consolidated review for the round. Sub-agents must never post reviews, comments, or replies.
+ORCH
+        fi
+        echo "$delim" >> "$GITHUB_OUTPUT"
 
     - uses: anthropics/claude-code-action@c3d45e8e941e1b2ad7b278c57482d9c5bf1f35b3 # v1
       with:
@@ -44,9 +90,12 @@ runs:
         claude_args: |
           --allowedTools "${{ steps.compose.outputs.allowed_tools }}"
           --disallowedTools "mcp__github_inline_comment__create_inline_comment"
+          ${{ steps.compose.outputs.model_flag }}
         prompt: |
           REPO: ${{ github.repository }}
           PR NUMBER: ${{ github.event.pull_request.number }}
+
+          ${{ steps.compose.outputs.orchestration }}
 
           Before reviewing, read and respect this repository's own conventions and agent
           instruction files if they exist: REVIEW.md, README.md, CLAUDE.md, AGENTS.md, and any
