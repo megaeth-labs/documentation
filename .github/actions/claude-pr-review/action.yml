@@ -68,17 +68,20 @@ runs:
 
         # Emit the depth-specific orchestration preamble as a multi-line output.
         delim="ORCH_$RANDOM$RANDOM"
+        # Emit via indented printf rather than a heredoc: a heredoc's closing
+        # delimiter must sit at column 0, which would terminate this YAML block
+        # scalar early and break action-manifest parsing.
         echo "orchestration<<$delim" >> "$GITHUB_OUTPUT"
         if [[ "$REVIEW_DEPTH" == "deep" ]]; then
-          cat >> "$GITHUB_OUTPUT" <<'ORCH'
-          REVIEW DEPTH: deep (multi-agent). You are the LEAD reviewer. Run an orchestrated review BEFORE the posting contract below, then deliver exactly one consolidated review.
-
-          Orchestration (do this first):
-          1. Fan out: use the Task tool to spawn one sub-agent per review dimension, in parallel where possible. Default dimensions (skip any irrelevant to the diff): (a) correctness & edge cases; (b) breakage / backward-compat / public-API & wire/consensus impact; (c) tests — presence, determinism, exact-value assertions; (d) design & complexity; (e) docs, logging, and metrics conventions. Give each sub-agent the PR number, the full diff scope, REVIEW.md, and the relevant local guidance, and require it to return a structured finding list: each item as `path:line — [Severity] finding (one-line rationale)`, anchored to RIGHT-side diff lines where possible. Sub-agents discover and rank; they do NOT post anything.
-          2. Merge & dedup: collect all sub-agent findings, drop duplicates and anything already fixed in the diff, and reconcile overlaps across dimensions into one canonical finding.
-          3. Adversarially verify: for each surviving non-trivial finding, spawn a skeptic sub-agent whose job is to REFUTE it against the actual current file contents and diff (default to "refuted" when uncertain). Keep a finding only if it survives refutation; demote or drop the rest. Record the verified set.
-          4. Hand the verified, deduplicated finding set into the standard contract below as your candidate findings. The Phase 4-6 triage, convergence, and single-review posting rules apply UNCHANGED: the lead posts exactly ONE consolidated review for the round. Sub-agents must never post reviews, comments, or replies.
-ORCH
+          {
+            printf '%s\n' 'REVIEW DEPTH: deep (multi-agent). You are the LEAD reviewer. Run an orchestrated review BEFORE the posting contract below, then deliver exactly one consolidated review.'
+            printf '%s\n' ''
+            printf '%s\n' 'Orchestration (do this first):'
+            printf '%s\n' '1. Fan out: use the Task tool to spawn one sub-agent per review dimension, in parallel where possible. Default dimensions (skip any irrelevant to the diff): (a) correctness and edge cases; (b) breakage / backward-compat / public-API and wire/consensus impact; (c) tests — presence, determinism, exact-value assertions; (d) design and complexity; (e) docs, logging, and metrics conventions. Give each sub-agent the PR number, the full diff scope, REVIEW.md, and the relevant local guidance, and require it to return a structured finding list: each item as path:line — [Severity] finding (one-line rationale), anchored to RIGHT-side diff lines where possible. Sub-agents discover and rank; they do NOT post anything.'
+            printf '%s\n' '2. Merge and dedup: collect all sub-agent findings, drop duplicates and anything already fixed in the diff, and reconcile overlaps across dimensions into one canonical finding.'
+            printf '%s\n' '3. Adversarially verify: for each surviving non-trivial finding, spawn a skeptic sub-agent whose job is to REFUTE it against the actual current file contents and diff (default to refuted when uncertain). Keep a finding only if it survives refutation; demote or drop the rest. Record the verified set.'
+            printf '%s\n' '4. Hand the verified, deduplicated finding set into the standard contract below as your candidate findings. The Phase 4-6 triage, convergence, and single-review posting rules apply UNCHANGED: the lead posts exactly ONE consolidated review for the round. Sub-agents must never post reviews, comments, or replies.'
+          } >> "$GITHUB_OUTPUT"
         fi
         echo "$delim" >> "$GITHUB_OUTPUT"
 
