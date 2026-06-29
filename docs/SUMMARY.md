@@ -39,6 +39,7 @@
 - [Build with AI](dev/build-with-ai.md)
 - [Tooling & Infrastructure](dev/tooling.md)
 - [Verifiable Randomness (VRF)](dev/vrf.md)
+- [Accept Payments](dev/payments.md)
 - [Developer FAQ](dev/faq.md)
 
 ## Node Operation
