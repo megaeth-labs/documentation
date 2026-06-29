@@ -10,7 +10,7 @@ description: >-
 
 This guide shows how to charge for access to an API, a piece of content, or a metered service in a MegaETH dapp.
 It explains the one pattern every approach shares, the two protocol families built on it, and five concrete flows you can pick from.
-All five run against the same MegaETH testnet token and are implemented end-to-end in the [Payment Demo](https://github.com/megaeth-labs/payment-demo).
+All five run against the same MegaETH Testnet token and are implemented end-to-end in the [Payment Demo](https://github.com/megaeth-labs/payment-demo).
 
 {% hint style="info" %}
 For a complete, runnable reference — a Next.js app with a connected wallet, a server-side relayer, the escrow contract, and all five flows side by side — see the [MegaETH Payment Demo](https://github.com/megaeth-labs/payment-demo).
@@ -126,14 +126,14 @@ It requires a funded server key.
 **Use it for:** high-frequency or metered billing — pay per API call, per inference, per request — where one transaction per payment would be too slow and too expensive.
 
 This is a **unidirectional payment channel**.
-The client deposits once into an onchain escrow, then pays for each request with a cheap **off-chain signed voucher** that carries a running total.
+The client deposits once into an onchain escrow, then pays for each request with a cheap **offchain signed voucher** that carries a running total.
 Only three operations touch the chain — `open`, `topUp`, `close` — while the per-request `voucher` is pure signature.
 
 ```text
 deposit ──open──▶ [escrow holds N]
-  request 1: voucher cumulative = 1   (off-chain, no gas)
-  request 2: voucher cumulative = 2   (off-chain, no gas)
-  request 3: voucher cumulative = 3   (off-chain, no gas)
+  request 1: voucher cumulative = 1   (offchain, no gas)
+  request 2: voucher cumulative = 2   (offchain, no gas)
+  request 3: voucher cumulative = 3   (offchain, no gas)
 close with cumulative = 3 ──▶ payee receives 3, payer refunded N − 3
 ```
 
@@ -165,7 +165,7 @@ The only difference is **who funds the channel onchain**: instead of the client 
 | --------- | --------------------------- | ------------------------------- |
 | `open`    | client calls escrow `open`  | server calls `openWithPermit2`  |
 | `topUp`   | client calls escrow `topUp` | server calls `topUpWithPermit2` |
-| `voucher` | off-chain signature         | off-chain signature (identical) |
+| `voucher` | offchain signature          | offchain signature (identical)  |
 | `close`   | server settles              | server settles (identical)      |
 
 Because a relayer (the server), not the payer, sends the funding transaction, the escrow needs entry points where the payer is authorized by **signature** rather than by being `msg.sender`.
@@ -196,7 +196,7 @@ Each lets someone authorize a token movement with a **signature** instead of a p
 - **EIP-2612 `permit`** — a token-native signed approval (`Permit(owner, spender, value, nonce, deadline)`). Works only if the token implements it. Used in Flows 1 and 3.
 - **Permit2** — a single canonical contract (deployed at the same address on every chain) that adds signature-based transfers to _any_ ERC-20 after a one-time `approve(Permit2)`. Its **witness** data binds an authorization to specific terms, preventing reuse on a different channel. Used in Flows 1 and 5.
 - **EIP-3009 `receiveWithAuthorization`** — a token-native signed transfer with arbitrary (non-sequential) nonces, enabling concurrent authorizations. Supported by the escrow as an alternative funding path.
-- **Payment channel + voucher** — an onchain escrow settled by cumulative off-chain signatures. The core of Flows 4 and 5.
+- **Payment channel + voucher** — an onchain escrow settled by cumulative offchain signatures. The core of Flows 4 and 5.
 
 ## MegaETH-specific notes
 
@@ -207,7 +207,7 @@ Each lets someone authorize a token movement with a **signature** instead of a p
 
 ## Reference implementation
 
-The [MegaETH Payment Demo](https://github.com/megaeth-labs/payment-demo) implements all five flows against MegaETH testnet, with a connected wallet on the client and a relayer/facilitator on the server.
+The [MegaETH Payment Demo](https://github.com/megaeth-labs/payment-demo) implements all five flows against MegaETH Testnet, with a connected wallet on the client and a relayer/facilitator on the server.
 
 | Flow | Protected route                      | Demo UI component        |
 | ---- | ------------------------------------ | ------------------------ |
