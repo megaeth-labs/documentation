@@ -30,7 +30,7 @@ See [Debugging Transactions](send-tx/debugging.md) for usage examples and common
 
 ## Onchain Payments
 
-To charge for access to an API, content, or a metered service, MegaETH dapps can use the HTTP 402 "pay then retry" pattern with the x402 and MPP protocol families.
+To charge for access to an API, content, or a metered service, MegaETH DApps can use the HTTP 402 "pay then retry" pattern with the x402 and MPP protocol families.
 See [Onchain Payments](payments.md) for the five concrete payment flows — one-time and pay-as-you-go, user-paid and gas-sponsored — with diagrams and a runnable reference implementation.
 
 ## Using the Canonical Bridge
