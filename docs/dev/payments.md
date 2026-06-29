@@ -325,7 +325,7 @@ The [MegaETH Payment Demo](https://github.com/megaeth-labs/payment-demo) impleme
 
 | Flow | Protected route                 | Demo UI component        |
 | ---- | ------------------------------- | ------------------------ |
-| 1    | `GET /api/protected`            | `X402Demo`               |
+| 1    | `GET /api/x402/exact`           | `X402Demo`               |
 | 2    | `GET /api/mpp/charge`           | `MppDemo`                |
 | 3    | `GET /api/mpp/gasless-charge`   | `MppGaslessDemo`         |
 | 4    | `POST /api/mpp/session`         | `MppOfficialSessionDemo` |
