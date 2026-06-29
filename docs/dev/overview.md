@@ -28,6 +28,11 @@ See [Gas Estimation](send-tx/gas-estimation.md) for code examples, toolchain con
 MegaETH supports `debug_traceTransaction` and other debug RPC methods (via managed RPC providers), and provides [`mega-evme`](https://docs.megaeth.com/mega-evme) for local transaction replay and simulation.
 See [Debugging Transactions](send-tx/debugging.md) for usage examples and common debugging scenarios.
 
+## Onchain Payments
+
+To charge for access to an API, content, or a metered service, MegaETH dapps can use the HTTP 402 "pay then retry" pattern with the x402 and MPP protocol families.
+See [Onchain Payments](payments.md) for the five concrete payment flows — one-time and pay-as-you-go, user-paid and gas-sponsored — with diagrams and a runnable reference implementation.
+
 ## Using the Canonical Bridge
 
 MegaETH's canonical bridge is the preferred method to bridge Ether (ETH) from Ethereum to MegaETH.
@@ -65,3 +70,4 @@ See [Contracts & Tokens](send-tx/contracts.md#l1-contracts-ethereum) for all L1 
 - [System Contracts](execution/system-contracts.md) — oracle, timestamp, and other system contracts
 - [RPC Reference](read/overview.md) — JSON-RPC methods and error codes
 - [Realtime API](read/realtime-api.md) — WebSocket and real-time RPC extensions
+- [Onchain Payments](payments.md) — charge for APIs, content, or metered services onchain
