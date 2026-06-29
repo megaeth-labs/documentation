@@ -1,6 +1,6 @@
 ---
 description: >-
-  How to accept onchain payments in a MegaETH DApp — the HTTP 402 "pay then
+  How to accept onchain payments in a MegaETH dapp — the HTTP 402 "pay then
   retry" pattern, the x402 and MPP protocol families, and five concrete payment
   flows (one-time and pay-as-you-go, user-paid and gas-sponsored) with a full
   worked example.
@@ -8,11 +8,11 @@ description: >-
 
 # Onchain Payments
 
-This guide shows how to charge for access to an API, a piece of content, or a metered service in a MegaETH DApp.
+This guide shows how to charge for access to an API, a piece of content, or a metered service in a MegaETH dapp.
 It explains the one pattern every approach shares, the two protocol families built on it, and five concrete flows you can pick from.
 
 {% hint style="info" %}
-For a complete, runnable reference — a Next.js app with a connected wallet, a server-side relayer, the escrow contract, and all five flows side by side — see the [MegaETH Payment Demo](https://github.com/megaeth-labs/payment-demo).
+All five flows run against the same MegaETH Testnet token and are implemented end-to-end in the [MegaETH Payment Demo](https://github.com/megaeth-labs/payment-demo).
 This guide explains the mechanisms; the demo is the code.
 {% endhint %}
 
@@ -49,7 +49,7 @@ sequenceDiagram
 
 ## Two protocol families
 
-DApps have two interoperable-by-pattern (but independent) protocol stacks to choose from, each with a Node.js SDK.
+For dapps, there are two interoperable-by-pattern (but independent) protocol stacks to choose from, each with a Node.js SDK.
 They both ride on HTTP 402; they are not extensions of each other.
 
 | Family                                                              | NPM Package | Model it covers                         |

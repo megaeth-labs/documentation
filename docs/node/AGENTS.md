@@ -24,7 +24,7 @@ Readers are comfortable on the Linux command line, know how to read a systemd un
 ## What Does NOT Belong Here
 
 - End-user wallet or bridging instructions → `docs/user/`.
-- DApp / contract developer guidance → `docs/dev/`.
+- dapp / contract developer guidance → `docs/dev/`.
 - Normative protocol specification → [mega-evm repo](https://github.com/megaeth-labs/mega-evm).
 - Internal architecture of the validator crate (module layout, trait design) → the upstream repo README.
 
