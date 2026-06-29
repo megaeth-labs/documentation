@@ -15,7 +15,7 @@ The site is organized into layers, each targeting a different audience:
 | Layer                   | Directory                                                 | Audience                        | Tone                               |
 | ----------------------- | --------------------------------------------------------- | ------------------------------- | ---------------------------------- |
 | **User Guide**          | `docs/user/`                                              | End users (wallets, DeFi users) | Plain language, no code            |
-| **Developer Docs**      | `docs/dev/`                                               | DApp/contract builders          | Practical guidance, code examples  |
+| **Developer Docs**      | `docs/dev/`                                               | dapp/contract builders          | Practical guidance, code examples  |
 | **Stateless Validator** | `docs/node/`                                              | Node operators                  | Reference, copy-paste commands     |
 | **Specification**       | [mega-evm repo](https://github.com/megaeth-labs/mega-evm) | Protocol implementers, auditors | Normative (MUST/SHALL), exhaustive |
 
