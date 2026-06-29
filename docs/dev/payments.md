@@ -49,7 +49,7 @@ sequenceDiagram
 
 ## Two protocol families
 
-DApps have two interoperable-by-pattern (but independent) protocol stacks to choose from (Node.js).
+Dapps have two interoperable-by-pattern (but independent) protocol stacks to choose from, each with a Node.js SDK.
 They both ride on HTTP 402; they are not extensions of each other.
 
 | Family                                                              | NPM Package | Model it covers                         |
