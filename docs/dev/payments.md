@@ -323,13 +323,13 @@ Each lets someone authorize a token movement with a **signature** instead of a p
 
 The [MegaETH Payment Demo](https://github.com/megaeth-labs/payment-demo) implements all five flows against MegaETH Testnet, with a connected wallet on the client and a relayer/facilitator on the server.
 
-| Flow | Protected route                      | Demo UI component        |
-| ---- | ------------------------------------ | ------------------------ |
-| 1    | `GET /api/protected`                 | `X402Demo`               |
-| 2    | `GET /api/mpp/charge`                | `MppDemo`                |
-| 3    | `GET /api/mpp/gasless-charge`        | `MppGaslessDemo`         |
-| 4    | `GET\|POST /api/mpp/session`         | `MppOfficialSessionDemo` |
-| 5    | `GET\|POST /api/mpp/session-gasless` | `MppSessionGaslessDemo`  |
+| Flow | Protected route                 | Demo UI component        |
+| ---- | ------------------------------- | ------------------------ |
+| 1    | `GET /api/protected`            | `X402Demo`               |
+| 2    | `GET /api/mpp/charge`           | `MppDemo`                |
+| 3    | `GET /api/mpp/gasless-charge`   | `MppGaslessDemo`         |
+| 4    | `POST /api/mpp/session`         | `MppOfficialSessionDemo` |
+| 5    | `POST /api/mpp/session-gasless` | `MppSessionGaslessDemo`  |
 
 The repository also includes the escrow contract (`contract/`) and protocol scheme notes (`docs/`) explaining each flow in more detail.
 
