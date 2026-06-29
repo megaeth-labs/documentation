@@ -70,6 +70,7 @@ Use these exact forms consistently. Do not alternate between variants.
 | Block type            | mini-block                                                     | miniblock, mini block, MiniBlock                            |
 | Onchain / offchain    | onchain, offchain                                              | on-chain, off-chain, on chain                               |
 | Smart contract        | smart contract                                                 | Smart Contract, smartcontract                               |
+| Decentralized app     | DApp, DApps                                                    | dapp, dApp, Dapp, dapps, dApps                              |
 | Gas dimensions        | compute gas, storage gas                                       | Compute Gas, Storage Gas, Compute gas                       |
 | Spec names            | MiniRex, MiniRex1, MiniRex2, Rex, Rex1, Rex2, Rex3, Rex4, Rex5 | minirex, MINIREX, mini-rex, rex-3                           |
 | State trie            | SALT                                                           | Salt, salt                                                  |
