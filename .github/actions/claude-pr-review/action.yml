@@ -85,6 +85,20 @@ runs:
         fi
         echo "$delim" >> "$GITHUB_OUTPUT"
 
+        # Inject the shared review rubric, maintained as a sibling markdown file so it
+        # can be edited and reviewed as prose rather than buried in a YAML block scalar.
+        rubric_delim="RUBRIC_$RANDOM$RANDOM"
+        {
+          echo "rubric<<$rubric_delim"
+          cat "$GITHUB_ACTION_PATH/rubric.md"
+          echo "$rubric_delim"
+        } >> "$GITHUB_OUTPUT"
+
+        # Stage the on-demand detailed checklist into the workspace so the review agent
+        # can Read it lazily, only for the areas a given diff actually touches.
+        mkdir -p "$GITHUB_WORKSPACE/.claude-review"
+        cp "$GITHUB_ACTION_PATH/rubric-detail.md" "$GITHUB_WORKSPACE/.claude-review/rubric-detail.md"
+
     - uses: anthropics/claude-code-action@c3d45e8e941e1b2ad7b278c57482d9c5bf1f35b3 # v1
       with:
         claude_code_oauth_token: ${{ inputs.claude_code_oauth_token }}
@@ -107,35 +121,11 @@ runs:
           general guidance below wherever they conflict.
           Be concise and actionable. Only comment on issues that matter.
 
-          Apply the following common review rubric as a baseline. A consumer repo's REVIEW.md and other agent files may override or extend any part of it; defer to those wherever they conflict.
+          Apply the common review rubric below as a baseline. A consumer repo's REVIEW.md and
+          other agent files may override or extend any part of it; defer to those wherever they
+          conflict.
 
-          Mindset:
-          - The goal is to improve overall code health over time. Approve changes that make the codebase better even if not perfect; do not let "perfect" block "better".
-          - Review is also knowledge transfer. Critique the code, not the person, and explain why — cite a reason, not just "change this to that".
-
-          Prioritize attention in this order (defer everything below the line to tooling):
-          1. Data structures — are the core types right? Bad code around good data structures is fixable; good code around bad data structures is not.
-          2. Design — is the approach right and does it fit the architecture? Prefer eliminating edge cases through better design over adding conditionals.
-          3. Correctness — edge cases, off-by-ones, race conditions, and especially any change to consensus-, protocol-, or wire-critical code or a backward-compatibility-sensitive contract (extra scrutiny here).
-          4. Complexity — could it be simpler? Can the number of concepts be cut?
-          5. Breakage — which downstream consumers or public APIs/contracts could this break? A breaking change to a published contract must be called out explicitly.
-          6. Tests — present for new or changed logic; deterministic (no sleep/wall-clock/flaky); assert exact values and specific error variants (not just is_ok/is_some/truthiness); cover side effects and the absence of unintended changes.
-          7. Naming and comments — names are clear; comments explain why, not what.
-          8. Style — defer to the repo's formatter and linter; never spend review effort on formatting.
-
-          Also check:
-          - PR title follows Conventional Commits and the description explains what changed and why; flag a title or description that is stale or misleading after new commits.
-          - unsafe code carries a SAFETY comment; errors are checked or have a comment justifying the ignore; no unhandled concurrency hazards (shared mutable state, TOCTOU, deadlocks, dropped errors or promise rejections).
-          - Public API or interface changes have a documented rationale, and framework conventions are respected rather than replaced.
-          - Logging uses structured fields at appropriate levels (not string interpolation or println-equivalents); recurring counts and durations are metrics, not logs.
-          - Documentation proximity matches the scope of the fact being documented: implementation mechanics live inline with the code they describe, while separate design docs focus on architecture and rationale and link to code instead of restating details that will drift.
-          - Flag the same fact duplicated across inline docs and separate docs; pick one authoritative home and link from the other.
-
-          Do NOT flag:
-          - Formatting or lint already enforced by the repo's formatter/linter, or type errors caught by its type checker.
-          - Redundant guards that aid readability, or empirically-tuned constants and thresholds.
-          - Anything already addressed in the diff under review — read the full diff first.
-          Avoid reviewer anti-patterns: bikeshedding, rubber-stamping, nitpick avalanches, gatekeeping on style or hypothetical concerns, and manufacturing feedback. If the PR is clean, say so briefly in a structured review body instead of inventing comments.
+          ${{ steps.compose.outputs.rubric }}
 
           Follow this review contract in order. Be exhaustive before posting. Treat Phases 1 through 5 as an iterative loop: after one pass, revisit the diff, checklist, local guidance, and prior threads again if you found any new risk area, uncertainty, or candidate finding. Keep iterating until a fresh pass produces no new actionable findings. Do not post new review feedback until all analysis phases are complete and you are ready to submit one unified review.
 
