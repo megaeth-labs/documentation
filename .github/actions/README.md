@@ -44,15 +44,15 @@ A consumer repo's `REVIEW.md` may override or extend this severity scale.
 
 ## Consumer Requirements
 
-Consumer jobs should pin these actions to `@main`. A merge to `mega-agents` `main` goes live
+Consumer jobs should pin these actions to `@main`. A merge to `documentation` `main` goes live
 for every consumer automatically, with no consumer workflow edits required.
-Use `megaeth-labs/mega-agents/.github/actions/claude-interactive@main`,
-`megaeth-labs/mega-agents/.github/actions/claude-pr-review@main`,
-`megaeth-labs/mega-agents/.github/actions/claude-label-check@main`, or
-`megaeth-labs/mega-agents/.github/actions/claude-issue-triage@main`.
+Use `megaeth-labs/documentation/.github/actions/claude-interactive@main`,
+`megaeth-labs/documentation/.github/actions/claude-pr-review@main`,
+`megaeth-labs/documentation/.github/actions/claude-label-check@main`, or
+`megaeth-labs/documentation/.github/actions/claude-issue-triage@main`.
 
-Mega-agents dogfoods these actions through the local `./.github/actions/claude-<name>` path, so every
-PR to mega-agents smoke-tests them before merge.
+Documentation dogfoods these actions through the local `./.github/actions/claude-<name>` path, so every
+PR to documentation smoke-tests them before merge.
 
 Consumer jobs must run `actions/checkout` before these actions. They must also provide the
 `CLAUDE_CODE_OAUTH_TOKEN` secret and set role-appropriate job permissions:
@@ -82,7 +82,7 @@ jobs:
           submodules: recursive
           fetch-depth: 1
 
-      - uses: megaeth-labs/mega-agents/.github/actions/claude-pr-review@main
+      - uses: megaeth-labs/documentation/.github/actions/claude-pr-review@main
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           extra_allowed_tools: "Bash(cargo:*)"
