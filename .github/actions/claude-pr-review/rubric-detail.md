@@ -5,6 +5,7 @@ rubric. These are line-level checks that would clutter a review if applied every
 findings here at `[Minor]`/`[Nit]` unless they cause incorrect behavior, in which case escalate.
 
 ## Persistence
+
 - **Crash-consistency:** on-disk writes must survive a crash mid-write — write to a temp file
   and atomically `rename()` into place; never leave a half-written file on crash or power loss.
 - **Atomic multi-step persists:** a sequence that must be all-or-nothing (e.g. clean-old +
@@ -16,6 +17,7 @@ findings here at `[Minor]`/`[Nit]` unless they cause incorrect behavior, in whic
   not-misleading over pretty (e.g. don't spend effort pretty-printing an internal dump).
 
 ## Unit-safety
+
 - **Annotate ambiguous integers:** two same-typed integers with different units in one
   struct or signature is a trap — put the unit in the name or a doc so durations and
   comparisons can't be miscomputed.
@@ -24,6 +26,7 @@ findings here at `[Minor]`/`[Nit]` unless they cause incorrect behavior, in whic
   visible at every call site and a fix is a one-file diff.
 
 ## Test-&-perf-surface
+
 - **Assertion placement:** put an assertion where the test or fuzzer actually observes the
   condition — not after an early `return Err` that makes it tautologically true (the failing
   case is then never exercised).

@@ -4,10 +4,11 @@ A consumer repo's `REVIEW.md` / `CLAUDE.md` / `AGENTS.md` override or extend any
 defer to them on conflict. This is the general baseline only.
 
 ## Stance (governs everything below)
+
 - Review **structure and design, not lines**. The deepest finding makes a special case
   disappear; the shallowest renames a variable. Spend attention high.
 - The goal is improving code health over time — approve "better" even when not "perfect."
-  Critique the code, not the person, and always say *why*.
+  Critique the code, not the person, and always say _why_.
 - **Personal taste or style is never a change request.** If the formatter, a linter, the type
   checker, or the author's reasonable judgment can own it, stay silent.
 - Severity is **leverage** (how much the design improves), not effort to spot. Default to
@@ -16,7 +17,9 @@ defer to them on conflict. This is the general baseline only.
 ## Lenses — judge in this order; the earlier the lens, the higher its leverage
 
 ### 1. Design & data structures
+
 Are the core types right? Bad code around good data structures is fixable; the reverse is not.
+
 - Encode invariants in the type so the compiler catches misuse — prefer a newtype/enum/`OnceCell`
   over a primitive-with-sentinel. A config knob or `Default` with only one correct value is a
   footgun; remove it.
@@ -24,15 +27,16 @@ Are the core types right? Bad code around good data structures is fixable; the r
   consumers, not a parallel type per subsystem. Decompose god-structs (pure logic that returns
   effects + a thin orchestrator).
 - Prefer eliminating an edge case through better design over adding a conditional.
-- Keep it simple — can the number of concepts be cut? An abstraction is *earned* only if it
+- Keep it simple — can the number of concepts be cut? An abstraction is _earned_ only if it
   (a) hides an impl detail, (b) enables a test fake, **and (c) keeps its generic bounds
   confined** — otherwise inline it; a single call site rarely earns a new trait or indirection.
 - Respect existing framework/library conventions rather than replacing them.
 
 ### 2. Correctness & safety
+
 - Edge cases, off-by-ones, and races; extra scrutiny for consensus-/protocol-/wire-critical or
   backward-compat-sensitive code.
-- **Fail loud over silently-wrong:** an explicit error beats a quietly wrong value. A *fatal*
+- **Fail loud over silently-wrong:** an explicit error beats a quietly wrong value. A _fatal_
   condition must actually terminate the unit, not just the loop that observed it.
 - Errors are handled or their ignore is justified with a comment; no silently dropped sends or
   join-errors; prefer typed error enums over opaque/stringly errors.
@@ -40,7 +44,9 @@ Are the core types right? Bad code around good data structures is fixable; the r
   hazards — shared mutable state, TOCTOU, deadlocks.
 
 ### 3. Surface stewardship
+
 What does this disturb that others depend on?
+
 - Call out breaking changes to any published or public API/contract explicitly; public API or
   interface changes carry a documented rationale.
 - Minimize the diff to vendored/forked/upstream files — even comment-only drift costs rebase
@@ -49,14 +55,16 @@ What does this disturb that others depend on?
 - Treat stable wire, on-disk, and public surfaces as sacred.
 
 ### 4. Change & operate
+
 Can the next person change and run this safely?
+
 - **Tests:** present for new/changed logic; deterministic (no sleep/wall-clock); assert exact
   values and specific error variants (not `is_ok`/truthiness); cover side effects and the
   absence of unintended change. If logic is hard to test, that's a design signal (split pure
   logic from I/O). A bool param every caller passes identically is an untested dimension. Don't
   build the expected value from the same primitive under test.
 - **Naming & docs:** names describe state/intent, not effect or serialization format; drop
-  redundant qualifiers. Comments and docs explain *why*, not *what*; new modules carry a
+  redundant qualifiers. Comments and docs explain _why_, not _what_; new modules carry a
   one-line orientation. A missing or misleading doc on a non-obvious invariant is a real gap.
 - **Observability:** error variants carry the disagreeing values; loss/drop logs carry the
   correlating key; fail-open paths expose a scrape-visible counter; long-running spawned tasks
@@ -67,6 +75,7 @@ Can the next person change and run this safely?
   duplicated across homes — pick one authoritative home.
 
 ## Do NOT flag
+
 - Formatting, lint, or type errors already owned by the repo's formatter/linter/type-checker —
   never spend review effort on style.
 - Redundant guards that aid readability; empirically-tuned constants/thresholds.
@@ -75,6 +84,7 @@ Can the next person change and run this safely?
   manufacturing feedback. If the PR is clean, say so.
 
 ## How to deliver
+
 - **Propose the concrete alternative** (a `suggestion` block, a sketch, a rename target) — not
   just a complaint. For a consequential design ask, note the option you considered and rejected
   and why.
@@ -87,9 +97,11 @@ Can the next person change and run this safely?
   flag a stale or misleading title/description after new commits.
 
 ## Routing to detailed checks (read on demand)
+
 Before finalizing, if the diff touches any of these areas, read the matching section of
 `.claude-review/rubric-detail.md` and apply it; skip areas the diff does not touch (these are
 line-level checks — do not load them when irrelevant):
+
 - **Persistence / on-disk writes / serialization** → §Persistence
 - **Unit / time / scaling math (ratios, conversions, timestamps)** → §Unit-safety
 - **Tests, fuzzers, or fault-injection harnesses; perf-shaped changes** → §Test-&-perf-surface
