@@ -32,7 +32,7 @@ In MetaMask, Rabby, or any Ethereum-compatible wallet, go to **Settings → Netw
 | **RPC URL** | <code class="expression">space.vars.testnet_rpc</code> |
 | **Chain ID** | <code class="expression">space.vars.testnet_chain_id</code> |
 | **Currency Symbol** | ETH |
-| **Block Explorer** | <code class="expression">space.vars.testnet_blockscout</code> |
+| **Block Explorer** | <code class="expression">space.vars.testnet_etherscan</code> |
 {% endtab %}
 {% endtabs %}
 
