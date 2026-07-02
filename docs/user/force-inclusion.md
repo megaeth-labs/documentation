@@ -98,7 +98,7 @@ Save the Ethereum transaction hash to track the deposit.
 After 5–20 minutes, check your balance or transaction on the block explorer:
 
 - **Mainnet:** [megaeth.blockscout.com](https://megaeth.blockscout.com)
-- **Testnet:** [megaeth-testnet-v2.blockscout.com](https://megaeth-testnet-v2.blockscout.com)
+- **Testnet:** [https://testnet-mega.etherscan.io](https://testnet-mega.etherscan.io)
 
 {% endstep %}
 {% endstepper %}
