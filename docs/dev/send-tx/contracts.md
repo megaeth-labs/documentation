@@ -17,9 +17,9 @@ description: Key contract addresses and tokens on MegaETH and Ethereum Mainnet.
 {% tab title="Testnet" %}
 | Token | Address | Description |
 | ----- | ------- | ----------- |
-| [MEGA](https://megaeth.com) | [`0xc903c68C1d389CEd76fEe0349067a4295828e6c2`](https://megaeth-testnet-v2.blockscout.com/address/0xc903c68C1d389CEd76fEe0349067a4295828e6c2) | MegaETH's native protocol token (testnet deployment). |
-| WETH | [`0x4200000000000000000000000000000000000006`](https://megaeth-testnet-v2.blockscout.com/address/0x4200000000000000000000000000000000000006) | Wrapped Ether — an ERC-20 version of ETH for use in dApps. |
-| [Multicall3](https://multicall3.com) | [`0xcA11bde05977b3631167028862bE2a173976CA11`](https://megaeth-testnet-v2.blockscout.com/address/0xcA11bde05977b3631167028862bE2a173976CA11) | Utility contract that batches multiple calls into one transaction. |
+| [MEGA](https://megaeth.com) | [`0xc903c68C1d389CEd76fEe0349067a4295828e6c2`](https://testnet-mega.etherscan.io/address/0xc903c68C1d389CEd76fEe0349067a4295828e6c2) | MegaETH's native protocol token (testnet deployment). |
+| WETH | [`0x4200000000000000000000000000000000000006`](https://testnet-mega.etherscan.io/address/0x4200000000000000000000000000000000000006) | Wrapped Ether — an ERC-20 version of ETH for use in dApps. |
+| [Multicall3](https://multicall3.com) | [`0xcA11bde05977b3631167028862bE2a173976CA11`](https://testnet-mega.etherscan.io/address/0xcA11bde05977b3631167028862bE2a173976CA11) | Utility contract that batches multiple calls into one transaction. |
 {% endtab %}
 {% endtabs %}
 
