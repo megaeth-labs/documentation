@@ -136,7 +136,7 @@ cast call $L2_TOKEN \
 
 {% hint style="info" %}
 The deposit takes approximately 1–2 minutes to appear on MegaETH — one L1 block for finality, plus sequencer relay time.
-You can track the L1 transaction on [Etherscan](https://etherscan.io) (mainnet) or [Sepolia Etherscan](https://sepolia.etherscan.io) (testnet), and the L2 deposit on [MegaETH Blockscout](https://megaeth.blockscout.com) (mainnet) or the [testnet explorer](https://megaeth-testnet-v2.blockscout.com).
+You can track the L1 transaction on [Etherscan](https://etherscan.io) (mainnet) or [Sepolia Etherscan](https://sepolia.etherscan.io) (testnet), and the L2 deposit on [MegaETH Blockscout](https://megaeth.blockscout.com) (mainnet) or the [testnet explorer](https://testnet-mega.etherscan.io).
 {% endhint %}
 
 {% endstep %}
