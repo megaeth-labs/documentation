@@ -121,11 +121,11 @@ User limits are dynamically updated in response to individual behavior.
 
 The public RPC endpoint caps the size of the request body, and the cap depends on the method being called:
 
-| Method class                                                                   | Maximum body size |
-| ------------------------------------------------------------------------------ | ----------------- |
-| Transaction submission (`eth_sendRawTransaction`, `realtime_sendRawTransaction`) | 2.5 MiB           |
+| Method class                                                                                        | Maximum body size |
+| --------------------------------------------------------------------------------------------------- | ----------------- |
+| Transaction submission (`eth_sendRawTransaction`, `realtime_sendRawTransaction`)                    | 2.5 MiB           |
 | Large reads and simulations (`eth_call`, `eth_callMany`, `eth_createAccessList`, `eth_estimateGas`) | 1.5 MiB           |
-| All other methods                                                              | 128 KiB           |
+| All other methods                                                                                   | 128 KiB           |
 
 The higher limits for simulation methods let you estimate gas for or simulate large contract deployments, whose initcode can exceed the 128 KiB default.
 A request whose body exceeds the applicable limit is rejected with HTTP `413` and RPC error `-32099` (`payload too large`) — see [Error Codes](rpc/error-codes.md).
