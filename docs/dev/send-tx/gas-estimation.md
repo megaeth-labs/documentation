@@ -75,6 +75,13 @@ There are two workarounds:
    For reference, standard Ethereum node software (geth, reth) defaults to 50M, and providers like Alchemy support up to 550M.
    See the [RPC Providers](../tooling.md#rpc-providers) table for providers that support MegaETH.
 
+### Request Body Size for Large Deployments
+
+Estimating gas for a large contract deployment sends the full initcode in the request body.
+To accommodate this, the public RPC endpoint allows `eth_call`, `eth_callMany`, `eth_createAccessList`, and `eth_estimateGas` bodies up to **1.5 MiB** — well above the 128 KiB limit applied to ordinary read methods.
+A request that exceeds this limit is rejected with HTTP `413` / `-32099` (`payload too large`).
+See [Request Body Limits](../read/overview.md#request-body-limits) for the full breakdown.
+
 ## Toolchain Configuration
 
 ### Foundry
