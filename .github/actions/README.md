@@ -27,6 +27,7 @@ The `pr-review` action additionally accepts:
 
 - `model` - optional, defaults to `opus`. Passed through to `claude --model`. Set another model id to override, or empty to fall through to the Claude Code CLI default (Sonnet class). Note the `opus` default means every consumer runs reviews on Opus out of the box.
 - `review_depth` - optional, defaults to `standard` (single-agent review). Set to `deep` for multi-agent orchestration: the lead agent fans out one sub-agent per review dimension, adversarially verifies each finding, then converges on the same single consolidated review. `deep` costs more tokens and wall-clock, so raise the calling job's `timeout-minutes` (see Concurrency) and prefer gating it per-PR (e.g. a label) rather than enabling it for every review.
+- `premortem` - optional, defaults to `on`. Adds an independent pre-mortem track to the review: a fresh sub-agent with no shared context assumes the PR already shipped and caused a production incident, reconstructs the most credible failure paths (top 5 candidates), an evidence-verifier sub-agent confirms or rejects each one against the actual code at head, and only `confirmed` findings are published as inline comments (marked `(pre-mortem, confirmed)`). `plausible_unverified` items appear only as non-blocking verification requests in the review body; rejected/stale/out-of-scope candidates are suppressed. The track is non-blocking — the review event is always `COMMENT`, never `REQUEST_CHANGES` — and caps the round at 5 Critical/Major plus 5 Minor/Nit inline comments across both tracks. It adds sub-agent wall-clock, so give the calling job `timeout-minutes` of at least `35`. Set to `off` to disable. The role prompts live in `claude-pr-review/premortem.md`.
 
 ## Per-Repo Conventions
 
@@ -99,7 +100,7 @@ jobs:
 
 ## Concurrency (pr-review)
 
-Consumers should give the `pr-review` job a `timeout-minutes` value of at least `25` plus a job-level concurrency group with `cancel-in-progress: false`.
+Consumers should give the `pr-review` job a `timeout-minutes` value of at least `25` (`35` when the default-on pre-mortem track is enabled) plus a job-level concurrency group with `cancel-in-progress: false`.
 This helps an in-progress multi-turn review finish instead of being cancelled mid-run, because the action resolves addressed automated threads silently and posts one consolidated review per round.
 Cancelling can leave partial state:
 

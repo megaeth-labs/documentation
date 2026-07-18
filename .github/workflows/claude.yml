@@ -58,7 +58,9 @@ jobs:
       (github.event.pull_request.user.type != 'Bot' ||
        github.event.pull_request.user.login == 'mega-putin[bot]')
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
+    # 35 rather than 25: the pre-mortem track (on by default) adds two rounds of
+    # sub-agent work on top of the standard review.
+    timeout-minutes: 35
     permissions:
       contents: read
       pull-requests: write
