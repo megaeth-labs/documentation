@@ -42,6 +42,10 @@ Are the core types right? Bad code around good data structures is fixable; the r
   join-errors; prefer typed error enums over opaque/stringly errors.
 - Unsafe code carries a `SAFETY` comment justifying its invariants. No unhandled concurrency
   hazards — shared mutable state, TOCTOU, deadlocks.
+- **Bound every queue and buffer.** An unbounded channel, work queue, retry backlog, or
+  per-connection buffer is a memory-DoS — one slow consumer or hostile peer grows it without
+  limit. Cap depth (with a drop or backpressure policy) and apply size checks before
+  accumulating bytes; keep metric label sets bounded too (no unbounded-cardinality labels).
 
 ### 3. Surface stewardship
 
@@ -105,3 +109,4 @@ line-level checks — do not load them when irrelevant):
 - **Persistence / on-disk writes / serialization** → §Persistence
 - **Unit / time / scaling math (ratios, conversions, timestamps)** → §Unit-safety
 - **Tests, fuzzers, or fault-injection harnesses; perf-shaped changes** → §Test-&-perf-surface
+- **CI/CD workflows or composite actions (`.github/workflows`, `action.yml`)** → §CI-workflow-security

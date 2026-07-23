@@ -35,3 +35,19 @@ findings here at `[Minor]`/`[Nit]` unless they cause incorrect behavior, in whic
 - **Dead or test-only scaffolding is a trapdoor:** a `Default`/`Option`/bootstrap field or
   method with zero production callers isn't merely unused — it's a latent footgun a future
   caller can trip. Confirm zero callers, then delete it.
+
+## CI-workflow-security
+
+- **No untrusted input in `run:` blocks:** never interpolate a PR title/body/branch or other
+  attacker-controlled value straight into a shell step — pass it through `env:` and reference
+  `"$VAR"`, or feed secrets via `--password-stdin`, so a crafted value can't inject commands.
+- **Least-privilege the token:** set `persist-credentials: false` on `checkout` when later steps
+  don't need the token, keep `GITHUB_TOKEN`/job permissions minimal, and pin third-party actions
+  to a full commit SHA when a broad-scoped token is in play.
+- **Teardown must run on failure:** cleanup of enclaves/containers/temp infra belongs on an
+  `if: always()` / `ERR` / `EXIT` trap path, not a plain step that `set -e` skips after an
+  earlier failure. Prefer `if: !cancelled()` over `always()` when a cancelled run must not
+  resurrect work.
+- **Guard comment/label triggers:** a workflow keyed on a comment marker or label must check the
+  actor's association/author — otherwise any outsider triggers the privileged path by echoing
+  the marker.
