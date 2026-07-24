@@ -38,6 +38,9 @@ The `pr-review` action additionally accepts:
   reviews, but skips it for ordinary incremental updates.
   `on` always enables it and `off` disables it.
 
+The semantic stage is bounded to 12 turns for fast incremental reviews, 24 for standard
+full or high-risk reviews, and 40 for explicit deep reviews.
+
 ### PR review pipeline
 
 The PR reviewer is an explicit staged pipeline:

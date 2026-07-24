@@ -97,12 +97,17 @@ runs:
         fi
 
         selected_model="$STRONG_MODEL"
+        max_turns=24
         if [[ "$MODEL_TIER" == "fast" ]]; then
           selected_model="$INCREMENTAL_MODEL"
+          max_turns=12
         fi
-        model_flag=""
+        if [[ "$REVIEW_DEPTH" == "deep" ]]; then
+          max_turns=40
+        fi
+        runtime_flags="--max-turns $max_turns"
         if [[ -n "$selected_model" ]]; then
-          model_flag="--model $selected_model"
+          runtime_flags="--model $selected_model $runtime_flags"
         fi
 
         cp "$GITHUB_ACTION_PATH/rubric.md" "$GITHUB_WORKSPACE/.pr-review/rubric.md"
@@ -110,7 +115,7 @@ runs:
         cp "$GITHUB_ACTION_PATH/premortem.md" "$GITHUB_WORKSPACE/.pr-review/premortem.md"
 
         echo "allowed_tools=${allowed_tools}" >> "$GITHUB_OUTPUT"
-        echo "model_flag=${model_flag}" >> "$GITHUB_OUTPUT"
+        echo "runtime_flags=${runtime_flags}" >> "$GITHUB_OUTPUT"
 
     - name: Analyze and verify findings
       id: review
@@ -125,7 +130,7 @@ runs:
           --allowedTools "${{ steps.compose.outputs.allowed_tools }}"
           --disallowedTools "mcp__github_inline_comment__create_inline_comment"
           --json-schema '${{ steps.prepare.outputs.output_schema }}'
-          ${{ steps.compose.outputs.model_flag }}
+          ${{ steps.compose.outputs.runtime_flags }}
         prompt: |
           You are the semantic analysis stage in a deterministic PR-review pipeline.
           You analyze and verify; you do not post, edit, resolve, or otherwise mutate
@@ -136,7 +141,8 @@ runs:
           Research notes, Task results, prose summaries, and completed analysis are
           not a final answer. Do not end after a tool call or delegate the final
           response. The lead session itself must return the schema-bound object, even
-          when every result array is empty.
+          when every result array is empty. Budget tool calls carefully and reserve
+          the final turn for this response.
 
           Read these frozen inputs before analyzing:
           - `.pr-review/review-input.json` — repository, PR, immutable SHAs,
