@@ -116,8 +116,8 @@ Each method belongs to one of four categories, and each category has its own req
 | Category | Limit (per 10 s) | Methods                                                                                                                     |
 | -------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | Instant  | 2,000            | `eth_chainId`, `eth_blockNumber`, `net_version`, `eth_accounts`, `web3_clientVersion`, `eth_getBalance`, `eth_getStorageAt` |
-| Simple   | 500              | Block/transaction queries and all other read methods not listed in another category                                         |
-| Compute  | 760              | `eth_call`, `eth_callMany`, `eth_estimateGas`, `eth_createAccessList`, `debug_trace*`, `trace_block`, `trace_transaction`   |
+| Simple   | 500              | Block/transaction queries, `eth_callAfter`, and all other read methods not listed in another category                       |
+| Compute  | 200              | `eth_call`, `eth_callMany`, `eth_estimateGas`, `eth_createAccessList`, `debug_trace*`, `trace_*`                            |
 | IO-heavy | 200              | `eth_getLogs`, `eth_getBlockReceipts`                                                                                       |
 
 Additional notes:
