@@ -12,7 +12,7 @@ MegaETH provides two ways to debug transactions:
 ## Debug RPC Methods
 
 The public MegaETH RPC endpoint supports tracing mined transactions and blocks.
-It does not support `debug_traceCall`; use `mega-evme` for local call simulation or check whether a managed RPC provider exposes that method.
+It does not support `debug_traceCall`; use [`mega-evme`](#simulating-a-new-transaction) for local call simulation or check whether a managed RPC provider exposes that method.
 
 The following methods are supported:
 
