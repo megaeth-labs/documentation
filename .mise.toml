@@ -1,5 +1,5 @@
 [tools]
-lychee = "latest"
+lychee = "0.24.2"
 "npm:markdownlint-cli2" = "latest"
 # Pinned: prettier >= 3.9.0 mangles GitBook template tags ({% tab %}/{% endtab %})
 # into markdown table rows, breaking page rendering. Re-evaluate before bumping.
