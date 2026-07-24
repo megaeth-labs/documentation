@@ -63,8 +63,8 @@ See [Debugging Transactions](../send-tx/debugging.md) for usage of debug methods
 | `eth_getCode`                             | Available      |                                                                   |
 | `eth_getFilterChanges`                    | Unavailable    |                                                                   |
 | `eth_getFilterLogs`                       | Unavailable    |                                                                   |
-| `eth_getLogs`                             | Available      |                                                                   |
 | `eth_getHeaderByNumber`                   | Available      |                                                                   |
+| `eth_getLogs`                             | Available      |                                                                   |
 | `eth_getLogsWithCursor`                   | Managed only   |                                                                   |
 | `eth_getStorageAt`                        | Available      |                                                                   |
 | `eth_getTransactionByBlockHashAndIndex`   | Available      |                                                                   |
@@ -141,7 +141,7 @@ The public RPC gateway may serve a small set of read methods from a server-side 
 - `web3_clientVersion`
 
 Only requests for **immutable data** are eligible: an explicit historical block number, a block hash, or the `earliest` tag.
-Requests using the `latest` or `pending` tags always go to a node, so cached responses are never stale — the realtime behavior described above is unaffected.
+Requests using the `latest`, `pending`, `safe`, or `finalized` tags always go to a node, so cached responses are never stale — the realtime behavior described above is unaffected.
 
 Two headers on the response are relevant:
 
