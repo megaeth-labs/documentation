@@ -6,13 +6,15 @@ description: realtime_sendRawTransaction — submit a transaction and receive th
 
 Submits a signed transaction and returns the receipt directly once the transaction is executed — no polling required.
 This is a drop-in replacement for `eth_sendRawTransaction` that eliminates the need to poll `eth_getTransactionReceipt`.
-The method times out after 10 seconds if the transaction has not been executed.
+When no timeout is supplied, the node uses its 5-second default wait.
+The public gateway accepts an optional timeout but caps it at 3,000 milliseconds.
 
 ## Parameters
 
-| Position | Type   | Required | Notes                          |
-| -------- | ------ | -------- | ------------------------------ |
-| `0`      | `Data` | Yes      | Hex-encoded signed transaction |
+| Position | Type     | Required | Notes                                                         |
+| -------- | -------- | -------- | ------------------------------------------------------------- |
+| `0`      | `Data`   | Yes      | Hex-encoded signed transaction                                |
+| `1`      | `number` | No       | Wait timeout in milliseconds; capped at `3000` by the gateway |
 
 ## Returns
 
@@ -31,9 +33,9 @@ A transaction receipt object on success:
 
 ## Errors
 
-| Code     | Cause                                                                       | Fix                                              |
-| -------- | --------------------------------------------------------------------------- | ------------------------------------------------ |
-| `-32000` | `realtime transaction expired` — transaction not executed within 10 seconds | Fall back to polling `eth_getTransactionReceipt` |
+| Code     | Cause                                                                          | Fix                                                              |
+| -------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| `-32000` | `realtime transaction expired` — receipt not available before the wait expired | The transaction may still land; poll `eth_getTransactionReceipt` |
 
 See also [Error reference](error-codes.md).
 
@@ -42,7 +44,7 @@ See also [Error reference](error-codes.md).
 ```bash
 curl -sS https://mainnet.megaeth.com/rpc \
   -X POST -H "Content-Type: application/json" \
-  -d '{"jsonrpc":"2.0","id":1,"method":"realtime_sendRawTransaction","params":["0x<hex-encoded-signed-tx>"]}'
+  -d '{"jsonrpc":"2.0","id":1,"method":"realtime_sendRawTransaction","params":["0x<hex-encoded-signed-tx>",3000]}'
 ```
 
 Successful response:

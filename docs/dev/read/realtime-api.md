@@ -22,8 +22,6 @@ Additional functionality will be added based on feedback.
 | ------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------- |
 | [`eth_subscribe`](rpc/eth_subscribe.md)                             | Stream logs, state changes, mini-blocks, and block headers over WebSocket | [Full reference](rpc/eth_subscribe.md)               |
 | [`realtime_sendRawTransaction`](rpc/realtime_sendRawTransaction.md) | Submit a transaction and get the receipt back in one call — no polling    | [Full reference](rpc/realtime_sendRawTransaction.md) |
-| [`eth_callAfter`](rpc/eth_callAfter.md)                             | Run `eth_call` after a prior transaction confirms (nonce-gated)           | [Full reference](rpc/eth_callAfter.md)               |
-| [`eth_getLogsWithCursor`](rpc/eth_getLogsWithCursor.md)             | Paginated log queries for large result sets                               | [Full reference](rpc/eth_getLogsWithCursor.md)       |
 
 The following standard Ethereum methods also return real-time results on MegaETH — they query against the latest mini-block automatically when called with `latest` or `pending`:
 
@@ -47,7 +45,8 @@ The following standard Ethereum methods also return real-time results on MegaETH
 **Problem:** Your dapp submits a transaction and needs the receipt immediately — polling `eth_getTransactionReceipt` adds latency and complexity.
 
 **Solution:** Use [`realtime_sendRawTransaction`](rpc/realtime_sendRawTransaction.md).
-It submits the transaction and blocks until the receipt is available (up to 10 seconds), returning it in a single round-trip.
+It submits the transaction and waits for the receipt in a single round-trip.
+The node's default wait is 5 seconds; an explicit timeout is capped at 3 seconds by the public gateway.
 Drop-in replacement for `eth_sendRawTransaction`.
 
 ### Streaming events for a live UI
@@ -71,22 +70,6 @@ Each notification includes the updated balance, nonce, and any storage slots tha
 
 **Solution:** Subscribe to [`miniBlocks`](rpc/eth_subscribe.md#miniblocks).
 Each notification contains the full set of transactions and receipts for that mini-block.
-
-### Chaining dependent transactions
-
-**Problem:** You send an approval transaction and then need to simulate the follow-up swap — but `eth_call` might execute before the approval confirms.
-
-**Solution:** Use [`eth_callAfter`](rpc/eth_callAfter.md).
-It waits for the sender's nonce to reach a target value (indicating the prior transaction has confirmed), then executes the call.
-This avoids race conditions between approval and swap simulation.
-
-### Querying large log ranges
-
-**Problem:** `eth_getLogs` fails or times out when the block range is too large.
-
-**Solution:** Use [`eth_getLogsWithCursor`](rpc/eth_getLogsWithCursor.md).
-When the server hits its resource limit, it returns a partial result with a cursor.
-Pass the cursor in the next request to continue from where you left off.
 
 ## How It Works
 

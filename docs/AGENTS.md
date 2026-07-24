@@ -84,7 +84,7 @@ Use these exact forms consistently. Do not alternate between variants.
 
 ## Formatting
 
-- **GitBook Markdown**: Use GitBook-flavored Markdown with custom blocks. See `/skill.md` for full syntax reference.
+- **GitBook Markdown**: Use GitBook-flavored Markdown with custom blocks. Follow the [official GitBook `write-docs` skill](https://raw.githubusercontent.com/GitBookIO/gitbook-skills/main/skills/write-docs/SKILL.md) for the full syntax reference.
 - **One sentence, one line**: Each sentence goes on its own line for better diffs.
 - **Frontmatter**: Every page must have YAML frontmatter with at least `description` for SEO.
 - **Headings**: Use `#` for the page title (H1), `##` for sections (H2), `###` for subsections (H3). One H1 per page. Use sentence case: "Gas forwarding rules" not "Gas Forwarding Rules." Capitalize only proper nouns (MegaETH, Ethereum, Rex4).

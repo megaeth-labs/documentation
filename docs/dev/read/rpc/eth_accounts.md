@@ -1,0 +1,34 @@
+---
+description: "eth_accounts JSON-RPC reference for MegaETH."
+---
+
+# eth_accounts
+
+Returns a list of addresses controlled by the RPC node.
+
+## Parameters
+
+None.
+
+## Returns
+
+**`result`** Address[]
+
+Accounts controlled by the RPC node; always empty on public endpoints.
+
+## Errors
+
+Standard JSON-RPC errors only.
+See [Error reference](error-codes.md).
+
+## Example
+
+```bash
+curl -sS https://mainnet.megaeth.com/rpc \
+  -H 'content-type: application/json' \
+  --data '{"jsonrpc":"2.0","id":41,"method":"eth_accounts","params":[]}'
+```
+
+```json
+{ "jsonrpc": "2.0", "id": 41, "result": [] }
+```

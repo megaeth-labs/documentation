@@ -14,100 +14,82 @@ If the read API still operated on one-second EVM blocks, applications would wait
 The Realtime API closes this gap: it queries against the most recent mini-block so that balances, receipts, logs, and state changes are visible within milliseconds of execution — not seconds.
 
 Standard methods like `eth_getBalance`, `eth_call`, and `eth_getTransactionReceipt` already reflect mini-block state automatically when called with `latest` or `pending`.
-On top of that, MegaETH introduces four extension methods for even lower-latency workflows:
+On top of that, MegaETH exposes two public extension paths for lower-latency workflows:
 
 - [`realtime_sendRawTransaction`](rpc/realtime_sendRawTransaction.md) — submit a transaction and get the receipt back in one call, no polling
 - [`eth_subscribe`](rpc/eth_subscribe.md) — stream logs, state changes, mini-blocks, and block headers over WebSocket as they happen
-- [`eth_callAfter`](rpc/eth_callAfter.md) — simulate a transaction after a prior one confirms (nonce-gated)
-- [`eth_getLogsWithCursor`](rpc/eth_getLogsWithCursor.md) — paginated log queries for large result sets
 
 For use-case-oriented guidance (which method to use for what), see the [Realtime API](realtime-api.md) page.
 
 ## Available Methods
 
 {% hint style="info" %}
-The table below reflects the **public MegaETH RPC endpoint**.
-Methods marked "Managed only" are unavailable on the public endpoint but supported by managed RPC providers such as [Alchemy](https://www.alchemy.com/).
-See [Debugging Transactions](../send-tx/debugging.md) for usage of debug methods, and [Tooling](../tooling.md#rpc-providers) for provider options.
+The table below reflects the public MegaETH Mainnet endpoint as verified on July 24, 2026.
+"Unavailable" includes methods recognized by the gateway but disabled or unimplemented upstream.
+Managed providers may expose additional methods.
 {% endhint %}
 
-| Method                                    | Availability   | Additional Restrictions                                           |
-| ----------------------------------------- | -------------- | ----------------------------------------------------------------- |
-| `debug_getRawBlock`                       | Managed only   |                                                                   |
-| `debug_getRawHeader`                      | Available      |                                                                   |
-| `debug_getRawReceipts`                    | Managed only   |                                                                   |
-| `debug_getRawTransaction`                 | Managed only   |                                                                   |
-| `debug_replayBlock`                       | Managed only   |                                                                   |
-| `debug_traceBlock`                        | Managed only   |                                                                   |
-| `debug_traceBlockByHash`                  | Available      |                                                                   |
-| `debug_traceBlockByNumber`                | Available      |                                                                   |
-| `debug_traceCall`                         | Available      |                                                                   |
-| `debug_traceCallMany`                     | Managed only   |                                                                   |
-| `debug_traceTransaction`                  | Available      |                                                                   |
-| `eth_accounts`                            | Available      |                                                                   |
-| `eth_blockNumber`                         | Available      |                                                                   |
-| `eth_call`                                | Available      | Compute gas limited to 60,000,000.                                |
-| `eth_callAfter`                           | Available      | Compute gas limited to 60,000,000. Timeout limited to 60 seconds. |
-| `eth_callMany`                            | Available      | Compute gas limited to 60,000,000 per call.                       |
-| `eth_chainId`                             | Available      |                                                                   |
-| `eth_createAccessList`                    | Available      | Compute gas limited to 60,000,000.                                |
-| `eth_estimateGas`                         | Available      | Compute gas limited to 60,000,000.                                |
-| `eth_feeHistory`                          | Available      | Block range limited to 256.                                       |
-| `eth_gasPrice`                            | Available      |                                                                   |
-| `eth_getBalance`                          | Available      |                                                                   |
-| `eth_getBlockByHash`                      | Available      |                                                                   |
-| `eth_getBlockByNumber`                    | Available      |                                                                   |
-| `eth_getBlockReceipts`                    | Available      |                                                                   |
-| `eth_getBlockTransactionCountByHash`      | Available      |                                                                   |
-| `eth_getBlockTransactionCountByNumber`    | Available      |                                                                   |
-| `eth_getCode`                             | Available      |                                                                   |
-| `eth_getFilterChanges`                    | Unavailable    |                                                                   |
-| `eth_getFilterLogs`                       | Unavailable    |                                                                   |
-| `eth_getHeaderByNumber`                   | Available      |                                                                   |
-| `eth_getLogs`                             | Available      |                                                                   |
-| `eth_getLogsWithCursor`                   | Managed only   |                                                                   |
-| `eth_getStorageAt`                        | Available      |                                                                   |
-| `eth_getTransactionByBlockHashAndIndex`   | Available      |                                                                   |
-| `eth_getTransactionByBlockNumberAndIndex` | Available      |                                                                   |
-| `eth_getTransactionByHash`                | Available      |                                                                   |
-| `eth_getTransactionCount`                 | Available      |                                                                   |
-| `eth_getTransactionReceipt`               | Available      |                                                                   |
-| `eth_getUncleByBlockHashAndIndex`         | Available      |                                                                   |
-| `eth_getUncleByBlockNumberAndIndex`       | Available      |                                                                   |
-| `eth_getUncleCountByBlockHash`            | Available      |                                                                   |
-| `eth_getUncleCountByBlockNumber`          | Available      |                                                                   |
-| `eth_maxPriorityFeePerGas`                | Available      |                                                                   |
-| `eth_mining`                              | Available      |                                                                   |
-| `eth_newBlockFilter`                      | Available      |                                                                   |
-| `eth_newFilter`                           | Available      |                                                                   |
-| `eth_newPendingTransactionFilter`         | Available      |                                                                   |
-| `eth_protocolVersion`                     | Available      |                                                                   |
-| `eth_sendRawTransaction`                  | Available      |                                                                   |
-| `eth_sendTransaction`                     | Unavailable    | Use `eth_sendRawTransaction` with a signed transaction.           |
-| `eth_sign`                                | Unavailable    | Sign client-side.                                                 |
-| `eth_signTransaction`                     | Unavailable    | Sign client-side.                                                 |
-| `eth_signTypedData`                       | Unavailable    | Sign client-side.                                                 |
-| `eth_subscribe`                           | WebSocket only |                                                                   |
-| `eth_syncing`                             | Available      |                                                                   |
-| `eth_uninstallFilter`                     | Available      |                                                                   |
-| `eth_unsubscribe`                         | WebSocket only |                                                                   |
-| `net_listening`                           | Available      |                                                                   |
-| `net_peerCount`                           | Available      |                                                                   |
-| `net_version`                             | Available      |                                                                   |
-| `realtime_sendRawTransaction`             | Available      |                                                                   |
-| `trace_block`                             | Available      |                                                                   |
-| `trace_call`                              | Available      |                                                                   |
-| `trace_callMany`                          | Managed only   |                                                                   |
-| `trace_get`                               | Managed only   |                                                                   |
-| `trace_rawTransaction`                    | Managed only   |                                                                   |
-| `trace_replayBlockTransactions`           | Managed only   |                                                                   |
-| `trace_replayTransaction`                 | Managed only   |                                                                   |
-| `trace_transaction`                       | Available      |                                                                   |
-| `txpool_content`                          | Unavailable    |                                                                   |
-| `txpool_contentFrom`                      | Unavailable    |                                                                   |
-| `txpool_inspect`                          | Unavailable    |                                                                   |
-| `txpool_status`                           | Unavailable    |                                                                   |
-| `web3_clientVersion`                      | Available      |                                                                   |
+| Method                                    | Availability   | Additional restrictions or behavior                                                             |
+| ----------------------------------------- | -------------- | ----------------------------------------------------------------------------------------------- |
+| `debug_getHistoryTransactionCount`        | Available      | MegaETH-specific.                                                                               |
+| `debug_getRawHeader`                      | Available      |                                                                                                 |
+| `debug_traceBlockByHash`                  | Available      | Large responses are streamed.                                                                   |
+| `debug_traceBlockByNumber`                | Available      | Large responses are streamed.                                                                   |
+| `debug_traceCall`                         | Unavailable    | The public endpoint returns `-32601`.                                                           |
+| `debug_traceTransaction`                  | Available      | Large responses are streamed.                                                                   |
+| `eth_accounts`                            | Available      | Returns an empty array because the gateway does not manage user keys.                           |
+| `eth_blockNumber`                         | Available      |                                                                                                 |
+| `eth_call`                                | Available      | Compute gas limited to 60,000,000.                                                              |
+| `eth_callAfter`                           | Unavailable    | The public endpoint returns `-32601`.                                                           |
+| `eth_callMany`                            | Available      | 100 bundles and 100 total calls; 60,000,000 compute gas per call; timeout capped at 25 seconds. |
+| `eth_chainId`                             | Available      |                                                                                                 |
+| `eth_createAccessList`                    | Available      | Compute gas limited to 60,000,000.                                                              |
+| `eth_estimateGas`                         | Available      | Compute gas limited to 60,000,000.                                                              |
+| `eth_feeHistory`                          | Available      | Block range limited to 256.                                                                     |
+| `eth_gasPrice`                            | Available      |                                                                                                 |
+| `eth_getBalance`                          | Available      |                                                                                                 |
+| `eth_getBlockByHash`                      | Available      |                                                                                                 |
+| `eth_getBlockByNumber`                    | Available      |                                                                                                 |
+| `eth_getBlockReceipts`                    | Available      |                                                                                                 |
+| `eth_getBlockTransactionCountByHash`      | Available      |                                                                                                 |
+| `eth_getBlockTransactionCountByNumber`    | Available      |                                                                                                 |
+| `eth_getCode`                             | Available      |                                                                                                 |
+| `eth_getCodeByHash`                       | Available      | MegaETH-specific.                                                                               |
+| `eth_getHeaderByHash`                     | Available      | MegaETH-specific.                                                                               |
+| `eth_getHeaderByNumber`                   | Available      | MegaETH-specific.                                                                               |
+| `eth_getLogs`                             | Available      |                                                                                                 |
+| `eth_getLogsWithCursor`                   | Unavailable    | The public endpoint returns `-32601`.                                                           |
+| `eth_getStorageAt`                        | Available      |                                                                                                 |
+| `eth_getTransactionByBlockHashAndIndex`   | Unavailable    | The public endpoint returns `-32601`.                                                           |
+| `eth_getTransactionByBlockNumberAndIndex` | Unavailable    | The public endpoint returns `-32601`.                                                           |
+| `eth_getTransactionByHash`                | Available      |                                                                                                 |
+| `eth_getTransactionCount`                 | Available      |                                                                                                 |
+| `eth_getTransactionReceipt`               | Available      |                                                                                                 |
+| `eth_getUncleByBlockHashAndIndex`         | Available      | Returns `null` for valid MegaETH blocks.                                                        |
+| `eth_getUncleByBlockNumberAndIndex`       | Available      | Returns `null` for valid MegaETH blocks.                                                        |
+| `eth_getUncleCountByBlockHash`            | Available      | Returns `0x0` for valid MegaETH blocks.                                                         |
+| `eth_getUncleCountByBlockNumber`          | Available      | Returns `0x0` for valid MegaETH blocks.                                                         |
+| `eth_getWithdrawalProof`                  | Available      | OP Stack withdrawal proof method.                                                               |
+| `eth_maxPriorityFeePerGas`                | Available      |                                                                                                 |
+| `eth_mining`                              | Unavailable    | The node reports the method as unimplemented.                                                   |
+| `eth_protocolVersion`                     | Available      | Legacy compatibility method.                                                                    |
+| `eth_sendRawTransaction`                  | Available      |                                                                                                 |
+| `eth_sendRawTransactionSync`              | Available      | MegaETH-specific synchronous receipt method.                                                    |
+| `eth_subscribe`                           | WebSocket only | Supports `logs`, `stateChanges`, `miniBlocks`, and `newHeads`.                                  |
+| `eth_syncing`                             | Available      |                                                                                                 |
+| `eth_unsubscribe`                         | WebSocket only |                                                                                                 |
+| `mega_getBlockWitness`                    | Available      | MegaETH-specific.                                                                               |
+| `mega_getWithdrawalProof`                 | Available      | Alias routed to `eth_getWithdrawalProof`.                                                       |
+| `mega_outputAtBlock`                      | Available      | OP Stack output-root method.                                                                    |
+| `net_listening`                           | Available      |                                                                                                 |
+| `net_peerCount`                           | Available      |                                                                                                 |
+| `net_version`                             | Available      |                                                                                                 |
+| `optimism_outputAtBlock`                  | Available      | Alias of `mega_outputAtBlock`.                                                                  |
+| `realtime_sendRawTransaction`             | Available      | MegaETH-specific synchronous receipt method.                                                    |
+| `trace_block`                             | Unavailable    | The public endpoint returns `-32601`.                                                           |
+| `trace_call`                              | Unavailable    | The public endpoint returns `-32601`.                                                           |
+| `trace_transaction`                       | Unavailable    | The public endpoint returns `-32601`.                                                           |
+| `web3_clientVersion`                      | Available      |                                                                                                 |
 
 ## Rate Limiting
 
@@ -133,15 +115,9 @@ A request whose body exceeds the applicable limit is rejected with HTTP `413` an
 
 ## Response Caching
 
-The public RPC gateway may serve a small set of read methods from a server-side cache inside the gateway itself, rather than forwarding every request to a node:
-
-- `eth_getBlockByNumber`
-- `eth_getBlockReceipts`
-- `eth_getHeaderByNumber`
-- `web3_clientVersion`
-
-Only requests for **immutable data** are eligible: an explicit historical block number, a block hash, or the `earliest` tag.
-Requests using the `latest`, `pending`, `safe`, or `finalized` tags always go to a node, so cached responses are never stale — the realtime behavior described above is unaffected.
+The public RPC gateway may serve read methods from an internal server-side cache rather than forwarding every request to a node.
+Eligibility and lifetime are method-specific: immutable block numbers and hashes can use longer-lived entries, while methods that follow the chain head either use a short-lived cache or bypass it.
+Do not assume that two different methods or block tags have the same cache policy.
 
 Two headers on the response are relevant:
 
@@ -152,7 +128,7 @@ Two headers on the response are relevant:
   Use it to understand where a response came from; it has no effect on correctness.
 
 Sending `Cache-Control: no-store` or `no-cache` as a _request_ header does not bypass the internal cache — request cache directives address intermediary caches, not the origin's own caching.
-Because only immutable data is cached, there is never a reason to bypass it.
+The gateway does not provide a request option that bypasses its internal cache.
 
 ## Related Pages
 
