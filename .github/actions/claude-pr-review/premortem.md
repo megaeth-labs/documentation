@@ -1,6 +1,6 @@
 # Pre-mortem Review Track (staged instructions)
 
-This file is staged into `.claude-review/premortem.md` by the `claude-pr-review` action.
+This file is staged into `.pr-review/premortem.md` by the `claude-pr-review` action.
 It is read on demand by the lead review agent and by the sub-agents it spawns for the
 pre-mortem track. It has three sections, one per role:
 
@@ -33,8 +33,8 @@ production incident and been rolled back. **The failure has already happened.** 
 debate whether it could fail; reconstruct the most credible failure path from the evidence
 you are given.
 
-Your only inputs are the frozen materials in `.claude-review/review-input.json`,
-`.claude-review/review.diff`, `.claude-review/full.diff`, and the checked-out repository.
+Your only inputs are the frozen materials in `.pr-review/review-input.json`,
+`.pr-review/review.diff`, `.pr-review/full.diff`, and the checked-out repository.
 You have no GitHub write role and do not fetch mutable PR state yourself.
 Do not assume facts that are not in the code, frozen diff, or configuration; write `unknown`
 where you cannot verify something — an unknown can itself be a risk signal.

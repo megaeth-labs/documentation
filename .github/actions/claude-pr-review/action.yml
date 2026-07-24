@@ -65,7 +65,7 @@ runs:
         GH_TOKEN: ${{ github.token }}
         REVIEW_DEPTH: ${{ inputs.review_depth }}
         PREMORTEM: ${{ inputs.premortem }}
-        STATE_DIR: ${{ github.workspace }}/.claude-review
+        STATE_DIR: ${{ github.workspace }}/.pr-review
       run: |
         set -euo pipefail
         python3 "$GITHUB_ACTION_PATH/review_pipeline.py" prepare \
@@ -105,9 +105,9 @@ runs:
           model_flag="--model $selected_model"
         fi
 
-        cp "$GITHUB_ACTION_PATH/rubric.md" "$GITHUB_WORKSPACE/.claude-review/rubric.md"
-        cp "$GITHUB_ACTION_PATH/rubric-detail.md" "$GITHUB_WORKSPACE/.claude-review/rubric-detail.md"
-        cp "$GITHUB_ACTION_PATH/premortem.md" "$GITHUB_WORKSPACE/.claude-review/premortem.md"
+        cp "$GITHUB_ACTION_PATH/rubric.md" "$GITHUB_WORKSPACE/.pr-review/rubric.md"
+        cp "$GITHUB_ACTION_PATH/rubric-detail.md" "$GITHUB_WORKSPACE/.pr-review/rubric-detail.md"
+        cp "$GITHUB_ACTION_PATH/premortem.md" "$GITHUB_WORKSPACE/.pr-review/premortem.md"
 
         echo "allowed_tools=${allowed_tools}" >> "$GITHUB_OUTPUT"
         echo "model_flag=${model_flag}" >> "$GITHUB_OUTPUT"
@@ -139,12 +139,12 @@ runs:
           when every result array is empty.
 
           Read these frozen inputs before analyzing:
-          - `.claude-review/review-input.json` — repository, PR, immutable SHAs,
+          - `.pr-review/review-input.json` — repository, PR, immutable SHAs,
             prior manifest, unresolved threads, review mode, and routing decision.
-          - `.claude-review/review.diff` — the full diff for a full review, or only
+          - `.pr-review/review.diff` — the full diff for a full review, or only
             the delta since the last published review for an incremental review.
-          - `.claude-review/full.diff` — the full PR diff for context and anchors.
-          - `.claude-review/rubric.md` and `.claude-review/rubric-detail.md`.
+          - `.pr-review/full.diff` — the full PR diff for context and anchors.
+          - `.pr-review/rubric.md` and `.pr-review/rubric-detail.md`.
           - Repository guidance such as REVIEW.md, README.md, CLAUDE.md, AGENTS.md,
             and path-specific guidance for changed files.
 
@@ -174,7 +174,7 @@ runs:
           7. Keep scope_summary to one short sentence describing what was reviewed.
 
           If review-input.json sets `review_scope.run_premortem` to true, read
-          `.claude-review/premortem.md` and run that independent reasoning pass
+          `.pr-review/premortem.md` and run that independent reasoning pass
           yourself. In standard mode, do not delegate this pass. Merge only confirmed
           results into normal findings. Convert useful unresolved hypotheses into
           open_questions. Do not output provenance or a no-findings pre-mortem status.
@@ -194,7 +194,7 @@ runs:
       shell: bash
       env:
         REVIEW_STRUCTURED_OUTPUT: ${{ steps.review.outputs.structured_output }}
-        STATE_DIR: ${{ github.workspace }}/.claude-review
+        STATE_DIR: ${{ github.workspace }}/.pr-review
       run: |
         set -euo pipefail
         python3 "$GITHUB_ACTION_PATH/review_pipeline.py" compile \
@@ -205,7 +205,7 @@ runs:
       shell: bash
       env:
         GH_TOKEN: ${{ steps.review.outputs.github_token || github.token }}
-        STATE_DIR: ${{ github.workspace }}/.claude-review
+        STATE_DIR: ${{ github.workspace }}/.pr-review
       run: |
         set -euo pipefail
         python3 "$GITHUB_ACTION_PATH/review_pipeline.py" publish \
