@@ -111,12 +111,23 @@ See [Debugging Transactions](../send-tx/debugging.md) for usage of debug methods
 
 ## Rate Limiting
 
-All available methods are subject to rate limiting based on two criteria:
+Read methods on the public RPC endpoint are rate-limited **per IP address** in **fixed 10-second windows**.
+Each method belongs to one of four categories, and each category has its own request budget:
 
-- **Compute Unit (CU) Limiting** — limits the computational cost of requests based on their complexity.
-- **Network Bandwidth Limiting** — limits the network traffic based on response sizes.
+| Category | Limit (per 10 s) | Methods                                                                                                                     |
+| -------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Instant  | 2,000            | `eth_chainId`, `eth_blockNumber`, `net_version`, `eth_accounts`, `web3_clientVersion`, `eth_getBalance`, `eth_getStorageAt` |
+| Simple   | 500              | Block/transaction queries, `eth_callAfter`, and all other read methods not listed in another category                       |
+| Compute  | 200              | `eth_call`, `eth_callMany`, `eth_estimateGas`, `eth_createAccessList`, `debug_trace*`, `trace_*`                            |
+| IO-heavy | 200              | `eth_getLogs`, `eth_getBlockReceipts`                                                                                       |
 
-User limits are dynamically updated in response to individual behavior.
+Additional notes:
+
+- Transaction submission methods (`eth_sendRawTransaction`, `realtime_sendRawTransaction`) are not subject to these read rate limits.
+- Cache hits still consume the method's per-category budget.
+- `eth_callMany` consumes one Compute-category request per inner transaction, not one per HTTP request.
+- `eth_callAfter` uses the Simple-category budget even though it shares `eth_call`'s 60,000,000 compute-gas cap.
+- A rate-limited request is rejected with HTTP `429` and RPC error `-32005` (`Rate limit exceeded`) — see [Error Codes](rpc/error-codes.md). Reduce request frequency, or use batching or WebSocket subscriptions to lower the request count.
 
 ## Request Body Limits
 
