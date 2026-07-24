@@ -55,6 +55,8 @@ Managed providers may expose additional methods.
 | `eth_getBlockTransactionCountByNumber`    | Available      |                                                                                                 |
 | `eth_getCode`                             | Available      |                                                                                                 |
 | `eth_getCodeByHash`                       | Available      | MegaETH-specific.                                                                               |
+| `eth_getFilterChanges`                    | Unavailable    | The public endpoint returns `-32601`.                                                           |
+| `eth_getFilterLogs`                       | Unavailable    | The public endpoint returns `-32601`.                                                           |
 | `eth_getHeaderByHash`                     | Available      | MegaETH-specific.                                                                               |
 | `eth_getHeaderByNumber`                   | Available      | MegaETH-specific.                                                                               |
 | `eth_getLogs`                             | Available      |                                                                                                 |
@@ -72,11 +74,15 @@ Managed providers may expose additional methods.
 | `eth_getWithdrawalProof`                  | Available      | OP Stack withdrawal proof method.                                                               |
 | `eth_maxPriorityFeePerGas`                | Available      |                                                                                                 |
 | `eth_mining`                              | Unavailable    | The node reports the method as unimplemented.                                                   |
+| `eth_newBlockFilter`                      | Unavailable    | The public endpoint returns `-32601`.                                                           |
+| `eth_newFilter`                           | Unavailable    | The public endpoint returns `-32601`.                                                           |
+| `eth_newPendingTransactionFilter`         | Unavailable    | The public endpoint returns `-32601`.                                                           |
 | `eth_protocolVersion`                     | Available      | Legacy compatibility method.                                                                    |
 | `eth_sendRawTransaction`                  | Available      |                                                                                                 |
 | `eth_sendRawTransactionSync`              | Available      | MegaETH-specific synchronous receipt method.                                                    |
 | `eth_subscribe`                           | WebSocket only | Supports `logs`, `stateChanges`, `miniBlocks`, and `newHeads`.                                  |
 | `eth_syncing`                             | Available      |                                                                                                 |
+| `eth_uninstallFilter`                     | Available      | Returns `false` when the filter ID does not exist.                                              |
 | `eth_unsubscribe`                         | WebSocket only |                                                                                                 |
 | `mega_getBlockWitness`                    | Available      | MegaETH-specific.                                                                               |
 | `mega_getWithdrawalProof`                 | Available      | Alias routed to `eth_getWithdrawalProof`.                                                       |

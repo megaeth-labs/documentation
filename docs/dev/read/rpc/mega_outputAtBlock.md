@@ -79,32 +79,46 @@ curl -sS https://mainnet.megaeth.com/rpc \
   --data '{"jsonrpc":"2.0","id":301,"method":"mega_outputAtBlock","params":["0x100"]}'
 ```
 
+The response below is illustrative; hashes and sync-status values are synthetic.
+
 ```json
 {
   "jsonrpc": "2.0",
   "id": 301,
   "result": {
     "version": "0x0000000000000000000000000000000000000000000000000000000000000000",
-    "outputRoot": "0xe41251ac90623f6a303572f9abea7d48a259fdb5812d36fdc3102abc69a62f97",
+    "outputRoot": "0x0000000000000000000000000000000000000000000000000000000000000001",
     "blockRef": {
-      "hash": "0x716a59d9fa50a9c225cbd4319bde1f1eccb9e8c3cacee8d7bda0dec17e1d9b34",
+      "hash": "0x0000000000000000000000000000000000000000000000000000000000000002",
       "number": 256,
-      "parentHash": "0xa1b2c3d4e5f60718293a4b5c6d7e8f9001122334455667788990aabbccddeeff",
+      "parentHash": "0x0000000000000000000000000000000000000000000000000000000000000003",
       "timestamp": 1762797267,
       "l1origin": {
-        "hash": "0x0011223344556677889900aabbccddeeff0011223344556677889900aabbccdd",
+        "hash": "0x0000000000000000000000000000000000000000000000000000000000000004",
         "number": 21000000
       },
       "sequenceNumber": 0
     },
     "syncStatus": {
-      "current_l1": { "hash": "0xaabb…", "number": 24732192 },
-      "unsafe_l2": { "hash": "0x8899…", "number": 11615881 },
-      "safe_l2": { "hash": "0x8899…", "number": 11615881 },
-      "finalized_l2": { "hash": "0x7788…", "number": 11615800 }
+      "current_l1": {
+        "hash": "0x0000000000000000000000000000000000000000000000000000000000000011",
+        "number": 24732192
+      },
+      "unsafe_l2": {
+        "hash": "0x0000000000000000000000000000000000000000000000000000000000000012",
+        "number": 11615881
+      },
+      "safe_l2": {
+        "hash": "0x0000000000000000000000000000000000000000000000000000000000000013",
+        "number": 11615881
+      },
+      "finalized_l2": {
+        "hash": "0x0000000000000000000000000000000000000000000000000000000000000014",
+        "number": 11615800
+      }
     },
-    "withdrawalStorageRoot": "0x8ed4baae3a927be3dea54996b4d5899f8c01e7594bf50b17dc1e741388ce3d12",
-    "stateRoot": "0xf5e1d1c08df99fabc86c73c2f88f137f63a880e9776315964f0c8ac77ae86305"
+    "withdrawalStorageRoot": "0x0000000000000000000000000000000000000000000000000000000000000005",
+    "stateRoot": "0x0000000000000000000000000000000000000000000000000000000000000006"
   }
 }
 ```

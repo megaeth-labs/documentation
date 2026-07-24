@@ -66,6 +66,7 @@
     - [eth_sendRawTransactionSync](dev/read/rpc/eth_sendRawTransactionSync.md)
     - [eth_subscribe](dev/read/rpc/eth_subscribe.md)
     - [eth_syncing](dev/read/rpc/eth_syncing.md)
+    - [eth_uninstallFilter](dev/read/rpc/eth_uninstallFilter.md)
     - [eth_unsubscribe](dev/read/rpc/eth_unsubscribe.md)
     - [mega_getBlockWitness](dev/read/rpc/mega_getBlockWitness.md)
     - [mega_getWithdrawalProof](dev/read/rpc/mega_getWithdrawalProof.md)

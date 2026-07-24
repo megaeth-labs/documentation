@@ -11,13 +11,13 @@ MegaETH provides two ways to debug transactions:
 
 ## Debug RPC Methods
 
-Standard Ethereum debug methods are available on the public MegaETH RPC endpoint (`https://mainnet.megaeth.com/rpc`) and through managed RPC providers such as [Alchemy](https://www.alchemy.com/).
+The public MegaETH RPC endpoint supports tracing mined transactions and blocks.
+It does not support `debug_traceCall`; use `mega-evme` for local call simulation or check whether a managed RPC provider exposes that method.
 
 The following methods are supported:
 
-- **`debug_traceTransaction`** — trace an already-mined transaction by hash
-- **`debug_traceCall`** — simulate and trace a call without broadcasting
-- **`debug_traceBlockByNumber`** / **`debug_traceBlockByHash`** — trace all transactions in a block
+- **[`debug_traceTransaction`](../read/rpc/debug_traceTransaction.md)** — trace an already-mined transaction by hash
+- **[`debug_traceBlockByNumber`](../read/rpc/debug_traceBlockByNumber.md)** / **[`debug_traceBlockByHash`](../read/rpc/debug_traceBlockByHash.md)** — trace all transactions in a block
 
 ### Supported Tracers
 

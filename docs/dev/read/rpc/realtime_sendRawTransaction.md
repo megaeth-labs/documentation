@@ -8,6 +8,7 @@ Submits a signed transaction and returns the receipt directly once the transacti
 This is a drop-in replacement for `eth_sendRawTransaction` that eliminates the need to poll `eth_getTransactionReceipt`.
 When no timeout is supplied, the node uses its 5-second default wait.
 The public gateway accepts an optional timeout but caps it at 3,000 milliseconds.
+The gateway routes this method and [`eth_sendRawTransactionSync`](./eth_sendRawTransactionSync.md) through the same synchronous submission handler, so their parameters and receipt behavior are equivalent.
 
 ## Parameters
 
@@ -23,6 +24,7 @@ A transaction receipt object on success:
 | Field             | Type              | Notes                                            |
 | ----------------- | ----------------- | ------------------------------------------------ |
 | `transactionHash` | `Data` (32 bytes) | Hash of the submitted transaction                |
+| `blockHash`       | `Data` (32 bytes) | Block containing the transaction                 |
 | `blockNumber`     | `Quantity`        | Block containing the transaction                 |
 | `from`            | `Data` (20 bytes) | Sender address                                   |
 | `to`              | `Data` (20 bytes) | Recipient address (`null` for contract creation) |
@@ -30,6 +32,9 @@ A transaction receipt object on success:
 | `status`          | `Quantity`        | `0x1` for success, `0x0` for revert              |
 | `logs`            | `Log[]`           | Event logs emitted during execution              |
 | `contractAddress` | `Data` (20 bytes) | Deployed contract address, or `null`             |
+
+For receipts produced from a streaming mini-block, `blockHash` can temporarily be the all-`ff` placeholder until the enclosing EVM block is committed.
+Refetch the receipt with `eth_getTransactionReceipt` after block sealing when a canonical block hash is required.
 
 ## Errors
 

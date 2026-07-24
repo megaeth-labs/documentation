@@ -1,13 +1,13 @@
 ---
-description: "Complete reference for the 50 JSON-RPC methods available through MegaETH's public HTTP and WebSocket endpoints."
+description: "Complete reference for the 51 JSON-RPC methods available through MegaETH's public HTTP and WebSocket endpoints."
 ---
 
 # RPC Reference
 
-The public MegaETH gateway exposes 48 HTTP methods and two WebSocket subscription methods.
+The public MegaETH gateway exposes 49 HTTP methods and two WebSocket subscription methods.
 This reference is based on the gateway registry, node implementation, and public Mainnet behavior verified on July 24, 2026.
 
-Use the [availability table](../overview.md#available-methods) for recognized methods that are disabled on the public endpoint and for methods offered only by managed providers.
+Use the [availability table](../overview.md#available-methods) for methods that are disabled or unsupported on the public endpoint.
 See [Error Codes](./error-codes.md) for shared JSON-RPC and gateway errors.
 
 ## State and simulation
@@ -45,6 +45,7 @@ See [Error Codes](./error-codes.md) for shared JSON-RPC and gateway errors.
 
 - [`eth_getLogs`](./eth_getLogs.md)
 - [`eth_subscribe`](./eth_subscribe.md) — WebSocket only
+- [`eth_uninstallFilter`](./eth_uninstallFilter.md)
 - [`eth_unsubscribe`](./eth_unsubscribe.md) — WebSocket only
 
 ## Fees and transaction submission

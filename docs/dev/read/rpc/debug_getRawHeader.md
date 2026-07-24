@@ -76,6 +76,6 @@ The RLP value is abbreviated below.
 ## Sources
 
 - Spec: [Ethereum Execution APIs, `src/debug/getters.yaml`](https://github.com/ethereum/execution-apis/blob/50d1e5e0b6f5a5046e45421e5c84497ab6e55e6c/src/debug/getters.yaml)
-- Node: [mega-reth debug RPC API](https://github.com/megaeth-labs/mega-reth/blob/0264d0821a8fe14ac6c7f710e9452edef7407b3f/crates/rpc/rpc-api/src/debug.rs)
-- Gateway: [mega-rpc method registry](https://github.com/megaeth-labs/mega-rpc/blob/06aa35aa95d569c227cc25d2aa12834eb0458aa0/workers/src/spec/methods.ts)
+- Code: `mega-reth@0264d0821a8fe14ac6c7f710e9452edef7407b3f`, `crates/rpc/rpc-api/src/debug.rs` (internal repository)
+- Code: `mega-rpc@06aa35aa95d569c227cc25d2aa12834eb0458aa0`, `workers/src/spec/methods.ts` (internal repository)
 - Probe: MegaETH Mainnet public endpoint, July 24, 2026

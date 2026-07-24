@@ -5,6 +5,7 @@ description: "eth_sendRawTransactionSync JSON-RPC reference for MegaETH."
 # eth_sendRawTransactionSync
 
 Submits a signed transaction and returns a receipt once the transaction is included in a block.
+The public gateway routes this method and [`realtime_sendRawTransaction`](./realtime_sendRawTransaction.md) through the same synchronous submission handler, with the same parameters and receipt result.
 
 ## Parameters
 
@@ -32,6 +33,8 @@ When omitted, the node uses its 5-second default; the public gateway caps explic
 - **`blockHash`** Hash32
 
   Containing block hash.
+  A receipt produced from a streaming mini-block can temporarily contain the all-`ff` placeholder hash until the enclosing EVM block is committed.
+  Refetch the receipt with `eth_getTransactionReceipt` after block sealing when a canonical block hash is required.
 
 - **`blockNumber`** Quantity
 

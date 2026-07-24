@@ -93,7 +93,6 @@ Outcome: success
 
 ## Sources
 
-- Node: [mega-reth `eth_callMany` implementation](https://github.com/megaeth-labs/mega-reth/blob/0264d0821a8fe14ac6c7f710e9452edef7407b3f/crates/rpc/rpc-eth-api/src/core.rs)
-- Gateway: [mega-rpc call-many adapter](https://github.com/megaeth-labs/mega-rpc/blob/06aa35aa95d569c227cc25d2aa12834eb0458aa0/workers/src/services/call-many/mega-call-many-adapter.ts)
-- Gateway: [mega-rpc method registry](https://github.com/megaeth-labs/mega-rpc/blob/06aa35aa95d569c227cc25d2aa12834eb0458aa0/workers/src/spec/methods.ts)
+- Code: `mega-reth@0264d0821a8fe14ac6c7f710e9452edef7407b3f`, `crates/rpc/rpc-eth-api/src/core.rs` (internal repository)
+- Code: `mega-rpc@06aa35aa95d569c227cc25d2aa12834eb0458aa0`, `workers/src/services/call-many/mega-call-many-adapter.ts` and `workers/src/spec/methods.ts` (internal repository)
 - Probe: MegaETH Mainnet public endpoint, July 24, 2026

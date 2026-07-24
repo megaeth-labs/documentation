@@ -9,11 +9,11 @@ The gateway routes both method names to the same node implementation.
 
 ## Parameters
 
-| Position | Name          | Type                | Required | Description                                                        |
-| -------- | ------------- | ------------------- | -------- | ------------------------------------------------------------------ |
-| `0`      | `address`     | `Address`           | Yes      | Must be `0x4200000000000000000000000000000000000016`.              |
-| `1`      | `storageKeys` | `Bytes32[]`         | Yes      | Withdrawal-message storage keys to prove; an empty array is valid. |
-| `2`      | `block`       | block number or tag | Yes      | State against which to build the proof.                            |
+| Position | Name          | Type                | Required | Description                                                                                              |
+| -------- | ------------- | ------------------- | -------- | -------------------------------------------------------------------------------------------------------- |
+| `0`      | `address`     | `Address`           | Yes      | Contract address to prove; use `0x4200000000000000000000000000000000000016` for withdrawal verification. |
+| `1`      | `storageKeys` | `Bytes32[]`         | Yes      | Withdrawal-message storage keys to prove; an empty array is valid.                                       |
+| `2`      | `block`       | block number or tag | Yes      | State against which to build the proof.                                                                  |
 
 ## Returns
 
