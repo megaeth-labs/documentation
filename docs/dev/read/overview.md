@@ -64,6 +64,7 @@ See [Debugging Transactions](../send-tx/debugging.md) for usage of debug methods
 | `eth_getFilterChanges`                    | Unavailable    |                                                                   |
 | `eth_getFilterLogs`                       | Unavailable    |                                                                   |
 | `eth_getLogs`                             | Available      |                                                                   |
+| `eth_getHeaderByNumber`                   | Available      |                                                                   |
 | `eth_getLogsWithCursor`                   | Managed only   |                                                                   |
 | `eth_getStorageAt`                        | Available      |                                                                   |
 | `eth_getTransactionByBlockHashAndIndex`   | Available      |                                                                   |
