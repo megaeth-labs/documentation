@@ -97,20 +97,21 @@ The response `result` is a single string of the form `<version>:<base64-payload>
 | `-32602` | Invalid params — malformed JSON, missing `blockNumber`, unparseable hex, or an invalid parameter combination. |
 | `-32603` | Witness not found for the requested keys, or a server-side failure while fetching it.                         |
 
-A missing witness and a server-side fetch failure both surface as `-32603`; the error `message` (for example `Witness not found`) distinguishes them.
-Note that `Witness not found` can be an expected outcome, not an error condition — see [Historical coverage](#historical-coverage) below.
+A missing witness and a server-side fetch failure both surface as `-32603`; the error `message` distinguishes them.
+To treat a missing witness as an expected outcome, match both `code == -32603` and an error `message` containing `Witness not found`.
+Treating `-32603` alone as a hard failure produces false alerts for testnet blocks outside the covered range — see [Historical coverage](#historical-coverage) below.
 The RPC layer in front of the witness service may also return standard JSON-RPC transport codes: `-32700` (parse error), `-32600` (invalid request).
 
 ### Historical coverage
 
 Witness availability on the public RPC depends on the network:
 
-| Network | Coverage                                                                                                                                           |
-| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Mainnet | All blocks.                                                                                                                                        |
-| Testnet | Block `1000` (a permanent test fixture) and blocks `>= 10325789`. Older testnet witnesses are at best sparsely available and cannot be backfilled. |
+| Network | Coverage                                                                                                                                                 |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Mainnet | All blocks.                                                                                                                                              |
+| Testnet | As of 2026-07-24: block `1000` (a permanent test fixture) and blocks `>= 10325789`. Older testnet witnesses are not guaranteed and cannot be backfilled. |
 
-Requesting a testnet block outside this range returns `Witness not found`.
+Requesting a testnet block outside this range typically returns `Witness not found`.
 
 ### Decoding pipeline
 
