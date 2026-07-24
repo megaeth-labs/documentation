@@ -88,7 +88,7 @@ runs:
       run: |
         set -euo pipefail
 
-        allowed_tools='Read,Glob,Grep,Bash(git diff:*),Bash(git show:*),Bash(git log:*),Bash(git blame:*),Bash(git status:*),Bash(ls:*),Bash(tree:*)'
+        allowed_tools='Read,Glob,Grep,StructuredOutput,Bash(git diff:*),Bash(git show:*),Bash(git log:*),Bash(git blame:*),Bash(git status:*),Bash(ls:*),Bash(tree:*)'
         if [[ -n "$EXTRA_ALLOWED_TOOLS" ]]; then
           allowed_tools="${allowed_tools},${EXTRA_ALLOWED_TOOLS}"
         fi
