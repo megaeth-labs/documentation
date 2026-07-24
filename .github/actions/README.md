@@ -25,9 +25,51 @@ The `interactive` action does not accept `extra_prompt` because `@claude` is nat
 
 The `pr-review` action additionally accepts:
 
-- `model` - optional, defaults to `opus`. Passed through to `claude --model`. Set another model id to override, or empty to fall through to the Claude Code CLI default (Sonnet class). Note the `opus` default means every consumer runs reviews on Opus out of the box.
-- `review_depth` - optional, defaults to `standard` (single-agent review). Set to `deep` for multi-agent orchestration: the lead agent fans out one sub-agent per review dimension, adversarially verifies each finding, then converges on the same single consolidated review. `deep` costs more tokens and wall-clock, so raise the calling job's `timeout-minutes` (see Concurrency) and prefer gating it per-PR (e.g. a label) rather than enabling it for every review.
-- `premortem` - optional, defaults to `on`. Adds an independent pre-mortem track to the review: a fresh sub-agent with no shared context assumes the PR already shipped and caused a production incident, reconstructs the most credible failure paths (top 5 candidates), an evidence-verifier sub-agent confirms or rejects each one against the actual code at head, and only `confirmed` findings are published as inline comments (marked `(pre-mortem, confirmed)`). `plausible_unverified` items appear only as non-blocking verification requests in the review body; rejected/stale/out-of-scope candidates are suppressed. The track is non-blocking — the review event is always `COMMENT`, never `REQUEST_CHANGES` — and caps the round at 5 Critical/Major plus 5 Minor/Nit inline comments across both tracks. It adds sub-agent wall-clock, so give the calling job `timeout-minutes` of at least `35`. Set to `off` to disable. The role prompts live in `claude-pr-review/premortem.md`.
+- `model` - optional, defaults to `claude-opus-4-7`.
+  This strong model handles initial, high-risk, and explicitly deep reviews.
+- `incremental_model` - optional, defaults to empty, which uses the Claude Code default
+  (Sonnet class).
+  It handles low-risk incremental reviews.
+- `review_depth` - optional, defaults to `standard`.
+  Set it to `deep` to make the semantic-analysis stage fan out relevant review dimensions
+  and adversarially verify the candidates before returning one structured result.
+- `premortem` - optional, defaults to `auto`.
+  Automatic mode runs the independent production-failure analysis for initial and high-risk
+  reviews, but skips it for ordinary incremental updates.
+  `on` always enables it and `off` disables it.
+
+### PR review pipeline
+
+The PR reviewer is an explicit staged pipeline:
+
+1. A deterministic preparation step freezes the base and head SHAs, loads the durable review
+   manifest, fetches prior automated threads, computes the full or incremental diff, and
+   selects the model tier.
+2. Claude performs semantic analysis and verification with read-only tools.
+   It returns schema-constrained data and cannot publish comments or resolve threads.
+3. A deterministic compiler validates findings, enforces severity budgets, checks RIGHT-side
+   anchors, formats the standard human-facing messages, and suppresses internal review
+   machinery.
+4. A deterministic publisher rechecks the live head, submits at most one review, resolves
+   addressed automated threads, and updates one sticky status comment.
+
+The sticky comment contains a hidden, versioned manifest with the last published head,
+reviewer and rubric versions, stable finding IDs, thread IDs, and finding dispositions.
+Later runs use that manifest as a checkpoint and fall back to GitHub review history if the
+manifest is unavailable.
+The manifest never contains complete diffs, PR prose, tool output, secrets, or Claude session
+transcripts.
+
+The action performs a full review when there is no valid checkpoint, the previous head is not
+an ancestor, or the pipeline or rubric version changed.
+Otherwise it reviews only the delta since the last published head and rechecks open findings.
+It discards output if the PR head changes during analysis.
+
+Internal production-failure analysis is never named in GitHub review output.
+Confirmed issues become ordinary findings.
+Useful uncertainty becomes an `Open question` with medium or low confidence and a concrete
+verification request.
+Rejected candidates and an empty internal analysis remain invisible.
 
 ## Per-Repo Conventions
 
@@ -37,11 +79,15 @@ other repo-level agent guidance), with those per-repo rules taking precedence ov
 canonical inline prompt. Use these files for repo-specific rules; reserve `extra_prompt` for
 small deltas that do not belong in a checked-in convention file.
 
-`pr-review` lets Claude iterate through multiple review passes before submission and stop only after it converges on no new actionable findings.
-It blocks the standalone inline-comment tool and requires new findings to be submitted through one pending GitHub review that is submitted once, so a completed review round should create one review notification.
-When old automated review threads are addressed, the action instructs Claude to resolve them silently instead of adding per-thread confirmation replies.
-It also tags every inline comment with a bold severity label (`**[Critical]**`, `**[Major]**`, `**[Minor]**`, `**[Nit]**`).
-A consumer repo's `REVIEW.md` may override or extend this severity scale.
+`pr-review` tags every inline finding with a bold severity label (`**[Critical]**`,
+`**[Major]**`, `**[Minor]**`, or `**[Nit]**`).
+Clean reviews and re-reviews update the sticky status without creating another review
+notification.
+Rounds with findings or open questions submit one atomic review and update the same sticky
+status.
+When old automated review threads are addressed, the deterministic publisher resolves them
+without adding confirmation replies.
+A consumer repo's `REVIEW.md` may override or extend the semantic severity guidance.
 
 ## Consumer Requirements
 
@@ -100,14 +146,16 @@ jobs:
 
 ## Concurrency (pr-review)
 
-Consumers should give the `pr-review` job a `timeout-minutes` value of at least `25` (`35` when the default-on pre-mortem track is enabled) plus a job-level concurrency group with `cancel-in-progress: false`.
-This helps an in-progress multi-turn review finish instead of being cancelled mid-run, because the action resolves addressed automated threads silently and posts one consolidated review per round.
-Cancelling can leave partial state:
+Consumers should give the `pr-review` job a `timeout-minutes` value of at least `25` plus a
+job-level concurrency group with `cancel-in-progress: true`.
+The publisher verifies the live PR head before every write, so obsolete runs cannot publish
+or advance the manifest.
+Latest-only cancellation avoids spending review time on queued, obsolete heads:
 
 ```yaml
 pr-review:
   timeout-minutes: 25
   concurrency:
     group: claude-pr-review-${{ github.event.pull_request.number }}
-    cancel-in-progress: false
+    cancel-in-progress: true
 ```
