@@ -63,6 +63,7 @@ See [Debugging Transactions](../send-tx/debugging.md) for usage of debug methods
 | `eth_getCode`                             | Available      |                                                                   |
 | `eth_getFilterChanges`                    | Unavailable    |                                                                   |
 | `eth_getFilterLogs`                       | Unavailable    |                                                                   |
+| `eth_getHeaderByNumber`                   | Available      |                                                                   |
 | `eth_getLogs`                             | Available      |                                                                   |
 | `eth_getLogsWithCursor`                   | Managed only   |                                                                   |
 | `eth_getStorageAt`                        | Available      |                                                                   |
@@ -129,6 +130,29 @@ The public RPC endpoint caps the size of the request body, and the cap depends o
 
 The higher limits for simulation methods let you estimate gas for or simulate large contract deployments, whose initcode can exceed the 128 KiB default.
 A request whose body exceeds the applicable limit is rejected with HTTP `413` and RPC error `-32099` (`payload too large`) — see [Error Codes](rpc/error-codes.md).
+
+## Response Caching
+
+The public RPC gateway may serve a small set of read methods from a server-side cache inside the gateway itself, rather than forwarding every request to a node:
+
+- `eth_getBlockByNumber`
+- `eth_getBlockReceipts`
+- `eth_getHeaderByNumber`
+- `web3_clientVersion`
+
+Only requests for **immutable data** are eligible: an explicit historical block number, a block hash, or the `earliest` tag.
+Requests using the `latest`, `pending`, `safe`, or `finalized` tags always go to a node, so cached responses are never stale — the realtime behavior described above is unaffected.
+
+Two headers on the response are relevant:
+
+- **`Cache-Control: no-store`** — every public response carries this header.
+  It is a directive to caches _downstream_ of the gateway (browsers, proxies, CDNs): do not store this response.
+  It does not mean the gateway itself computed the response from scratch — the gateway's internal cache is part of the origin, not a downstream cache, so serving from it does not conflict with `no-store`.
+- **`X-Workers-Cache-Status`** — reports whether the gateway's internal cache was hit (`HIT`, `MISS`, or other [Cloudflare cache statuses](https://developers.cloudflare.com/cache/concepts/cache-responses/)).
+  Use it to understand where a response came from; it has no effect on correctness.
+
+Sending `Cache-Control: no-store` or `no-cache` as a _request_ header does not bypass the internal cache — request cache directives address intermediary caches, not the origin's own caching.
+Because only immutable data is cached, there is never a reason to bypass it.
 
 ## Related Pages
 
