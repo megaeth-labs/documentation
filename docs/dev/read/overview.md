@@ -123,6 +123,7 @@ Each method belongs to one of four categories, and each category has its own req
 Additional notes:
 
 - Transaction submission methods (`eth_sendRawTransaction`, `realtime_sendRawTransaction`) are not subject to these read rate limits.
+- Cache hits still consume the method's per-category budget.
 - `eth_callMany` consumes one Compute-category request per inner transaction, not one per HTTP request.
 - `eth_callAfter` uses the Simple-category budget even though it shares `eth_call`'s 60,000,000 compute-gas cap.
 - A rate-limited request is rejected with HTTP `429` and RPC error `-32005` (`Rate limit exceeded`) — see [Error Codes](rpc/error-codes.md). Reduce request frequency, or use batching or WebSocket subscriptions to lower the request count.

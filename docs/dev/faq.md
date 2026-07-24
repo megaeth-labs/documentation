@@ -257,9 +257,10 @@ let _ = rustls::crypto::ring::default_provider().install_default();
 {% endstep %}
 {% endstepper %}
 
-### What does "rabbit hole is full. Please try again later" mean?
+### What does `Rate limit exceeded` mean?
 
 It means you are hitting a rate limit.
+Older clients or outdated docs may still refer to `rabbit hole is full. Please try again later`, but the public gateway now returns `Rate limit exceeded` with RPC error `-32005`.
 
 ### What does "rpc method is not whitelisted" mean?
 
