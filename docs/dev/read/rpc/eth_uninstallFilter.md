@@ -75,5 +75,4 @@ Outcome: false
 ## Sources
 
 - Spec: [Ethereum Execution APIs, `src/eth/filter.yaml`](https://github.com/ethereum/execution-apis/blob/50d1e5e0b6f5a5046e45421e5c84497ab6e55e6c/src/eth/filter.yaml)
-- Code: `mega-reth@0264d0821a8fe14ac6c7f710e9452edef7407b3f`, `crates/rpc/rpc/src/eth/filter.rs` (internal repository)
 - Probe: MegaETH Mainnet public endpoint, July 24, 2026

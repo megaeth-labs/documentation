@@ -111,7 +111,7 @@ Each method belongs to one of four categories, and each category has its own req
 
 Additional notes:
 
-- Transaction submission methods (`eth_sendRawTransaction`, `realtime_sendRawTransaction`) are not subject to these read rate limits.
+- Transaction submission methods (`eth_sendRawTransaction`, `eth_sendRawTransactionSync`, `realtime_sendRawTransaction`) are not subject to these read rate limits.
 - Cache hits still consume the method's per-category budget.
 - `eth_callMany` consumes one Compute-category request per inner transaction, not one per HTTP request.
 - A rate-limited request is rejected with HTTP `429` and RPC error `-32005` (`Rate limit exceeded`) — see [Error Codes](rpc/error-codes.md). Reduce request frequency, or use batching or WebSocket subscriptions to lower the request count.
@@ -120,11 +120,11 @@ Additional notes:
 
 The public RPC endpoint caps the size of the request body, and the cap depends on the method being called:
 
-| Method class                                                                                        | Maximum body size |
-| --------------------------------------------------------------------------------------------------- | ----------------- |
-| Transaction submission (`eth_sendRawTransaction`, `realtime_sendRawTransaction`)                    | 2.5 MiB           |
-| Large reads and simulations (`eth_call`, `eth_callMany`, `eth_createAccessList`, `eth_estimateGas`) | 1.5 MiB           |
-| All other methods                                                                                   | 128 KiB           |
+| Method class                                                                                                   | Maximum body size |
+| -------------------------------------------------------------------------------------------------------------- | ----------------- |
+| Transaction submission (`eth_sendRawTransaction`, `eth_sendRawTransactionSync`, `realtime_sendRawTransaction`) | 2.5 MiB           |
+| Large reads and simulations (`eth_call`, `eth_callMany`, `eth_createAccessList`, `eth_estimateGas`)            | 1.5 MiB           |
+| All other methods                                                                                              | 128 KiB           |
 
 The higher limits for simulation methods let you estimate gas for or simulate large contract deployments, whose initcode can exceed the 128 KiB default.
 A request whose body exceeds the applicable limit is rejected with HTTP `413` and RPC error `-32099` (`payload too large`) — see [Error Codes](rpc/error-codes.md).

@@ -76,6 +76,4 @@ Outcome: success
 ## Sources
 
 - Spec: [Ethereum Execution APIs method reference](https://github.com/ethereum/execution-apis/blob/50d1e5e0b6f5a5046e45421e5c84497ab6e55e6c/docs-api/api/methods/eth_getUncleCountByBlockHash.mdx)
-- Code: `mega-reth@0264d0821a8fe14ac6c7f710e9452edef7407b3f`, `crates/rpc/rpc-eth-api/src/core.rs` (internal repository)
-- Code: `mega-rpc@06aa35aa95d569c227cc25d2aa12834eb0458aa0`, `workers/src/spec/methods.ts` (internal repository)
 - Probe: MegaETH Mainnet public endpoint, July 24, 2026
