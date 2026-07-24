@@ -92,7 +92,7 @@ runs:
         if [[ -n "$EXTRA_ALLOWED_TOOLS" ]]; then
           allowed_tools="${allowed_tools},${EXTRA_ALLOWED_TOOLS}"
         fi
-        if [[ "$REVIEW_DEPTH" == "deep" || "$RUN_PREMORTEM" == "true" ]]; then
+        if [[ "$REVIEW_DEPTH" == "deep" ]]; then
           allowed_tools="${allowed_tools},Task"
         fi
 
@@ -129,8 +129,14 @@ runs:
         prompt: |
           You are the semantic analysis stage in a deterministic PR-review pipeline.
           You analyze and verify; you do not post, edit, resolve, or otherwise mutate
-          anything on GitHub. Return only the structured result required by the JSON
-          schema supplied to Claude Code.
+          anything on GitHub.
+
+          Completion contract: before ending the lead session, you MUST return the
+          structured result required by the JSON schema supplied to Claude Code.
+          Research notes, Task results, prose summaries, and completed analysis are
+          not a final answer. Do not end after a tool call or delegate the final
+          response. The lead session itself must return the schema-bound object, even
+          when every result array is empty.
 
           Read these frozen inputs before analyzing:
           - `.claude-review/review-input.json` — repository, PR, immutable SHAs,
@@ -168,14 +174,15 @@ runs:
           7. Keep scope_summary to one short sentence describing what was reviewed.
 
           If review-input.json sets `review_scope.run_premortem` to true, read
-          `.claude-review/premortem.md` and run that independent analysis internally.
-          Merge only confirmed results into normal findings. Convert useful unresolved
-          hypotheses into open_questions. Do not output provenance or a no-findings
-          pre-mortem status.
+          `.claude-review/premortem.md` and run that independent reasoning pass
+          yourself. In standard mode, do not delegate this pass. Merge only confirmed
+          results into normal findings. Convert useful unresolved hypotheses into
+          open_questions. Do not output provenance or a no-findings pre-mortem status.
 
           If review_depth is `deep`, fan out the relevant review dimensions with Task,
           then adversarially verify and deduplicate their candidates before producing
-          the single structured result. Sub-agents may analyze only and must not post.
+          the single structured result yourself. Sub-agents may analyze only and must
+          not post or provide the lead session's final response.
 
           REVIEW DEPTH: ${{ inputs.review_depth }}
           RUN INTERNAL PRE-MORTEM: ${{ steps.prepare.outputs.run_premortem }}
