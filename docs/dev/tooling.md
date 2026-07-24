@@ -25,6 +25,8 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | Envio HyperRPC | HTTP _(read-only)_ | [Docs](https://docs.envio.dev/docs/HyperRPC/overview-hyperrpc)    | `https://megaeth.rpc.hypersync.xyz`                       | Supported |
 | Chainstack     | HTTP               | [Docs](https://chainstack.com/build-better-with-megaeth/)         | No public endpoint (API key required)                     | Supported |
 
+For an independent third-party comparison of the MegaETH RPC providers listed above, see the [OpenChainBench MegaETH RPC benchmark](https://openchainbench.com/benchmarks/megaeth-rpc). Latency (p50/p95/p99), reliability, and stale-block detection are probed every minute from three regions (US East, EU West, Singapore) and published under a CC BY 4.0 license alongside the open-source Go harness.
+
 ---
 
 ## Explorers
