@@ -39,7 +39,8 @@ The server needs two upstream endpoints to operate:
 
 {% hint style="info" %}
 Most external teams do not run their own witness generator.
-Point `--witness-endpoint` at the MegaETH public RPC — it serves `mega_getBlockWitness` for all historical blocks.
+Point `--witness-endpoint` at the MegaETH public RPC — it serves `mega_getBlockWitness` for all historical blocks on mainnet.
+On testnet, witnesses are only available for block `1000` and blocks `>= 10325789` — see [Historical coverage](witness.md#historical-coverage).
 In the common case both flags point to the same URL.
 {% endhint %}
 
