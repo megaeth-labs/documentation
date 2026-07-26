@@ -4,12 +4,12 @@ description: Run a MegaETH full node — sync blocks and state from the sequence
 
 # Run a full node
 
-A **full node** is a role of `mega-reth`, the MegaETH node client derived from [reth](https://github.com/paradigmxyz/reth).
+A **full node** is a role of `mega-reth`, the MegaETH node client.
 Like a replica node, it syncs blocks and state from the sequencer stream and serves the full JSON-RPC surface.
 In addition, it runs an embedded, asynchronous stateless validator that re-executes every committed block against a [SALT witness](witness.md) and halts on any state-root, receipts-root, logs-bloom, or gas mismatch produced by the sequencer.
 Full nodes do not need to trust the sequencer's execution results.
 
-For how full nodes fit into the network, see [Architecture](../architecture.md).
+For how full nodes and replica nodes fit into the network, see [RPC Nodes](../architecture.md#rpc-nodes) in the architecture overview.
 For the standalone validator binary that verifies blocks without holding any chain state, see [Stateless Validation](stateless-validation.md).
 
 {% hint style="info" %}
@@ -19,16 +19,14 @@ To run a full node, [contact the MegaETH team](https://megaeth.com) to request a
 
 ## Node types
 
-`mega-reth node` runs one of several roles, selected with `--node-type`:
+`mega-reth node` selects its role with `--node-type`.
+The roles available to external operators are:
 
-| Value         | Role                                                                                                                    |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `full-node`   | Syncs blocks and state, serves JSON-RPC, and re-validates every block with the embedded stateless validator. This page. |
-| `rpc-node`    | Replica node: syncs blocks and state and serves JSON-RPC without re-execution.                                          |
-| `replayer`    | Re-executes blocks to generate witness data and serves `mega_getBlockWitness`.                                          |
-| `replay-full` | Isolated successor to the legacy `replayer` role; keeps a block index and also serves `mega_getBlockWitness`.           |
-| `verifier`    | Syncs block data and re-executes transactions to check state consistency.                                               |
-| `sequencer`   | The block producer. Default value — a full node must pass `--node-type full-node` explicitly.                           |
+| Value       | Role                                                                                                                    |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `full-node` | Syncs blocks and state, serves JSON-RPC, and re-validates every block with the embedded stateless validator. This page. |
+| `rpc-node`  | Replica node: syncs blocks and state and serves JSON-RPC without re-execution.                                          |
+| `sequencer` | The block producer. Default value — a full node must pass `--node-type full-node` explicitly.                           |
 
 `full-node` and `rpc-node` share the same sync path and data directory layout; the only difference is the embedded validator pipeline that produces attestations.
 Both types serve `mega_getValidatedChain`, but on an `rpc-node` it only reflects validated tips pushed by an upstream full node via `--validator.report-to`.
@@ -72,7 +70,7 @@ mega-reth node \
 - `--max-load` caps how many downstream children this node serves in one streaming tree; it is required and has no default.
 - `--metrics` binds the Prometheus endpoint; omit it to disable metrics.
 
-To also serve JSON-RPC, add the standard reth server flags:
+To also serve JSON-RPC, add the standard server flags:
 
 ```bash
   --http --http.addr 127.0.0.1 --http.port 8545 \
@@ -257,19 +255,19 @@ curl -sX POST http://localhost:8545 \
 
 ### Useful metrics
 
-| Metric                                                           | Type      | What it tells you                                                                         |
-| ---------------------------------------------------------------- | --------- | ----------------------------------------------------------------------------------------- |
-| `reth_state_sync_backend_provider_local_block_height`            | Gauge     | Latest committed block — the sync tip.                                                    |
-| `reth_megaeth_validator_cursor`                                  | Gauge     | Highest contiguously validated block.                                                     |
-| `reth_megaeth_validator_halted`                                  | Gauge     | `1` when the pipeline halted — on a mismatch or any fatal validator error. Alert on this. |
-| `reth_megaeth_validator_validated_blocks_total`                  | Counter   | Blocks re-executed and validated.                                                         |
-| `reth_megaeth_validator_failures_validate_total`                 | Counter   | Deterministic validation failures.                                                        |
-| `reth_megaeth_validator_changeset_fallback_full_total`           | Counter   | Delta-mode blocks that fell back to the full path. Steady growth is worth investigating.  |
-| `reth_megaeth_validator_block_validation_duration_seconds`       | Summary   | End-to-end validation time per block.                                                     |
-| `reth_megaeth_validator_validation_witness_verification_seconds` | Summary   | Witness IPA-proof verification time per block.                                            |
-| `reth_megaeth_validator_validation_block_replay_seconds`         | Summary   | EVM replay time per block.                                                                |
-| `reth_megaeth_validator_reorg_resets_total`                      | Counter   | Validator cursor rollbacks caused by reorgs.                                              |
-| `reth_db_table_size{table=<TABLE>}`                              | Gauge     | On-disk size per database table — watch for disk planning.                                |
+| Metric                                                           | Type    | What it tells you                                                                         |
+| ---------------------------------------------------------------- | ------- | ----------------------------------------------------------------------------------------- |
+| `reth_state_sync_backend_provider_local_block_height`            | Gauge   | Latest committed block — the sync tip.                                                    |
+| `reth_megaeth_validator_cursor`                                  | Gauge   | Highest contiguously validated block.                                                     |
+| `reth_megaeth_validator_halted`                                  | Gauge   | `1` when the pipeline halted — on a mismatch or any fatal validator error. Alert on this. |
+| `reth_megaeth_validator_validated_blocks_total`                  | Counter | Blocks re-executed and validated.                                                         |
+| `reth_megaeth_validator_failures_validate_total`                 | Counter | Deterministic validation failures.                                                        |
+| `reth_megaeth_validator_changeset_fallback_full_total`           | Counter | Delta-mode blocks that fell back to the full path. Steady growth is worth investigating.  |
+| `reth_megaeth_validator_block_validation_duration_seconds`       | Summary | End-to-end validation time per block.                                                     |
+| `reth_megaeth_validator_validation_witness_verification_seconds` | Summary | Witness IPA-proof verification time per block.                                            |
+| `reth_megaeth_validator_validation_block_replay_seconds`         | Summary | EVM replay time per block.                                                                |
+| `reth_megaeth_validator_reorg_resets_total`                      | Counter | Validator cursor rollbacks caused by reorgs.                                              |
+| `reth_db_table_size{table=<TABLE>}`                              | Gauge   | On-disk size per database table — watch for disk planning.                                |
 
 The three duration metrics are recorded as histograms internally but exported as Prometheus **summaries** — pre-computed quantile series plus `_sum` and `_count`, with no `_bucket` series.
 Read the quantiles directly (`reth_megaeth_validator_block_validation_duration_seconds{quantile="0.99"}`); `histogram_quantile()` returns nothing for them.
@@ -329,13 +327,13 @@ WantedBy=multi-user.target
 
 An explicitly passed `--datadir` is used as-is (the OS default adds a `<CHAIN_ID>/` level) and contains:
 
-| Path               | Contents                                                                                                            |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------- |
-| `db/main_db/`      | RocksDB instance holding headers, transactions, receipts, SALT state and trie, and changesets.                      |
-| `db/index_db/`     | RocksDB instance holding history indexes and transaction lookups (`full-node`, `rpc-node`, and `replay-full` only). |
-| `known-peers.json` | Persisted peer set, written on shutdown.                                                                            |
-| `jwt.hex`          | Auto-generated Engine API JWT secret.                                                                               |
-| `discovery-secret` | P2P identity key.                                                                                                   |
+| Path               | Contents                                                                                                   |
+| ------------------ | ---------------------------------------------------------------------------------------------------------- |
+| `db/main_db/`      | RocksDB instance holding headers, transactions, receipts, SALT state and trie, and changesets.             |
+| `db/index_db/`     | RocksDB instance holding history indexes and transaction lookups (created for `full-node` and `rpc-node`). |
+| `known-peers.json` | Persisted peer set, written on shutdown.                                                                   |
+| `jwt.hex`          | Auto-generated Engine API JWT secret.                                                                      |
+| `discovery-secret` | P2P identity key.                                                                                          |
 
 The data directory layout is tied to the node type — reuse a data directory only with a node type that shares its layout (`full-node` and `rpc-node` do; a `sequencer` data directory does not).
 
