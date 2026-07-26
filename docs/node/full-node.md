@@ -44,7 +44,8 @@ A full node needs four inputs beyond the binary itself:
 4. **Witness endpoint** — one or more RPC URLs serving [`mega_getBlockWitness`](witness.md), passed via `--validator.rpc-urls`.
    The endpoint needs no other JSON-RPC method: the validator reads blocks and bytecode from the node's own database and fetches only witnesses remotely.
 
-Plan for a fast NVMe SSD and several hundred GB of storage — the MegaETH Mainnet data directory measures roughly 400 GB as of July 2026 and grows with chain history.
+Plan for a fast NVMe SSD and several hundred GB of storage — a full-history MegaETH Mainnet data directory measures roughly 400 GB as of July 2026 and grows with chain history.
+A node bootstrapped at the tip (see [Initial sync](#initial-sync)) starts far smaller and grows from its bootstrap block.
 Validation throughput scales with CPU cores; the validator defaults to one worker per two physical cores.
 
 ## Quick start
@@ -61,15 +62,24 @@ mega-reth node \
   --sequencer-public-key <SEQUENCER_PUBLIC_KEY> \
   --trusted-peers <ENODE_URL>,<ENODE_URL> \
   --disable-discovery \
+  --bootstrap-policy required \
   --max-load 100 \
   --validator.rpc-urls <WITNESS_RPC_URL> \
   --metrics 127.0.0.1:9001 \
   --log.file.directory <LOG_DIR>
 ```
 
+- `--bootstrap-policy required` starts the node at the current chain tip: it fetches a snapshot of the SALT state from the trusted peers and syncs forward from there.
+  The flag defaults to `never`, and a node started without it begins at block 1 and replays the entire chain — see [Initial sync](#initial-sync) for the trade-off.
 - `--disable-discovery` is recommended: MegaETH has no public discovery network, and all sync traffic flows through the trusted peers anyway.
 - `--max-load` caps how many downstream children this node serves in one streaming tree; it is required and has no default.
+- `--validator.rpc-urls` must be quoted when the URL carries query parameters — an unquoted `&` splits the command in the shell and the node starts with a truncated URL.
 - `--metrics` binds the Prometheus endpoint; omit it to disable metrics.
+
+{% hint style="warning" %}
+`--bootstrap-policy required` needs an empty `--datadir`.
+Pointing it at a directory that already holds a chain synced from genesis exits with `Bootstrap is required, but the database is not empty`.
+{% endhint %}
 
 To also serve JSON-RPC, add the standard server flags:
 
@@ -91,34 +101,52 @@ On start, the node:
 
 1. Opens the data directory and runs crash-consistency recovery.
 2. Initializes P2P networking and logs its own `enode` URL.
-3. Handshakes with the trusted peers and starts state sync (`Committed block to engine` lines mark per-block progress).
-4. Resolves the validator anchor and starts the validation pipeline.
+3. Handshakes with the trusted peers and reports what it found (`Loaded local state`), then — on the first run only — fetches the SALT state at the tip and rebuilds the state trie.
+4. Starts state sync (`Committed block to engine` lines mark per-block progress).
+5. Resolves the validator anchor and starts the validation pipeline.
 
 Healthy startup output includes these lines:
 
 ```text
 INFO Starting mega-reth version=...
 INFO MegaETH P2P networking initialized enode=enode://...
+INFO Loaded local state local_block=0 known_block=... bootstrap_status=NotOccurred
+INFO Rebuilding trie block_number=...
+INFO Rebuilt salt and withdrawal tries salt_elapsed=... withdrawal_elapsed=...
 INFO Committed block to engine block_number=... source=Fetcher
 INFO validator: anchor resolved number=... action=SeedFresh
 INFO megaeth validator pipeline started workers=8 in_flight_multiplier=2 rpc_endpoints=1 mode=delta
 INFO validator: blocks validated and advanced from=... to=... count=...
 ```
 
+`known_block` in the `Loaded local state` line is the tip the trusted peers reported — with `--bootstrap-policy required` that is where the node lands, so `Committed block to engine` should start near it, not at block 1.
+
 ### Subsequent runs
 
 All flags shown above are operational, not persisted — re-supply them on every run.
+
+Keep `--bootstrap-policy required` in place.
+Once a bootstrap has finished the flag is a no-op on restart, and leaving it set means a data directory that is ever cleared bootstraps again instead of quietly replaying from genesis.
+An interrupted bootstrap resumes on the next start on its own, whatever the flag says.
+
 The validator resumes from its persisted cursor automatically; only pass `--validator.start-block` when you deliberately want to re-anchor (see [Validator pipeline](#validator-pipeline)).
 
 ## Initial sync
 
 `--bootstrap-policy` selects how an empty data directory reaches the chain tip:
 
-- **`never` (default)** — fetch and apply every historical block from the trusted peers, starting at genesis.
-  The node serves full chain history but initial sync replays the entire chain.
-- **`required`** — fetch a snapshot of the current SALT state from peers instead of replaying history, then sync blocks forward from there.
-  Bootstrap requires an empty data directory, and a full node additionally needs at least 256 recent blocks before the bootstrap can finish.
+- **`required`** — fetch a snapshot of the current SALT state from the trusted peers instead of replaying history, then sync blocks forward from there.
+  The node bootstraps at the tip its peers report at startup, so it is caught up and serving current state without replaying the chain.
+  Bootstrap requires an empty data directory, and on a full node it does not complete until the node has also applied the next 256 blocks past that base block.
   A bootstrapped node cannot serve history from before its bootstrap block and cannot unwind below it.
+- **`never` (default)** — fetch and apply every historical block from the trusted peers, starting at genesis.
+  The node serves full chain history, but initial sync replays the entire chain.
+
+Pass `required` unless the node has to answer queries about blocks and state that predate its own start.
+The flag defaults to `never`, so omitting it is what makes a fresh node start at block 1.
+
+Bootstrapped state is verified, not taken on trust: when the fetched buckets are complete the node rebuilds the SALT and withdrawal tries from scratch and compares the recomputed state root against the header's, failing the bootstrap on a mismatch.
+The rebuild is CPU-bound and can take a while on a large state.
 
 {% hint style="warning" %}
 An interrupted bootstrap can only resume if the node is fewer than 1,800 blocks behind the tip.
@@ -126,6 +154,7 @@ Beyond that, the node exits with `The last bootstrap is unfinished and it is too
 {% endhint %}
 
 Either way the embedded validator validates forward only, from the anchor it resolves at startup (see [Anchor](#anchor)); blocks before that point are not re-attested.
+On a bootstrapped node both candidates sit at or near the bootstrap block, so attestation begins there rather than at genesis.
 
 ## Command-line reference
 
@@ -145,15 +174,15 @@ Command-line flags take precedence over environment variables.
 
 ### Networking and state sync
 
-| Flag                       | Env variable                      | Default   | Description                                                                                               |
-| -------------------------- | --------------------------------- | --------- | --------------------------------------------------------------------------------------------------------- |
-| `--trusted-peers`          | `MEGARETH_TRUSTED_PEERS`          | empty     | Comma-separated enode URLs of upstream peers. Effectively required — see [Prerequisites](#prerequisites). |
-| `--subscribe-trusted-only` | `MEGARETH_SUBSCRIBE_TRUSTED_ONLY` | `true`    | Subscribe to block streams from trusted peers only.                                                       |
-| `--disable-discovery`      | `MEGARETH_DISABLE_DISCOVERY`      | `false`   | Disable peer discovery. Recommended — MegaETH publishes no bootnodes.                                     |
-| `--port`                   | `MEGARETH_PORT`                   | `30303`   | P2P listen port.                                                                                          |
-| `--addr`                   | `MEGARETH_ADDR`                   | `0.0.0.0` | P2P listen address.                                                                                       |
-| `--min-handshake-peers`    | `MEGARETH_MIN_HANDSHAKE_PEERS`    | `1`       | Peers that must complete the state-sync handshake before syncing starts.                                  |
-| `--bootstrap-policy`       | `MEGARETH_BOOTSTRAP_POLICY`       | `never`   | `never` (replay from genesis) or `required` (state bootstrap). See [Initial sync](#initial-sync).         |
+| Flag                       | Env variable                      | Default   | Description                                                                                                          |
+| -------------------------- | --------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------- |
+| `--trusted-peers`          | `MEGARETH_TRUSTED_PEERS`          | empty     | Comma-separated enode URLs of upstream peers. Effectively required — see [Prerequisites](#prerequisites).            |
+| `--subscribe-trusted-only` | `MEGARETH_SUBSCRIBE_TRUSTED_ONLY` | `true`    | Subscribe to block streams from trusted peers only.                                                                  |
+| `--disable-discovery`      | `MEGARETH_DISABLE_DISCOVERY`      | `false`   | Disable peer discovery. Recommended — MegaETH publishes no bootnodes.                                                |
+| `--port`                   | `MEGARETH_PORT`                   | `30303`   | P2P listen port.                                                                                                     |
+| `--addr`                   | `MEGARETH_ADDR`                   | `0.0.0.0` | P2P listen address.                                                                                                  |
+| `--min-handshake-peers`    | `MEGARETH_MIN_HANDSHAKE_PEERS`    | `1`       | Peers that must complete the state-sync handshake before syncing starts.                                             |
+| `--bootstrap-policy`       | `MEGARETH_BOOTSTRAP_POLICY`       | `never`   | `never` (replay from genesis) or `required` (state bootstrap at the current tip). See [Initial sync](#initial-sync). |
 
 ### Validator flags
 
@@ -322,6 +351,7 @@ MEGARETH_DATA_DIR=/var/lib/megaeth/full-node
 MEGARETH_SEQUENCER_PUBLIC_KEY=<SEQUENCER_PUBLIC_KEY>
 MEGARETH_TRUSTED_PEERS=<ENODE_URL>,<ENODE_URL>
 MEGARETH_DISABLE_DISCOVERY=true
+MEGARETH_BOOTSTRAP_POLICY=required
 MEGARETH_MAX_LOAD=100
 MEGARETH_VALIDATOR_RPC_URLS=<WITNESS_RPC_URL>
 MEGARETH_METRICS=127.0.0.1:9001
@@ -349,6 +379,10 @@ WantedBy=multi-user.target
 ```
 
 `TimeoutStopSec=120` matters: on shutdown the node flushes its databases, and a clean stop can take tens of seconds (5 s for ordinary tasks and 30 s total for critical tasks by default; `MEGARETH_CRITICAL_WAIT_SECS=N` replaces the critical budget with 5 s + N s).
+
+`MEGARETH_BOOTSTRAP_POLICY=required` belongs in the env file permanently.
+It applies only to an empty data directory and is ignored once the bootstrap has finished, so it costs nothing on restart and keeps a future re-sync from replaying the chain from genesis.
+Adding it to a data directory that was already synced from genesis is the one case that fails — see [Troubleshooting](#troubleshooting).
 
 ## Data directory and maintenance
 
@@ -422,6 +456,7 @@ Check that `--trusted-peers` is set, the enode URLs are current, and the peers a
 **Startup fails with `--node-type full requires at least one --validator.rpc-urls`.**
 Full nodes cannot start without a witness endpoint.
 Pass `--validator.rpc-urls` (see [Prerequisites](#prerequisites)).
+The `--node-type full` in that message is a stale spelling in the error text itself — the value the flag accepts is `full-node`.
 
 **`megaeth validator pipeline halted` and `reth_megaeth_validator_halted` is 1.**
 The validator hit a deterministic mismatch: this node could not reproduce a block the sequencer committed.
