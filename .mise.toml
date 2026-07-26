@@ -1,5 +1,10 @@
 [tools]
-lychee = "latest"
+# Pinned: `include_fragments` changed type in 0.24 (bool -> string), so an unpinned "latest"
+# resolved to a different version on CI than locally and the config parsed on only one of them.
+# 0.24.x also renamed its macOS assets (lychee-arm64-macos.tar.gz -> lychee-aarch64-apple-darwin
+# .tar.gz) without a matching aqua registry update, so it cannot install on Apple Silicon at all.
+# Keep this version in sync with `include_fragments` in lychee.toml.
+lychee = "0.23.0"
 "npm:markdownlint-cli2" = "latest"
 # Pinned: prettier >= 3.9.0 mangles GitBook template tags ({% tab %}/{% endtab %})
 # into markdown table rows, breaking page rendering. Re-evaluate before bumping.
