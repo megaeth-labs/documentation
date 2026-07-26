@@ -21,12 +21,14 @@ To run a full node, [contact the MegaETH team](https://megaeth.com) to request a
 
 `mega-reth node` runs one of several roles, selected with `--node-type`:
 
-| Value       | Role                                                                                                                    |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `full-node` | Syncs blocks and state, serves JSON-RPC, and re-validates every block with the embedded stateless validator. This page. |
-| `rpc-node`  | Replica node: syncs blocks and state and serves JSON-RPC without re-execution.                                          |
-| `replayer`  | Re-executes blocks to generate witness data and serves `mega_getBlockWitness`.                                          |
-| `sequencer` | The block producer. Default value — a full node must pass `--node-type full-node` explicitly.                           |
+| Value         | Role                                                                                                                    |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `full-node`   | Syncs blocks and state, serves JSON-RPC, and re-validates every block with the embedded stateless validator. This page. |
+| `rpc-node`    | Replica node: syncs blocks and state and serves JSON-RPC without re-execution.                                          |
+| `replayer`    | Re-executes blocks to generate witness data and serves `mega_getBlockWitness`.                                          |
+| `replay-full` | Isolated successor to the legacy `replayer` role; keeps a block index and also serves `mega_getBlockWitness`.           |
+| `verifier`    | Syncs block data and re-executes transactions to check state consistency.                                               |
+| `sequencer`   | The block producer. Default value — a full node must pass `--node-type full-node` explicitly.                           |
 
 `full-node` and `rpc-node` share the same sync path and data directory layout; the only difference is the embedded validator pipeline that produces attestations.
 Both types serve `mega_getValidatedChain`, but on an `rpc-node` it only reflects validated tips pushed by an upstream full node via `--validator.report-to`.
@@ -73,10 +75,18 @@ mega-reth node \
 To also serve JSON-RPC, add the standard reth server flags:
 
 ```bash
-  --http --http.addr 0.0.0.0 --http.port 8545 \
-  --http.api eth,net,web3,debug,trace,txpool,admin \
-  --ws --ws.addr 0.0.0.0 --ws.port 8546
+  --http --http.addr 127.0.0.1 --http.port 8545 \
+  --http.api eth,net,web3 \
+  --ws --ws.addr 127.0.0.1 --ws.port 8546
 ```
+
+The `mega_*` methods are not part of this selection — they are merged into every enabled transport regardless of `--http.api`, so `mega_getValidatedChain` works with the namespace set above.
+
+{% hint style="warning" %}
+Bind to `127.0.0.1` unless the node is deliberately a public RPC endpoint.
+Serving `0.0.0.0` with `admin`, `debug`, `trace`, or `txpool` enabled exposes `admin_addPeer` (unauthenticated peer manipulation), `debug_trace*` (unmetered remote CPU and memory), and `txpool_content` (pending-transaction leakage) to anyone who can reach the port.
+To serve traffic publicly, keep the node on loopback and put a reverse proxy in front of it that terminates TLS, rate-limits, and forwards only the namespaces you intend to expose.
+{% endhint %}
 
 On start, the node:
 
@@ -237,8 +247,7 @@ reth_megaeth_validator_cursor 6907396
 The difference is the validation lag in blocks.
 A small, stable lag is normal; a growing lag means validation cannot keep pace (see [Troubleshooting](#troubleshooting)).
 
-Full nodes also serve `mega_getValidatedChain`, which returns the anchor and the validated tip.
-`mega_*` methods are merged into every enabled transport, so the namespace does not need to be listed in `--http.api`:
+Full nodes also serve `mega_getValidatedChain`, which returns the anchor and the validated tip — available on any enabled transport, whatever `--http.api` selects:
 
 ```bash
 curl -sX POST http://localhost:8545 \
@@ -256,13 +265,14 @@ curl -sX POST http://localhost:8545 \
 | `reth_megaeth_validator_validated_blocks_total`                  | Counter   | Blocks re-executed and validated.                                                         |
 | `reth_megaeth_validator_failures_validate_total`                 | Counter   | Deterministic validation failures.                                                        |
 | `reth_megaeth_validator_changeset_fallback_full_total`           | Counter   | Delta-mode blocks that fell back to the full path. Steady growth is worth investigating.  |
-| `reth_megaeth_validator_block_validation_duration_seconds`       | Histogram | End-to-end validation time per block.                                                     |
-| `reth_megaeth_validator_validation_witness_verification_seconds` | Histogram | Witness IPA-proof verification time per block.                                            |
-| `reth_megaeth_validator_validation_block_replay_seconds`         | Histogram | EVM replay time per block.                                                                |
+| `reth_megaeth_validator_block_validation_duration_seconds`       | Summary   | End-to-end validation time per block.                                                     |
+| `reth_megaeth_validator_validation_witness_verification_seconds` | Summary   | Witness IPA-proof verification time per block.                                            |
+| `reth_megaeth_validator_validation_block_replay_seconds`         | Summary   | EVM replay time per block.                                                                |
 | `reth_megaeth_validator_reorg_resets_total`                      | Counter   | Validator cursor rollbacks caused by reorgs.                                              |
-| `reth_db_table_size{table=...}`                                  | Gauge     | On-disk size per database table — watch for disk planning.                                |
+| `reth_db_table_size{table=<TABLE>}`                              | Gauge     | On-disk size per database table — watch for disk planning.                                |
 
-The duration metrics are exposed as Prometheus summaries (quantile series plus `_sum`/`_count`), not bucketed histograms.
+The three duration metrics are recorded as histograms internally but exported as Prometheus **summaries** — pre-computed quantile series plus `_sum` and `_count`, with no `_bucket` series.
+Read the quantiles directly (`reth_megaeth_validator_block_validation_duration_seconds{quantile="0.99"}`); `histogram_quantile()` returns nothing for them.
 
 ### Key log lines
 
@@ -319,13 +329,13 @@ WantedBy=multi-user.target
 
 An explicitly passed `--datadir` is used as-is (the OS default adds a `<CHAIN_ID>/` level) and contains:
 
-| Path               | Contents                                                                                       |
-| ------------------ | ---------------------------------------------------------------------------------------------- |
-| `db/main_db/`      | RocksDB instance holding headers, transactions, receipts, SALT state and trie, and changesets. |
-| `db/index_db/`     | RocksDB instance holding history indexes and transaction lookups (full and rpc nodes only).    |
-| `known-peers.json` | Persisted peer set, written on shutdown.                                                       |
-| `jwt.hex`          | Auto-generated Engine API JWT secret.                                                          |
-| `discovery-secret` | P2P identity key.                                                                              |
+| Path               | Contents                                                                                                            |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------- |
+| `db/main_db/`      | RocksDB instance holding headers, transactions, receipts, SALT state and trie, and changesets.                      |
+| `db/index_db/`     | RocksDB instance holding history indexes and transaction lookups (`full-node`, `rpc-node`, and `replay-full` only). |
+| `known-peers.json` | Persisted peer set, written on shutdown.                                                                            |
+| `jwt.hex`          | Auto-generated Engine API JWT secret.                                                                               |
+| `discovery-secret` | P2P identity key.                                                                                                   |
 
 The data directory layout is tied to the node type — reuse a data directory only with a node type that shares its layout (`full-node` and `rpc-node` do; a `sequencer` data directory does not).
 
@@ -395,7 +405,7 @@ Preserve the logs around the halt and report the block number to the MegaETH tea
 
 **The lag between the sync tip and the validator cursor keeps growing.**
 Either witness fetches are stalling (witness endpoint slow, rate-limited, or persistently behind the local tip — consider raising `--validator.tip-buffer`) or validation is CPU-bound (raise `--validator.workers` up to the physical core count).
-The `block_validation_duration_seconds`, `validation_witness_verification_seconds`, and `validation_block_replay_seconds` histograms show where the time goes.
+The `block_validation_duration_seconds`, `validation_witness_verification_seconds`, and `validation_block_replay_seconds` quantiles show where the time goes.
 
 **`reth_megaeth_validator_changeset_fallback_full_total` climbs steadily.**
 Delta mode cannot find stored changesets for current blocks, so every block takes the slower full path.
