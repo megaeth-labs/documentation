@@ -29,7 +29,8 @@ The roles available to external operators are:
 | `sequencer` | The block producer. Default value — a full node must pass `--node-type full-node` explicitly.                           |
 
 `full-node` and `rpc-node` share the same sync path and data directory layout; the only difference is the embedded validator pipeline that produces attestations.
-Both types serve `mega_getValidatedChain`, but on an `rpc-node` it only reflects validated tips pushed by an upstream full node via `--validator.report-to`.
+Both types serve `mega_getValidatedChain`, but on an `rpc-node` it only reflects validated tips pushed by an upstream full node via `--validator.report-to` — that node validated nothing itself, and its `anchor` always reads `null`.
+To see where attestation actually starts, query the full node that produced the tips.
 
 ## Prerequisites
 
@@ -124,7 +125,7 @@ An interrupted bootstrap can only resume if the node is fewer than 1,800 blocks 
 Beyond that, the node exits with `The last bootstrap is unfinished and it is too far behind to recover` — clear the data directory and restart the bootstrap.
 {% endhint %}
 
-The embedded validator anchors at the first synced head and validates forward only; blocks before the anchor are not re-attested.
+Either way the embedded validator validates forward only, from the anchor it resolves at startup (see [Anchor](#anchor)); blocks before that point are not re-attested.
 
 ## Command-line reference
 
@@ -214,10 +215,19 @@ Once the anchor is persisted, restarts with the same flag are skipped without re
 
 Both modes IPA-verify the witness and re-execute the block with the `stateless-validator` library; they differ in how the replay result is bound to the block header:
 
-- **`delta` (default)** — compare the replay-derived SALT changeset against the hash-verified changeset that state sync persisted for the same block, skipping the per-block SALT trie recompute.
-  Blocks whose stored changeset is unavailable automatically fall back to `full` behavior (counted by `reth_megaeth_validator_changeset_fallback_full_total`).
+- **`delta` (default)** — verify the witness against a pre-state anchored to the parent header, then compare the replay-derived SALT changeset against the hash-verified changeset that state sync persisted for the same block, skipping the per-block SALT trie recompute.
 - **`full`** — recompute the SALT trie root from the replay output and compare it with the header's state root.
-  Slower, but independent of stored changesets.
+  Slower, but independent of stored changesets and parent anchors.
+
+Delta mode never runs unanchored: a block falls back to `full` behavior for that block alone when either input is missing, and each cause has its own counter.
+
+| Missing input                                                    | Counter                                                |
+| ---------------------------------------------------------------- | ------------------------------------------------------ |
+| Stored changeset row                                             | `reth_megaeth_validator_changeset_fallback_full_total` |
+| Parent-anchor pair (reorg mid-fetch, or a pruned/bootstrap edge) | `reth_megaeth_validator_anchor_fallback_full_total`    |
+
+Both are counted once per validated block, not per fetch attempt.
+Validation results are identical either way — only throughput differs.
 
 ### Mismatch handling
 
@@ -253,6 +263,9 @@ curl -sX POST http://localhost:8545 \
   -d '{"jsonrpc":"2.0","method":"mega_getValidatedChain","params":[],"id":1}'
 ```
 
+`(anchor, tip]` is the range this node has re-executed and validated itself.
+`tip` reads `null` until the first attestation lands after a fresh start or a re-anchor, so treat a null tip on a freshly started node as "not yet", not as a failure.
+
 ### Useful metrics
 
 | Metric                                                           | Type    | What it tells you                                                                         |
@@ -262,14 +275,28 @@ curl -sX POST http://localhost:8545 \
 | `reth_megaeth_validator_halted`                                  | Gauge   | `1` when the pipeline halted — on a mismatch or any fatal validator error. Alert on this. |
 | `reth_megaeth_validator_validated_blocks_total`                  | Counter | Blocks re-executed and validated.                                                         |
 | `reth_megaeth_validator_failures_validate_total`                 | Counter | Deterministic validation failures.                                                        |
-| `reth_megaeth_validator_changeset_fallback_full_total`           | Counter | Delta-mode blocks that fell back to the full path. Steady growth is worth investigating.  |
+| `reth_megaeth_validator_failures_panic_total`                    | Counter | Panics inside the validation closure. Any non-zero value is a bug — report it.            |
+| `reth_megaeth_validator_changeset_fallback_full_total`           | Counter | Delta-mode blocks that fell back for a missing changeset row.                             |
+| `reth_megaeth_validator_anchor_fallback_full_total`              | Counter | Delta-mode blocks that fell back for a missing parent anchor.                             |
 | `reth_megaeth_validator_block_validation_duration_seconds`       | Summary | End-to-end validation time per block.                                                     |
 | `reth_megaeth_validator_validation_witness_verification_seconds` | Summary | Witness IPA-proof verification time per block.                                            |
 | `reth_megaeth_validator_validation_block_replay_seconds`         | Summary | EVM replay time per block.                                                                |
+| `reth_megaeth_validator_validation_salt_update_seconds`          | Summary | SALT stage time — trie recompute in `full`, changeset compare in `delta`.                 |
+| `reth_megaeth_validator_canonical_lag_seconds`                   | Summary | Wall time from dispatch to persist, a per-block lag proxy.                                |
 | `reth_megaeth_validator_reorg_resets_total`                      | Counter | Validator cursor rollbacks caused by reorgs.                                              |
 | `reth_db_table_size{table=<TABLE>}`                              | Gauge   | On-disk size per database table — watch for disk planning.                                |
 
-The three duration metrics are recorded as histograms internally but exported as Prometheus **summaries** — pre-computed quantile series plus `_sum` and `_count`, with no `_bucket` series.
+Two more appear only when `--validator.report-to` is set:
+
+| Metric                                                      | Type    | What it tells you                                                           |
+| ----------------------------------------------------------- | ------- | --------------------------------------------------------------------------- |
+| `reth_megaeth_validator_publisher_active`                   | Gauge   | `1` while the validated-block publisher loop is running, `0` once it exits. |
+| `reth_megaeth_validator_publish_failures_total{peer=<URL>}` | Counter | Failed `mega_setValidatedBlocks` pushes per peer.                           |
+
+A peer that is reachable but refuses a report is not counted as a failure — only transport errors, timeouts, RPC-layer errors, and publish-client panics are.
+The `peer` label is the configured URL after `Url` normalization, so `http://rpc-a:8545` appears as `http://rpc-a:8545/` and Prometheus matchers must use the trailing-slash form.
+
+The `_seconds` metrics are recorded as histograms internally but exported as Prometheus **summaries** — pre-computed quantile series plus `_sum` and `_count`, with no `_bucket` series.
 Read the quantiles directly (`reth_megaeth_validator_block_validation_duration_seconds{quantile="0.99"}`); `histogram_quantile()` returns nothing for them.
 
 ### Key log lines
@@ -403,12 +430,19 @@ Preserve the logs around the halt and report the block number to the MegaETH tea
 
 **The lag between the sync tip and the validator cursor keeps growing.**
 Either witness fetches are stalling (witness endpoint slow, rate-limited, or persistently behind the local tip — consider raising `--validator.tip-buffer`) or validation is CPU-bound (raise `--validator.workers` up to the physical core count).
-The `block_validation_duration_seconds`, `validation_witness_verification_seconds`, and `validation_block_replay_seconds` quantiles show where the time goes.
+The `validation_witness_verification_seconds`, `validation_block_replay_seconds`, and `validation_salt_update_seconds` quantiles break the per-block cost into fetch-verify, replay, and SALT stages; `block_validation_duration_seconds` is the total.
 
-**`reth_megaeth_validator_changeset_fallback_full_total` climbs steadily.**
-Delta mode cannot find stored changesets for current blocks, so every block takes the slower full path.
+**A fallback counter climbs steadily.**
+Delta mode is degrading to the slower full path on most blocks.
 Validation results remain correct; expect reduced throughput.
-On a database whose recent blocks were synced by a current build, steady growth is unexpected and worth reporting.
+Which counter is moving says why:
+
+- `reth_megaeth_validator_changeset_fallback_full_total` — the stored changeset row is missing.
+  On a database whose recent blocks were synced by a current build this is unexpected and worth reporting.
+- `reth_megaeth_validator_anchor_fallback_full_total` — the parent-anchor pair is missing.
+  A burst around a reorg is normal; sustained growth points at a pruned or bootstrap-edge datadir.
+
+Switching to `--validator.mode full` removes the fallback churn but not the underlying cost.
 
 **Startup fails with `Bootstrap is required, but the database is not empty`.**
 `--bootstrap-policy required` only works on an empty data directory.
