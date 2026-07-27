@@ -52,11 +52,9 @@ HIGH_RISK_PARTS = {
     "security",
     "storage",
 }
-REVIEWER_LOGINS = {
+LEGACY_REVIEWER_LOGINS = {
     "claude",
-    "claude[bot]",
     "github-actions",
-    "github-actions[bot]",
 }
 GITHUB_LINK_RETRY_ATTEMPTS = 5
 GITHUB_LINK_RETRY_DELAY_SECONDS = 1
@@ -114,6 +112,23 @@ def gh_pages(endpoint: str) -> list[Any]:
         if isinstance(page, list):
             flattened.extend(page)
     return flattened
+
+
+def authenticated_login() -> str:
+    response = gh_json(
+        [
+            "api",
+            "graphql",
+            "-f",
+            "query=query { viewer { login } }",
+        ]
+    )
+    login = str(
+        (response or {}).get("data", {}).get("viewer", {}).get("login") or ""
+    )
+    if not login:
+        raise PipelineError("could not determine GitHub publisher identity")
+    return login
 
 
 def utc_now() -> str:
@@ -239,17 +254,37 @@ def is_high_risk(paths: list[str]) -> bool:
     return False
 
 
-def is_bot_login(login: str | None) -> bool:
+def canonical_login(login: str | None) -> str:
     lowered = (login or "").lower()
-    return lowered in REVIEWER_LOGINS
+    return lowered.removesuffix("[bot]")
 
 
-def is_stateful_review(login: str | None, body: str | None) -> bool:
-    lowered = (login or "").lower()
-    if lowered in {"claude", "claude[bot]"}:
+def reviewer_logins(publisher_login: str | None = None) -> set[str]:
+    logins = set(LEGACY_REVIEWER_LOGINS)
+    if publisher_login:
+        logins.add(canonical_login(publisher_login))
+    return logins
+
+
+def is_bot_login(
+    login: str | None,
+    *,
+    publisher_login: str | None = None,
+) -> bool:
+    return canonical_login(login) in reviewer_logins(publisher_login)
+
+
+def is_stateful_review(
+    login: str | None,
+    body: str | None,
+    *,
+    publisher_login: str | None = None,
+) -> bool:
+    lowered = canonical_login(login)
+    if lowered == "claude":
         return True
     return (
-        lowered in {"github-actions", "github-actions[bot]"}
+        lowered in reviewer_logins(publisher_login)
         and decode_state(body or "") is not None
     )
 
@@ -259,17 +294,22 @@ def is_owned_review_comment(
     *,
     repository: str,
     pull_request: int,
+    publisher_login: str | None = None,
 ) -> bool:
-    login = str((comment.get("author") or {}).get("login") or "").lower()
-    if login in {"claude", "claude[bot]"}:
+    login = canonical_login((comment.get("author") or {}).get("login"))
+    if login == "claude":
         return True
-    if login not in {"github-actions", "github-actions[bot]"}:
+    if login not in reviewer_logins(publisher_login):
         return False
     review = comment.get("pullRequestReview") or {}
     review_login = (review.get("author") or {}).get("login")
     state = decode_state(str(review.get("body") or ""))
     return (
-        is_stateful_review(review_login, str(review.get("body") or ""))
+        is_stateful_review(
+            review_login,
+            str(review.get("body") or ""),
+            publisher_login=publisher_login,
+        )
         and valid_manifest(
             state,
             repository=repository,
@@ -327,10 +367,11 @@ def load_sticky_state(
     *,
     repository: str,
     pull_request: int,
+    publisher_login: str | None = None,
 ) -> tuple[dict[str, Any] | None, int | None]:
     for comment in reversed(comments):
         login = (comment.get("user") or {}).get("login")
-        if not is_bot_login(login):
+        if not is_bot_login(login, publisher_login=publisher_login):
             continue
         body = comment.get("body") or ""
         state = decode_state(body)
@@ -339,7 +380,13 @@ def load_sticky_state(
             repository=repository,
             pull_request=pull_request,
         ):
-            return state, int(comment["id"])
+            editable_comment_id = (
+                int(comment["id"])
+                if not publisher_login
+                or canonical_login(login) == canonical_login(publisher_login)
+                else None
+            )
+            return state, editable_comment_id
     return None, None
 
 
@@ -348,9 +395,13 @@ def load_review_state(
     *,
     repository: str,
     pull_request: int,
+    publisher_login: str | None = None,
 ) -> dict[str, Any] | None:
     for review in reversed(reviews):
-        if not is_bot_login((review.get("user") or {}).get("login")):
+        if not is_bot_login(
+            (review.get("user") or {}).get("login"),
+            publisher_login=publisher_login,
+        ):
             continue
         body = review.get("body") or ""
         state = decode_state(body)
@@ -388,12 +439,20 @@ def compare_commits(
     return value if isinstance(value, dict) else None
 
 
-def latest_reviewed_head(reviews: list[dict[str, Any]]) -> str | None:
+def latest_reviewed_head(
+    reviews: list[dict[str, Any]],
+    *,
+    publisher_login: str | None = None,
+) -> str | None:
     for review in reversed(reviews):
         login = (review.get("user") or {}).get("login")
         commit_id = review.get("commit_id")
         if (
-            is_stateful_review(login, str(review.get("body") or ""))
+            is_stateful_review(
+                login,
+                str(review.get("body") or ""),
+                publisher_login=publisher_login,
+            )
             and commit_id
         ):
             return str(commit_id)
@@ -470,6 +529,8 @@ query($owner:String!, $name:String!, $number:Int!, $cursor:String) {
 def import_legacy_findings(
     manifest: dict[str, Any],
     threads: list[dict[str, Any]],
+    *,
+    publisher_login: str | None = None,
 ) -> None:
     known_threads: dict[str, dict[str, Any]] = {}
     known_comments: dict[int, dict[str, Any]] = {}
@@ -489,6 +550,7 @@ def import_legacy_findings(
             first,
             repository=str(manifest.get("repository") or ""),
             pull_request=int(manifest.get("pull_request") or 0),
+            publisher_login=publisher_login,
         ):
             continue
         thread_id = thread.get("id")
@@ -587,6 +649,7 @@ def prepare(args: argparse.Namespace) -> None:
             action_dir / "premortem.md",
         ]
     )
+    publisher_login = authenticated_login()
 
     pull = gh_json(
         ["api", f"repos/{args.repository}/pulls/{args.pull_request}"]
@@ -615,11 +678,13 @@ def prepare(args: argparse.Namespace) -> None:
         comments,
         repository=args.repository,
         pull_request=args.pull_request,
+        publisher_login=publisher_login,
     )
     review_state = load_review_state(
         reviews,
         repository=args.repository,
         pull_request=args.pull_request,
+        publisher_login=publisher_login,
     )
     prior_state = sticky_state or review_state
     manifest = (
@@ -632,12 +697,19 @@ def prepare(args: argparse.Namespace) -> None:
             rubric_version=rubric_version,
         )
     )
-    import_legacy_findings(manifest, threads)
+    import_legacy_findings(
+        manifest,
+        threads,
+        publisher_login=publisher_login,
+    )
     sync_manifest_threads(manifest, threads)
 
     previous_head = (
         manifest.get("cursor", {}).get("last_published_head")
-        or latest_reviewed_head(reviews)
+        or latest_reviewed_head(
+            reviews,
+            publisher_login=publisher_login,
+        )
     )
     version_matches = (
         prior_state is not None
@@ -646,6 +718,10 @@ def prepare(args: argparse.Namespace) -> None:
         and manifest.get("reviewer", {}).get("rubric_version") == rubric_version
         and manifest.get("reviewer", {}).get("model_policy_version")
         == MODEL_POLICY_VERSION
+        and canonical_login(
+            manifest.get("reviewer", {}).get("publisher_login")
+        )
+        == canonical_login(publisher_login)
     )
 
     mode = "full"
@@ -776,6 +852,7 @@ def prepare(args: argparse.Namespace) -> None:
         "review_threads": threads,
         "commentable_lines": commentable_lines,
         "sticky_comment_id": sticky_comment_id,
+        "publisher_login": publisher_login,
         "pipeline_version": pipeline_version,
         "rubric_version": rubric_version,
     }
@@ -1170,6 +1247,7 @@ def compile_review(
         "pipeline_version": review_input["pipeline_version"],
         "rubric_version": review_input["rubric_version"],
         "model_policy_version": MODEL_POLICY_VERSION,
+        "publisher_login": review_input.get("publisher_login"),
     }
     round_value = {
         "round_id": round_id,
@@ -1207,6 +1285,7 @@ def compile_review(
         "schema_version": SCHEMA_VERSION,
         "repository": review_input["repository"],
         "pull_request": review_input["pull_request"],
+        "publisher_login": review_input.get("publisher_login"),
         "frozen_head": head,
         "base_sha": review_input["pull_request_data"]["base_sha"],
         "mode": scope["mode"],
@@ -1249,13 +1328,15 @@ def existing_round_review(
     pull_request: int,
     marker: str,
     commit_id: str,
+    *,
+    publisher_login: str | None = None,
 ) -> int | None:
     reviews = gh_pages(
         f"repos/{repository}/pulls/{pull_request}/reviews?per_page=100"
     )
     for review in reversed(reviews):
         login = str((review.get("user") or {}).get("login") or "")
-        if not is_bot_login(login):
+        if not is_bot_login(login, publisher_login=publisher_login):
             continue
         if str(review.get("commit_id") or "") != commit_id:
             continue
@@ -1358,6 +1439,7 @@ def submit_review(
         payload["pull_request"],
         payload["round_marker"],
         payload["frozen_head"],
+        publisher_login=payload.get("publisher_login"),
     )
     if existing is not None:
         posted, inline_published = recover_existing_review(
@@ -1405,6 +1487,7 @@ def submit_review(
             pull_request,
             payload["round_marker"],
             payload["frozen_head"],
+            publisher_login=payload.get("publisher_login"),
         )
         if existing is not None:
             posted, inline_published = recover_existing_review(
@@ -1457,8 +1540,12 @@ def submit_review(
 def resolve_threads(
     thread_ids: list[str],
     *,
+    enabled: bool = False,
     before_write: Callable[[], None] | None = None,
 ) -> set[str]:
+    if not enabled:
+        return set()
+
     mutation = """
 mutation($threadId:ID!) {
   resolveReviewThread(input:{threadId:$threadId}) {
@@ -1683,6 +1770,7 @@ def publish(args: argparse.Namespace) -> None:
         )
         resolve_threads(
             payload["resolve_thread_ids"],
+            enabled=os.environ.get("GH_RESOLVE_THREADS", "").lower() == "true",
             before_write=require_frozen_pull,
         )
 

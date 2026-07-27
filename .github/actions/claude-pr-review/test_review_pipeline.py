@@ -41,6 +41,7 @@ def review_input(*, mode: str = "full"):
         "review_threads": [],
         "commentable_lines": {"src/example.py": [10, 11, 12]},
         "sticky_comment_id": None,
+        "publisher_login": "github-actions[bot]",
         "pipeline_version": "sha256:pipeline",
         "rubric_version": "sha256:rubric",
     }
@@ -80,7 +81,23 @@ class ReviewPipelineTests(unittest.TestCase):
         self.assertIn("Read,Glob,Grep,StructuredOutput,", action)
         self.assertIn("id: review_retry", action)
         self.assertIn("MUST call the\n          StructuredOutput tool", action)
-        self.assertIn("GH_TOKEN: ${{ github.token }}", action)
+
+    def test_action_exposes_optional_github_identity_token(self):
+        action = Path(pipeline.__file__).with_name("action.yml").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("github_identity_token:", action)
+        identity_env = (
+            "GH_TOKEN: "
+            "${{ inputs.github_identity_token || github.token }}"
+        )
+        self.assertEqual(action.count(identity_env), 2)
+        self.assertIn(
+            "GH_RESOLVE_THREADS: "
+            "${{ inputs.github_identity_token != '' }}",
+            action,
+        )
         self.assertNotIn("GH_TOKEN: ${{ steps.review", action)
 
     def test_output_schema_uses_action_compatible_dialect(self):
@@ -152,6 +169,20 @@ class ReviewPipelineTests(unittest.TestCase):
         self.assertTrue(pipeline.is_bot_login("github-actions"))
         self.assertTrue(pipeline.is_bot_login("github-actions[bot]"))
         self.assertFalse(pipeline.is_bot_login("unrelated-bot[bot]"))
+        self.assertTrue(
+            pipeline.is_bot_login(
+                "mega-ci[bot]",
+                publisher_login="mega-ci[bot]",
+            )
+        )
+
+    @mock.patch.object(pipeline, "gh_json")
+    def test_authenticated_login_uses_active_github_identity(self, gh_json_mock):
+        gh_json_mock.return_value = {
+            "data": {"viewer": {"login": "mega-ci[bot]"}}
+        }
+
+        self.assertEqual(pipeline.authenticated_login(), "mega-ci[bot]")
 
     def test_latest_reviewed_head_ignores_unrelated_actions_review(self):
         state = review_input()["manifest"]
@@ -199,6 +230,50 @@ class ReviewPipelineTests(unittest.TestCase):
         self.assertEqual(loaded, state)
         self.assertEqual(comment_id, 2)
 
+    def test_identity_migration_reads_legacy_sticky_without_editing_it(self):
+        state = review_input()["manifest"]
+        marker = (
+            f"{pipeline.STATE_MARKER_PREFIX}{pipeline.encode_state(state)} -->"
+        )
+
+        loaded, comment_id = pipeline.load_sticky_state(
+            [
+                {
+                    "id": 2,
+                    "body": marker,
+                    "user": {"login": "github-actions[bot]"},
+                }
+            ],
+            repository="megaeth-labs/example",
+            pull_request=7,
+            publisher_login="mega-ci[bot]",
+        )
+
+        self.assertEqual(loaded, state)
+        self.assertIsNone(comment_id)
+
+    def test_configured_identity_can_update_its_sticky_state(self):
+        state = review_input()["manifest"]
+        marker = (
+            f"{pipeline.STATE_MARKER_PREFIX}{pipeline.encode_state(state)} -->"
+        )
+
+        loaded, comment_id = pipeline.load_sticky_state(
+            [
+                {
+                    "id": 3,
+                    "body": marker,
+                    "user": {"login": "mega-ci[bot]"},
+                }
+            ],
+            repository="megaeth-labs/example",
+            pull_request=7,
+            publisher_login="mega-ci",
+        )
+
+        self.assertEqual(loaded, state)
+        self.assertEqual(comment_id, 3)
+
     def test_review_body_is_manifest_fallback(self):
         state = review_input()["manifest"]
         marker = (
@@ -216,6 +291,27 @@ class ReviewPipelineTests(unittest.TestCase):
             pull_request=7,
         )
         self.assertEqual(loaded["cursor"]["review_id"], 42)
+
+    def test_configured_identity_review_is_manifest_fallback(self):
+        state = review_input()["manifest"]
+        marker = (
+            f"{pipeline.STATE_MARKER_PREFIX}{pipeline.encode_state(state)} -->"
+        )
+
+        loaded = pipeline.load_review_state(
+            [
+                {
+                    "id": 43,
+                    "body": marker,
+                    "user": {"login": "mega-ci[bot]"},
+                }
+            ],
+            repository="megaeth-labs/example",
+            pull_request=7,
+            publisher_login="mega-ci[bot]",
+        )
+
+        self.assertEqual(loaded["cursor"]["review_id"], 43)
 
     def test_inline_fallback_review_restores_body_only_finding(self):
         state = review_input()["manifest"]
@@ -284,6 +380,44 @@ class ReviewPipelineTests(unittest.TestCase):
         self.assertEqual(finding["thread_id"], "THREAD")
         self.assertEqual(finding["comment_id"], 99)
         self.assertTrue(finding["thread_required"])
+
+    def test_configured_identity_thread_links_from_stateful_review(self):
+        manifest = review_input()["manifest"]
+        state = review_input()["manifest"]
+        marker = (
+            f"{pipeline.STATE_MARKER_PREFIX}{pipeline.encode_state(state)} -->"
+        )
+        thread = {
+            "id": "THREAD",
+            "isResolved": False,
+            "comments": {
+                "nodes": [
+                    {
+                        "databaseId": 99,
+                        "body": "**[Major]** Finding",
+                        "path": "src/example.py",
+                        "line": 11,
+                        "url": "https://example.test/thread",
+                        "author": {"login": "mega-ci[bot]"},
+                        "pullRequestReview": {
+                            "databaseId": 42,
+                            "body": marker,
+                            "author": {"login": "mega-ci[bot]"},
+                        },
+                    }
+                ]
+            },
+        }
+
+        pipeline.import_legacy_findings(
+            manifest,
+            [thread],
+            publisher_login="mega-ci[bot]",
+        )
+
+        finding = next(iter(manifest["findings"].values()))
+        self.assertEqual(finding["thread_id"], "THREAD")
+        self.assertEqual(finding["comment_id"], 99)
 
     def test_unresolved_github_thread_reopens_manifest_finding(self):
         manifest = review_input()["manifest"]
@@ -531,6 +665,31 @@ class ReviewPipelineTests(unittest.TestCase):
         )
 
     @mock.patch.object(pipeline, "gh_pages")
+    def test_existing_round_review_accepts_configured_identity(
+        self,
+        pages_mock,
+    ):
+        pages_mock.return_value = [
+            {
+                "id": 4,
+                "body": "<!-- round -->",
+                "commit_id": "head",
+                "user": {"login": "mega-ci[bot]"},
+            }
+        ]
+
+        self.assertEqual(
+            pipeline.existing_round_review(
+                "megaeth-labs/example",
+                7,
+                "<!-- round -->",
+                "head",
+                publisher_login="mega-ci[bot]",
+            ),
+            4,
+        )
+
+    @mock.patch.object(pipeline, "gh_pages")
     @mock.patch.object(pipeline, "existing_round_review", return_value=None)
     @mock.patch.object(pipeline, "run")
     def test_review_submission_is_one_atomic_request(
@@ -647,7 +806,10 @@ class ReviewPipelineTests(unittest.TestCase):
                 }
             }
         }
-        self.assertEqual(pipeline.resolve_threads(["THREAD"]), {"THREAD"})
+        self.assertEqual(
+            pipeline.resolve_threads(["THREAD"], enabled=True),
+            {"THREAD"},
+        )
 
         gh_json_mock.return_value = {
             "data": {
@@ -660,7 +822,25 @@ class ReviewPipelineTests(unittest.TestCase):
             pipeline.PipelineError,
             "did not confirm resolution",
         ):
-            pipeline.resolve_threads(["THREAD"])
+            pipeline.resolve_threads(["THREAD"], enabled=True)
+
+    @mock.patch.object(pipeline, "gh_json")
+    def test_thread_resolution_is_skipped_without_explicit_identity(
+        self,
+        gh_json_mock,
+    ):
+        before_write = mock.Mock()
+
+        self.assertEqual(
+            pipeline.resolve_threads(
+                ["THREAD"],
+                before_write=before_write,
+            ),
+            set(),
+        )
+
+        gh_json_mock.assert_not_called()
+        before_write.assert_not_called()
 
     @mock.patch.object(pipeline, "submit_review")
     @mock.patch.object(pipeline, "gh_json")
