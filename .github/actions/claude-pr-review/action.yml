@@ -71,6 +71,8 @@ runs:
         python3 "$GITHUB_ACTION_PATH/review_pipeline.py" prepare \
           --repository "$GITHUB_REPOSITORY" \
           --pull-request "${{ github.event.pull_request.number }}" \
+          --event-head "${{ github.event.pull_request.head.sha }}" \
+          --event-base "${{ github.event.pull_request.base.sha }}" \
           --state-dir "$STATE_DIR" \
           --review-depth "$REVIEW_DEPTH" \
           --premortem "$PREMORTEM"

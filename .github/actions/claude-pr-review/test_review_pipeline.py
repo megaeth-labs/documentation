@@ -55,7 +55,49 @@ def clean_output():
     }
 
 
+def sample_finding(**overrides):
+    finding = {
+        "title": "Retry state survives a failed attempt",
+        "path": "src/example.py",
+        "symbol": "retry",
+        "line": 11,
+        "start_line": None,
+        "severity": "major",
+        "confidence": "high",
+        "root_cause": "The retry loop reuses partial state",
+        "impact": "Every later attempt fails deterministically.",
+        "suggested_fix": "Clear partial state at the start of each attempt.",
+    }
+    finding.update(overrides)
+    return finding
+
+
 class ReviewPipelineTests(unittest.TestCase):
+    def test_action_allows_structured_output(self):
+        action = Path(pipeline.__file__).with_name("action.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("Read,Glob,Grep,StructuredOutput,", action)
+
+    def test_expected_pull_requires_frozen_base_and_head(self):
+        pull = {
+            "base": {"sha": "base"},
+            "head": {"sha": "head"},
+        }
+        pipeline.require_expected_pull(
+            pull,
+            expected_base="base",
+            expected_head="head",
+            context="in test",
+        )
+        with self.assertRaises(pipeline.StaleReviewError):
+            pipeline.require_expected_pull(
+                pull,
+                expected_base="different-base",
+                expected_head="head",
+                context="in test",
+            )
+
     def test_state_marker_round_trip(self):
         state = pipeline.empty_manifest(
             repository="megaeth-labs/example",
@@ -163,20 +205,7 @@ class ReviewPipelineTests(unittest.TestCase):
 
     def test_finding_is_anchored_and_rendered_deterministically(self):
         output = clean_output()
-        output["findings"] = [
-            {
-                "title": "Retry state survives a failed attempt",
-                "path": "src/example.py",
-                "symbol": "retry",
-                "line": 11,
-                "start_line": None,
-                "severity": "major",
-                "confidence": "high",
-                "root_cause": "The retry loop reuses partial state",
-                "impact": "Every later attempt fails deterministically.",
-                "suggested_fix": "Clear partial state at the start of each attempt.",
-            }
-        ]
+        output["findings"] = [sample_finding()]
         payload = pipeline.compile_review(review_input(), output)
         self.assertEqual(payload["verdict"], "findings")
         self.assertTrue(payload["should_submit_review"])
@@ -219,6 +248,35 @@ class ReviewPipelineTests(unittest.TestCase):
         ):
             pipeline.compile_review(value, clean_output())
 
+    def test_skip_with_open_finding_preserves_manifest(self):
+        value = review_input(mode="skip")
+        value["manifest"]["findings"]["F-existing"] = {
+            "status": "open",
+            "severity": "major",
+            "thread_id": "THREAD",
+        }
+        payload = pipeline.compile_review(value, None)
+        self.assertFalse(payload["should_submit_review"])
+        self.assertEqual(
+            payload["manifest"]["findings"]["F-existing"]["status"],
+            "open",
+        )
+
+    def test_finding_path_is_canonicalized(self):
+        output = clean_output()
+        output["findings"] = [sample_finding(path="./src/example.py")]
+        payload = pipeline.compile_review(review_input(), output)
+        self.assertEqual(
+            payload["inline_comments"][0]["path"],
+            "src/example.py",
+        )
+
+    def test_invalid_finding_path_fails_loudly(self):
+        output = clean_output()
+        output["findings"] = [sample_finding(path="src/not-changed.py")]
+        with self.assertRaisesRegex(pipeline.PipelineError, "unchanged path"):
+            pipeline.compile_review(review_input(), output)
+
     def test_resolved_prior_finding_produces_thread_resolution(self):
         value = review_input()
         value["manifest"]["findings"]["F-existing"] = {
@@ -243,18 +301,7 @@ class ReviewPipelineTests(unittest.TestCase):
 
     def test_existing_open_finding_is_not_reposted(self):
         output = clean_output()
-        finding = {
-            "title": "Retry state survives a failed attempt",
-            "path": "src/example.py",
-            "symbol": "retry",
-            "line": 11,
-            "start_line": None,
-            "severity": "major",
-            "confidence": "high",
-            "root_cause": "The retry loop reuses partial state",
-            "impact": "Every later attempt fails deterministically.",
-            "suggested_fix": "Clear partial state at the start of each attempt.",
-        }
+        finding = sample_finding()
         item_id = pipeline.finding_id(finding)
         value = review_input()
         value["manifest"]["findings"][item_id] = {
@@ -273,6 +320,86 @@ class ReviewPipelineTests(unittest.TestCase):
         payload = pipeline.compile_review(value, output)
         self.assertEqual(payload["inline_comments"], [])
         self.assertFalse(payload["should_submit_review"])
+
+    def test_resolved_prior_does_not_suppress_distinct_same_symbol_finding(self):
+        value = review_input()
+        value["manifest"]["findings"]["F-existing"] = {
+            "status": "open",
+            "severity": "major",
+            "path": "src/example.py",
+            "symbol": "retry",
+            "line": 11,
+            "thread_id": "THREAD",
+        }
+        output = clean_output()
+        output["prior_findings"] = [
+            {
+                "finding_id": "F-existing",
+                "disposition": "resolved",
+                "reason": "The partial-state leak was fixed.",
+            }
+        ]
+        output["findings"] = [
+            sample_finding(
+                title="Retry count is off by one",
+                root_cause="The retry condition uses an inclusive bound",
+                impact="One extra request is issued after exhaustion.",
+                suggested_fix="Use an exclusive retry bound.",
+            )
+        ]
+        payload = pipeline.compile_review(value, output)
+        self.assertEqual(payload["resolve_thread_ids"], ["THREAD"])
+        self.assertEqual(len(payload["inline_comments"]), 1)
+
+    def test_round_marker_changes_with_rubric_version(self):
+        first = review_input()
+        second = review_input()
+        second["rubric_version"] = "sha256:new-rubric"
+        first_payload = pipeline.compile_review(first, clean_output())
+        second_payload = pipeline.compile_review(second, clean_output())
+        self.assertNotEqual(
+            first_payload["round_marker"],
+            second_payload["round_marker"],
+        )
+        self.assertNotEqual(
+            first_payload["round"]["round_id"],
+            second_payload["round"]["round_id"],
+        )
+
+    @mock.patch.object(pipeline, "gh_pages")
+    def test_existing_round_review_requires_bot_author_and_commit(
+        self,
+        pages_mock,
+    ):
+        pages_mock.return_value = [
+            {
+                "id": 1,
+                "body": "<!-- round -->",
+                "commit_id": "head",
+                "user": {"login": "human"},
+            },
+            {
+                "id": 2,
+                "body": "<!-- round -->",
+                "commit_id": "other-head",
+                "user": {"login": "claude"},
+            },
+            {
+                "id": 3,
+                "body": "<!-- round -->",
+                "commit_id": "head",
+                "user": {"login": "claude[bot]"},
+            },
+        ]
+        self.assertEqual(
+            pipeline.existing_round_review(
+                "megaeth-labs/example",
+                7,
+                "<!-- round -->",
+                "head",
+            ),
+            3,
+        )
 
     @mock.patch.object(pipeline, "gh_pages")
     @mock.patch.object(pipeline, "existing_round_review", return_value=None)
@@ -302,6 +429,7 @@ class ReviewPipelineTests(unittest.TestCase):
             "repository": "megaeth-labs/example",
             "pull_request": 7,
             "round_marker": "<!-- round -->",
+            "frozen_head": "b" * 40,
             "review_body": "Review body",
             "inline_comments": [
                 {
@@ -317,6 +445,7 @@ class ReviewPipelineTests(unittest.TestCase):
         self.assertEqual(review_id, 42)
         self.assertEqual(posted["F-1"]["comment_id"], 99)
         request = json.loads(run_mock.call_args.kwargs["input_text"])
+        self.assertEqual(request["commit_id"], "b" * 40)
         self.assertEqual(request["event"], "COMMENT")
         self.assertEqual(len(request["comments"]), 1)
         self.assertNotIn("finding_id", request["comments"][0])
@@ -328,12 +457,16 @@ class ReviewPipelineTests(unittest.TestCase):
         gh_json_mock,
         submit_mock,
     ):
-        gh_json_mock.return_value = {"head": {"sha": "new-head"}}
+        gh_json_mock.return_value = {
+            "base": {"sha": "base"},
+            "head": {"sha": "new-head"},
+        }
         payload = {
             "mode": "incremental",
             "repository": "megaeth-labs/example",
             "pull_request": 7,
             "frozen_head": "old-head",
+            "base_sha": "base",
             "verdict": "clean",
         }
         with tempfile.TemporaryDirectory() as directory:

@@ -14,7 +14,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
 
 SCHEMA_VERSION = 1
@@ -54,6 +54,10 @@ HIGH_RISK_PARTS = {
 
 class PipelineError(RuntimeError):
     """A deterministic pipeline failure."""
+
+
+class StaleReviewError(PipelineError):
+    """The pull request no longer matches the frozen review revision."""
 
 
 def run(
@@ -142,6 +146,32 @@ def sanitize_text(value: Any, *, maximum: int) -> str:
     text = " ".join(str(value or "").strip().split())
     text = text.replace("<!--", "").replace("-->", "")
     return text[:maximum].rstrip()
+
+
+def canonicalize_path(value: Any) -> str:
+    path = sanitize_text(value, maximum=500)
+    while path.startswith("./"):
+        path = path[2:]
+    return path
+
+
+def pull_base_head(pull: dict[str, Any]) -> tuple[str, str]:
+    return str(pull["base"]["sha"]), str(pull["head"]["sha"])
+
+
+def require_expected_pull(
+    pull: dict[str, Any],
+    *,
+    expected_base: str,
+    expected_head: str,
+    context: str,
+) -> None:
+    base_sha, head_sha = pull_base_head(pull)
+    if base_sha != expected_base or head_sha != expected_head:
+        raise StaleReviewError(
+            f"PR changed {context}: expected {expected_base}..{expected_head}, "
+            f"found {base_sha}..{head_sha}"
+        )
 
 
 def public_text(value: Any, *, maximum: int) -> str:
@@ -497,8 +527,15 @@ def prepare(args: argparse.Namespace) -> None:
     pull = gh_json(
         ["api", f"repos/{args.repository}/pulls/{args.pull_request}"]
     )
-    current_head = pull["head"]["sha"]
-    base_sha = pull["base"]["sha"]
+    base_sha, current_head = pull_base_head(pull)
+    expected_head = str(args.event_head or current_head)
+    expected_base = str(args.event_base or base_sha)
+    require_expected_pull(
+        pull,
+        expected_base=expected_base,
+        expected_head=expected_head,
+        context="before preparation",
+    )
     comments = gh_pages(
         f"repos/{args.repository}/issues/{args.pull_request}/comments?per_page=100"
     )
@@ -618,6 +655,14 @@ def prepare(args: argparse.Namespace) -> None:
             args.repository,
         ]
     ).stdout
+    require_expected_pull(
+        gh_json(
+            ["api", f"repos/{args.repository}/pulls/{args.pull_request}"]
+        ),
+        expected_base=expected_base,
+        expected_head=expected_head,
+        context="during preparation",
+    )
     (state_dir / "full.diff").write_text(full_diff, encoding="utf-8")
     if mode == "incremental":
         incremental_diff = "\n".join(
@@ -750,11 +795,13 @@ def compile_review(
     head = scope["current_head"]
     round_key = (
         f"{review_input['repository']}#{review_input['pull_request']}@"
-        f"{head}:{review_input['pipeline_version']}"
+        f"{head}:{review_input['pipeline_version']}:"
+        f"{review_input['rubric_version']}:{MODEL_POLICY_VERSION}"
     )
+    round_id = hashlib.sha256(round_key.encode()).hexdigest()[:20]
     round_marker = (
         f"<!-- claude-review-round:v1 "
-        f"{hashlib.sha256(round_key.encode()).hexdigest()[:20]} -->"
+        f"{round_id} -->"
     )
 
     if scope["mode"] == "skip":
@@ -762,7 +809,15 @@ def compile_review(
             "scope_summary": "No changes since the last completed review.",
             "findings": [],
             "open_questions": [],
-            "prior_findings": [],
+            "prior_findings": [
+                {
+                    "finding_id": item_id,
+                    "disposition": "open",
+                    "reason": "No changes were analyzed in skip mode.",
+                }
+                for item_id, item in manifest["findings"].items()
+                if isinstance(item, dict) and item.get("status") == "open"
+            ],
         }
     model_output = validate_model_output(model_output)
 
@@ -795,28 +850,55 @@ def compile_review(
             f"Reviewed {len(scope['changed_paths'])} changed file(s)."
         )
 
+    resolution_ids: list[str] = []
+    for disposition in model_output["prior_findings"]:
+        if not isinstance(disposition, dict):
+            raise PipelineError("prior_findings contains a non-object")
+        item_id = str(disposition.get("finding_id") or "")
+        item = manifest["findings"].get(item_id)
+        if not isinstance(item, dict):
+            raise PipelineError(f"prior_findings references unknown ID: {item_id}")
+        status = disposition.get("disposition")
+        if status not in {"open", "resolved"}:
+            raise PipelineError(
+                f"prior_findings has invalid disposition for {item_id}"
+            )
+        item["status"] = status
+        item["last_checked_sha"] = head
+        if status == "resolved":
+            item["resolved_sha"] = head
+            if item.get("thread_id"):
+                resolution_ids.append(item["thread_id"])
+
     changed_paths = set(scope["full_pr_paths"])
     commentable = {
         path: set(lines)
         for path, lines in review_input["commentable_lines"].items()
     }
     findings: list[dict[str, Any]] = []
-    for raw in model_output["findings"]:
+    for index, raw in enumerate(model_output["findings"]):
         if not isinstance(raw, dict):
-            continue
+            raise PipelineError(f"finding {index} is not an object")
         severity = str(raw.get("severity", "")).lower()
         confidence = str(raw.get("confidence", "")).lower()
-        path = sanitize_text(raw.get("path"), maximum=500)
+        path = canonicalize_path(raw.get("path"))
         if (
             severity not in SEVERITIES
             or confidence != "high"
-            or path not in changed_paths
         ):
-            continue
+            raise PipelineError(
+                f"finding {index} has invalid severity or confidence"
+            )
+        if path not in changed_paths:
+            raise PipelineError(
+                f"finding {index} references unchanged path: {path!r}"
+            )
         try:
             line = int(raw["line"])
         except (KeyError, TypeError, ValueError):
-            continue
+            raise PipelineError(f"finding {index} has an invalid line")
+        if isinstance(raw.get("line"), bool) or line < 1:
+            raise PipelineError(f"finding {index} has an invalid line")
         finding = {
             "title": public_text(raw.get("title"), maximum=160),
             "path": path,
@@ -839,7 +921,7 @@ def compile_review(
             finding[field]
             for field in ("title", "path", "root_cause", "impact", "suggested_fix")
         ):
-            continue
+            raise PipelineError(f"finding {index} is missing required text")
         prior_finding_id = raw.get("prior_finding_id")
         if (
             prior_finding_id
@@ -847,26 +929,6 @@ def compile_review(
             and manifest["findings"][prior_finding_id].get("status") == "open"
         ):
             manifest["findings"][prior_finding_id]["last_checked_sha"] = head
-            continue
-        same_open_finding = next(
-            (
-                item
-                for item in manifest["findings"].values()
-                if isinstance(item, dict)
-                and item.get("status") == "open"
-                and item.get("path") == path
-                and (
-                    item.get("line") == line
-                    or (
-                        finding["symbol"]
-                        and item.get("symbol") == finding["symbol"]
-                    )
-                )
-            ),
-            None,
-        )
-        if same_open_finding is not None:
-            same_open_finding["last_checked_sha"] = head
             continue
         finding["finding_id"] = finding_id(finding)
         existing = manifest["findings"].get(finding["finding_id"])
@@ -881,12 +943,14 @@ def compile_review(
     findings = high + low
 
     questions: list[dict[str, Any]] = []
-    for raw in model_output["open_questions"][:3]:
+    for index, raw in enumerate(model_output["open_questions"][:3]):
         if not isinstance(raw, dict):
-            continue
+            raise PipelineError(f"open question {index} is not an object")
         confidence = str(raw.get("confidence", "")).lower()
         if confidence not in QUESTION_CONFIDENCE:
-            continue
+            raise PipelineError(
+                f"open question {index} has invalid confidence"
+            )
         question = {
             "question": public_text(raw.get("question"), maximum=500),
             "confidence": confidence,
@@ -899,26 +963,9 @@ def compile_review(
                 maximum=600,
             ),
         }
-        if all(question.values()):
-            questions.append(question)
-
-    resolution_ids: list[str] = []
-    for disposition in model_output["prior_findings"]:
-        if not isinstance(disposition, dict):
-            continue
-        item_id = str(disposition.get("finding_id") or "")
-        item = manifest["findings"].get(item_id)
-        if not isinstance(item, dict):
-            continue
-        status = disposition.get("disposition")
-        if status not in {"open", "resolved"}:
-            continue
-        item["status"] = status
-        item["last_checked_sha"] = head
-        if status == "resolved":
-            item["resolved_sha"] = head
-            if item.get("thread_id"):
-                resolution_ids.append(item["thread_id"])
+        if not all(question.values()):
+            raise PipelineError(f"open question {index} is incomplete")
+        questions.append(question)
 
     for finding in findings:
         item_id = finding["finding_id"]
@@ -1055,6 +1102,7 @@ def compile_review(
         "model_policy_version": MODEL_POLICY_VERSION,
     }
     round_value = {
+        "round_id": round_id,
         "from": scope.get("previous_reviewed_head"),
         "to": head,
         "mode": scope["mode"],
@@ -1130,11 +1178,17 @@ def existing_round_review(
     repository: str,
     pull_request: int,
     marker: str,
+    commit_id: str,
 ) -> int | None:
     reviews = gh_pages(
         f"repos/{repository}/pulls/{pull_request}/reviews?per_page=100"
     )
     for review in reversed(reviews):
+        login = str((review.get("user") or {}).get("login") or "")
+        if not is_bot_login(login):
+            continue
+        if str(review.get("commit_id") or "") != commit_id:
+            continue
         if marker in (review.get("body") or ""):
             return int(review["id"])
     return None
@@ -1142,6 +1196,8 @@ def existing_round_review(
 
 def submit_review(
     payload: dict[str, Any],
+    *,
+    before_write: Callable[[], None] | None = None,
 ) -> tuple[int | None, dict[str, dict[str, Any]]]:
     if not payload["should_submit_review"]:
         return None, {}
@@ -1149,6 +1205,7 @@ def submit_review(
         payload["repository"],
         payload["pull_request"],
         payload["round_marker"],
+        payload["frozen_head"],
     )
     if existing is not None:
         return existing, {}
@@ -1164,10 +1221,13 @@ def submit_review(
         for comment in payload["inline_comments"]
     ]
     request = {
+        "commit_id": payload["frozen_head"],
         "event": "COMMENT",
         "body": payload["review_body"],
         "comments": comments,
     }
+    if before_write is not None:
+        before_write()
     result = run(
         [
             "gh",
@@ -1186,6 +1246,7 @@ def submit_review(
             repository,
             pull_request,
             payload["round_marker"],
+            payload["frozen_head"],
         )
         if existing is not None:
             return existing, {}
@@ -1200,6 +1261,8 @@ def submit_review(
                 "\n\nFindings without inline anchors:\n"
                 + "\n".join(fallback)
             )
+        if before_write is not None:
+            before_write()
         response = gh_json(
             [
                 "api",
@@ -1207,7 +1270,11 @@ def submit_review(
                 "--method",
                 "POST",
             ],
-            input_value={"event": "COMMENT", "body": body},
+            input_value={
+                "commit_id": payload["frozen_head"],
+                "event": "COMMENT",
+                "body": body,
+            },
         )
         return int(response["id"]), {}
 
@@ -1237,7 +1304,11 @@ def submit_review(
     return review_id, posted
 
 
-def resolve_threads(thread_ids: list[str]) -> None:
+def resolve_threads(
+    thread_ids: list[str],
+    *,
+    before_write: Callable[[], None] | None = None,
+) -> None:
     mutation = """
 mutation($threadId:ID!) {
   resolveReviewThread(input:{threadId:$threadId}) {
@@ -1246,6 +1317,8 @@ mutation($threadId:ID!) {
 }
 """
     for thread_id in thread_ids:
+        if before_write is not None:
+            before_write()
         gh_json(
             [
                 "api",
@@ -1302,7 +1375,12 @@ def attach_published_threads(
             finding["thread_url"] = first.get("url")
 
 
-def upsert_sticky(payload: dict[str, Any], manifest: dict[str, Any]) -> int:
+def upsert_sticky(
+    payload: dict[str, Any],
+    manifest: dict[str, Any],
+    *,
+    before_write: Callable[[], None] | None = None,
+) -> int:
     body = (
         f"{payload['status_body']}\n\n"
         f"{STATE_MARKER_PREFIX}{encode_state(manifest)} -->"
@@ -1310,6 +1388,8 @@ def upsert_sticky(payload: dict[str, Any], manifest: dict[str, Any]) -> int:
     repository = payload["repository"]
     comment_id = payload.get("sticky_comment_id")
     if comment_id:
+        if before_write is not None:
+            before_write()
         comment = gh_json(
             [
                 "api",
@@ -1320,6 +1400,8 @@ def upsert_sticky(payload: dict[str, Any], manifest: dict[str, Any]) -> int:
             input_value={"body": body},
         )
     else:
+        if before_write is not None:
+            before_write()
         comment = gh_json(
             [
                 "api",
@@ -1381,43 +1463,73 @@ def publish(args: argparse.Namespace) -> None:
         write_step_summary(payload)
         write_github_output({"published": "false", "stale": "false"})
         return
-    pull = gh_json(
-        [
-            "api",
-            f"repos/{payload['repository']}/pulls/{payload['pull_request']}",
-        ]
-    )
-    live_head = pull["head"]["sha"]
-    if live_head != payload["frozen_head"]:
+
+    def require_frozen_pull() -> None:
+        pull = gh_json(
+            [
+                "api",
+                f"repos/{payload['repository']}/pulls/"
+                f"{payload['pull_request']}",
+            ]
+        )
+        require_expected_pull(
+            pull,
+            expected_base=str(payload["base_sha"]),
+            expected_head=str(payload["frozen_head"]),
+            context="before GitHub mutation",
+        )
+
+    try:
+        require_frozen_pull()
+    except StaleReviewError:
         write_step_summary(payload, stale=True)
         write_github_output({"published": "false", "stale": "true"})
         return
 
-    review_id, posted_comments = submit_review(payload)
-    resolve_threads(payload["resolve_thread_ids"])
+    try:
+        review_id, posted_comments = submit_review(
+            payload,
+            before_write=require_frozen_pull,
+        )
+        resolve_threads(
+            payload["resolve_thread_ids"],
+            before_write=require_frozen_pull,
+        )
 
-    manifest = payload["manifest"]
-    for finding_id_value, posted in posted_comments.items():
-        finding = manifest["findings"].get(finding_id_value)
-        if isinstance(finding, dict):
-            finding["comment_id"] = posted.get("comment_id")
-            finding["thread_url"] = posted.get("thread_url")
-    attach_published_threads(payload, manifest)
-    manifest["cursor"] = {
-        "last_published_head": payload["frozen_head"],
-        "base_branch_sha": payload["base_sha"],
-        "review_id": review_id,
-        "reviewed_at": utc_now(),
-        "mode": payload["mode"],
-    }
-    round_value = payload["round"]
-    round_value["review_id"] = review_id
-    rounds = manifest.setdefault("rounds", [])
-    if not any(item.get("to") == round_value["to"] for item in rounds):
-        rounds.append(round_value)
-    manifest["rounds"] = rounds
-    prune_manifest(manifest)
-    sticky_id = upsert_sticky(payload, manifest)
+        manifest = payload["manifest"]
+        for finding_id_value, posted in posted_comments.items():
+            finding = manifest["findings"].get(finding_id_value)
+            if isinstance(finding, dict):
+                finding["comment_id"] = posted.get("comment_id")
+                finding["thread_url"] = posted.get("thread_url")
+        attach_published_threads(payload, manifest)
+        manifest["cursor"] = {
+            "last_published_head": payload["frozen_head"],
+            "base_branch_sha": payload["base_sha"],
+            "review_id": review_id,
+            "reviewed_at": utc_now(),
+            "mode": payload["mode"],
+        }
+        round_value = payload["round"]
+        round_value["review_id"] = review_id
+        rounds = manifest.setdefault("rounds", [])
+        if not any(
+            isinstance(item, dict)
+            and item.get("round_id") == round_value["round_id"]
+            for item in rounds
+        ):
+            rounds.append(round_value)
+        manifest["rounds"] = rounds
+        prune_manifest(manifest)
+        sticky_id = upsert_sticky(
+            payload,
+            manifest,
+            before_write=require_frozen_pull,
+        )
+    except StaleReviewError:
+        write_step_summary(payload, stale=True)
+        write_github_output({"published": "false", "stale": "true"})
+        return
 
     result = {
         "review_id": review_id,
@@ -1445,6 +1557,8 @@ def parser() -> argparse.ArgumentParser:
     prepare_parser = subparsers.add_parser("prepare")
     prepare_parser.add_argument("--repository", required=True)
     prepare_parser.add_argument("--pull-request", type=int, required=True)
+    prepare_parser.add_argument("--event-head")
+    prepare_parser.add_argument("--event-base")
     prepare_parser.add_argument("--state-dir", required=True)
     prepare_parser.add_argument(
         "--review-depth",

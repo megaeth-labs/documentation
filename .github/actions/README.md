@@ -151,8 +151,9 @@ jobs:
 
 Consumers should give the `pr-review` job a `timeout-minutes` value of at least `25` plus a
 job-level concurrency group with `cancel-in-progress: true`.
-The publisher verifies the live PR head before every write, so obsolete runs cannot publish
-or advance the manifest.
+The publisher revalidates the live PR base and head immediately before each GitHub mutation,
+and review submissions are pinned to the frozen head commit. If either revision changes,
+publication stops without advancing the manifest.
 Latest-only cancellation avoids spending review time on queued, obsolete heads:
 
 ```yaml
