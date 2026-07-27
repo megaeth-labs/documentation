@@ -62,6 +62,10 @@ Later runs use that manifest as a checkpoint and fall back to GitHub review hist
 manifest is unavailable.
 The manifest never contains complete diffs, PR prose, tool output, secrets, or Claude session
 transcripts.
+Inline findings are linked back to the exact published review and comment IDs, with bounded
+retries for GitHub API propagation.
+The publisher does not mark an inline finding resolved unless GitHub confirms the thread
+resolution mutation.
 
 The action performs a full review when there is no valid checkpoint, the previous head is not
 an ancestor, or the pipeline or rubric version changed.

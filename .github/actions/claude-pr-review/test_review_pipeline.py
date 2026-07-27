@@ -148,6 +148,33 @@ class ReviewPipelineTests(unittest.TestCase):
             "Token leaks through tracing",
         )
 
+    def test_job_token_publisher_identities_are_recognized(self):
+        self.assertTrue(pipeline.is_bot_login("github-actions"))
+        self.assertTrue(pipeline.is_bot_login("github-actions[bot]"))
+        self.assertFalse(pipeline.is_bot_login("unrelated-bot[bot]"))
+
+    def test_latest_reviewed_head_ignores_unrelated_actions_review(self):
+        state = review_input()["manifest"]
+        marker = (
+            f"{pipeline.STATE_MARKER_PREFIX}{pipeline.encode_state(state)} -->"
+        )
+        reviews = [
+            {
+                "body": marker,
+                "commit_id": "reviewed-head",
+                "user": {"login": "github-actions[bot]"},
+            },
+            {
+                "body": "unrelated workflow review",
+                "commit_id": "unrelated-head",
+                "user": {"login": "github-actions[bot]"},
+            },
+        ]
+        self.assertEqual(
+            pipeline.latest_reviewed_head(reviews),
+            "reviewed-head",
+        )
+
     def test_sticky_state_must_be_bot_authored(self):
         state = review_input()["manifest"]
         marker = (
@@ -163,7 +190,7 @@ class ReviewPipelineTests(unittest.TestCase):
                 {
                     "id": 2,
                     "body": marker,
-                    "user": {"login": "claude"},
+                    "user": {"login": "github-actions[bot]"},
                 },
             ],
             repository="megaeth-labs/example",
@@ -182,13 +209,81 @@ class ReviewPipelineTests(unittest.TestCase):
                 {
                     "id": 42,
                     "body": marker,
-                    "user": {"login": "claude"},
+                    "user": {"login": "github-actions[bot]"},
                 }
             ],
             repository="megaeth-labs/example",
             pull_request=7,
         )
         self.assertEqual(loaded["cursor"]["review_id"], 42)
+
+    def test_inline_fallback_review_restores_body_only_finding(self):
+        state = review_input()["manifest"]
+        state["findings"]["F-1"] = {
+            "status": "open",
+            "thread_required": True,
+            "thread_id": None,
+        }
+        marker = (
+            f"{pipeline.STATE_MARKER_PREFIX}{pipeline.encode_state(state)} -->"
+        )
+        loaded = pipeline.load_review_state(
+            [
+                {
+                    "id": 42,
+                    "body": f"{marker}\n{pipeline.INLINE_FALLBACK_MARKER}",
+                    "user": {"login": "github-actions[bot]"},
+                }
+            ],
+            repository="megaeth-labs/example",
+            pull_request=7,
+        )
+        self.assertFalse(loaded["findings"]["F-1"]["thread_required"])
+
+    def test_job_token_thread_links_only_from_stateful_review(self):
+        manifest = review_input()["manifest"]
+        manifest["findings"]["F-1"] = {
+            "status": "open",
+            "title": "Retry state survives a failed attempt",
+            "path": "src/example.py",
+            "line": 11,
+        }
+        thread = {
+            "id": "THREAD",
+            "isResolved": False,
+            "comments": {
+                "nodes": [
+                    {
+                        "databaseId": 99,
+                        "body": (
+                            "**[Major]** Retry state survives a failed attempt"
+                        ),
+                        "path": "src/example.py",
+                        "line": 11,
+                        "url": "https://example.test/thread",
+                        "author": {"login": "github-actions"},
+                        "pullRequestReview": {
+                            "databaseId": 42,
+                            "body": "unrelated workflow review",
+                            "author": {"login": "github-actions"},
+                        },
+                    }
+                ]
+            },
+        }
+        pipeline.import_legacy_findings(manifest, [thread])
+        self.assertIsNone(manifest["findings"]["F-1"].get("thread_id"))
+
+        state = review_input()["manifest"]
+        marker = (
+            f"{pipeline.STATE_MARKER_PREFIX}{pipeline.encode_state(state)} -->"
+        )
+        thread["comments"]["nodes"][0]["pullRequestReview"]["body"] = marker
+        pipeline.import_legacy_findings(manifest, [thread])
+        finding = manifest["findings"]["F-1"]
+        self.assertEqual(finding["thread_id"], "THREAD")
+        self.assertEqual(finding["comment_id"], 99)
+        self.assertTrue(finding["thread_required"])
 
     def test_unresolved_github_thread_reopens_manifest_finding(self):
         manifest = review_input()["manifest"]
@@ -311,6 +406,28 @@ class ReviewPipelineTests(unittest.TestCase):
             "resolved",
         )
 
+    def test_inline_finding_cannot_resolve_without_thread_id(self):
+        value = review_input()
+        value["manifest"]["findings"]["F-existing"] = {
+            "status": "open",
+            "severity": "major",
+            "thread_required": True,
+            "thread_id": None,
+        }
+        output = clean_output()
+        output["prior_findings"] = [
+            {
+                "finding_id": "F-existing",
+                "disposition": "resolved",
+                "reason": "The retry now clears partial state.",
+            }
+        ]
+        with self.assertRaisesRegex(
+            pipeline.PipelineError,
+            "without a GitHub thread ID",
+        ):
+            pipeline.compile_review(value, output)
+
     def test_existing_open_finding_is_not_reposted(self):
         output = clean_output()
         finding = sample_finding()
@@ -400,7 +517,7 @@ class ReviewPipelineTests(unittest.TestCase):
                 "id": 3,
                 "body": "<!-- round -->",
                 "commit_id": "head",
-                "user": {"login": "claude[bot]"},
+                "user": {"login": "github-actions[bot]"},
             },
         ]
         self.assertEqual(
@@ -431,7 +548,6 @@ class ReviewPipelineTests(unittest.TestCase):
             {
                 "id": 99,
                 "path": "src/example.py",
-                "line": 11,
                 "body": "**[Major]** Finding",
                 "html_url": "https://example.test/thread",
             }
@@ -453,14 +569,98 @@ class ReviewPipelineTests(unittest.TestCase):
                 }
             ],
         }
-        review_id, posted = pipeline.submit_review(payload)
+        review_id, posted, inline_published = pipeline.submit_review(payload)
         self.assertEqual(review_id, 42)
         self.assertEqual(posted["F-1"]["comment_id"], 99)
+        self.assertTrue(inline_published)
         request = json.loads(run_mock.call_args.kwargs["input_text"])
         self.assertEqual(request["commit_id"], "b" * 40)
         self.assertEqual(request["event"], "COMMENT")
         self.assertEqual(len(request["comments"]), 1)
         self.assertNotIn("finding_id", request["comments"][0])
+
+    @mock.patch.object(pipeline.time, "sleep")
+    @mock.patch.object(pipeline, "review_threads")
+    def test_published_thread_links_through_exact_review(
+        self,
+        threads_mock,
+        sleep_mock,
+    ):
+        threads_mock.side_effect = [
+            [],
+            [
+                {
+                    "id": "THREAD",
+                    "comments": {
+                        "nodes": [
+                            {
+                                "databaseId": 99,
+                                "path": "src/example.py",
+                                "line": 11,
+                                "body": "**[Major]** Finding",
+                                "url": "https://example.test/thread",
+                                "author": {"login": "github-actions"},
+                                "pullRequestReview": {
+                                    "databaseId": 42,
+                                    "body": "state",
+                                    "author": {"login": "github-actions"},
+                                },
+                            }
+                        ]
+                    },
+                }
+            ],
+        ]
+        manifest = review_input()["manifest"]
+        manifest["findings"]["F-1"] = {
+            "status": "open",
+            "comment_id": None,
+            "thread_id": None,
+            "thread_required": True,
+        }
+        payload = {
+            "repository": "megaeth-labs/example",
+            "pull_request": 7,
+            "inline_comments": [
+                {
+                    "finding_id": "F-1",
+                    "path": "src/example.py",
+                    "line": 11,
+                    "body": "**[Major]** Finding",
+                }
+            ],
+        }
+        pipeline.attach_published_threads(payload, manifest, 42)
+        finding = manifest["findings"]["F-1"]
+        self.assertEqual(finding["thread_id"], "THREAD")
+        self.assertEqual(finding["comment_id"], 99)
+        sleep_mock.assert_called_once_with(
+            pipeline.GITHUB_LINK_RETRY_DELAY_SECONDS
+        )
+
+    @mock.patch.object(pipeline, "gh_json")
+    def test_thread_resolution_requires_github_confirmation(self, gh_json_mock):
+        gh_json_mock.return_value = {
+            "data": {
+                "resolveReviewThread": {
+                    "thread": {"id": "THREAD", "isResolved": True}
+                }
+            }
+        }
+        self.assertEqual(pipeline.resolve_threads(["THREAD"]), {"THREAD"})
+
+        gh_json_mock.return_value = {
+            "data": {
+                "resolveReviewThread": {
+                    "thread": {"id": "THREAD", "isResolved": False}
+                }
+            }
+        }
+        with self.assertRaisesRegex(
+            pipeline.PipelineError,
+            "did not confirm resolution",
+        ):
+            pipeline.resolve_threads(["THREAD"])
 
     @mock.patch.object(pipeline, "submit_review")
     @mock.patch.object(pipeline, "gh_json")
