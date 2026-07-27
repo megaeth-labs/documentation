@@ -30,7 +30,7 @@ The default is `"latest"`.
 Balance in wei.
 The method returns a zero quantity for unknown accounts and zero-balance accounts alike.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

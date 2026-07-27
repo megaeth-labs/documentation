@@ -21,7 +21,7 @@ The public MegaETH endpoint supports this standard debug method.
 The result shape depends on the tracer.
 With no named tracer, the result contains opcode-level `structLogs`; with `callTracer`, it is a nested call frame.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

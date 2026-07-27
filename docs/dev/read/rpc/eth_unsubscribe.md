@@ -22,7 +22,7 @@ Subscription ID returned by `eth_subscribe`.
 
 `true` if the subscription was found and cancelled; `false` if the ID was not active.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

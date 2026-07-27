@@ -20,7 +20,7 @@ None.
 
 The chain ID for the connected network.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

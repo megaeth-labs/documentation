@@ -23,7 +23,7 @@ An output object containing `outputRoot`, `blockRef`, `withdrawalStorageRoot`, `
 The upstream `version` field can be present on a fresh response but is omitted by the gateway's cached projection.
 See [`mega_outputAtBlock`](./mega_outputAtBlock.md#result) for every field.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

@@ -29,7 +29,7 @@ The default is `"latest"`.
 
 Runtime bytecode (not creation bytecode) at the address; `0x` when no code is deployed.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

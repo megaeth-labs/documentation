@@ -109,7 +109,7 @@ Object keyed by address. Each value:
 
   Execution error when the call reverts; may coexist with `accessList` and `gasUsed`.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

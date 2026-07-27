@@ -18,7 +18,7 @@ None.
 The result is a hexadecimal `QUANTITY`.
 Do not confuse this compatibility value with the MegaETH chain ID or network ID.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

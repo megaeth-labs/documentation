@@ -21,7 +21,7 @@ Returns `true` when the filter existed and was removed.
 Returns `false` when the filter ID was unknown or had already expired.
 `false` does not mean that `eth_uninstallFilter` itself is unavailable.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

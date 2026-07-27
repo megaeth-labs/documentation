@@ -21,7 +21,7 @@ None.
 
 Always a zero-wei quantity.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

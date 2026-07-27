@@ -23,7 +23,7 @@ The public MegaETH endpoint supports this method. The standard, node, and gatewa
 
 An EIP-1186-style account proof containing `accountProof`, `balance`, `codeHash`, `nonce`, `storageHash`, and one `storageProof` entry per requested key.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

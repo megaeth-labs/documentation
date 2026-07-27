@@ -66,7 +66,7 @@ Concrete hex block number; block tags such as `latest` are not accepted.
 
   Backend sync-status snapshot.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

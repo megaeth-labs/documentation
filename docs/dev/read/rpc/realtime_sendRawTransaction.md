@@ -40,7 +40,7 @@ A transaction receipt object on success:
 For receipts produced from a streaming mini-block, `blockHash` can temporarily be the all-`ff` placeholder until the enclosing EVM block is committed.
 Refetch the receipt with `eth_getTransactionReceipt` after block sealing when a canonical block hash is required.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

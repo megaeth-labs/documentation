@@ -20,7 +20,7 @@ None.
 
 Network ID as a decimal integer string.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

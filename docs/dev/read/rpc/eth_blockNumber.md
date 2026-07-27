@@ -20,7 +20,7 @@ None.
 
 Current head block number; advances with each new block.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

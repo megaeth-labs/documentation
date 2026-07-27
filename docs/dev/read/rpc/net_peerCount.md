@@ -20,7 +20,7 @@ None.
 
 Number of connected peers.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

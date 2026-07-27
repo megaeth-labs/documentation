@@ -60,7 +60,7 @@ Hex block number or tag: `latest`, `safe`, `finalized`, `earliest`, `pending`.
 
 Additional standard fields (`stateRoot`, `logsBloom`, `transactionsRoot`, `receiptsRoot`, `baseFeePerGas`, …) are also included.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

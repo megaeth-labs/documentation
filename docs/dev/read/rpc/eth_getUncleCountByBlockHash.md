@@ -20,7 +20,7 @@ MegaETH does not produce proof-of-work uncles, so valid MegaETH blocks return ze
 The result is a hexadecimal `QUANTITY` containing the uncle count.
 For a valid MegaETH block this is zero.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

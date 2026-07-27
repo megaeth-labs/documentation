@@ -20,7 +20,7 @@ None.
 
 Client name, version, and build target.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

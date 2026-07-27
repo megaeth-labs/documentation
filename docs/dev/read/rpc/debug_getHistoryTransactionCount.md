@@ -24,7 +24,7 @@ Hex block number or tag (`earliest`, `latest`, `safe`, `finalized`).
 Cumulative transaction count across all blocks up to the selected block.
 Consecutive blocks with no transactions return the same value.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

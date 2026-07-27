@@ -24,7 +24,7 @@ For example, set `tracer` to `"callTracer"` for a nested call frame instead of o
 The result is an array ordered by transaction index.
 Each entry contains `txHash` and either `result` or `error`; the shape of `result` depends on the selected tracer.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

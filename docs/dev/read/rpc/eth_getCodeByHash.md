@@ -22,7 +22,7 @@ Target runtime code hash.
 
 Runtime bytecode; `0x` when no bytecode is stored for that hash.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

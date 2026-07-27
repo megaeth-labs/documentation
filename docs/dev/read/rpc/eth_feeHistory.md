@@ -54,7 +54,7 @@ Monotonically increasing values from `0` to `100`; omit to exclude `reward` from
 
   Blob gas utilization ratio per block when available.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

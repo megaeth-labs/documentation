@@ -30,7 +30,7 @@ None.
 
   Target block.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

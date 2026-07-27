@@ -20,7 +20,7 @@ None.
 
 Accounts controlled by the RPC node; always empty on public endpoints.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

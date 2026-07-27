@@ -21,7 +21,7 @@ None.
 
 Gas price in wei.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

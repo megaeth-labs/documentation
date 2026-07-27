@@ -21,7 +21,7 @@ MegaETH blocks do not contain proof-of-work uncles, so the method returns `null`
 The result is a block object or `null` when no uncle exists at the selected index.
 On MegaETH, `null` is expected and does not mean that the parent block itself is missing.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

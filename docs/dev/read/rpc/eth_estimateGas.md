@@ -101,7 +101,7 @@ Object keyed by address. Each value:
 
 Estimated execution gas.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

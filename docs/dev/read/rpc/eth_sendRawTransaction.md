@@ -23,7 +23,7 @@ Supported envelope types are legacy, EIP-2930, EIP-1559, EIP-4844, and EIP-7702.
 
 32-byte transaction hash.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

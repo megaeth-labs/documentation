@@ -35,7 +35,7 @@ The default is `"latest"`.
 
 Raw 32-byte storage word; a zero value can mean an empty slot, a non-existent account, or an explicitly stored zero.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

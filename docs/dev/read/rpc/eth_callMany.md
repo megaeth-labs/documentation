@@ -28,7 +28,7 @@ Each transaction uses the standard `eth_call` transaction-call fields.
 The result is an array of bundle results.
 Each bundle result is an array containing one object per transaction; a successful call object contains a `value` field with the returned `DATA`.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

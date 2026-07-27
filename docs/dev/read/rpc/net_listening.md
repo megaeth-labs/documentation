@@ -20,7 +20,7 @@ None.
 
 Always `true`.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

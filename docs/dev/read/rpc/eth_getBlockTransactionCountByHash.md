@@ -22,7 +22,7 @@ Target block hash.
 
 Transaction count; `null` when the block is not found.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

@@ -60,7 +60,7 @@ The node defaults an omitted value to `latest`, but the public endpoint requires
 
   Per-key storage proofs; each entry has `key` (`Bytes32`), `value` (`Bytes32`), `proof` (`Data[]`).
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

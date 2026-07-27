@@ -20,7 +20,7 @@ The public MegaETH endpoint supports this standard debug method.
 The result is a `DATA` value containing the RLP-encoded header.
 Decode the bytes as an Ethereum block header rather than treating them as a JSON block object.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

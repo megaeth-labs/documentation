@@ -55,7 +55,7 @@ Payloads depend on the subscription type:
 
 Notifications are not replayed automatically after a connection closes. Reconnect and create a new subscription when continuity is required.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

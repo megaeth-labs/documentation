@@ -138,7 +138,7 @@ Raw return bytes.
 Calls to non-contract addresses return `0x`.
 Reverts surface as JSON-RPC errors, not as a normal result.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

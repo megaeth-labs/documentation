@@ -46,7 +46,7 @@ Use `blockNumber` together with `blockHash`, or the paired `parentHash` and `att
 
 `v0:` followed by a base64-encoded zstd-compressed witness blob.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 

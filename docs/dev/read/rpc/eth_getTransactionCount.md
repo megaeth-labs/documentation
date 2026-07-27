@@ -30,7 +30,7 @@ The default is `"latest"`.
 Transaction count at the requested block.
 The method returns a zero quantity for both unknown accounts and accounts with zero transactions.
 
-## MegaETH Behavior
+## Comparison with Ethereum Standard JSON-RPC
 
 ### Ethereum Standard
 
