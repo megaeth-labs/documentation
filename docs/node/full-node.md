@@ -30,6 +30,8 @@ The roles available to external operators are:
 
 `full-node` and `rpc-node` share the same sync path and data directory layout; the only difference is the embedded validator pipeline that produces attestations.
 Both types serve `mega_getValidatedChain`, but on an `rpc-node` it only reflects validated tips pushed by an upstream full node via `--validator.report-to` — that node validated nothing itself, and its `anchor` always reads `null`.
+An `rpc-node` accepts those pushes only when started with `--rpc.accept-validated-blocks` (env `MEGARETH_RPC_ACCEPT_VALIDATED_BLOCKS`, default `false`).
+The flag opens an unauthenticated write path — any client that can reach the RPC port can push validated tips — so enable it only on nodes whose RPC surface is private.
 To see where attestation actually starts, query the full node that produced the tips.
 
 ## Prerequisites
@@ -176,32 +178,32 @@ Command-line flags take precedence over environment variables.
 
 ### Networking and state sync
 
-| Flag                       | Env variable                      | Default   | Description                                                                                                          |
-| -------------------------- | --------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------- |
-| `--trusted-peers`          | `MEGARETH_TRUSTED_PEERS`          | empty     | Comma-separated enode URLs of upstream peers. Effectively required — see [Prerequisites](#prerequisites).            |
-| `--subscribe-trusted-only` | `MEGARETH_SUBSCRIBE_TRUSTED_ONLY` | `true`    | Subscribe to block streams from trusted peers only.                                                                  |
-| `--disable-discovery`      | `MEGARETH_DISABLE_DISCOVERY`      | `false`   | Disable peer discovery. Recommended — MegaETH publishes no bootnodes.                                                |
-| `--port`                   | `MEGARETH_PORT`                   | `30303`   | P2P listen port.                                                                                                     |
-| `--addr`                   | `MEGARETH_ADDR`                   | `0.0.0.0` | P2P listen address.                                                                                                  |
-| `--min-handshake-peers`    | `MEGARETH_MIN_HANDSHAKE_PEERS`    | `1`       | Peers that must complete the state-sync handshake before syncing starts.                                             |
-| `--bootstrap-policy`       | `MEGARETH_BOOTSTRAP_POLICY`       | `never`   | `never` (replay from genesis) or `required` (state bootstrap at the current tip). See [Initial sync](#initial-sync). |
+| Flag                       | Env variable                      | Default   | Description                                                                                                            |
+| -------------------------- | --------------------------------- | --------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `--trusted-peers`          | `MEGARETH_TRUSTED_PEERS`          | empty     | Comma-separated enode URLs of upstream peers. Effectively required — see [Prerequisites](#prerequisites).              |
+| `--subscribe-trusted-only` | `MEGARETH_SUBSCRIBE_TRUSTED_ONLY` | `true`    | Subscribe to block streams from trusted peers only. The bare flag only sets `true`; pass `false` via the env variable. |
+| `--disable-discovery`      | `MEGARETH_DISABLE_DISCOVERY`      | `false`   | Disable peer discovery. Recommended — MegaETH publishes no bootnodes.                                                  |
+| `--port`                   | `MEGARETH_PORT`                   | `30303`   | P2P listen port.                                                                                                       |
+| `--addr`                   | `MEGARETH_ADDR`                   | `0.0.0.0` | P2P listen address.                                                                                                    |
+| `--min-handshake-peers`    | `MEGARETH_MIN_HANDSHAKE_PEERS`    | `1`       | Peers that must complete the state-sync handshake before syncing starts.                                               |
+| `--bootstrap-policy`       | `MEGARETH_BOOTSTRAP_POLICY`       | `never`   | `never` (replay from genesis) or `required` (state bootstrap at the current tip). See [Initial sync](#initial-sync).   |
 
 ### Validator flags
 
 Only consulted when `--node-type full-node`; other node types ignore them.
 
-| Flag                                | Env variable                               | Default            | Description                                                                                                    |
-| ----------------------------------- | ------------------------------------------ | ------------------ | -------------------------------------------------------------------------------------------------------------- |
-| `--validator.rpc-urls`              | `MEGARETH_VALIDATOR_RPC_URLS`              | — (required)       | Witness RPC URLs (comma-separated, round-robin failover). Each must serve `mega_getBlockWitness`.              |
-| `--validator.mode`                  | `MEGARETH_VALIDATOR_MODE`                  | `delta`            | Validation strategy: `delta` or `full`. See [Validation modes](#validation-modes).                             |
-| `--validator.workers`               | `MEGARETH_VALIDATOR_WORKERS`               | physical cores / 2 | Parallel validation workers (minimum 1). Worker count mainly matters during catch-up.                          |
-| `--validator.start-block`           | `MEGARETH_VALIDATOR_START_BLOCK`           | unset              | Trusted block hash to anchor at; validation begins at the next block. Overrides the persisted anchor.          |
-| `--validator.start-block-wait-secs` | `MEGARETH_VALIDATOR_START_BLOCK_WAIT_SECS` | `0` (indefinite)   | How long to wait for the start block to appear locally before the pipeline halts.                              |
-| `--validator.witness-wait-secs`     | `MEGARETH_VALIDATOR_WITNESS_WAIT_SECS`     | `60`               | Per-block witness-fetch deadline; on expiry the block is re-enqueued.                                          |
-| `--validator.tip-buffer`            | `MEGARETH_VALIDATOR_TIP_BUFFER`            | `1`                | Blocks of headroom below the local tip before fetching a witness, giving the witness generator time to finish. |
-| `--validator.channel-capacity`      | `MEGARETH_VALIDATOR_CHANNEL_CAPACITY`      | workers × 2        | Target total in-flight witness fetches; values below the worker count are clamped up.                          |
-| `--validator.poll-interval-ms`      | `MEGARETH_VALIDATOR_POLL_INTERVAL_MS`      | `100`              | Tip-refresh interval when the validator is caught up.                                                          |
-| `--validator.report-to`             | `MEGARETH_VALIDATOR_REPORT_TO`             | empty (disabled)   | RPC-node URLs that receive best-effort `mega_setValidatedBlocks` pushes of the validated tip.                  |
+| Flag                                | Env variable                               | Default            | Description                                                                                                                                     |
+| ----------------------------------- | ------------------------------------------ | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--validator.rpc-urls`              | `MEGARETH_VALIDATOR_RPC_URLS`              | — (required)       | Witness RPC URLs (comma-separated, round-robin failover). Each must serve `mega_getBlockWitness`.                                               |
+| `--validator.mode`                  | `MEGARETH_VALIDATOR_MODE`                  | `delta`            | Validation strategy: `delta` or `full`. See [Validation modes](#validation-modes).                                                              |
+| `--validator.workers`               | `MEGARETH_VALIDATOR_WORKERS`               | physical cores / 2 | Parallel validation workers (minimum 1). Worker count mainly matters during catch-up.                                                           |
+| `--validator.start-block`           | `MEGARETH_VALIDATOR_START_BLOCK`           | unset              | Trusted block hash to anchor at; validation begins at the next block. Overrides the persisted anchor.                                           |
+| `--validator.start-block-wait-secs` | `MEGARETH_VALIDATOR_START_BLOCK_WAIT_SECS` | `0` (indefinite)   | How long to wait for the start block to appear locally before the pipeline halts.                                                               |
+| `--validator.witness-wait-secs`     | `MEGARETH_VALIDATOR_WITNESS_WAIT_SECS`     | `60`               | Per-block witness-fetch deadline; on expiry the block is re-enqueued.                                                                           |
+| `--validator.tip-buffer`            | `MEGARETH_VALIDATOR_TIP_BUFFER`            | `1`                | Blocks of headroom below the local tip before fetching a witness, giving the witness generator time to finish.                                  |
+| `--validator.channel-capacity`      | `MEGARETH_VALIDATOR_CHANNEL_CAPACITY`      | workers × 2        | Target total in-flight witness fetches; values below the worker count are clamped up.                                                           |
+| `--validator.poll-interval-ms`      | `MEGARETH_VALIDATOR_POLL_INTERVAL_MS`      | `100`              | Tip-refresh interval when the validator is caught up.                                                                                           |
+| `--validator.report-to`             | `MEGARETH_VALIDATOR_REPORT_TO`             | empty (disabled)   | RPC-node URLs that receive best-effort `mega_setValidatedBlocks` pushes of the validated tip. Targets must run `--rpc.accept-validated-blocks`. |
 
 {% hint style="info" %}
 When pointing `--validator.rpc-urls` at a rate-limited endpoint, lower `--validator.channel-capacity` to cap concurrent witness fetches — the default of two in-flight fetches per worker is tuned for a dedicated witness provider.
@@ -235,7 +237,7 @@ At startup the validator resolves it in this order:
 3. Flag unset, fresh database — anchor at the last finalized block, or at the first synced canonical head if nothing is finalized yet.
 
 The resolved anchor is persisted, so the choice survives restarts.
-The `validator: anchor resolved` log line reports the outcome: `action=Skip` (anchor unchanged), `SeedFresh` (first anchor), or `OverrideWithRollback` (re-anchored via flag).
+The `validator: anchor resolved` log line reports the outcome: `action=Skip` (anchor unchanged), `SeedFresh` (first anchor, flag unset), or `OverrideWithRollback` (re-anchored via flag).
 
 {% hint style="warning" %}
 `--validator.start-block` takes a block **hash**, not a number, and re-anchoring clears the validated cursor — the range validated under the old anchor is no longer attested.
@@ -317,12 +319,12 @@ curl -sX POST http://localhost:8545 \
 | `reth_megaeth_validator_reorg_resets_total`                      | Counter | Validator cursor rollbacks caused by reorgs.                                              |
 | `reth_db_table_size{table=<TABLE>}`                              | Gauge   | On-disk size per database table — watch for disk planning.                                |
 
-Two more appear only when `--validator.report-to` is set:
+Two more track the validated-block publisher:
 
-| Metric                                                      | Type    | What it tells you                                                           |
-| ----------------------------------------------------------- | ------- | --------------------------------------------------------------------------- |
-| `reth_megaeth_validator_publisher_active`                   | Gauge   | `1` while the validated-block publisher loop is running, `0` once it exits. |
-| `reth_megaeth_validator_publish_failures_total{peer=<URL>}` | Counter | Failed `mega_setValidatedBlocks` pushes per peer.                           |
+| Metric                                                      | Type    | What it tells you                                                                                                      |
+| ----------------------------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `reth_megaeth_validator_publisher_active`                   | Gauge   | `1` while the publisher loop is running. Exported on every full node; stays `0` unless `--validator.report-to` is set. |
+| `reth_megaeth_validator_publish_failures_total{peer=<URL>}` | Counter | Failed `mega_setValidatedBlocks` pushes per peer. The per-peer series appears after that peer's first failure.         |
 
 A peer that is reachable but refuses a report is not counted as a failure — only transport errors, timeouts, RPC-layer errors, and publish-client panics are.
 The `peer` label is the configured URL after `Url` normalization, so `http://rpc-a:8545` appears as `http://rpc-a:8545/` and Prometheus matchers must use the trailing-slash form.
@@ -381,6 +383,7 @@ WantedBy=multi-user.target
 ```
 
 `TimeoutStopSec=120` matters: on shutdown the node flushes its databases, and a clean stop can take tens of seconds (5 s for ordinary tasks and 30 s total for critical tasks by default; `MEGARETH_CRITICAL_WAIT_SECS=N` replaces the critical budget with 5 s + N s).
+If you raise `MEGARETH_CRITICAL_WAIT_SECS`, raise `TimeoutStopSec` to stay above 5 s + N s — when the stop timeout expires first, systemd escalates to SIGKILL, the hard kill the backup rules below warn against.
 
 `MEGARETH_BOOTSTRAP_POLICY=required` belongs in the env file permanently.
 It applies only to an empty data directory and is ignored once the bootstrap has finished, so it costs nothing on restart and keeps a future re-sync from replaying the chain from genesis.
@@ -388,15 +391,15 @@ Adding it to a data directory that was already synced from genesis is the one ca
 
 ## Data directory and maintenance
 
-An explicitly passed `--datadir` is used as-is (the OS default adds a `<CHAIN_ID>/` level) and contains:
+An explicitly passed `--datadir` is used as-is (the OS default adds a `<CHAIN_ID>/` level) and contains, among other entries:
 
-| Path               | Contents                                                                                                   |
-| ------------------ | ---------------------------------------------------------------------------------------------------------- |
-| `db/main_db/`      | RocksDB instance holding headers, transactions, receipts, SALT state and trie, and changesets.             |
-| `db/index_db/`     | RocksDB instance holding history indexes and transaction lookups (created for `full-node` and `rpc-node`). |
-| `known-peers.json` | Persisted peer set, written on shutdown.                                                                   |
-| `jwt.hex`          | Auto-generated Engine API JWT secret.                                                                      |
-| `discovery-secret` | P2P identity key.                                                                                          |
+| Path               | Contents                                                                                                                      |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| `db/main_db/`      | RocksDB instance holding headers, transactions, receipts, transaction-hash lookups, and the SALT state, trie, and changesets. |
+| `db/index_db/`     | RocksDB instance holding history indexes and account/storage changesets (created for `full-node` and `rpc-node`).             |
+| `known-peers.json` | Persisted peer set, written on shutdown.                                                                                      |
+| `jwt.hex`          | Auto-generated Engine API JWT secret.                                                                                         |
+| `discovery-secret` | P2P identity key.                                                                                                             |
 
 The data directory layout is tied to the node type — reuse a data directory only with a node type that shares its layout (`full-node` and `rpc-node` do; a `sequencer` data directory does not).
 
@@ -420,22 +423,7 @@ mega-reth tables-height \
 # Expect: "tables height is consistent true at block height: <N>"
 ```
 
-### Unwinding to an earlier block
-
-`mega-reth recovery` rewinds the database to a target block after verifying consistency:
-
-```bash
-mega-reth recovery \
-  --datadir <DATA_DIR> \
-  --chain <PATH_TO_GENESIS_JSON> \
-  --node-type full-node \
-  --target_block_number <BLOCK_NUMBER>
-```
-
-{% hint style="warning" %}
-`recovery` rewrites the database destructively — back up the data directory first.
-Maintenance subcommands (`tables-height`, `recovery`, `db`) do not raise the process file-descriptor limit the way `node` does; raise it yourself (`ulimit -n 1048576`) before running them against a large database.
-{% endhint %}
+Maintenance subcommands (`tables-height`, `db`) do not raise the process file-descriptor limit the way `node` does — raise it yourself (`ulimit -n 1048576`) before running them against a large database.
 
 ## Trust model
 
