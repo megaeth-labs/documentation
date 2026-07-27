@@ -13,6 +13,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import Any, Callable
 
@@ -23,6 +24,7 @@ STATE_MARKER_PREFIX = "<!-- claude-review-state:v1 "
 STATE_MARKER_RE = re.compile(
     r"<!-- claude-review-state:v1 ([A-Za-z0-9_-]+) -->"
 )
+INLINE_FALLBACK_MARKER = "<!-- claude-review-inline-fallback:v1 -->"
 SEVERITIES = {"critical", "major", "minor", "nit"}
 QUESTION_CONFIDENCE = {"medium", "low"}
 INTERNAL_TERMS_RE = re.compile(
@@ -50,6 +52,14 @@ HIGH_RISK_PARTS = {
     "security",
     "storage",
 }
+REVIEWER_LOGINS = {
+    "claude",
+    "claude[bot]",
+    "github-actions",
+    "github-actions[bot]",
+}
+GITHUB_LINK_RETRY_ATTEMPTS = 5
+GITHUB_LINK_RETRY_DELAY_SECONDS = 1
 
 
 class PipelineError(RuntimeError):
@@ -231,7 +241,41 @@ def is_high_risk(paths: list[str]) -> bool:
 
 def is_bot_login(login: str | None) -> bool:
     lowered = (login or "").lower()
-    return lowered in {"claude", "claude[bot]"}
+    return lowered in REVIEWER_LOGINS
+
+
+def is_stateful_review(login: str | None, body: str | None) -> bool:
+    lowered = (login or "").lower()
+    if lowered in {"claude", "claude[bot]"}:
+        return True
+    return (
+        lowered in {"github-actions", "github-actions[bot]"}
+        and decode_state(body or "") is not None
+    )
+
+
+def is_owned_review_comment(
+    comment: dict[str, Any],
+    *,
+    repository: str,
+    pull_request: int,
+) -> bool:
+    login = str((comment.get("author") or {}).get("login") or "").lower()
+    if login in {"claude", "claude[bot]"}:
+        return True
+    if login not in {"github-actions", "github-actions[bot]"}:
+        return False
+    review = comment.get("pullRequestReview") or {}
+    review_login = (review.get("author") or {}).get("login")
+    state = decode_state(str(review.get("body") or ""))
+    return (
+        is_stateful_review(review_login, str(review.get("body") or ""))
+        and valid_manifest(
+            state,
+            repository=repository,
+            pull_request=pull_request,
+        )
+    )
 
 
 def empty_manifest(
@@ -286,7 +330,7 @@ def load_sticky_state(
 ) -> tuple[dict[str, Any] | None, int | None]:
     for comment in reversed(comments):
         login = (comment.get("user") or {}).get("login")
-        if login not in {"claude", "claude[bot]", "github-actions[bot]"}:
+        if not is_bot_login(login):
             continue
         body = comment.get("body") or ""
         state = decode_state(body)
@@ -308,13 +352,18 @@ def load_review_state(
     for review in reversed(reviews):
         if not is_bot_login((review.get("user") or {}).get("login")):
             continue
-        state = decode_state(review.get("body") or "")
+        body = review.get("body") or ""
+        state = decode_state(body)
         if not valid_manifest(
             state,
             repository=repository,
             pull_request=pull_request,
         ):
             continue
+        if INLINE_FALLBACK_MARKER in body:
+            for finding in state["findings"].values():
+                if isinstance(finding, dict) and not finding.get("thread_id"):
+                    finding["thread_required"] = False
         state.setdefault("cursor", {})["review_id"] = review.get("id")
         return state
     return None
@@ -343,7 +392,10 @@ def latest_reviewed_head(reviews: list[dict[str, Any]]) -> str | None:
     for review in reversed(reviews):
         login = (review.get("user") or {}).get("login")
         commit_id = review.get("commit_id")
-        if is_bot_login(login) and commit_id:
+        if (
+            is_stateful_review(login, str(review.get("body") or ""))
+            and commit_id
+        ):
             return str(commit_id)
     return None
 
@@ -368,6 +420,11 @@ query($owner:String!, $name:String!, $number:Int!, $cursor:String) {
               originalLine
               url
               databaseId
+              pullRequestReview {
+                databaseId
+                body
+                author { login }
+              }
             }
           }
         }
@@ -428,7 +485,11 @@ def import_legacy_findings(
         if thread.get("isResolved") or not comments:
             continue
         first = comments[0]
-        if not is_bot_login((first.get("author") or {}).get("login")):
+        if not is_owned_review_comment(
+            first,
+            repository=str(manifest.get("repository") or ""),
+            pull_request=int(manifest.get("pull_request") or 0),
+        ):
             continue
         thread_id = thread.get("id")
         comment_id = int(first.get("databaseId") or 0)
@@ -437,6 +498,7 @@ def import_legacy_findings(
         if comment_id in known_comments:
             known_comments[comment_id]["thread_id"] = thread_id
             known_comments[comment_id]["thread_url"] = first.get("url")
+            known_comments[comment_id]["thread_required"] = True
             continue
         matching_findings = [
             value
@@ -454,6 +516,7 @@ def import_legacy_findings(
             matching_findings[0]["thread_id"] = thread_id
             matching_findings[0]["comment_id"] = comment_id or None
             matching_findings[0]["thread_url"] = first.get("url")
+            matching_findings[0]["thread_required"] = True
             continue
         legacy_id = f"F-legacy-{hashlib.sha256(thread_id.encode()).hexdigest()[:8]}"
         title = sanitize_text(first.get("body"), maximum=160)
@@ -469,6 +532,7 @@ def import_legacy_findings(
             "thread_id": thread_id,
             "comment_id": comment_id or None,
             "thread_url": first.get("url"),
+            "thread_required": True,
             "first_seen_sha": None,
             "last_checked_sha": None,
             "resolved_sha": None,
@@ -866,6 +930,11 @@ def compile_review(
         item["status"] = status
         item["last_checked_sha"] = head
         if status == "resolved":
+            if item.get("thread_required") and not item.get("thread_id"):
+                raise PipelineError(
+                    f"cannot resolve inline finding {item_id} without "
+                    "a GitHub thread ID"
+                )
             item["resolved_sha"] = head
             if item.get("thread_id"):
                 resolution_ids.append(item["thread_id"])
@@ -982,6 +1051,7 @@ def compile_review(
             "thread_id": existing.get("thread_id"),
             "comment_id": existing.get("comment_id"),
             "thread_url": existing.get("thread_url"),
+            "thread_required": finding["inline"],
             "first_seen_sha": existing.get("first_seen_sha") or head,
             "last_checked_sha": head,
             "resolved_sha": None,
@@ -1194,13 +1264,95 @@ def existing_round_review(
     return None
 
 
+def review_used_inline_fallback(
+    repository: str,
+    pull_request: int,
+    review_id: int,
+) -> bool:
+    review = gh_json(
+        [
+            "api",
+            f"repos/{repository}/pulls/{pull_request}/reviews/{review_id}",
+        ]
+    )
+    return INLINE_FALLBACK_MARKER in str((review or {}).get("body") or "")
+
+
+def match_review_comments(
+    repository: str,
+    pull_request: int,
+    review_id: int,
+    expected_comments: list[dict[str, Any]],
+) -> dict[str, dict[str, Any]]:
+    if not expected_comments:
+        return {}
+    posted: dict[str, dict[str, Any]] = {}
+    for attempt in range(GITHUB_LINK_RETRY_ATTEMPTS):
+        posted_comments = gh_pages(
+            f"repos/{repository}/pulls/{pull_request}/reviews/"
+            f"{review_id}/comments?per_page=100"
+        )
+        used_ids: set[int] = set()
+        posted = {}
+        for expected in expected_comments:
+            matches = []
+            for comment in posted_comments:
+                comment_id = int(comment.get("id") or 0)
+                line = comment.get("line") or comment.get("original_line")
+                if (
+                    comment_id not in used_ids
+                    and comment.get("path") == expected["path"]
+                    and comment.get("body") == expected["body"]
+                    and (line is None or line == expected["line"])
+                ):
+                    matches.append(comment)
+            if not matches:
+                continue
+            comment = max(matches, key=lambda item: int(item.get("id") or 0))
+            comment_id = int(comment.get("id") or 0)
+            used_ids.add(comment_id)
+            posted[expected["finding_id"]] = {
+                "comment_id": comment_id or None,
+                "thread_url": comment.get("html_url"),
+            }
+        if len(posted) == len(expected_comments):
+            return posted
+        if attempt + 1 < GITHUB_LINK_RETRY_ATTEMPTS:
+            time.sleep(GITHUB_LINK_RETRY_DELAY_SECONDS)
+    return posted
+
+
+def recover_existing_review(
+    repository: str,
+    pull_request: int,
+    review_id: int,
+    expected_comments: list[dict[str, Any]],
+) -> tuple[dict[str, dict[str, Any]], bool]:
+    inline_fallback = review_used_inline_fallback(
+        repository,
+        pull_request,
+        review_id,
+    )
+    posted = (
+        {}
+        if inline_fallback
+        else match_review_comments(
+            repository,
+            pull_request,
+            review_id,
+            expected_comments,
+        )
+    )
+    return posted, bool(expected_comments) and not inline_fallback
+
+
 def submit_review(
     payload: dict[str, Any],
     *,
     before_write: Callable[[], None] | None = None,
-) -> tuple[int | None, dict[str, dict[str, Any]]]:
+) -> tuple[int | None, dict[str, dict[str, Any]], bool]:
     if not payload["should_submit_review"]:
-        return None, {}
+        return None, {}, False
     existing = existing_round_review(
         payload["repository"],
         payload["pull_request"],
@@ -1208,7 +1360,13 @@ def submit_review(
         payload["frozen_head"],
     )
     if existing is not None:
-        return existing, {}
+        posted, inline_published = recover_existing_review(
+            payload["repository"],
+            payload["pull_request"],
+            existing,
+            payload["inline_comments"],
+        )
+        return existing, posted, inline_published
 
     repository = payload["repository"]
     pull_request = payload["pull_request"]
@@ -1249,7 +1407,13 @@ def submit_review(
             payload["frozen_head"],
         )
         if existing is not None:
-            return existing, {}
+            posted, inline_published = recover_existing_review(
+                repository,
+                pull_request,
+                existing,
+                payload["inline_comments"],
+            )
+            return existing, posted, inline_published
         fallback = [
             f"- `{comment['path']}:{comment['line']}` — "
             f"{sanitize_text(comment['body'], maximum=1800)}"
@@ -1261,6 +1425,7 @@ def submit_review(
                 "\n\nFindings without inline anchors:\n"
                 + "\n".join(fallback)
             )
+        body += f"\n\n{INLINE_FALLBACK_MARKER}"
         if before_write is not None:
             before_write()
         response = gh_json(
@@ -1276,39 +1441,24 @@ def submit_review(
                 "body": body,
             },
         )
-        return int(response["id"]), {}
+        return int(response["id"]), {}, False
 
     response = json.loads(result.stdout)
     review_id = int(response["id"])
-    posted: dict[str, dict[str, Any]] = {}
-    posted_comments = gh_pages(
-        f"repos/{repository}/pulls/{pull_request}/reviews/"
-        f"{review_id}/comments?per_page=100"
+    posted = match_review_comments(
+        repository,
+        pull_request,
+        review_id,
+        payload["inline_comments"],
     )
-    for expected in payload["inline_comments"]:
-        matches = [
-            comment
-            for comment in posted_comments
-            if comment.get("path") == expected["path"]
-            and (comment.get("line") or comment.get("original_line"))
-            == expected["line"]
-            and comment.get("body") == expected["body"]
-        ]
-        if not matches:
-            continue
-        comment = max(matches, key=lambda item: int(item.get("id") or 0))
-        posted[expected["finding_id"]] = {
-            "comment_id": comment.get("id"),
-            "thread_url": comment.get("html_url"),
-        }
-    return review_id, posted
+    return review_id, posted, bool(payload["inline_comments"])
 
 
 def resolve_threads(
     thread_ids: list[str],
     *,
     before_write: Callable[[], None] | None = None,
-) -> None:
+) -> set[str]:
     mutation = """
 mutation($threadId:ID!) {
   resolveReviewThread(input:{threadId:$threadId}) {
@@ -1316,10 +1466,11 @@ mutation($threadId:ID!) {
   }
 }
 """
+    resolved: set[str] = set()
     for thread_id in thread_ids:
         if before_write is not None:
             before_write()
-        gh_json(
+        response = gh_json(
             [
                 "api",
                 "graphql",
@@ -1329,50 +1480,89 @@ mutation($threadId:ID!) {
                 f"threadId={thread_id}",
             ]
         )
+        thread = (
+            (response or {})
+            .get("data", {})
+            .get("resolveReviewThread", {})
+            .get("thread", {})
+        )
+        if (
+            str(thread.get("id") or "") != thread_id
+            or thread.get("isResolved") is not True
+        ):
+            raise PipelineError(
+                f"GitHub did not confirm resolution of review thread {thread_id}"
+            )
+        resolved.add(thread_id)
+    return resolved
 
 
 def attach_published_threads(
     payload: dict[str, Any],
     manifest: dict[str, Any],
+    review_id: int,
 ) -> None:
-    threads = review_threads(payload["repository"], payload["pull_request"])
-    for published in payload["inline_comments"]:
-        finding = manifest["findings"].get(published["finding_id"])
-        published_comment_id = (
-            int(finding.get("comment_id") or 0)
-            if isinstance(finding, dict)
-            else 0
-        )
-        candidates: list[tuple[int, dict[str, Any], dict[str, Any]]] = []
-        for thread in threads:
-            comments = (thread.get("comments") or {}).get("nodes") or []
-            if not comments:
+    published_ids = {
+        published["finding_id"] for published in payload["inline_comments"]
+    }
+    for attempt in range(GITHUB_LINK_RETRY_ATTEMPTS):
+        threads = review_threads(payload["repository"], payload["pull_request"])
+        for published in payload["inline_comments"]:
+            finding = manifest["findings"].get(published["finding_id"])
+            if not isinstance(finding, dict) or finding.get("thread_id"):
                 continue
-            first = comments[0]
-            database_id = int(first.get("databaseId") or 0)
-            exact_comment = (
-                published_comment_id and database_id == published_comment_id
-            )
-            semantic_match = (
-                not published_comment_id
-                and first.get("path") == published["path"]
-                and (first.get("line") or first.get("originalLine"))
-                == published["line"]
-                and first.get("body") == published["body"]
-            )
-            if (
-                (exact_comment or semantic_match)
-                and is_bot_login((first.get("author") or {}).get("login"))
-            ):
-                candidates.append(
-                    (database_id, thread, first)
+            published_comment_id = int(finding.get("comment_id") or 0)
+            candidates: list[tuple[int, dict[str, Any], dict[str, Any]]] = []
+            for thread in threads:
+                comments = (thread.get("comments") or {}).get("nodes") or []
+                if not comments:
+                    continue
+                first = comments[0]
+                database_id = int(first.get("databaseId") or 0)
+                parent_review_id = int(
+                    (
+                        first.get("pullRequestReview") or {}
+                    ).get("databaseId")
+                    or 0
                 )
-        if not candidates:
-            continue
-        _, thread, first = max(candidates, key=lambda item: item[0])
-        if isinstance(finding, dict):
+                exact_comment = (
+                    published_comment_id
+                    and database_id == published_comment_id
+                    and parent_review_id == review_id
+                )
+                semantic_match = (
+                    not published_comment_id
+                    and parent_review_id == review_id
+                    and first.get("path") == published["path"]
+                    and (first.get("line") or first.get("originalLine"))
+                    == published["line"]
+                    and first.get("body") == published["body"]
+                )
+                if exact_comment or semantic_match:
+                    candidates.append((database_id, thread, first))
+            if not candidates:
+                continue
+            _, thread, first = max(candidates, key=lambda item: item[0])
             finding["thread_id"] = thread.get("id")
+            finding["comment_id"] = int(first.get("databaseId") or 0) or None
             finding["thread_url"] = first.get("url")
+            finding["thread_required"] = True
+        missing = sorted(
+            finding_id_value
+            for finding_id_value in published_ids
+            if not (
+                isinstance(manifest["findings"].get(finding_id_value), dict)
+                and manifest["findings"][finding_id_value].get("thread_id")
+            )
+        )
+        if not missing:
+            return
+        if attempt + 1 < GITHUB_LINK_RETRY_ATTEMPTS:
+            time.sleep(GITHUB_LINK_RETRY_DELAY_SECONDS)
+    raise PipelineError(
+        "could not associate published inline findings with GitHub threads: "
+        + ", ".join(missing)
+    )
 
 
 def upsert_sticky(
@@ -1487,7 +1677,7 @@ def publish(args: argparse.Namespace) -> None:
         return
 
     try:
-        review_id, posted_comments = submit_review(
+        review_id, posted_comments, inline_published = submit_review(
             payload,
             before_write=require_frozen_pull,
         )
@@ -1502,7 +1692,17 @@ def publish(args: argparse.Namespace) -> None:
             if isinstance(finding, dict):
                 finding["comment_id"] = posted.get("comment_id")
                 finding["thread_url"] = posted.get("thread_url")
-        attach_published_threads(payload, manifest)
+        if inline_published:
+            if review_id is None:
+                raise PipelineError(
+                    "inline findings were published without a review ID"
+                )
+            attach_published_threads(payload, manifest, review_id)
+        else:
+            for published in payload["inline_comments"]:
+                finding = manifest["findings"].get(published["finding_id"])
+                if isinstance(finding, dict):
+                    finding["thread_required"] = False
         manifest["cursor"] = {
             "last_published_head": payload["frozen_head"],
             "base_branch_sha": payload["base_sha"],
