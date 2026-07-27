@@ -445,7 +445,8 @@ A full node removes the sequencer's execution from its trusted computing base in
 The witness endpoint does not need to be trusted for correctness: witness contents are cryptographically verified, so a faulty endpoint can only stall validation, not produce a false attestation.
 
 Like the standalone stateless validator, a full node validates the block sequence its peers feed it — it does not derive the canonical chain from L1, and it does not check consistency with the rollup batches posted to L1.
-On a full node, the `safe` and `finalized` block tags advance only when an external consensus client drives `engine_forkchoiceUpdated`; sequencer-provided finality markers are ignored.
+Once syncing, a full node ignores the sequencer's `safe` and `finalized` markers in block metadata: those tags advance only when an external consensus client drives `engine_forkchoiceUpdated`.
+The exception is bootstrap — blocks applied by the bootstrapper persist the sequencer's markers, so a node that has bootstrapped starts its next run with `safe` and `finalized` seeded from the sequencer's view rather than from a consensus client.
 
 ## Troubleshooting
 
