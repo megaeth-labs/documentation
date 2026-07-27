@@ -26,7 +26,8 @@ The roles available to external operators are:
 | ----------- | ----------------------------------------------------------------------------------------------------------------------- |
 | `full-node` | Syncs blocks and state, serves JSON-RPC, and re-validates every block with the embedded stateless validator. This page. |
 | `rpc-node`  | Replica node: syncs blocks and state and serves JSON-RPC without re-execution.                                          |
-| `sequencer` | The block producer. Default value — a full node must pass `--node-type full-node` explicitly.                           |
+
+The flag defaults to `sequencer` — the block-producer role MegaETH itself operates — so a full node must pass `--node-type full-node` explicitly.
 
 `full-node` and `rpc-node` share the same sync path and data directory layout; the only difference is the embedded validator pipeline that produces attestations.
 Both types serve `mega_getValidatedChain`, but on an `rpc-node` it only reflects validated tips pushed by an upstream full node via `--validator.report-to` — that node validated nothing itself, and its `anchor` always reads `null`.
