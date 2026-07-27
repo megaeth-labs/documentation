@@ -4,7 +4,11 @@ description: "debug_getHistoryTransactionCount JSON-RPC reference for MegaETH."
 
 # debug_getHistoryTransactionCount
 
+## Summary
+
 Returns the chain-wide cumulative transaction count up to and including a given block.
+
+The public MegaETH endpoint supports this method. The standard, node, and gateway layers below identify behavior that differs from a generic Ethereum endpoint.
 
 ## Parameters
 
@@ -13,30 +17,70 @@ Returns the chain-wide cumulative transaction count up to and including a given 
 Hex block number or tag (`earliest`, `latest`, `safe`, `finalized`).
 `pending` is not supported.
 
-## Returns
+## Result
 
 **`result`** Quantity
 
 Cumulative transaction count across all blocks up to the selected block.
 Consecutive blocks with no transactions return the same value.
 
+## MegaETH Behavior
+
+### Ethereum Standard
+
+`debug_getHistoryTransactionCount` is not part of the core Ethereum execution JSON-RPC API. It is a MegaETH debug extension.
+
+### MegaETH Node Behavior
+
+MegaETH adds this diagnostic method. It resolves the selected block and returns the cumulative transaction count through that block; `pending` is not a supported selector.
+
+### MegaETH Public Gateway
+
+The public gateway exposes the method in the simple read tier and caches resolved results as immutable data for 30 minutes.
+
+This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
+
 ## Errors
 
-| Code     | Cause                                                                           | Fix             |
-| -------- | ------------------------------------------------------------------------------- | --------------- |
-| `-32001` | Block selector cannot be resolved or unsupported tag such as `pending` was used | Fix the request |
-| `-32602` | Invalid parameter shape                                                         | Fix the request |
+The `| Scope |` column distinguishes method failures from gateway policy errors.
 
-See also [Error reference](error-codes.md).
+| Code     | Scope            | Message             | When it happens                                                                 |
+| -------- | ---------------- | ------------------- | ------------------------------------------------------------------------------- |
+| `-32001` | Method           | Resource not found  | Block selector cannot be resolved or unsupported tag such as `pending` was used |
+| `-32602` | Request          | Invalid params      | Invalid parameter shape                                                         |
+| `-32005` | Transport/policy | Rate limit exceeded | The caller exceeds the public gateway's simple read budget.                     |
+| `-32099` | Transport/policy | Payload too large   | The request body exceeds the 128 KiB public endpoint limit.                     |
 
-## Example
+See also [Error Codes](./error-codes.md).
 
-```bash
-curl -sS https://mainnet.megaeth.com/rpc \
-  -H 'content-type: application/json' \
-  --data '{"jsonrpc":"2.0","id":1,"method":"debug_getHistoryTransactionCount","params":["0x12a05f"]}'
+## Examples
+
+Endpoint: `https://mainnet.megaeth.com/rpc`
+
+Capture date: July 24, 2026
+
+Outcome: success
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "debug_getHistoryTransactionCount",
+  "params": ["0x12a05f"]
+}
 ```
 
-```jsonc
-{ "jsonrpc": "2.0", "id": 1, "result": "0x12cbab" } // 1,231,787 total transactions through block 1,220,703
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": "0x12cbab"
+}
 ```
+
+## Sources
+
+- Spec: EIP-1474 for JSON-RPC framing and error conventions; this method is an extension or legacy compatibility method.
+- Code: `git@github.com:megaeth-labs/mega-reth.git @ ab60376631228edab3a6df180f295280bad26e93: crates/megaeth/rpc/src/debug.rs`
+- Code: `git@github.com:megaeth-labs/mega-rpc.git @ 06aa35aa95d569c227cc25d2aa12834eb0458aa0: workers/src/spec/methods.ts`
+- Probe: MegaETH Mainnet public endpoint, July 24, 2026

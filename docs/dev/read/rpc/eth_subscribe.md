@@ -4,143 +4,97 @@ description: eth_subscribe — WebSocket subscriptions for real-time logs, state
 
 # eth_subscribe
 
-Creates a WebSocket subscription that streams data as mini-blocks are produced.
-This is the lowest-latency way to receive transaction results — logs, state changes, and block contents arrive within ~10ms of execution.
+## Summary
 
-Call `eth_unsubscribe` with the subscription ID when a subscription is no longer needed.
+Creates a WebSocket subscription and returns a subscription ID.
+MegaETH supports standard log and head subscriptions plus `stateChanges` and `miniBlocks` for real-time mini-block data.
 
-{% hint style="info" %}
-WebSocket connections require periodic client activity to remain open.
-Send `eth_chainId` at least once every 30 seconds to keep the connection alive.
-Idle connections may be closed by the server.
-{% endhint %}
+The public method is WebSocket-only. Use [`eth_unsubscribe`](./eth_unsubscribe.md) on the same connection when the subscription is no longer needed.
 
-## Subscription Types
+## Parameters
+
+| Position | Name           | Type            | Required | Description                                                        |
+| -------- | -------------- | --------------- | -------- | ------------------------------------------------------------------ |
+| `0`      | `subscription` | string          | Yes      | One of `logs`, `stateChanges`, `miniBlocks`, or `newHeads`.        |
+| `1`      | `options`      | object or array | Depends  | Filter options for `logs`, or an address array for `stateChanges`. |
 
 ### `logs`
 
-Streams event logs as transactions are packaged into mini-blocks.
-Set both `fromBlock` and `toBlock` to `"pending"` for real-time delivery.
+The optional filter object accepts:
 
-**Parameters:**
-
-| Field       | Type               | Required | Notes                                 |
-| ----------- | ------------------ | -------- | ------------------------------------- |
-| `fromBlock` | `BlockTag`         | No       | Set to `"pending"` for real-time logs |
-| `toBlock`   | `BlockTag`         | No       | Set to `"pending"` for real-time logs |
-| `address`   | `Data` \| `Data[]` | No       | Contract address(es) to filter        |
-| `topics`    | `Data[]`           | No       | Position-sensitive topic filter       |
-
-**Example:**
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "method": "eth_subscribe",
-  "params": [
-    "logs",
-    {
-      "address": "0x8320fe7702b96808f7bbc0d4a888ed1468216cfd",
-      "topics": [
-        "0xd78a0cb8bb633d06981248b816e7bd33c2a35a6089241d099fa519e361cab902"
-      ],
-      "fromBlock": "pending",
-      "toBlock": "pending"
-    }
-  ]
-}
-```
-
-Each notification uses the same schema as `eth_getLogs`.
+| Field       | Type                 | Required | Description                                                           |
+| ----------- | -------------------- | -------- | --------------------------------------------------------------------- |
+| `fromBlock` | block tag            | No       | Set to `pending` with `toBlock` for real-time mini-block logs.        |
+| `toBlock`   | block tag            | No       | Set to `pending` with `fromBlock` for real-time mini-block logs.      |
+| `address`   | address or address[] | No       | Emitting contract address or addresses.                               |
+| `topics`    | array                | No       | Position-sensitive topic filter; nested arrays express OR conditions. |
 
 ### `stateChanges`
 
-Streams account state changes as transactions are packaged into mini-blocks.
-Takes a list of account addresses to monitor.
-
-**Parameters:**
-
-| Position | Type     | Required | Notes                                |
-| -------- | -------- | -------- | ------------------------------------ |
-| `0`      | `Data[]` | Yes      | List of account addresses to monitor |
-
-**Example:**
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "method": "eth_subscribe",
-  "params": ["stateChanges", ["0x2ef038991d64c72646d4f06ba78d93f4f1654e3f"]]
-}
-```
-
-**Notification schema:**
-
-| Field     | Type              | Notes                                |
-| --------- | ----------------- | ------------------------------------ |
-| `address` | `Data` (20 bytes) | Account address                      |
-| `nonce`   | `Number`          | Latest nonce                         |
-| `balance` | `Quantity`        | Latest balance                       |
-| `storage` | `Object`          | Changed storage slots (slot → value) |
-
-**Example notification:**
-
-```json
-{
-  "address": "0x2ef038991d64c72646d4f06ba78d93f4f1654e3f",
-  "nonce": 1,
-  "balance": "0x16345785d8a0000",
-  "storage": {
-    "0xb6318d15e99499c465cc5e3d630975bf37b5641a8beb2614b018219310f4ea12": "0x68836e425f5",
-    "0xbf0f571b7368c19b53ab5ef0ff767ed8e0aef55a462778a6119b7871b017ce8f": "0x71094412456b0"
-  }
-}
-```
+The second parameter is a required array of account addresses to monitor.
 
 ### `miniBlocks`
 
-Streams mini-blocks as they are produced by the sequencer.
-
-**Parameters:** None.
-
-**Example:**
-
-```json
-{
-  "jsonrpc": "2.0",
-  "id": 1,
-  "method": "eth_subscribe",
-  "params": ["miniBlocks"]
-}
-```
-
-**Notification schema:**
-
-| Field                  | Type            | Notes                                                                                                                                                                                         |
-| ---------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `block_number`         | `Quantity`      | EVM block number that this mini-block belongs to                                                                                                                                              |
-| `block_timestamp`      | `Quantity`      | EVM block timestamp                                                                                                                                                                           |
-| `index`                | `Quantity`      | Index of this mini-block within the EVM block                                                                                                                                                 |
-| `mini_block_number`    | `Quantity`      | Global mini-block height                                                                                                                                                                      |
-| `mini_block_timestamp` | `Quantity`      | Creation timestamp (Unix microseconds)                                                                                                                                                        |
-| `gas_used`             | `Quantity`      | Gas consumed in this mini-block                                                                                                                                                               |
-| `transactions`         | `Transaction[]` | Transactions (same schema as `eth_getTransactionByHash`)                                                                                                                                      |
-| `receipts`             | `Receipt[]`     | Receipts (same schema as `eth_getTransactionReceipt`)                                                                                                                                         |
-| `transaction_root`     | `Hash`          | Merkle (MPT) root of `transactions`                                                                                                                                                           |
-| `receipt_root`         | `Hash`          | Merkle (MPT) root of `receipts`                                                                                                                                                               |
-| `signature`            | `Object`        | Sequencer's ECDSA signature over the header hash, as `r`, `s`, and `yParity` fields. Absent for pre-Rex5 mini-blocks. See [Sequencer signatures](../../../mini-block.md#sequencer-signatures) |
+No second parameter is required.
 
 ### `newHeads`
 
-Streams EVM block headers as they are sealed.
-Standard Ethereum subscription — works the same as on other EVM chains.
-On MegaETH, headers include an additional `miniBlockCount` field.
+No second parameter is required.
 
-**Parameters:** None.
+## Result
 
-**Example:**
+The initial response contains a connection-scoped subscription ID as `DATA`.
+Subsequent notifications use `eth_subscription` and include that ID plus a `result` payload.
+
+Payloads depend on the subscription type:
+
+- `logs` uses the same log object schema as [`eth_getLogs`](./eth_getLogs.md).
+- `stateChanges` returns an account address, numeric nonce, balance quantity, and changed storage slots.
+- `miniBlocks` returns the EVM block number and timestamp, mini-block index and global height, microsecond timestamp, gas used, transactions, receipts, roots, and the sequencer signature when available.
+- `newHeads` returns a block header and includes MegaETH's additional `miniBlockCount` field.
+
+Notifications are not replayed automatically after a connection closes. Reconnect and create a new subscription when continuity is required.
+
+## MegaETH Behavior
+
+### Ethereum Standard
+
+Ethereum WebSocket providers commonly implement `eth_subscribe` for `logs` and `newHeads`, although subscriptions are transport extensions rather than HTTP execution-API methods.
+Subscription IDs and delivery are scoped to the WebSocket connection.
+
+### MegaETH Node Behavior
+
+MegaETH adds `stateChanges` and `miniBlocks`.
+These expose state and receipt data as mini-blocks are produced, while `newHeads` follows sealed EVM blocks and adds `miniBlockCount`.
+For real-time log delivery, both log-range tags should be `pending`.
+
+### MegaETH Public Gateway
+
+The public gateway accepts this method only over `wss://mainnet.megaeth.com/ws`.
+It supports `logs`, `stateChanges`, `miniBlocks`, and `newHeads`, tracks ownership per connection, and requires periodic client activity; sending a lightweight request such as `eth_chainId` at least every 30 seconds prevents idle closure.
+
+This behavior and a successful `newHeads` subscription were observed on July 24, 2026.
+Connection policy and operational timeouts may change.
+
+## Errors
+
+The `| Scope |` column distinguishes method failures from gateway policy errors.
+
+| Code     | Scope            | Message                       | When it happens                                                       |
+| -------- | ---------------- | ----------------------------- | --------------------------------------------------------------------- |
+| `-32602` | Method           | Invalid params                | The subscription type or its filter/options are malformed.            |
+| `-32000` | Transport/policy | WebSocket connection required | The method is sent over HTTP instead of a WebSocket connection.       |
+| `-32601` | Transport/policy | Method not found              | The requested subscription type is not enabled by the public gateway. |
+
+See also [Error Codes](./error-codes.md).
+
+## Examples
+
+Endpoint: `wss://mainnet.megaeth.com/ws` (WebSocket)
+
+Capture date: July 24, 2026
+
+Outcome: success
 
 ```json
 {
@@ -151,11 +105,17 @@ On MegaETH, headers include an additional `miniBlockCount` field.
 }
 ```
 
-## Errors
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": "0xaec58cfc2dc41f873fc37d6c871230c1"
+}
+```
 
-| Code     | Cause                                             | Fix                                |
-| -------- | ------------------------------------------------- | ---------------------------------- |
-| `-32602` | Invalid subscription type or malformed parameters | Fix the request                    |
-| `-32000` | WebSocket connection required                     | Use a WebSocket endpoint, not HTTP |
+## Sources
 
-See also [Error reference](error-codes.md).
+- Spec: EIP-1474 for JSON-RPC framing; subscriptions are a WebSocket transport extension.
+- Code: `git@github.com:megaeth-labs/mega-reth.git @ ab60376631228edab3a6df180f295280bad26e93: crates/megaeth/rpc/src/pubsub.rs`
+- Code: `git@github.com:megaeth-labs/mega-rpc.git @ 06aa35aa95d569c227cc25d2aa12834eb0458aa0: workers/src/rpc-gateway/websocket-session.ts`
+- Probe: MegaETH Mainnet public WebSocket endpoint, July 24, 2026

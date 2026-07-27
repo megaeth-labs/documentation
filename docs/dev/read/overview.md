@@ -43,8 +43,8 @@ Managed providers may expose additional methods.
 | `eth_callAfter`                           | Unavailable    | The public endpoint returns `-32601`.                                                           |
 | `eth_callMany`                            | Available      | 100 bundles and 100 total calls; 60,000,000 compute gas per call; timeout capped at 25 seconds. |
 | `eth_chainId`                             | Available      |                                                                                                 |
-| `eth_createAccessList`                    | Available      | Compute gas limited to 60,000,000.                                                              |
-| `eth_estimateGas`                         | Available      | Compute gas limited to 60,000,000.                                                              |
+| `eth_createAccessList`                    | Available      | Routed to the compute pool; no separate 60M compute override is added.                          |
+| `eth_estimateGas`                         | Available      | Uses an internal CPU-time limit; the source default is 0.5 seconds.                             |
 | `eth_feeHistory`                          | Available      | Block range limited to 256.                                                                     |
 | `eth_gasPrice`                            | Available      |                                                                                                 |
 | `eth_getBalance`                          | Available      |                                                                                                 |

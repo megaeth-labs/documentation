@@ -4,7 +4,11 @@ description: "eth_getTransactionReceipt JSON-RPC reference for MegaETH."
 
 # eth_getTransactionReceipt
 
+## Summary
+
 Returns a transaction receipt by hash.
+
+The public MegaETH endpoint supports this method. The standard, node, and gateway layers below identify behavior that differs from a generic Ethereum endpoint.
 
 ## Parameters
 
@@ -12,7 +16,7 @@ Returns a transaction receipt by hash.
 
 Hash of the target transaction.
 
-## Returns
+## Result
 
 `Receipt | null` — `null` when the transaction is unknown or not yet mined.
 
@@ -22,7 +26,7 @@ Hash of the target transaction.
 
 - **`status`** Quantity
 
-  `0x1` success; `0x0` failure.
+  A nonzero status indicates success; zero indicates that execution reverted.
 
 - **`blockHash`** Hash32
 
@@ -58,20 +62,51 @@ Hash of the target transaction.
 
 Additional fields include `cumulativeGasUsed`, `logsBloom`, `type`, and L1 fee fields (`l1Fee`, `l1GasPrice`, `l1GasUsed`, etc.).
 
+## MegaETH Behavior
+
+### Ethereum Standard
+
+The canonical Ethereum method uses the parameter and result contract documented above, including the stated `null`, `false`, or zero-value semantics where applicable.
+
+### MegaETH Node Behavior
+
+The node returns `null` until a receipt is visible. Receipts produced from a real-time mini-block may temporarily use the all-`ff` block-hash placeholder until the EVM block seals.
+
+### MegaETH Public Gateway
+
+The gateway first checks its receipt cache, forwards misses upstream, and caches non-null receipts for 30 minutes. A `null` result is not cached.
+
+This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
+
 ## Errors
 
-| Code     | Cause                                    | Fix             |
-| -------- | ---------------------------------------- | --------------- |
-| `-32602` | Transaction hash is missing or malformed | Fix the request |
+The `| Scope |` column distinguishes method failures from gateway policy errors.
 
-See also [Error reference](error-codes.md).
+| Code     | Scope            | Message             | When it happens                                             |
+| -------- | ---------------- | ------------------- | ----------------------------------------------------------- |
+| `-32602` | Request          | Invalid params      | Transaction hash is missing or malformed                    |
+| `-32005` | Transport/policy | Rate limit exceeded | The caller exceeds the public gateway's simple read budget. |
+| `-32099` | Transport/policy | Payload too large   | The request body exceeds the 128 KiB public endpoint limit. |
 
-## Example
+See also [Error Codes](./error-codes.md).
 
-```bash
-curl -sS https://mainnet.megaeth.com/rpc \
-  -H 'content-type: application/json' \
-  --data '{"jsonrpc":"2.0","id":120,"method":"eth_getTransactionReceipt","params":["0xf3473347041eb4ccc045ee58e6c79c80d98ee4aa783d49e49c69d0a0e50d8ed6"]}'
+## Examples
+
+Endpoint: `https://mainnet.megaeth.com/rpc`
+
+Capture date: July 24, 2026
+
+Outcome: success
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 120,
+  "method": "eth_getTransactionReceipt",
+  "params": [
+    "0xf3473347041eb4ccc045ee58e6c79c80d98ee4aa783d49e49c69d0a0e50d8ed6"
+  ]
+}
 ```
 
 ```json
@@ -93,3 +128,10 @@ curl -sS https://mainnet.megaeth.com/rpc \
   }
 }
 ```
+
+## Sources
+
+- Spec: `git@github.com:ethereum/execution-apis.git @ d24f58b56dcd16ab0f0c70ec609bcc1c42750b51: src/eth/transaction.yaml`
+- Code: `git@github.com:megaeth-labs/mega-reth.git @ ab60376631228edab3a6df180f295280bad26e93: crates/rpc/rpc-eth-api/src/core.rs`
+- Code: `git@github.com:megaeth-labs/mega-rpc.git @ 06aa35aa95d569c227cc25d2aa12834eb0458aa0: workers/src/processors/tx-receipt-processor.ts`
+- Probe: MegaETH Mainnet public endpoint, July 24, 2026

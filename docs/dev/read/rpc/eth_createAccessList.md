@@ -4,7 +4,11 @@ description: "eth_createAccessList JSON-RPC reference for MegaETH."
 
 # eth_createAccessList
 
+## Summary
+
 Generates an access list for a transaction.
+
+The public MegaETH endpoint supports this method. The standard, node, and gateway layers below identify behavior that differs from a generic Ethereum endpoint.
 
 ## Parameters
 
@@ -91,7 +95,7 @@ Object keyed by address. Each value:
 
   Move a precompile to the specified address before `code` is applied.
 
-## Returns
+## Result
 
 - **`accessList`** array
 
@@ -105,22 +109,58 @@ Object keyed by address. Each value:
 
   Execution error when the call reverts; may coexist with `accessList` and `gasUsed`.
 
+## MegaETH Behavior
+
+### Ethereum Standard
+
+The canonical Ethereum method uses the parameter and result contract documented above, including the stated `null`, `false`, or zero-value semantics where applicable.
+
+### MegaETH Node Behavior
+
+The node executes the call in access-list collection mode and returns both the accessed addresses and storage keys and the resulting gas usage.
+
+### MegaETH Public Gateway
+
+The gateway routes the method to the compute pool without response caching and permits a 1.5 MiB single-request body.
+Unlike `eth_call`, gateway source does not add the separate 60,000,000 compute-gas override to this method.
+
+This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
+
 ## Errors
 
-| Code     | Cause                                                   | Fix                                    |
-| -------- | ------------------------------------------------------- | -------------------------------------- |
-| `-32602` | Malformed transaction object or block selector          | Fix the request                        |
-| `-32000` | Pre-execution check failed (e.g. intrinsic gas too low) | Raise or remove the gas cap            |
-| `-32003` | Sender cannot cover gas and value in the selected state | Fund the sender or lower the value/fee |
+The `| Scope |` column distinguishes method failures from gateway policy errors.
 
-See also [Error reference](error-codes.md).
+| Code     | Scope            | Message              | When it happens                                              |
+| -------- | ---------------- | -------------------- | ------------------------------------------------------------ |
+| `-32602` | Request          | Invalid params       | Malformed transaction object or block selector               |
+| `-32000` | Method           | Server error         | Pre-execution check failed (e.g. intrinsic gas too low)      |
+| `-32003` | Method           | Transaction rejected | Sender cannot cover gas and value in the selected state      |
+| `-32005` | Transport/policy | Rate limit exceeded  | The caller exceeds the public gateway's compute read budget. |
+| `-32099` | Transport/policy | Payload too large    | The request body exceeds the 1.5 MiB public endpoint limit.  |
 
-## Example
+See also [Error Codes](./error-codes.md).
 
-```bash
-curl -sS https://mainnet.megaeth.com/rpc \
-  -H 'content-type: application/json' \
-  --data '{"jsonrpc":"2.0","id":7,"method":"eth_createAccessList","params":[{"to":"0x1111111111111111111111111111111111111111","input":"0x"},"latest"]}'
+## Examples
+
+Endpoint: `https://mainnet.megaeth.com/rpc`
+
+Capture date: July 24, 2026
+
+Outcome: success
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 7,
+  "method": "eth_createAccessList",
+  "params": [
+    {
+      "to": "0x1111111111111111111111111111111111111111",
+      "input": "0x"
+    },
+    "latest"
+  ]
+}
 ```
 
 ```json
@@ -133,3 +173,10 @@ curl -sS https://mainnet.megaeth.com/rpc \
   }
 }
 ```
+
+## Sources
+
+- Spec: `git@github.com:ethereum/execution-apis.git @ d24f58b56dcd16ab0f0c70ec609bcc1c42750b51: src/eth/execute.yaml`
+- Code: `git@github.com:megaeth-labs/mega-reth.git @ ab60376631228edab3a6df180f295280bad26e93: crates/megaeth/rpc/src/eth/api.rs`
+- Code: `git@github.com:megaeth-labs/mega-rpc.git @ 06aa35aa95d569c227cc25d2aa12834eb0458aa0: workers/src/spec/methods.ts`
+- Probe: MegaETH Mainnet public endpoint, July 24, 2026

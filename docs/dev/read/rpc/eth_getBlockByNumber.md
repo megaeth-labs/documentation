@@ -4,7 +4,11 @@ description: "eth_getBlockByNumber JSON-RPC reference for MegaETH."
 
 # eth_getBlockByNumber
 
+## Summary
+
 Returns a block by number or tag.
+
+The public MegaETH endpoint supports this method. The standard, node, and gateway layers below identify behavior that differs from a generic Ethereum endpoint.
 
 ## Parameters
 
@@ -18,7 +22,7 @@ Hex block number or tag: `latest`, `safe`, `finalized`, `earliest`, `pending`.
 
 `false` returns transaction hashes; `true` returns full transaction objects.
 
-## Returns
+## Result
 
 `Block | null` — `null` when the requested block does not exist or is not yet available.
 
@@ -56,21 +60,50 @@ Hex block number or tag: `latest`, `safe`, `finalized`, `earliest`, `pending`.
 
 Additional standard fields (`stateRoot`, `logsBloom`, `transactionsRoot`, `receiptsRoot`, `baseFeePerGas`, …) are also included.
 
+## MegaETH Behavior
+
+### Ethereum Standard
+
+The canonical Ethereum method uses the parameter and result contract documented above, including the stated `null`, `false`, or zero-value semantics where applicable.
+
+### MegaETH Node Behavior
+
+The node resolves a block number or tag and honors the `fullTransactions` response-shape flag. A missing block is represented by `null`.
+
+### MegaETH Public Gateway
+
+The gateway returns `null` immediately for `pending`. Other responses are streamed and cached; head-following tags use short-lived entries while fixed blocks are treated as immutable.
+
+This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
+
 ## Errors
 
-| Code     | Cause                                                           | Fix                                                   |
-| -------- | --------------------------------------------------------------- | ----------------------------------------------------- |
-| `-32602` | Malformed block selector or `fullTransactions` is not a boolean | Fix the request                                       |
-| `4444`   | Requested historical block is not available on this endpoint    | Verify historical-state availability for the endpoint |
+The `| Scope |` column distinguishes method failures from gateway policy errors.
 
-See also [Error reference](error-codes.md).
+| Code     | Scope            | Message                    | When it happens                                                 |
+| -------- | ---------------- | -------------------------- | --------------------------------------------------------------- |
+| `-32602` | Request          | Invalid params             | Malformed block selector or `fullTransactions` is not a boolean |
+| `4444`   | Method           | Pruned history unavailable | Requested historical block is not available on this endpoint    |
+| `-32005` | Transport/policy | Rate limit exceeded        | The caller exceeds the public gateway's simple read budget.     |
+| `-32099` | Transport/policy | Payload too large          | The request body exceeds the 128 KiB public endpoint limit.     |
 
-## Example
+See also [Error Codes](./error-codes.md).
 
-```bash
-curl -sS https://mainnet.megaeth.com/rpc \
-  -H 'content-type: application/json' \
-  --data '{"jsonrpc":"2.0","id":81,"method":"eth_getBlockByNumber","params":["0x100000",false]}'
+## Examples
+
+Endpoint: `https://mainnet.megaeth.com/rpc`
+
+Capture date: July 24, 2026
+
+Outcome: success
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 81,
+  "method": "eth_getBlockByNumber",
+  "params": ["0x100000", false]
+}
 ```
 
 ```json
@@ -87,3 +120,35 @@ curl -sS https://mainnet.megaeth.com/rpc \
   }
 }
 ```
+
+Pending-block edge case:
+
+Endpoint: `https://mainnet.megaeth.com/rpc`
+
+Capture date: July 27, 2026
+
+Outcome: null
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 82,
+  "method": "eth_getBlockByNumber",
+  "params": ["pending", false]
+}
+```
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 82,
+  "result": null
+}
+```
+
+## Sources
+
+- Spec: `git@github.com:ethereum/execution-apis.git @ d24f58b56dcd16ab0f0c70ec609bcc1c42750b51: src/eth/block.yaml`
+- Code: `git@github.com:megaeth-labs/mega-reth.git @ ab60376631228edab3a6df180f295280bad26e93: crates/rpc/rpc-eth-api/src/core.rs`
+- Code: `git@github.com:megaeth-labs/mega-rpc.git @ 06aa35aa95d569c227cc25d2aa12834eb0458aa0: workers/src/processors/simple-cache-processor.ts`
+- Probe: MegaETH Mainnet public endpoint, July 24 and July 27, 2026
