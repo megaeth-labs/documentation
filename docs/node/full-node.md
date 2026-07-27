@@ -44,8 +44,10 @@ A full node needs four inputs beyond the binary itself:
 4. **Witness endpoint** — one or more RPC URLs serving [`mega_getBlockWitness`](witness.md), passed via `--validator.rpc-urls`.
    The endpoint needs no other JSON-RPC method: the validator reads blocks and bytecode from the node's own database and fetches only witnesses remotely.
 
-Plan for a fast NVMe SSD and several hundred GB of storage — a full-history MegaETH Mainnet data directory measures roughly 400 GB as of July 2026 and grows with chain history.
-A node bootstrapped at the tip (see [Initial sync](#initial-sync)) starts far smaller and grows from its bootstrap block.
+Plan for a fast NVMe SSD, sized by how the node syncs — the two paths differ by an order of magnitude.
+A node bootstrapped at the tip (see [Initial sync](#initial-sync)) holds only the SALT state at its bootstrap block and everything after: budget at least 500 GB, and size the volume for months of growth rather than for the footprint just after bootstrap.
+A node that replays from genesis keeps the chain un-pruned, which on MegaETH Mainnet is roughly 3 TB as of July 2026 (Testnet is roughly 1.6 TB) — provision 4 TB.
+Budget for logs separately: they are written outside the data directory and rotate at `--log.file.max-size` × `--log.file.max-files`.
 Validation throughput scales with CPU cores; the validator defaults to one worker per two physical cores.
 
 ## Quick start
