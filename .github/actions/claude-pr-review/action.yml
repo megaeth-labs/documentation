@@ -5,6 +5,13 @@ inputs:
   claude_code_oauth_token:
     required: true
     description: OAuth token for Claude Code.
+  github_identity_token:
+    required: false
+    default: ""
+    description: >
+      Optional GitHub token used for review publication and state updates.
+      When supplied, it is also used to resolve addressed automated review
+      threads. Empty uses the job token and skips thread resolution.
   allowed_bots:
     required: false
     default: mega-putin
@@ -62,7 +69,7 @@ runs:
       id: prepare
       shell: bash
       env:
-        GH_TOKEN: ${{ github.token }}
+        GH_TOKEN: ${{ inputs.github_identity_token || github.token }}
         REVIEW_DEPTH: ${{ inputs.review_depth }}
         PREMORTEM: ${{ inputs.premortem }}
         STATE_DIR: ${{ github.workspace }}/.pr-review
@@ -248,7 +255,8 @@ runs:
       id: publish
       shell: bash
       env:
-        GH_TOKEN: ${{ github.token }}
+        GH_TOKEN: ${{ inputs.github_identity_token || github.token }}
+        GH_RESOLVE_THREADS: ${{ inputs.github_identity_token != '' }}
         STATE_DIR: ${{ github.workspace }}/.pr-review
       run: |
         set -euo pipefail

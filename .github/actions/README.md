@@ -25,6 +25,12 @@ The `interactive` action does not accept `extra_prompt` because `@claude` is nat
 
 The `pr-review` action additionally accepts:
 
+- `github_identity_token` - optional, defaults to empty.
+  When supplied, this token is the single identity for creating reviews,
+  posting or updating status comments, and resolving addressed automated
+  review threads.
+  When omitted, publication uses the job token and leaves GitHub thread state
+  unchanged.
 - `model` - optional, defaults to `claude-opus-4-7`.
   This strong model handles initial, high-risk, and explicitly deep reviews.
 - `incremental_model` - optional, defaults to empty, which uses the Claude Code default
@@ -37,6 +43,13 @@ The `pr-review` action additionally accepts:
   Automatic mode runs the independent production-failure analysis for initial and high-risk
   reviews, but skips it for ordinary incremental updates.
   `on` always enables it and `off` disables it.
+
+Consumers that already create a GitHub App token can opt into the unified identity with:
+
+```yaml
+with:
+  github_identity_token: ${{ steps.app-token.outputs.token }}
+```
 
 The semantic stage is bounded to 12 turns for fast incremental reviews, 24 for standard
 full or high-risk reviews, and 40 for explicit deep reviews.
@@ -53,8 +66,8 @@ The PR reviewer is an explicit staged pipeline:
 3. A deterministic compiler validates findings, enforces severity budgets, checks RIGHT-side
    anchors, formats the standard human-facing messages, and suppresses internal review
    machinery.
-4. A deterministic publisher rechecks the live head, submits at most one review, resolves
-   addressed automated threads, and updates one sticky status comment.
+4. A deterministic publisher rechecks the live head, submits at most one review, optionally
+   resolves addressed automated threads, and updates one sticky status comment.
 
 The sticky comment contains a hidden, versioned manifest with the last published head,
 reviewer and rubric versions, stable finding IDs, thread IDs, and finding dispositions.
@@ -64,8 +77,10 @@ The manifest never contains complete diffs, PR prose, tool output, secrets, or C
 transcripts.
 Inline findings are linked back to the exact published review and comment IDs, with bounded
 retries for GitHub API propagation.
-The publisher does not mark an inline finding resolved unless GitHub confirms the thread
-resolution mutation.
+When `github_identity_token` is configured, the publisher does not mark a GitHub thread
+resolved unless GitHub confirms the resolution mutation.
+The configured identity is stored in the review manifest while historical `claude` and
+`github-actions` state remains readable for migration.
 
 The action performs a full review when there is no valid checkpoint, the previous head is not
 an ancestor, or the pipeline or rubric version changed.
