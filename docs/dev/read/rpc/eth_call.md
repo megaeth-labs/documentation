@@ -154,8 +154,6 @@ The gateway routes the request to the compute pool, rewrites it to `mega_callWit
 It preserves the caller's `gas` field and separately supplies an internal compute-gas limit of 60,000,000; the internal limit caps compute gas without replacing the total gas budget.
 The public endpoint permits a 1.5 MiB single-request body.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

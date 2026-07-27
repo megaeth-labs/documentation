@@ -38,8 +38,6 @@ This is the OP node's native output-root method. The related MegaETH execution-n
 The gateway accepts this name and `mega_outputAtBlock`, routes both to the OP-node pool as `optimism_outputAtBlock`, and applies the same split cache policy for output data and synchronization status.
 Because the cached projection omits `version`, callers must not require that field even though it can appear on a fresh response.
 
-This public behavior was confirmed from gateway source and the example was observed on July 27, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

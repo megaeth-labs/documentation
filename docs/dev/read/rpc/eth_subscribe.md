@@ -73,9 +73,6 @@ For real-time log delivery, both log-range tags should be `pending`.
 The public gateway accepts this method only over `wss://mainnet.megaeth.com/ws`.
 It supports `logs`, `stateChanges`, `miniBlocks`, and `newHeads`, tracks ownership per connection, and requires periodic client activity; sending a lightweight request such as `eth_chainId` at least every 30 seconds prevents idle closure.
 
-This behavior and a successful `newHeads` subscription were observed on July 24, 2026.
-Connection policy and operational timeouts may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

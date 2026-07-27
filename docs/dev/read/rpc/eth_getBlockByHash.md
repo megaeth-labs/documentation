@@ -74,8 +74,6 @@ The node returns the canonical block matching the hash, or `null` if the hash is
 
 The gateway streams and caches successful block responses for 30 minutes, using a hash-to-number mapping to deduplicate entries. A `null` lookup is not cached.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

@@ -34,8 +34,6 @@ The node reports its configured network identifier as a decimal string. On MegaE
 
 The gateway exposes the method in the instant read tier and caches the immutable network ID for 30 minutes.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

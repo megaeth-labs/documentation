@@ -54,8 +54,6 @@ MegaETH adds this synchronous submission method. It returns a real-time receipt 
 
 The gateway routes this name and `eth_sendRawTransactionSync` through the same synchronous handler. After gateway-side validation, both names are rewritten to the node's `realtime_sendRawTransactionWithSender` method. The gateway caps explicit waits at 3,000 milliseconds and accepts request bodies up to 2.5 MiB.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

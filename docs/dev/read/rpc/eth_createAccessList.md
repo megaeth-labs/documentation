@@ -124,8 +124,6 @@ The node executes the call in access-list collection mode and returns both the a
 The gateway routes the method to the compute pool without response caching and permits a 1.5 MiB single-request body.
 Unlike `eth_call`, gateway source does not add the separate 60,000,000 compute-gas override to this method.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

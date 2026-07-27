@@ -36,8 +36,6 @@ MegaETH adds a direct code-hash lookup that returns the stored runtime bytecode.
 
 The public gateway exposes this MegaETH extension and caches successful immutable lookups for 30 minutes.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

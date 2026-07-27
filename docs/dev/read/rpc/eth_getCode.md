@@ -43,8 +43,6 @@ The node returns runtime bytecode from the selected state. A missing account and
 
 The gateway streams bytecode responses and caches successful fixed-state lookups for up to 30 minutes. The exact cache key follows the address and block selector.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

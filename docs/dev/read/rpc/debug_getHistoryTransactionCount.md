@@ -38,8 +38,6 @@ MegaETH adds this diagnostic method. It resolves the selected block and returns 
 
 The public gateway exposes the method in the simple read tier and caches resolved results as immutable data for 30 minutes.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

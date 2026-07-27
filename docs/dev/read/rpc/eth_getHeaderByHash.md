@@ -64,8 +64,6 @@ MegaETH exposes a header-only lookup. It returns `null` when the hash is unknown
 
 The gateway streams successful responses, caches them for 30 minutes, and records a hash-to-number mapping. A `null` result is deliberately not cached.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

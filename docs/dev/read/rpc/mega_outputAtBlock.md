@@ -81,8 +81,6 @@ The current MegaETH execution node's related native method is `mega_optimismOutp
 The gateway rewrites this method to `optimism_outputAtBlock` and routes it to the OP-node pool. It caches stable output data for 30 minutes but refreshes the embedded synchronization status on a 1-second cadence.
 Its cached projection omits the upstream `version` field, so callers must tolerate `version` being present on a fresh response and absent on a cache hit.
 
-This public behavior was confirmed from gateway source and the example was observed on July 27, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

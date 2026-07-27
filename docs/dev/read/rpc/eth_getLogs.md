@@ -93,8 +93,6 @@ The node applies the standard address/topic filter and enforces canonical block-
 
 The gateway places the method in the IO-heavy tier, routes older explicit ranges to its ClickHouse-backed log service when configured, streams the response, and caches only cache-safe filters. There is no gateway block-range cap, but backend row, time, or memory limits can still make very large queries incomplete or fail.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

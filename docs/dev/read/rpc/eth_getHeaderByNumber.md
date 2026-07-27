@@ -64,8 +64,6 @@ MegaETH exposes a header-only lookup by number or tag. It returns `null` when th
 
 The gateway returns `null` immediately for `pending`; other header responses are streamed and cached, with fixed blocks treated as immutable.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

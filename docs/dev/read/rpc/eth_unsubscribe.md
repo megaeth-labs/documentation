@@ -36,8 +36,6 @@ The node cancels a subscription in the WebSocket session that created it. Subscr
 
 The public method is WebSocket-only. The gateway keeps subscription ownership per connection and rejects attempts to cancel a subscription from another session.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

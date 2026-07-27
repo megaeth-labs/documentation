@@ -34,8 +34,6 @@ The node returns the current canonical EVM block height. Mini-blocks produced wi
 
 The gateway uses the instant read tier and may cache the head number for 1 second. Applications that need mini-block cadence should use WebSocket subscriptions instead.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

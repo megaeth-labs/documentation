@@ -49,8 +49,6 @@ The node reads a 32-byte storage word from the selected state. A zero word does 
 
 The gateway exposes the method in the instant read tier and does not cache the response. Historical-state retention errors from the selected backend remain visible to callers.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

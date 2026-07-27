@@ -39,7 +39,7 @@ System transactions may therefore appear in block traces.
 ### MegaETH Public Gateway
 
 The public gateway streams trace responses because they can be large.
-It requires two positional parameters and was observed to support `callTracer` on July 24, 2026.
+It requires two positional parameters and supports `callTracer`.
 
 ## Errors
 

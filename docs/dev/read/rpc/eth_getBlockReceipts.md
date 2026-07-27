@@ -80,8 +80,6 @@ The node returns all receipts for the selected block. The response can be large 
 
 The gateway returns `null` immediately for `pending`, streams large responses, and caches successful results for up to 30 minutes. The method is in the IO-heavy read tier.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

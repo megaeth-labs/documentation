@@ -34,8 +34,6 @@ The node constructs a client/build identifier. The exact string is operational m
 
 The gateway uses the instant read tier and caches the version string for 30 minutes. Callers must not parse the deployment suffix as a stable API.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

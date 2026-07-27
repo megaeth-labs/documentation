@@ -42,7 +42,6 @@ The MegaETH node executes bundles in order against a shared evolving simulation 
 
 The gateway accepts two to four positional parameters, limits requests to 100 bundles and 100 total transactions, and limits each call to 60,000,000 compute gas.
 It applies a 5-second default timeout and accepts an explicit timeout up to 25 seconds.
-These limits were verified in gateway source and a successful call was observed on July 24, 2026.
 
 ## Errors
 

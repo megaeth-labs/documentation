@@ -68,8 +68,6 @@ The node implements the standard fee-history shape. The public gateway does not 
 
 The gateway synthesizes this response locally instead of querying a node. It accepts 1 to 256 blocks and currently fills the response with a 1,000,000-wei base fee, 0.1 gas-used ratio, 1-wei blob base fee, zero blob utilization, and zero rewards. Treat these as gateway policy values, not measured historical blocks.
 
-This public behavior was confirmed from gateway source and the example was observed on July 27, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

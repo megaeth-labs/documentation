@@ -34,8 +34,6 @@ The node derives this value from its chain specification. MegaETH Mainnet uses c
 
 The gateway uses the instant read tier and caches the immutable result for 30 minutes. MegaETH Mainnet returned chain ID 4326 in the captured example.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

@@ -37,8 +37,6 @@ MegaETH implements this OP Stack withdrawal-proof extension for the L2-to-L1 mes
 
 The public gateway exposes this method and caches successful proofs for 30 minutes. All three positional parameters are required at the gateway.
 
-This public behavior was confirmed from gateway source and the example was observed on July 27, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

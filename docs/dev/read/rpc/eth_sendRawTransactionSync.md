@@ -84,8 +84,6 @@ The current MegaETH node does not register this `eth_*` alias. Its native synchr
 
 The gateway exposes this compatibility name and routes it and `realtime_sendRawTransaction` through the same handler. Both are rewritten to the node's `realtime_sendRawTransactionWithSender` method after gateway-side validation. The gateway caps explicit waits at 3,000 milliseconds and accepts request bodies up to 2.5 MiB. An expiry is inconclusive: the transaction may still land.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

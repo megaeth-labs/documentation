@@ -74,8 +74,6 @@ The node resolves a block number or tag and honors the `fullTransactions` respon
 
 The gateway returns `null` immediately for `pending`. Other responses are streamed and cached; head-following tags use short-lived entries while fixed blocks are treated as immutable.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

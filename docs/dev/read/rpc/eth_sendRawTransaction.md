@@ -37,8 +37,6 @@ The node decodes and validates the signed transaction before admitting it to the
 
 The gateway validates chain ID, signature, intrinsic gas, fee floor, nonce, balance, and policy checks before forwarding. The method is exempt from read-rate limits and accepts request bodies up to 2.5 MiB.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

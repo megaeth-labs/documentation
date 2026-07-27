@@ -36,8 +36,6 @@ The node looks up the block and returns its transaction count. An unknown block 
 
 The gateway caches successful hash-based lookups for 30 minutes in the simple read tier.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

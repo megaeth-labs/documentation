@@ -37,7 +37,6 @@ MegaETH uses geth-compatible tracer options and includes system transactions in 
 ### MegaETH Public Gateway
 
 The public gateway streams trace responses and requires two positional parameters.
-Support and a successful `callTracer` response were observed on July 24, 2026.
 
 ## Errors
 

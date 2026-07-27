@@ -44,8 +44,6 @@ The node reads the account balance from the selected state. `latest` and `pendin
 
 For `latest` or `pending`, the gateway rewrites the request to `mega_getAccountInfo`, treats `pending` as `latest`, and compares rollback-aware cached metadata with the upstream result. It can return cached data when the upstream fails; historical selectors bypass this account cache.
 
-This public behavior was confirmed from gateway source and the example was observed on July 27, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

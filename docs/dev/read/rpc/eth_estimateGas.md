@@ -118,8 +118,6 @@ It does not cache the result and supplies an internal CPU-time limit whose sourc
 This is distinct from `eth_call`'s 60,000,000 compute-gas limit.
 The public endpoint permits a 1.5 MiB single-request body.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

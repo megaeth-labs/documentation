@@ -31,7 +31,7 @@ MegaETH exposes the inherited compatibility method through the `eth` namespace.
 ### MegaETH Public Gateway
 
 The gateway treats this response as immutable and may cache it.
-The value shown in the example was observed on July 24, 2026, but callers should not use it for chain selection; use [`eth_chainId`](./eth_chainId.md) instead.
+Callers should not use this value for chain selection; use [`eth_chainId`](./eth_chainId.md) instead.
 
 ## Errors
 

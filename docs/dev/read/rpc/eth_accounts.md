@@ -34,8 +34,6 @@ A self-hosted node can report accounts only when its RPC environment manages key
 
 The gateway does not query a signer or node. It synthesizes an empty array, so an empty result means only that the public endpoint does not manage user keys.
 
-This public behavior was confirmed from gateway source and the example was observed on July 27, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

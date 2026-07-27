@@ -44,8 +44,6 @@ The node returns `false` when caught up and a progress object while synchronizin
 
 The gateway forwards this dynamic status without response caching in the simple read tier.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

@@ -60,8 +60,6 @@ MegaETH returns a `v0:`-prefixed, base64-encoded zstd witness. Requests can sele
 
 The gateway does not cache witness responses. In an outer batch, if any witness request uses a block number below 7,385,897, at most four `mega_getBlockWitness` requests are allowed.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

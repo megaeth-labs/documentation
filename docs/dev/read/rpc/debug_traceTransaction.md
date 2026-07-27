@@ -35,7 +35,6 @@ Tracing a system transaction may expose MegaETH system-contract calls.
 ### MegaETH Public Gateway
 
 The public gateway streams this method's response and requires both positional parameters.
-Support and a successful `callTracer` response were observed on July 24, 2026.
 
 ## Errors
 

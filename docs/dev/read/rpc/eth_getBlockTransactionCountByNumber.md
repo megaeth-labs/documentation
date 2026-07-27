@@ -36,8 +36,6 @@ The node resolves the number or tag and returns the block's transaction count. A
 
 The gateway caches successful fixed-block lookups for 30 minutes in the simple read tier.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

@@ -35,8 +35,6 @@ The node fee policy does not require a priority fee, but the public result is sy
 
 The gateway synthesizes a zero-wei priority fee without calling a node. This is a current MegaETH fee-policy response, not a market estimate.
 
-This public behavior was confirmed from gateway source and the example was observed on July 27, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

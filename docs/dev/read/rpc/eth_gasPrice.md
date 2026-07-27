@@ -35,8 +35,6 @@ The node's gas oracle reflects the active MegaETH fee policy. On Mainnet the obs
 
 The gateway uses the simple read path and may cache the head-dependent result for 1 second. The captured Mainnet value was 1,000,000 wei, or 0.001 gwei.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

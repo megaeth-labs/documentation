@@ -74,8 +74,6 @@ The current MegaETH node registers the withdrawal-proof implementation as `eth_g
 
 The gateway rewrites this alias to `eth_getWithdrawalProof` and caches successful proofs for 30 minutes. Callers receive the same result shape under either name.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

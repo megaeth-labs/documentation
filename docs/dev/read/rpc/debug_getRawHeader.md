@@ -34,7 +34,6 @@ The encoded header includes the fields used by the selected MegaETH hardfork.
 ### MegaETH Public Gateway
 
 The public gateway forwards this method through its compute pool and may cache immutable block selections.
-Support and a successful historical lookup were observed on July 24, 2026.
 
 ## Errors
 

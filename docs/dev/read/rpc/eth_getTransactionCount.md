@@ -44,8 +44,6 @@ The node returns the account nonce at the selected state. Unknown accounts and a
 
 For `latest` or `pending`, the gateway rewrites to `mega_getAccountInfo`, treats `pending` as `latest`, and can return a fresh cached nonce immediately. Historical selectors bypass the account cache; a nonce read in the same outer batch as submissions need not include those submissions.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

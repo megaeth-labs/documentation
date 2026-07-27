@@ -76,8 +76,6 @@ The node returns `null` until a receipt is visible. Receipts produced from a rea
 
 The gateway first checks its receipt cache, forwards misses upstream, and caches non-null receipts for 30 minutes. A `null` result is not cached.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.

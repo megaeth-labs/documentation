@@ -80,8 +80,6 @@ The node returns a transaction known to canonical storage or the live transactio
 
 The gateway caches included transactions for 30 minutes. A `null` result is not cached, so a later request can observe a transaction that has since become available.
 
-This public behavior was confirmed from gateway source and the example was observed on July 24, 2026. Gateway policy and operational values may change.
-
 ## Errors
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.
