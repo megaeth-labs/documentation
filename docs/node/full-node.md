@@ -402,6 +402,7 @@ An explicitly passed `--datadir` is used as-is (the OS default adds a `<CHAIN_ID
 | `discovery-secret` | P2P identity key.                                                                                                             |
 
 The data directory layout is tied to the node type — reuse a data directory only with a node type that shares its layout (`full-node` and `rpc-node` do; a `sequencer` data directory does not).
+It is also bound to its chain: opening it with a different `--chain` fails at startup with `genesis hash in the storage does not match the specified chainspec`.
 
 ### Graceful shutdown and backups
 
