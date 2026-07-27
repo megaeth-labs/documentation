@@ -162,11 +162,13 @@ The public WebSocket endpoint supports the following methods:
 - `eth_subscribe`
 - `eth_unsubscribe`
 - `eth_sendRawTransaction`
+- `eth_sendRawTransactionSync`
 - `realtime_sendRawTransaction`
 - `eth_chainId`
 
 WebSocket connections are rate-limited to 5 messages per second per connection.
 Send `eth_chainId` at least once every 30 seconds to keep the connection alive — idle connections may be closed by the server.
+See [Operations and limits](rpc/operations-and-limits.md#websocket-limits) for connection, subscription, filter, and message-size limits.
 
 ### Can I set up my own RPC node?
 

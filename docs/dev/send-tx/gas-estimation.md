@@ -80,7 +80,7 @@ There are two workarounds:
 Estimating gas for a large contract deployment sends the full initcode in the request body.
 To accommodate this, the public RPC endpoint allows `eth_call`, `eth_callMany`, `eth_createAccessList`, and `eth_estimateGas` bodies up to **1.5 MiB** — well above the 128 KiB limit applied to ordinary read methods.
 A request that exceeds this limit is rejected with HTTP `413` / `-32099` (`payload too large`).
-See [Request Body Limits](../rpc/README.md#request-body-limits) for the full breakdown.
+See [HTTP request and response limits](../rpc/operations-and-limits.md#http-request-and-response-limits) for the full breakdown.
 
 ## Toolchain Configuration
 
@@ -151,7 +151,7 @@ If you need to debug which dimension caused a failure, see [Debugging Transactio
 
 - [Gas Model](../execution/gas-model.md) — how compute gas, storage gas, and the bucket multiplier work
 - [EVM Differences](../execution/overview.md) — volatile data caps, SSTORE refund changes, 98/100 forwarding
-- [RPC Reference](../rpc/README.md) — method availability and restrictions
+- [RPC Reference](../rpc/reference/README.md) — method availability and restrictions
 - [Developer FAQ](../faq.md) — `eth_estimateGas` gas cap, block gas limit
 - [Dual Gas Model (spec)](https://docs.megaeth.com/spec/megaevm/dual-gas-model) — formal specification of compute gas and storage gas
 - [Resource Limits (spec)](https://docs.megaeth.com/spec/megaevm/resource-limits) — per-transaction and per-block limit enforcement

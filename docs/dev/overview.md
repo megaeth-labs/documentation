@@ -68,6 +68,6 @@ See [Contracts & Tokens](send-tx/contracts.md#l1-contracts-ethereum) for all L1 
 - [EVM Differences](execution/overview.md) — what's different from Ethereum
 - [Gas Model](execution/gas-model.md) — how MegaETH's dual gas model works
 - [System Contracts](execution/system-contracts.md) — oracle, timestamp, and other system contracts
-- [RPC Reference](rpc/README.md) — JSON-RPC methods and error codes
+- [JSON-RPC](rpc/README.md) — protocol guidance, limits, errors, and RPC methods
 - [Realtime API](read/realtime-api.md) — WebSocket and real-time RPC extensions
 - [Onchain Payments](payments.md) — charge for APIs, content, or metered services onchain
