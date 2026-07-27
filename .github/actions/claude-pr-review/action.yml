@@ -81,6 +81,7 @@ runs:
           --event-head "${{ github.event.pull_request.head.sha }}" \
           --event-base "${{ github.event.pull_request.base.sha }}" \
           --state-dir "$STATE_DIR" \
+          --resolve-threads "${{ inputs.github_identity_token != '' }}" \
           --review-depth "$REVIEW_DEPTH" \
           --premortem "$PREMORTEM"
 
@@ -175,9 +176,10 @@ runs:
           1. Respect the frozen mode and SHA scope in review-input.json. For an
              incremental review, discover new findings only in review.diff. Use the
              current files and full.diff to decide whether prior findings were fixed.
-          2. Examine every open manifest finding and return exactly one prior_findings
-             disposition (`open` or `resolved`) for it. Never resolve human-authored
-             threads.
+          2. Examine every open manifest finding. Return a prior_findings disposition
+             (`open` or `resolved`) for each finding you assessed. An omitted finding
+             remains open; only an explicit `resolved` disposition closes one. Never
+             resolve human-authored threads.
           3. Put only high-confidence, actionable defects in findings. Severity and
              confidence are separate: uncertain concerns belong in open_questions
              with medium or low confidence, phrased as concrete verification requests.

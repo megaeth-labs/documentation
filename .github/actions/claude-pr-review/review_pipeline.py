@@ -585,6 +585,7 @@ def import_legacy_findings(
         manifest["findings"][legacy_id] = {
             "fingerprint": None,
             "status": "open",
+            "thread_resolution": "unresolved",
             "severity": "major",
             "confidence": "high",
             "title": title,
@@ -616,9 +617,23 @@ def sync_manifest_threads(
         resolved = thread_status.get(str(finding["thread_id"]))
         if resolved is True:
             finding["status"] = "resolved"
+            finding["thread_resolution"] = "confirmed"
         elif resolved is False:
-            finding["status"] = "open"
-            finding["resolved_sha"] = None
+            if (
+                finding.get("status") == "resolved"
+                and finding.get("thread_resolution") == "confirmed"
+            ):
+                finding["status"] = "open"
+                finding["resolved_sha"] = None
+                finding["thread_resolution"] = "unresolved"
+            elif finding.get("status") == "resolved":
+                # An unresolved GitHub thread is expected when publication used
+                # the job token and deliberately skipped thread resolution.
+                # Preserve the code-level disposition until a capable identity
+                # can resolve the thread.
+                finding["thread_resolution"] = "skipped"
+            else:
+                finding["thread_resolution"] = "unresolved"
 
 
 def write_github_output(values: dict[str, Any]) -> None:
@@ -853,6 +868,7 @@ def prepare(args: argparse.Namespace) -> None:
         "commentable_lines": commentable_lines,
         "sticky_comment_id": sticky_comment_id,
         "publisher_login": publisher_login,
+        "thread_resolution_enabled": args.resolve_threads == "true",
         "pipeline_version": pipeline_version,
         "rubric_version": rubric_version,
     }
@@ -974,12 +990,11 @@ def compile_review(
     ]
     if len(returned_prior_ids) != len(set(returned_prior_ids)):
         raise PipelineError("prior_findings contains duplicate finding IDs")
-    if set(returned_prior_ids) != expected_prior_ids:
-        missing = sorted(expected_prior_ids - set(returned_prior_ids))
-        unknown = sorted(set(returned_prior_ids) - expected_prior_ids)
+    unknown = sorted(set(returned_prior_ids) - expected_prior_ids)
+    if unknown:
         raise PipelineError(
-            "prior_findings must disposition every open finding exactly once "
-            f"(missing={missing}, unknown={unknown})"
+            "prior_findings references findings that are not open "
+            f"(unknown={unknown})"
         )
 
     scope_summary = public_text(
@@ -992,6 +1007,9 @@ def compile_review(
         )
 
     resolution_ids: list[str] = []
+    resolution_enabled = bool(
+        review_input.get("thread_resolution_enabled", False)
+    )
     for disposition in model_output["prior_findings"]:
         if not isinstance(disposition, dict):
             raise PipelineError("prior_findings contains a non-object")
@@ -1014,7 +1032,23 @@ def compile_review(
                 )
             item["resolved_sha"] = head
             if item.get("thread_id"):
-                resolution_ids.append(item["thread_id"])
+                item["thread_resolution"] = (
+                    "pending" if resolution_enabled else "skipped"
+                )
+        elif item.get("thread_id"):
+            item["thread_resolution"] = "unresolved"
+
+    if resolution_enabled:
+        resolution_ids = sorted(
+            {
+                str(item["thread_id"])
+                for item in manifest["findings"].values()
+                if isinstance(item, dict)
+                and item.get("status") == "resolved"
+                and item.get("thread_id")
+                and item.get("thread_resolution") != "confirmed"
+            }
+        )
 
     changed_paths = set(scope["full_pr_paths"])
     commentable = {
@@ -1119,6 +1153,7 @@ def compile_review(
         manifest["findings"][item_id] = {
             "fingerprint": item_id,
             "status": "open",
+            "thread_resolution": "unresolved",
             "severity": finding["severity"],
             "confidence": finding["confidence"],
             "title": finding["title"],
@@ -1768,13 +1803,19 @@ def publish(args: argparse.Namespace) -> None:
             payload,
             before_write=require_frozen_pull,
         )
-        resolve_threads(
+        resolved_threads = resolve_threads(
             payload["resolve_thread_ids"],
             enabled=os.environ.get("GH_RESOLVE_THREADS", "").lower() == "true",
             before_write=require_frozen_pull,
         )
 
         manifest = payload["manifest"]
+        for finding in manifest["findings"].values():
+            if (
+                isinstance(finding, dict)
+                and finding.get("thread_id") in resolved_threads
+            ):
+                finding["thread_resolution"] = "confirmed"
         for finding_id_value, posted in posted_comments.items():
             finding = manifest["findings"].get(finding_id_value)
             if isinstance(finding, dict):
@@ -1848,6 +1889,11 @@ def parser() -> argparse.ArgumentParser:
     prepare_parser.add_argument("--event-head")
     prepare_parser.add_argument("--event-base")
     prepare_parser.add_argument("--state-dir", required=True)
+    prepare_parser.add_argument(
+        "--resolve-threads",
+        choices=("true", "false"),
+        default="false",
+    )
     prepare_parser.add_argument(
         "--review-depth",
         choices=("standard", "deep"),

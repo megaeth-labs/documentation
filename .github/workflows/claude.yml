@@ -40,7 +40,7 @@ jobs:
         with:
           fetch-depth: 1
 
-      - uses: ./.github/actions/claude-interactive
+      - uses: megaeth-labs/documentation/.github/actions/claude-interactive@main
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           allowed_bots: "mega-putin"
@@ -88,7 +88,7 @@ jobs:
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: ./.github/actions/claude-pr-review
+      - uses: megaeth-labs/documentation/.github/actions/claude-pr-review@main
         if: steps.workflow-change.outputs.skip != 'true'
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
