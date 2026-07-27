@@ -16,8 +16,8 @@ It does not support `debug_traceCall`; use [`mega-evme`](#simulating-a-new-trans
 
 The following methods are supported:
 
-- **[`debug_traceTransaction`](../read/rpc/debug_traceTransaction.md)** — trace an already-mined transaction by hash
-- **[`debug_traceBlockByNumber`](../read/rpc/debug_traceBlockByNumber.md)** / **[`debug_traceBlockByHash`](../read/rpc/debug_traceBlockByHash.md)** — trace all transactions in a block
+- **[`debug_traceTransaction`](../rpc/debug_traceTransaction.md)** — trace an already-mined transaction by hash
+- **[`debug_traceBlockByNumber`](../rpc/debug_traceBlockByNumber.md)** / **[`debug_traceBlockByHash`](../rpc/debug_traceBlockByHash.md)** — trace all transactions in a block
 
 ### Supported Tracers
 
@@ -205,7 +205,7 @@ See [Volatile Data Access](../execution/volatile-data.md) for the full list of t
 - [Gas Estimation](gas-estimation.md) — estimate gas correctly and avoid common errors
 - [EVM Differences](../execution/overview.md) — volatile data caps, SSTORE refund changes, 98/100 forwarding
 - [Gas Model](../execution/gas-model.md) — how compute gas and storage gas work
-- [RPC Reference](../read/overview.md) — method availability and restrictions
+- [RPC Reference](../rpc/README.md) — method availability and restrictions
 - [Dual Gas Model (spec)](https://docs.megaeth.com/spec/megaevm/dual-gas-model) — formal specification of compute gas and storage gas
 - [Gas Detention (spec)](https://docs.megaeth.com/spec/megaevm/gas-detention) — compute gas cap triggered by volatile data access
 - [mega-evme](https://docs.megaeth.com/mega-evme) — full command reference, configuration, and cookbook

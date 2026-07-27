@@ -94,7 +94,7 @@ Use these exact forms consistently. Do not alternate between variants.
 
 ### Within the same layer
 
-Use relative paths: `[Gas Model](gas-model.md)` or `[RPC Methods](../read/overview.md)`.
+Use relative paths: `[Gas Model](gas-model.md)` or `[RPC Methods](../rpc/README.md)`.
 
 ### Between layers
 

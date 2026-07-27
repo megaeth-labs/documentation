@@ -18,10 +18,10 @@ Additional functionality will be added based on feedback.
 
 ## Available Methods
 
-| Method                                                              | What it does                                                              | Reference                                            |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------- |
-| [`eth_subscribe`](rpc/eth_subscribe.md)                             | Stream logs, state changes, mini-blocks, and block headers over WebSocket | [Full reference](rpc/eth_subscribe.md)               |
-| [`realtime_sendRawTransaction`](rpc/realtime_sendRawTransaction.md) | Submit a transaction and get the receipt back in one call — no polling    | [Full reference](rpc/realtime_sendRawTransaction.md) |
+| Method                                                                 | What it does                                                              | Reference                                               |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------- |
+| [`eth_subscribe`](../rpc/eth_subscribe.md)                             | Stream logs, state changes, mini-blocks, and block headers over WebSocket | [Full reference](../rpc/eth_subscribe.md)               |
+| [`realtime_sendRawTransaction`](../rpc/realtime_sendRawTransaction.md) | Submit a transaction and get the receipt back in one call — no polling    | [Full reference](../rpc/realtime_sendRawTransaction.md) |
 
 The following standard Ethereum methods also return real-time results on MegaETH — they query against the latest mini-block automatically when called with `latest` or `pending`:
 
@@ -44,7 +44,7 @@ The following standard Ethereum methods also return real-time results on MegaETH
 
 **Problem:** Your dapp submits a transaction and needs the receipt immediately — polling `eth_getTransactionReceipt` adds latency and complexity.
 
-**Solution:** Use [`realtime_sendRawTransaction`](rpc/realtime_sendRawTransaction.md).
+**Solution:** Use [`realtime_sendRawTransaction`](../rpc/realtime_sendRawTransaction.md).
 It submits the transaction and waits for the receipt in a single round-trip.
 The node's default wait is 5 seconds; an explicit timeout is capped at 3 seconds by the public gateway.
 Drop-in replacement for `eth_sendRawTransaction`.
@@ -53,7 +53,7 @@ Drop-in replacement for `eth_sendRawTransaction`.
 
 **Problem:** Your frontend needs to update in real time as swaps, transfers, or game actions happen on-chain.
 
-**Solution:** Subscribe to [`logs`](rpc/eth_subscribe.md#logs) over WebSocket with `fromBlock` and `toBlock` set to `"pending"`.
+**Solution:** Subscribe to [`logs`](../rpc/eth_subscribe.md#logs) over WebSocket with `fromBlock` and `toBlock` set to `"pending"`.
 Logs arrive within ~10ms of execution — fast enough for live trading dashboards, game UIs, and notification systems.
 Filter by contract address and topics to receive only the events you care about.
 
@@ -61,14 +61,14 @@ Filter by contract address and topics to receive only the events you care about.
 
 **Problem:** You need to track balance or storage changes for specific accounts in real time (e.g., a liquidation bot watching collateral ratios).
 
-**Solution:** Subscribe to [`stateChanges`](rpc/eth_subscribe.md#statechanges) with the account addresses you want to monitor.
+**Solution:** Subscribe to [`stateChanges`](../rpc/eth_subscribe.md#statechanges) with the account addresses you want to monitor.
 Each notification includes the updated balance, nonce, and any storage slots that changed.
 
 ### Building a block explorer or indexer
 
 **Problem:** You need every transaction and receipt as soon as it's executed, not when the next EVM block is sealed.
 
-**Solution:** Subscribe to [`miniBlocks`](rpc/eth_subscribe.md#miniblocks).
+**Solution:** Subscribe to [`miniBlocks`](../rpc/eth_subscribe.md#miniblocks).
 Each notification contains the full set of transactions and receipts for that mini-block.
 
 ## How It Works
@@ -94,4 +94,4 @@ At T+100ms, she sends 1 ETH to Bob — the transaction is packaged into a mini-b
 ## Related Pages
 
 - [Mini-Blocks](../../mini-block.md) — understanding the two block types
-- [RPC Reference](overview.md) — full method availability table and rate limiting
+- [RPC Reference](../rpc/README.md) — full method availability table and rate limiting

@@ -121,7 +121,7 @@ curl -s https://mainnet.megaeth.com/rpc \
 
 Returns the full transaction receipt directly.
 The node waits up to 5 seconds by default; the public gateway caps an explicit timeout at 3,000 milliseconds and returns `-32000 realtime transaction expired` if the deadline elapses first.
-See [`realtime_sendRawTransaction`](../read/rpc/realtime_sendRawTransaction.md) for the full reference.
+See [`realtime_sendRawTransaction`](../rpc/realtime_sendRawTransaction.md) for the full reference.
 {% endtab %}
 {% endtabs %}
 
