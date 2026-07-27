@@ -80,6 +80,8 @@ class ReviewPipelineTests(unittest.TestCase):
         self.assertIn("Read,Glob,Grep,StructuredOutput,", action)
         self.assertIn("id: review_retry", action)
         self.assertIn("MUST call the\n          StructuredOutput tool", action)
+        self.assertIn("GH_TOKEN: ${{ github.token }}", action)
+        self.assertNotIn("GH_TOKEN: ${{ steps.review", action)
 
     def test_output_schema_uses_action_compatible_dialect(self):
         schema_path = Path(pipeline.__file__).with_name(

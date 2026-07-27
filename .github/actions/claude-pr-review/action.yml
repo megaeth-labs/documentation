@@ -248,7 +248,7 @@ runs:
       id: publish
       shell: bash
       env:
-        GH_TOKEN: ${{ steps.review_retry.outputs.github_token || steps.review.outputs.github_token || github.token }}
+        GH_TOKEN: ${{ github.token }}
         STATE_DIR: ${{ github.workspace }}/.pr-review
       run: |
         set -euo pipefail
