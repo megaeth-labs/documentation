@@ -78,6 +78,16 @@ class ReviewPipelineTests(unittest.TestCase):
             encoding="utf-8"
         )
         self.assertIn("Read,Glob,Grep,StructuredOutput,", action)
+        self.assertIn("id: review_retry", action)
+        self.assertIn("MUST call the\n          StructuredOutput tool", action)
+
+    def test_output_schema_uses_action_compatible_dialect(self):
+        schema_path = Path(pipeline.__file__).with_name(
+            "review-output.schema.json"
+        )
+        schema = json.loads(schema_path.read_text(encoding="utf-8"))
+        self.assertNotIn("$schema", schema)
+        self.assertEqual(schema["type"], "object")
 
     def test_expected_pull_requires_frozen_base_and_head(self):
         pull = {

@@ -122,6 +122,7 @@ runs:
     - name: Analyze and verify findings
       id: review
       if: steps.prepare.outputs.mode != 'skip'
+      continue-on-error: true
       uses: anthropics/claude-code-action@c3d45e8e941e1b2ad7b278c57482d9c5bf1f35b3 # v1
       with:
         claude_code_oauth_token: ${{ inputs.claude_code_oauth_token }}
@@ -138,8 +139,10 @@ runs:
           You analyze and verify; you do not post, edit, resolve, or otherwise mutate
           anything on GitHub.
 
-          Completion contract: before ending the lead session, you MUST return the
-          structured result required by the JSON schema supplied to Claude Code.
+          Completion contract: before ending the lead session, you MUST call the
+          StructuredOutput tool exactly once with the result required by the JSON
+          schema supplied to Claude Code. Do not return the object as prose or a
+          fenced JSON block.
           Research notes, Task results, prose summaries, and completed analysis are
           not a final answer. Do not end after a tool call or delegate the final
           response. The lead session itself must return the schema-bound object, even
@@ -197,11 +200,44 @@ runs:
 
           ${{ inputs.extra_prompt }}
 
+    - name: Retry missing structured review output
+      id: review_retry
+      if: >-
+        steps.prepare.outputs.mode != 'skip' &&
+        (steps.review.outcome == 'failure' ||
+         steps.review.outputs.structured_output == '')
+      uses: anthropics/claude-code-action@c3d45e8e941e1b2ad7b278c57482d9c5bf1f35b3 # v1
+      with:
+        claude_code_oauth_token: ${{ inputs.claude_code_oauth_token }}
+        allowed_bots: ${{ inputs.allowed_bots }}
+        additional_permissions: |
+          actions: read
+        claude_args: |
+          --allowedTools "${{ steps.compose.outputs.allowed_tools }}"
+          --disallowedTools "mcp__github_inline_comment__create_inline_comment"
+          --json-schema '${{ steps.prepare.outputs.output_schema }}'
+          ${{ steps.compose.outputs.runtime_flags }}
+        prompt: |
+          Produce the schema-bound pull request review result now. The prior attempt
+          did not return structured output.
+
+          Read `.pr-review/review-input.json`, `.pr-review/review.diff`,
+          `.pr-review/full.diff`, `.pr-review/rubric.md`, and
+          `.pr-review/rubric-detail.md`. If review-input.json enables the internal
+          pre-mortem, also read `.pr-review/premortem.md`. Apply the same frozen
+          scope, prior-finding disposition, confidence, and security rules encoded
+          in those files.
+
+          Your final action MUST be exactly one call to the StructuredOutput tool
+          with an object matching the supplied JSON schema. Do not return prose,
+          Markdown, or a fenced JSON block. Empty arrays are correct for a clean
+          change.
+
     - name: Compile and validate review
       id: compile
       shell: bash
       env:
-        REVIEW_STRUCTURED_OUTPUT: ${{ steps.review.outputs.structured_output }}
+        REVIEW_STRUCTURED_OUTPUT: ${{ steps.review.outputs.structured_output || steps.review_retry.outputs.structured_output }}
         STATE_DIR: ${{ github.workspace }}/.pr-review
       run: |
         set -euo pipefail
@@ -212,7 +248,7 @@ runs:
       id: publish
       shell: bash
       env:
-        GH_TOKEN: ${{ steps.review.outputs.github_token || github.token }}
+        GH_TOKEN: ${{ steps.review_retry.outputs.github_token || steps.review.outputs.github_token || github.token }}
         STATE_DIR: ${{ github.workspace }}/.pr-review
       run: |
         set -euo pipefail
