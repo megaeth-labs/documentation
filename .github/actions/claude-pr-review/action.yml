@@ -135,6 +135,8 @@ runs:
       with:
         claude_code_oauth_token: ${{ inputs.claude_code_oauth_token }}
         allowed_bots: ${{ inputs.allowed_bots }}
+        display_report: false
+        show_full_output: false
         additional_permissions: |
           actions: read
         claude_args: |
@@ -219,6 +221,8 @@ runs:
       with:
         claude_code_oauth_token: ${{ inputs.claude_code_oauth_token }}
         allowed_bots: ${{ inputs.allowed_bots }}
+        display_report: false
+        show_full_output: false
         additional_permissions: |
           actions: read
         claude_args: |
@@ -263,4 +267,23 @@ runs:
       run: |
         set -euo pipefail
         python3 "$GITHUB_ACTION_PATH/review_pipeline.py" publish \
+          --state-dir "$STATE_DIR"
+
+    - name: Report concise review outcome
+      if: always()
+      continue-on-error: true
+      shell: bash
+      env:
+        STATE_DIR: ${{ github.workspace }}/.pr-review
+        PREPARE_OUTCOME: ${{ steps.prepare.outcome }}
+        COMPOSE_OUTCOME: ${{ steps.compose.outcome }}
+        REVIEW_OUTCOME: ${{ steps.review.outcome }}
+        REVIEW_RETRY_OUTCOME: ${{ steps.review_retry.outcome }}
+        COMPILE_OUTCOME: ${{ steps.compile.outcome }}
+        PUBLISH_OUTCOME: ${{ steps.publish.outcome }}
+        PUBLISH_PUBLISHED: ${{ steps.publish.outputs.published }}
+        PUBLISH_STALE: ${{ steps.publish.outputs.stale }}
+      run: |
+        set -euo pipefail
+        python3 "$GITHUB_ACTION_PATH/review_pipeline.py" report \
           --state-dir "$STATE_DIR"

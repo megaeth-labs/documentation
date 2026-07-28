@@ -82,6 +82,11 @@ class ReviewPipelineTests(unittest.TestCase):
         self.assertIn("Read,Glob,Grep,StructuredOutput,", action)
         self.assertIn("id: review_retry", action)
         self.assertIn("MUST call the\n          StructuredOutput tool", action)
+        self.assertEqual(action.count("show_full_output: false"), 2)
+        self.assertEqual(action.count("display_report: false"), 2)
+        self.assertIn("- name: Report concise review outcome", action)
+        self.assertIn("if: always()", action)
+        self.assertIn("review_pipeline.py\" report", action)
 
     def test_action_exposes_optional_github_identity_token(self):
         action = Path(pipeline.__file__).with_name("action.yml").read_text(
@@ -129,6 +134,178 @@ class ReviewPipelineTests(unittest.TestCase):
         schema = json.loads(schema_path.read_text(encoding="utf-8"))
         self.assertNotIn("$schema", schema)
         self.assertEqual(schema["type"], "object")
+
+    def test_failure_diagnostic_includes_code_and_review_context(self):
+        with tempfile.TemporaryDirectory() as directory:
+            state_dir = Path(directory)
+            state_dir.joinpath("review-input.json").write_text(
+                json.dumps(review_input()),
+                encoding="utf-8",
+            )
+
+            diagnostic = pipeline.diagnostic_for(
+                "compile",
+                pipeline.PipelineError(
+                    "invalid prior finding",
+                    code="PRIOR_FINDING_INVALID",
+                    remediation="Return only known open finding IDs.",
+                ),
+                state_dir=state_dir,
+            )
+
+        self.assertEqual(diagnostic["code"], "PRIOR_FINDING_INVALID")
+        self.assertEqual(diagnostic["phase"], "compile")
+        self.assertEqual(diagnostic["context"]["mode"], "full")
+        self.assertEqual(
+            diagnostic["context"]["head"],
+            "b" * 40,
+        )
+        self.assertEqual(
+            diagnostic["context"]["thread_resolution"],
+            "disabled",
+        )
+
+    @mock.patch("builtins.print")
+    def test_record_failure_writes_json_and_error_annotation(self, print_mock):
+        with tempfile.TemporaryDirectory() as directory:
+            state_dir = Path(directory)
+            diagnostic = pipeline.record_failure(
+                "compile",
+                pipeline.PipelineError(
+                    "unknown prior finding",
+                    code="PRIOR_FINDING_INVALID",
+                ),
+                state_dir=state_dir,
+                fallback_context={
+                    "repository": "megaeth-labs/example",
+                    "pull_request": 7,
+                    "head": "b" * 40,
+                },
+            )
+            written = json.loads(
+                state_dir.joinpath(pipeline.FAILURE_FILENAME).read_text(
+                    encoding="utf-8"
+                )
+            )
+
+        self.assertEqual(written, diagnostic)
+        self.assertEqual(
+            written["context"]["repository"],
+            "megaeth-labs/example",
+        )
+        annotation = print_mock.call_args.args[0]
+        self.assertTrue(annotation.startswith("::error title="))
+        self.assertIn("PRIOR_FINDING_INVALID", annotation)
+        self.assertIn("Next:", annotation)
+
+    @mock.patch.object(pipeline.subprocess, "run")
+    def test_failed_github_command_hides_verbose_arguments(self, run_mock):
+        run_mock.return_value = SimpleNamespace(
+            returncode=1,
+            stdout="",
+            stderr="permission denied",
+        )
+
+        with self.assertRaises(pipeline.PipelineError) as context:
+            pipeline.run(
+                [
+                    "gh",
+                    "api",
+                    "graphql",
+                    "-f",
+                    "query=a very long GraphQL query",
+                ]
+            )
+
+        self.assertEqual(context.exception.code, "GITHUB_API_FAILED")
+        self.assertEqual(
+            str(context.exception),
+            "gh api graphql failed: permission denied",
+        )
+
+    @mock.patch("builtins.print")
+    def test_failure_report_is_human_readable(self, print_mock):
+        with tempfile.TemporaryDirectory() as directory:
+            state_dir = Path(directory)
+            summary_path = state_dir / "summary.md"
+            diagnostic = {
+                "schema_version": 1,
+                "status": "failed",
+                "phase": "compile",
+                "code": "PRIOR_FINDING_INVALID",
+                "message": "Unknown prior finding F-1.",
+                "remediation": "Return only known open finding IDs.",
+                "context": {
+                    "head": "b" * 40,
+                    "mode": "incremental",
+                    "thread_resolution": "disabled",
+                },
+            }
+            state_dir.joinpath(pipeline.FAILURE_FILENAME).write_text(
+                json.dumps(diagnostic),
+                encoding="utf-8",
+            )
+            environment = {
+                "GITHUB_STEP_SUMMARY": str(summary_path),
+                "PREPARE_OUTCOME": "success",
+                "COMPOSE_OUTCOME": "success",
+                "REVIEW_OUTCOME": "success",
+                "REVIEW_RETRY_OUTCOME": "skipped",
+                "COMPILE_OUTCOME": "failure",
+                "PUBLISH_OUTCOME": "skipped",
+            }
+            with mock.patch.dict("os.environ", environment, clear=True):
+                pipeline.report(SimpleNamespace(state_dir=directory))
+            summary = summary_path.read_text(encoding="utf-8")
+
+        self.assertIn("## Claude PR review failed", summary)
+        self.assertIn("`PRIOR_FINDING_INVALID`", summary)
+        self.assertIn("**Cause:** Unknown prior finding F-1.", summary)
+        self.assertIn(
+            "**Next action:** Return only known open finding IDs.",
+            summary,
+        )
+        self.assertIn("Step outcomes", summary)
+        self.assertIn("FAILED [PRIOR_FINDING_INVALID]", print_mock.call_args.args[0])
+
+    @mock.patch("builtins.print")
+    def test_success_report_summarizes_result_and_retry(self, print_mock):
+        with tempfile.TemporaryDirectory() as directory:
+            state_dir = Path(directory)
+            summary_path = state_dir / "summary.md"
+            state_dir.joinpath("review-input.json").write_text(
+                json.dumps(review_input(mode="incremental")),
+                encoding="utf-8",
+            )
+            state_dir.joinpath("review-payload.json").write_text(
+                json.dumps(
+                    {
+                        "verdict": "clean",
+                        "mode": "incremental",
+                        "frozen_head": "b" * 40,
+                    }
+                ),
+                encoding="utf-8",
+            )
+            environment = {
+                "GITHUB_STEP_SUMMARY": str(summary_path),
+                "PREPARE_OUTCOME": "success",
+                "COMPOSE_OUTCOME": "success",
+                "REVIEW_OUTCOME": "failure",
+                "REVIEW_RETRY_OUTCOME": "success",
+                "COMPILE_OUTCOME": "success",
+                "PUBLISH_OUTCOME": "success",
+                "PUBLISH_PUBLISHED": "true",
+                "PUBLISH_STALE": "false",
+            }
+            with mock.patch.dict("os.environ", environment, clear=True):
+                pipeline.report(SimpleNamespace(state_dir=directory))
+            summary = summary_path.read_text(encoding="utf-8")
+
+        self.assertIn("Review completed and publication succeeded", summary)
+        self.assertIn("**Verdict:** `clean`", summary)
+        self.assertIn("**Model retry used:** `yes`", summary)
+        self.assertIn("OK verdict=clean", print_mock.call_args.args[0])
 
     def test_expected_pull_requires_frozen_base_and_head(self):
         pull = {
