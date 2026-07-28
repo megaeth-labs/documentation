@@ -1415,6 +1415,24 @@ class ReviewPipelineTests(unittest.TestCase):
             payload["question_annotations"][0]["headline"],
         )
 
+    def test_retry_gets_a_larger_turn_budget_than_the_first_attempt(self):
+        action = Path(pipeline.__file__).with_name("action.yml").read_text(
+            encoding="utf-8"
+        )
+
+        self.assertIn("max_turns=36", action)
+        self.assertIn("retry_turns=$(( (max_turns * 3 + 1) / 2 ))", action)
+        # The first attempt and the retry must not share a budget: exhausting
+        # turns is deterministic, so replaying it cannot succeed.
+        self.assertIn(
+            "${{ steps.compose.outputs.retry_runtime_flags }}",
+            action,
+        )
+        self.assertEqual(
+            action.count("${{ steps.compose.outputs.runtime_flags }}"),
+            1,
+        )
+
     def test_in_progress_status_announces_the_round(self):
         payload = {
             "repository": "megaeth-labs/example",

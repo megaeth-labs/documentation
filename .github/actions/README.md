@@ -44,6 +44,14 @@ The `pr-review` action additionally accepts:
   reviews, but skips it for ordinary incremental updates.
   `on` always enables it and `off` disables it.
 
+The semantic-analysis stage runs under a turn budget: 12 for a low-risk incremental review,
+36 for a strong-tier one, and 56 for `deep`.
+Roughly ten turns go on mandated context — six pipeline files plus repo guidance — before the
+diff is read, and a small diff inside a large file spends many more paging through it, so the
+budget tracks files to understand rather than lines changed.
+The retry gets half again as many turns as the first attempt, because exhausting the budget is
+deterministic and replaying it with the same budget cannot succeed.
+
 Consumers that already create a GitHub App token can opt into the unified identity with:
 
 ```yaml
