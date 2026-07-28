@@ -106,18 +106,30 @@ runs:
           allowed_tools="${allowed_tools},Task"
         fi
 
+        # Turn budgets. The prompt mandates reading six pipeline files plus
+        # repo guidance before analysis begins, so roughly ten turns are spent
+        # on context before the diff is even read; a review whose diff sits in
+        # a large file spends many more paging through it. 24 proved too tight
+        # for exactly that shape (a small diff inside a big file) even though
+        # it is ample for a typical PR.
         selected_model="$STRONG_MODEL"
-        max_turns=24
+        max_turns=36
         if [[ "$MODEL_TIER" == "fast" ]]; then
           selected_model="$INCREMENTAL_MODEL"
           max_turns=12
         fi
         if [[ "$REVIEW_DEPTH" == "deep" ]]; then
-          max_turns=40
+          max_turns=56
         fi
+        # Exhausting the budget is deterministic: retrying with the same one
+        # burns a second full model run that cannot succeed. Give the retry
+        # half again as many turns so it can actually finish.
+        retry_turns=$(( (max_turns * 3 + 1) / 2 ))
         runtime_flags="--max-turns $max_turns"
+        retry_runtime_flags="--max-turns $retry_turns"
         if [[ -n "$selected_model" ]]; then
           runtime_flags="--model $selected_model $runtime_flags"
+          retry_runtime_flags="--model $selected_model $retry_runtime_flags"
         fi
 
         cp "$GITHUB_ACTION_PATH/rubric.md" "$GITHUB_WORKSPACE/.pr-review/rubric.md"
@@ -126,6 +138,7 @@ runs:
 
         echo "allowed_tools=${allowed_tools}" >> "$GITHUB_OUTPUT"
         echo "runtime_flags=${runtime_flags}" >> "$GITHUB_OUTPUT"
+        echo "retry_runtime_flags=${retry_runtime_flags}" >> "$GITHUB_OUTPUT"
 
     - name: Analyze and verify findings
       id: review
@@ -249,10 +262,14 @@ runs:
           --allowedTools "${{ steps.compose.outputs.allowed_tools }}"
           --disallowedTools "mcp__github_inline_comment__create_inline_comment"
           --json-schema '${{ steps.prepare.outputs.output_schema }}'
-          ${{ steps.compose.outputs.runtime_flags }}
+          ${{ steps.compose.outputs.retry_runtime_flags }}
         prompt: |
           Produce the schema-bound pull request review result now. The prior attempt
-          did not return structured output.
+          did not return structured output. One cause is running out of turns before
+          answering, so favour returning a well-supported result over exhaustive
+          exploration: read what you need, stop widening the search once the changed
+          lines are understood, and keep turns in reserve for the final response. A
+          smaller set of high-confidence findings beats no answer at all.
 
           Read `.pr-review/review-input.json`, `.pr-review/review.diff`,
           `.pr-review/full.diff`, `.pr-review/rubric.md`, and
@@ -299,6 +316,9 @@ runs:
       continue-on-error: true
       shell: bash
       env:
+        # Needed because this step retires the sticky status comment when a
+        # round ends without publishing.
+        GH_TOKEN: ${{ inputs.github_identity_token || github.token }}
         STATE_DIR: ${{ github.workspace }}/.pr-review
         PREPARE_OUTCOME: ${{ steps.prepare.outcome }}
         COMPOSE_OUTCOME: ${{ steps.compose.outcome }}
