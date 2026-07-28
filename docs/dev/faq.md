@@ -46,12 +46,15 @@ See the [Contract Limits specification](https://docs.megaeth.com/spec/megaevm/co
 
 ## Transaction Lifecycle & Txpool
 
-### What is the gas limit of `eth_call` / `eth_estimateGas`?
+### What limits apply to `eth_call` and `eth_estimateGas`?
 
-60,000,000 compute gas on the public RPC endpoint.
+The public gateway adds a 60,000,000 compute-gas limit to `eth_call`.
+It preserves the caller's total `gas` field, so this is a compute limit rather than a replacement total-gas limit.
 
-Note that this limit is _different_ from the protocol per-transaction gas limit of 10,000,000,000.
-It applies only to RPC simulation calls.
+`eth_estimateGas` instead uses the node's CPU-limited estimator; the gateway's source default is 500,000,000 nanoseconds (0.5 seconds).
+It does not add the same 60M compute-gas override.
+
+These RPC simulation limits are _different_ from the protocol per-transaction gas limit of 10,000,000,000.
 Managed RPC providers may allow higher limits.
 
 ### What is the maximum number of transactions I can have in the txpool?
@@ -159,11 +162,13 @@ The public WebSocket endpoint supports the following methods:
 - `eth_subscribe`
 - `eth_unsubscribe`
 - `eth_sendRawTransaction`
+- `eth_sendRawTransactionSync`
 - `realtime_sendRawTransaction`
 - `eth_chainId`
 
 WebSocket connections are rate-limited to 5 messages per second per connection.
 Send `eth_chainId` at least once every 30 seconds to keep the connection alive — idle connections may be closed by the server.
+See [Operations and limits](rpc/operations-and-limits.md#websocket-limits) for connection, subscription, filter, and message-size limits.
 
 ### Can I set up my own RPC node?
 

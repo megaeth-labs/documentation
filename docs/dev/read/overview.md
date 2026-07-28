@@ -1,171 +1,71 @@
 ---
-description: How to query state and data from MegaETH — JSON-RPC methods, rate limiting, subscriptions, and real-time queries.
+description: How to read current state, historical data, transactions, logs, and real-time updates from MegaETH.
 ---
 
 # Read from MegaETH
 
-## Realtime API
+MegaETH supports standard Ethereum JSON-RPC reads for accounts, contracts, blocks, transactions, receipts, and logs.
+Existing Ethereum libraries work without a MegaETH-specific read API.
 
-Standard Ethereum JSON-RPC was designed for chains with multi-second block times.
-On those chains, a one-second delay between execution and queryability is normal — you poll `eth_getTransactionReceipt`, wait for the next block, and eventually get your result.
+The main difference is freshness.
+Requests using `latest` or `pending` read from MegaETH's streaming state, which advances as mini-blocks are produced.
+You can therefore read state updated within milliseconds without waiting for the next EVM block.
 
-MegaETH produces [mini-blocks](../../mini-block.md) every ~10 milliseconds.
-If the read API still operated on one-second EVM blocks, applications would wait 100× longer than necessary to see their results.
-The Realtime API closes this gap: it queries against the most recent mini-block so that balances, receipts, logs, and state changes are visible within milliseconds of execution — not seconds.
+## Choose a read pattern
 
-Standard methods like `eth_getBalance`, `eth_call`, and `eth_getTransactionReceipt` already reflect mini-block state automatically when called with `latest` or `pending`.
-On top of that, MegaETH introduces four extension methods for even lower-latency workflows:
+| Pattern                  | Use it for                                                                           | Starting point                                    |
+| ------------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------- |
+| HTTP JSON-RPC            | One-time reads, contract calls, simulations, and historical queries                  | [JSON-RPC](../rpc/README.md)                      |
+| WebSocket subscriptions  | Push-based logs, pending transactions, block headers, mini-blocks, and state changes | [Realtime API](realtime-api.md)                   |
+| Concrete block selectors | Reproducible reads against a specific EVM block                                      | [Type reference](../rpc/types.md#block-selectors) |
 
-- [`realtime_sendRawTransaction`](rpc/realtime_sendRawTransaction.md) — submit a transaction and get the receipt back in one call, no polling
-- [`eth_subscribe`](rpc/eth_subscribe.md) — stream logs, state changes, mini-blocks, and block headers over WebSocket as they happen
-- [`eth_callAfter`](rpc/eth_callAfter.md) — simulate a transaction after a prior one confirms (nonce-gated)
-- [`eth_getLogsWithCursor`](rpc/eth_getLogsWithCursor.md) — paginated log queries for large result sets
+Use HTTP for request-and-response workflows.
+Use WebSocket subscriptions when your application needs updates as they happen or wants to avoid polling.
 
-For use-case-oriented guidance (which method to use for what), see the [Realtime API](realtime-api.md) page.
+## State freshness and block tags
 
-## Available Methods
+| Selector                 | Data source                | Behavior                                                             |
+| ------------------------ | -------------------------- | -------------------------------------------------------------------- |
+| `latest`                 | Streaming state            | Includes state committed by the latest mini-block.                   |
+| `pending`                | Streaming state            | Uses the same real-time state view as `latest`.                      |
+| `safe`                   | EVM block state            | Reads the latest block considered safe.                              |
+| `finalized`              | EVM block state            | Reads the latest finalized block.                                    |
+| Hexadecimal block number | Historical EVM block state | Repeats the state view for that block when retained by the endpoint. |
 
-{% hint style="info" %}
-The table below reflects the **public MegaETH RPC endpoint**.
-Methods marked "Managed only" are unavailable on the public endpoint but supported by managed RPC providers such as [Alchemy](https://www.alchemy.com/).
-See [Debugging Transactions](../send-tx/debugging.md) for usage of debug methods, and [Tooling](../tooling.md#rpc-providers) for provider options.
-{% endhint %}
+No additional flag or header is required for real-time reads.
+Pass `latest` or `pending` to methods that accept a block selector.
 
-| Method                                    | Availability   | Additional Restrictions                                           |
-| ----------------------------------------- | -------------- | ----------------------------------------------------------------- |
-| `debug_getRawBlock`                       | Managed only   |                                                                   |
-| `debug_getRawHeader`                      | Available      |                                                                   |
-| `debug_getRawReceipts`                    | Managed only   |                                                                   |
-| `debug_getRawTransaction`                 | Managed only   |                                                                   |
-| `debug_replayBlock`                       | Managed only   |                                                                   |
-| `debug_traceBlock`                        | Managed only   |                                                                   |
-| `debug_traceBlockByHash`                  | Available      |                                                                   |
-| `debug_traceBlockByNumber`                | Available      |                                                                   |
-| `debug_traceCall`                         | Available      |                                                                   |
-| `debug_traceCallMany`                     | Managed only   |                                                                   |
-| `debug_traceTransaction`                  | Available      |                                                                   |
-| `eth_accounts`                            | Available      |                                                                   |
-| `eth_blockNumber`                         | Available      |                                                                   |
-| `eth_call`                                | Available      | Compute gas limited to 60,000,000.                                |
-| `eth_callAfter`                           | Available      | Compute gas limited to 60,000,000. Timeout limited to 60 seconds. |
-| `eth_callMany`                            | Available      | Compute gas limited to 60,000,000 per call.                       |
-| `eth_chainId`                             | Available      |                                                                   |
-| `eth_createAccessList`                    | Available      | Compute gas limited to 60,000,000.                                |
-| `eth_estimateGas`                         | Available      | Compute gas limited to 60,000,000.                                |
-| `eth_feeHistory`                          | Available      | Block range limited to 256.                                       |
-| `eth_gasPrice`                            | Available      |                                                                   |
-| `eth_getBalance`                          | Available      |                                                                   |
-| `eth_getBlockByHash`                      | Available      |                                                                   |
-| `eth_getBlockByNumber`                    | Available      |                                                                   |
-| `eth_getBlockReceipts`                    | Available      |                                                                   |
-| `eth_getBlockTransactionCountByHash`      | Available      |                                                                   |
-| `eth_getBlockTransactionCountByNumber`    | Available      |                                                                   |
-| `eth_getCode`                             | Available      |                                                                   |
-| `eth_getFilterChanges`                    | Unavailable    |                                                                   |
-| `eth_getFilterLogs`                       | Unavailable    |                                                                   |
-| `eth_getHeaderByNumber`                   | Available      |                                                                   |
-| `eth_getLogs`                             | Available      |                                                                   |
-| `eth_getLogsWithCursor`                   | Managed only   |                                                                   |
-| `eth_getStorageAt`                        | Available      |                                                                   |
-| `eth_getTransactionByBlockHashAndIndex`   | Available      |                                                                   |
-| `eth_getTransactionByBlockNumberAndIndex` | Available      |                                                                   |
-| `eth_getTransactionByHash`                | Available      |                                                                   |
-| `eth_getTransactionCount`                 | Available      |                                                                   |
-| `eth_getTransactionReceipt`               | Available      |                                                                   |
-| `eth_getUncleByBlockHashAndIndex`         | Available      |                                                                   |
-| `eth_getUncleByBlockNumberAndIndex`       | Available      |                                                                   |
-| `eth_getUncleCountByBlockHash`            | Available      |                                                                   |
-| `eth_getUncleCountByBlockNumber`          | Available      |                                                                   |
-| `eth_maxPriorityFeePerGas`                | Available      |                                                                   |
-| `eth_mining`                              | Available      |                                                                   |
-| `eth_newBlockFilter`                      | Available      |                                                                   |
-| `eth_newFilter`                           | Available      |                                                                   |
-| `eth_newPendingTransactionFilter`         | Available      |                                                                   |
-| `eth_protocolVersion`                     | Available      |                                                                   |
-| `eth_sendRawTransaction`                  | Available      |                                                                   |
-| `eth_sendTransaction`                     | Unavailable    | Use `eth_sendRawTransaction` with a signed transaction.           |
-| `eth_sign`                                | Unavailable    | Sign client-side.                                                 |
-| `eth_signTransaction`                     | Unavailable    | Sign client-side.                                                 |
-| `eth_signTypedData`                       | Unavailable    | Sign client-side.                                                 |
-| `eth_subscribe`                           | WebSocket only |                                                                   |
-| `eth_syncing`                             | Available      |                                                                   |
-| `eth_uninstallFilter`                     | Available      |                                                                   |
-| `eth_unsubscribe`                         | WebSocket only |                                                                   |
-| `net_listening`                           | Available      |                                                                   |
-| `net_peerCount`                           | Available      |                                                                   |
-| `net_version`                             | Available      |                                                                   |
-| `realtime_sendRawTransaction`             | Available      |                                                                   |
-| `trace_block`                             | Available      |                                                                   |
-| `trace_call`                              | Available      |                                                                   |
-| `trace_callMany`                          | Managed only   |                                                                   |
-| `trace_get`                               | Managed only   |                                                                   |
-| `trace_rawTransaction`                    | Managed only   |                                                                   |
-| `trace_replayBlockTransactions`           | Managed only   |                                                                   |
-| `trace_replayTransaction`                 | Managed only   |                                                                   |
-| `trace_transaction`                       | Available      |                                                                   |
-| `txpool_content`                          | Unavailable    |                                                                   |
-| `txpool_contentFrom`                      | Unavailable    |                                                                   |
-| `txpool_inspect`                          | Unavailable    |                                                                   |
-| `txpool_status`                           | Unavailable    |                                                                   |
-| `web3_clientVersion`                      | Available      |                                                                   |
+Historical availability depends on the serving endpoint's retention.
+If an old state query returns code `4444`, see the [Error reference](../rpc/error-codes.md#historical-state-unavailable).
 
-## Rate Limiting
+## Public gateway behavior
 
-Read methods on the public RPC endpoint are rate-limited **per IP address** in **fixed 10-second windows**.
-Each method belongs to one of four categories, and each category has its own request budget:
+The public MegaETH endpoint applies operational policies in addition to each method's JSON-RPC contract.
+Account for these policies when choosing query size, concurrency, and retry behavior.
 
-| Category | Limit (per 10 s) | Methods                                                                                                                     |
-| -------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Instant  | 2,000            | `eth_chainId`, `eth_blockNumber`, `net_version`, `eth_accounts`, `web3_clientVersion`, `eth_getBalance`, `eth_getStorageAt` |
-| Simple   | 500              | Block/transaction queries, `eth_callAfter`, and all other read methods not listed in another category                       |
-| Compute  | 200              | `eth_call`, `eth_callMany`, `eth_estimateGas`, `eth_createAccessList`, `debug_trace*`, `trace_*`                            |
-| IO-heavy | 200              | `eth_getLogs`, `eth_getBlockReceipts`                                                                                       |
+| Behavior                    | What to expect                                                                                                                                                                  | Details                                                                                              |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| Rate limiting               | Read methods use per-IP tiers with fixed 10-second windows. A limited request returns HTTP `429` with JSON-RPC code `-32005`.                                                   | [Read rate limits](../rpc/operations-and-limits.md#read-rate-limits)                                 |
+| Request and response limits | The default request-body limit is 128 KiB, large reads and simulations allow up to 1.5 MiB, batches contain at most 100 requests, and responses are limited to 50 MiB.          | [HTTP request and response limits](../rpc/operations-and-limits.md#http-request-and-response-limits) |
+| Method-specific limits      | Expensive methods such as `eth_call`, `eth_callMany`, `eth_feeHistory`, and `eth_getLogs` have additional execution or result constraints.                                      | [Method-specific limits](../rpc/operations-and-limits.md#method-specific-limits)                     |
+| Gateway caching             | Eligible reads may be served from the gateway's internal cache. Cache policy depends on the method and selector, and `Cache-Control: no-store` only controls downstream caches. | [Gateway caching](../rpc/operations-and-limits.md#gateway-caching)                                   |
 
-Additional notes:
+Use bounded ranges and pagination for large log or historical queries.
+Retry `-32005` failures with exponential backoff and jitter instead of immediate repetition.
+Inspect `X-Workers-Cache-Status` when you need to determine whether an eligible response came from the gateway cache.
 
-- Transaction submission methods (`eth_sendRawTransaction`, `realtime_sendRawTransaction`) are not subject to these read rate limits.
-- Cache hits still consume the method's per-category budget.
-- `eth_callMany` consumes one Compute-category request per inner transaction, not one per HTTP request.
-- `eth_callAfter` uses the Simple-category budget even though it shares `eth_call`'s 60,000,000 compute-gas cap.
-- A rate-limited request is rejected with HTTP `429` and RPC error `-32005` (`Rate limit exceeded`) — see [Error Codes](rpc/error-codes.md). Reduce request frequency, or use batching or WebSocket subscriptions to lower the request count.
+## Common tasks
 
-## Request Body Limits
+- Read an account balance with [`eth_getBalance`](../rpc/reference/eth_getBalance.md).
+- Read contract storage with [`eth_getStorageAt`](../rpc/reference/eth_getStorageAt.md).
+- Execute a read-only contract call with [`eth_call`](../rpc/reference/eth_call.md).
+- Look up a transaction or receipt with [`eth_getTransactionByHash`](../rpc/reference/eth_getTransactionByHash.md) and [`eth_getTransactionReceipt`](../rpc/reference/eth_getTransactionReceipt.md).
+- Query emitted events with [`eth_getLogs`](../rpc/reference/eth_getLogs.md).
+- Stream real-time updates with [`eth_subscribe`](../rpc/reference/eth_subscribe.md).
 
-The public RPC endpoint caps the size of the request body, and the cap depends on the method being called:
+## Next steps
 
-| Method class                                                                                        | Maximum body size |
-| --------------------------------------------------------------------------------------------------- | ----------------- |
-| Transaction submission (`eth_sendRawTransaction`, `realtime_sendRawTransaction`)                    | 2.5 MiB           |
-| Large reads and simulations (`eth_call`, `eth_callMany`, `eth_createAccessList`, `eth_estimateGas`) | 1.5 MiB           |
-| All other methods                                                                                   | 128 KiB           |
-
-The higher limits for simulation methods let you estimate gas for or simulate large contract deployments, whose initcode can exceed the 128 KiB default.
-A request whose body exceeds the applicable limit is rejected with HTTP `413` and RPC error `-32099` (`payload too large`) — see [Error Codes](rpc/error-codes.md).
-
-## Response Caching
-
-The public RPC gateway may serve a small set of read methods from a server-side cache inside the gateway itself, rather than forwarding every request to a node:
-
-- `eth_getBlockByNumber`
-- `eth_getBlockReceipts`
-- `eth_getHeaderByNumber`
-- `web3_clientVersion`
-
-Only requests for **immutable data** are eligible: an explicit historical block number, a block hash, or the `earliest` tag.
-Requests using the `latest`, `pending`, `safe`, or `finalized` tags always go to a node, so cached responses are never stale — the realtime behavior described above is unaffected.
-
-Two headers on the response are relevant:
-
-- **`Cache-Control: no-store`** — every public response carries this header.
-  It is a directive to caches _downstream_ of the gateway (browsers, proxies, CDNs): do not store this response.
-  It does not mean the gateway itself computed the response from scratch — the gateway's internal cache is part of the origin, not a downstream cache, so serving from it does not conflict with `no-store`.
-- **`X-Workers-Cache-Status`** — reports whether the gateway's internal cache was hit (`HIT`, `MISS`, or other [Cloudflare cache statuses](https://developers.cloudflare.com/cache/concepts/cache-responses/)).
-  Use it to understand where a response came from; it has no effect on correctness.
-
-Sending `Cache-Control: no-store` or `no-cache` as a _request_ header does not bypass the internal cache — request cache directives address intermediary caches, not the origin's own caching.
-Because only immutable data is cached, there is never a reason to bypass it.
-
-## Related Pages
-
-- [Realtime API](realtime-api.md) — use-case guide for streaming data and instant receipts
-- [Error Codes](rpc/error-codes.md) — HTTP and RPC error codes with mitigations
+- [JSON-RPC](../rpc/README.md) explains request framing, shared types, errors, and public gateway limits.
+- [RPC Reference](../rpc/reference/README.md) lists method availability and the complete method documentation.
+- [Realtime API](realtime-api.md) explains mini-block-level reads and WebSocket subscriptions.
+- [Operations and limits](../rpc/operations-and-limits.md) documents rate limits, request limits, caching, and WebSocket limits.

@@ -79,7 +79,7 @@ A signed mini-block is a binding commitment: if the sequencer ever sealed an EVM
 The signing key is registered onchain in the [SequencerRegistry](https://docs.megaeth.com/spec/system-contracts/sequencer-registry) system contract at `0x6342000000000000000000000000000000000006`, introduced in Rex5.
 The key can be rotated by scheduling a change in the registry; rotations take effect at an EVM block boundary, and the full change history remains queryable onchain.
 
-The signature is a standard secp256k1 ECDSA signature over `keccak256(rlp(header))`, where the header is the following eight fields of the [`miniBlocks` subscription payload](dev/read/rpc/eth_subscribe.md#miniblocks), RLP-encoded in this order:
+The signature is a standard secp256k1 ECDSA signature over `keccak256(rlp(header))`, where the header is the following eight fields of the [`miniBlocks` subscription payload](dev/rpc/reference/eth_subscribe.md#miniblocks), RLP-encoded in this order:
 
 | #   | Payload field          | Type         |
 | --- | ---------------------- | ------------ |
@@ -104,7 +104,7 @@ Mini-blocks produced before Rex5 are unsigned — the `signature` field is absen
 
 To verify a mini-block, rebuild the header hash, recover the signer from the signature, and compare it against the sequencer key registered onchain.
 
-The example below uses [viem](https://viem.sh) and takes a notification payload `mb` exactly as delivered by the [`miniBlocks` subscription](dev/read/rpc/eth_subscribe.md#miniblocks).
+The example below uses [viem](https://viem.sh) and takes a notification payload `mb` exactly as delivered by the [`miniBlocks` subscription](dev/rpc/reference/eth_subscribe.md#miniblocks).
 
 ```typescript
 import {
@@ -195,6 +195,6 @@ Each notification delivers the mini-block's transactions, receipts, and state ch
 
 - [Architecture](architecture.md) — how transactions flow through the MegaETH network
 - [Realtime API](dev/read/realtime-api.md) — subscribe to mini-blocks and get execution results with minimum latency
-- [eth_subscribe](dev/read/rpc/eth_subscribe.md) — full reference of the `miniBlocks` subscription payload
+- [eth_subscribe](dev/rpc/reference/eth_subscribe.md) — full reference of the `miniBlocks` subscription payload
 - [High-Precision Timestamp](dev/execution/system-contracts.md#high-precision-timestamp) — microsecond timestamps available within mini-blocks
 - [SequencerRegistry (spec)](https://docs.megaeth.com/spec/system-contracts/sequencer-registry) — onchain registry of the sequencer signing key

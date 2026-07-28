@@ -46,8 +46,9 @@ curl -s https://mainnet.megaeth.com/rpc \
 {% endtabs %}
 
 {% hint style="warning" %}
-The public RPC caps `eth_estimateGas` at **60M compute gas**.
-If your transaction needs more (e.g., deploying a large contract), either set a manual gas limit or use a [managed RPC provider](../tooling.md#rpc-providers) with a higher cap.
+The public RPC runs `eth_estimateGas` through a CPU-limited estimator whose source-default budget is **0.5 seconds**.
+Long-running estimates can fail even when the transaction's protocol gas limit would be valid.
+If this affects a large deployment, either set a manual gas limit or use a [managed RPC provider](../tooling.md#rpc-providers) with a different estimation policy.
 You can determine the exact gas needed by simulating locally with [`mega-evme`](debugging.md#simulating-a-new-transaction).
 {% endhint %}
 
@@ -119,8 +120,8 @@ curl -s https://mainnet.megaeth.com/rpc \
 ```
 
 Returns the full transaction receipt directly.
-Times out after 10 seconds if the transaction has not been executed.
-See [`realtime_sendRawTransaction`](../read/rpc/realtime_sendRawTransaction.md) for the full reference.
+The node waits up to 5 seconds by default; the public gateway caps an explicit timeout at 3,000 milliseconds and returns `-32000 realtime transaction expired` if the deadline elapses first.
+See [`realtime_sendRawTransaction`](../rpc/reference/realtime_sendRawTransaction.md) for the full reference.
 {% endtab %}
 {% endtabs %}
 
