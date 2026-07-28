@@ -65,7 +65,21 @@ def clean_output():
         "findings": [],
         "open_questions": [],
         "prior_findings": [],
+        "prior_questions": [],
     }
+
+
+def question_output(**overrides):
+    output = clean_output()
+    question = {
+        "question": "Can the upstream return duplicate records?",
+        "confidence": "medium",
+        "why_it_matters": "Duplicate records would be applied twice.",
+        "verification": "Confirm the upstream uniqueness contract.",
+    }
+    question.update(overrides)
+    output["open_questions"] = [question]
+    return output
 
 
 def sample_finding(**overrides):
@@ -1341,6 +1355,296 @@ class ReviewPipelineTests(unittest.TestCase):
             )
             pipeline.publish(SimpleNamespace(state_dir=directory))
         submit_mock.assert_not_called()
+
+    def test_open_question_carries_a_stable_marker(self):
+        payload = pipeline.compile_review(review_input(), question_output())
+        questions = payload["manifest"]["questions"]
+        self.assertEqual(len(questions), 1)
+        question_id_value = next(iter(questions))
+        self.assertEqual(questions[question_id_value]["status"], "open")
+        self.assertIn(
+            pipeline.question_marker(question_id_value),
+            payload["review_body"],
+        )
+        self.assertEqual(payload["question_annotations"], [])
+
+    def test_still_open_question_is_not_asked_twice(self):
+        value = review_input()
+        first = pipeline.compile_review(value, question_output())
+        value["manifest"] = first["manifest"]
+
+        second = pipeline.compile_review(value, question_output())
+
+        self.assertEqual(len(second["manifest"]["questions"]), 1)
+        self.assertNotIn("Open question", second["review_body"])
+        self.assertFalse(second["should_submit_review"])
+
+    def test_answered_question_produces_a_pending_annotation(self):
+        value = review_input()
+        first = pipeline.compile_review(value, question_output())
+        question_id_value = next(iter(first["manifest"]["questions"]))
+        first["manifest"]["questions"][question_id_value]["review_id"] = 42
+        value["manifest"] = first["manifest"]
+        output = clean_output()
+        output["prior_questions"] = [
+            {
+                "question_id": question_id_value,
+                "disposition": "answered",
+                "reason": "The author confirmed the upstream is unique.",
+            }
+        ]
+
+        payload = pipeline.compile_review(value, output)
+
+        question = payload["manifest"]["questions"][question_id_value]
+        self.assertEqual(question["status"], "answered")
+        self.assertEqual(question["annotation"], "pending")
+        self.assertEqual(
+            payload["question_annotations"],
+            [
+                {
+                    "question_id": question_id_value,
+                    "review_id": 42,
+                    "headline": pipeline.question_headline(question),
+                }
+            ],
+        )
+        self.assertIn(
+            "✅ **Answered**",
+            payload["question_annotations"][0]["headline"],
+        )
+
+    def test_closed_question_without_a_review_stops_being_retried(self):
+        value = review_input()
+        first = pipeline.compile_review(value, question_output())
+        question_id_value = next(iter(first["manifest"]["questions"]))
+        value["manifest"] = first["manifest"]
+        output = clean_output()
+        output["prior_questions"] = [
+            {
+                "question_id": question_id_value,
+                "disposition": "withdrawn",
+                "reason": "The code path was deleted.",
+            }
+        ]
+
+        payload = pipeline.compile_review(value, output)
+
+        self.assertEqual(
+            payload["manifest"]["questions"][question_id_value]["annotation"],
+            "unavailable",
+        )
+        self.assertEqual(payload["question_annotations"], [])
+
+    def test_unknown_prior_question_fails_loudly(self):
+        output = clean_output()
+        output["prior_questions"] = [
+            {
+                "question_id": "Q-unknown",
+                "disposition": "answered",
+                "reason": "Answered elsewhere.",
+            }
+        ]
+
+        with self.assertRaisesRegex(pipeline.PipelineError, "not open"):
+            pipeline.compile_review(review_input(), output)
+
+    def test_missing_prior_questions_leaves_them_open(self):
+        value = review_input()
+        first = pipeline.compile_review(value, question_output())
+        question_id_value = next(iter(first["manifest"]["questions"]))
+        value["manifest"] = first["manifest"]
+        output = clean_output()
+        output.pop("prior_questions", None)
+
+        payload = pipeline.compile_review(value, output)
+
+        self.assertEqual(
+            payload["manifest"]["questions"][question_id_value]["status"],
+            "open",
+        )
+
+    @mock.patch.object(pipeline, "gh_json")
+    def test_annotation_rewrites_the_asking_review_in_place(self, gh_mock):
+        question_id_value = "Q-abc123"
+        marker = pipeline.question_marker(question_id_value)
+        original = (
+            "❓ 1 open question(s)\n\n"
+            f"❓ **Open question · Medium confidence** {marker}\n"
+            "- Can the upstream return duplicate records?\n\n"
+            "<!-- claude-review-state:v1 payload -->"
+        )
+        gh_mock.side_effect = [{"body": original}, {"id": 42}]
+        payload = {
+            "repository": "megaeth-labs/example",
+            "pull_request": 7,
+            "question_annotations": [
+                {
+                    "question_id": question_id_value,
+                    "review_id": 42,
+                    "headline": f"✅ **Answered**: confirmed unique {marker}",
+                }
+            ],
+        }
+        manifest = {"questions": {question_id_value: {"annotation": "pending"}}}
+
+        pipeline.annotate_questions(payload, manifest)
+
+        written = gh_mock.call_args.kwargs["input_value"]["body"]
+        self.assertIn(f"✅ **Answered**: confirmed unique {marker}", written)
+        self.assertNotIn("❓ **Open question", written)
+        self.assertIn("- Can the upstream return duplicate records?", written)
+        self.assertIn("<!-- claude-review-state:v1 payload -->", written)
+        self.assertEqual(
+            manifest["questions"][question_id_value]["annotation"],
+            "applied",
+        )
+
+    @mock.patch.object(pipeline, "gh_json")
+    def test_annotation_is_idempotent(self, gh_mock):
+        question_id_value = "Q-abc123"
+        marker = pipeline.question_marker(question_id_value)
+        headline = f"✅ **Answered**: confirmed unique {marker}"
+        gh_mock.return_value = {"body": f"{headline}\n- question text"}
+        payload = {
+            "repository": "megaeth-labs/example",
+            "pull_request": 7,
+            "question_annotations": [
+                {
+                    "question_id": question_id_value,
+                    "review_id": 42,
+                    "headline": headline,
+                }
+            ],
+        }
+        manifest = {"questions": {question_id_value: {"annotation": "pending"}}}
+
+        pipeline.annotate_questions(payload, manifest)
+
+        self.assertEqual(gh_mock.call_count, 1)
+        self.assertEqual(
+            manifest["questions"][question_id_value]["annotation"],
+            "applied",
+        )
+
+    @mock.patch.object(pipeline, "gh_json")
+    def test_missing_marker_stops_retrying(self, gh_mock):
+        gh_mock.return_value = {"body": "a legacy review with no marker"}
+        payload = {
+            "repository": "megaeth-labs/example",
+            "pull_request": 7,
+            "question_annotations": [
+                {
+                    "question_id": "Q-abc123",
+                    "review_id": 42,
+                    "headline": "✅ **Answered**",
+                }
+            ],
+        }
+        manifest = {"questions": {"Q-abc123": {"annotation": "pending"}}}
+
+        pipeline.annotate_questions(payload, manifest)
+
+        self.assertEqual(gh_mock.call_count, 1)
+        self.assertEqual(
+            manifest["questions"]["Q-abc123"]["annotation"],
+            "unavailable",
+        )
+
+    @mock.patch.object(pipeline, "gh_json")
+    def test_annotation_failure_stays_pending_for_the_next_round(self, gh_mock):
+        gh_mock.side_effect = pipeline.PipelineError("gh api failed")
+        payload = {
+            "repository": "megaeth-labs/example",
+            "pull_request": 7,
+            "question_annotations": [
+                {
+                    "question_id": "Q-abc123",
+                    "review_id": 42,
+                    "headline": "✅ **Answered**",
+                }
+            ],
+        }
+        manifest = {"questions": {"Q-abc123": {"annotation": "pending"}}}
+
+        pipeline.annotate_questions(payload, manifest)
+
+        self.assertEqual(
+            manifest["questions"]["Q-abc123"]["annotation"],
+            "pending",
+        )
+
+    @mock.patch.object(pipeline, "gh_json")
+    def test_annotation_propagates_a_stale_head(self, gh_mock):
+        def stale():
+            raise pipeline.StaleReviewError("head moved")
+
+        payload = {
+            "repository": "megaeth-labs/example",
+            "pull_request": 7,
+            "question_annotations": [
+                {
+                    "question_id": "Q-abc123",
+                    "review_id": 42,
+                    "headline": "✅ **Answered**",
+                }
+            ],
+        }
+
+        with self.assertRaises(pipeline.StaleReviewError):
+            pipeline.annotate_questions(payload, {}, before_write=stale)
+        gh_mock.assert_not_called()
+
+    def test_sticky_comment_declares_that_it_is_rewritten(self):
+        payload = pipeline.compile_review(review_input(), question_output())
+        question_id_value = next(iter(payload["manifest"]["questions"]))
+        payload["manifest"]["questions"][question_id_value]["review_id"] = 42
+
+        body = pipeline.render_status_body(payload, payload["manifest"])
+
+        self.assertIn("Living comment — rewritten in place", body)
+        self.assertIn("Open questions awaiting an answer:", body)
+        self.assertIn(
+            "#pullrequestreview-42",
+            body,
+        )
+        self.assertIn("Open questions: 1", body)
+
+    def test_sticky_comment_drops_an_answered_question(self):
+        value = review_input()
+        first = pipeline.compile_review(value, question_output())
+        question_id_value = next(iter(first["manifest"]["questions"]))
+        first["manifest"]["questions"][question_id_value]["review_id"] = 42
+        value["manifest"] = first["manifest"]
+        output = clean_output()
+        output["prior_questions"] = [
+            {
+                "question_id": question_id_value,
+                "disposition": "answered",
+                "reason": "Answered in the discussion.",
+            }
+        ]
+        payload = pipeline.compile_review(value, output)
+
+        body = pipeline.render_status_body(payload, payload["manifest"])
+
+        self.assertNotIn("Open questions awaiting an answer:", body)
+        self.assertIn("Open questions: 0", body)
+
+    def test_skip_mode_keeps_questions_open(self):
+        value = review_input()
+        first = pipeline.compile_review(value, question_output())
+        question_id_value = next(iter(first["manifest"]["questions"]))
+        skipped = review_input(mode="skip")
+        skipped["manifest"] = first["manifest"]
+
+        payload = pipeline.compile_review(skipped, None)
+
+        self.assertEqual(
+            payload["manifest"]["questions"][question_id_value]["status"],
+            "open",
+        )
+        self.assertEqual(payload["question_annotations"], [])
 
 
 if __name__ == "__main__":

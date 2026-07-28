@@ -1,7 +1,13 @@
 {
   "type": "object",
   "additionalProperties": false,
-  "required": ["scope_summary", "findings", "open_questions", "prior_findings"],
+  "required": [
+    "scope_summary",
+    "findings",
+    "open_questions",
+    "prior_findings",
+    "prior_questions"
+  ],
   "properties": {
     "scope_summary": {
       "type": "string",
@@ -97,6 +103,27 @@
           "verification": {
             "type": "string",
             "maxLength": 600
+          }
+        }
+      }
+    },
+    "prior_questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["question_id", "disposition", "reason"],
+        "properties": {
+          "question_id": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "disposition": {
+            "enum": ["open", "answered", "withdrawn"]
+          },
+          "reason": {
+            "type": "string",
+            "maxLength": 300
           }
         }
       }
