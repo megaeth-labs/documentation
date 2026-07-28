@@ -3,3 +3,60 @@ root: ./docs/
 structure:
   readme: README.md
   summary: SUMMARY.md
+
+redirects:
+  dev/read/rpc: dev/rpc/reference/README.md
+  dev/read/rpc/debug_getHistoryTransactionCount: dev/rpc/reference/debug_getHistoryTransactionCount.md
+  dev/read/rpc/debug_getRawHeader: dev/rpc/reference/debug_getRawHeader.md
+  dev/read/rpc/debug_traceBlockByHash: dev/rpc/reference/debug_traceBlockByHash.md
+  dev/read/rpc/debug_traceBlockByNumber: dev/rpc/reference/debug_traceBlockByNumber.md
+  dev/read/rpc/debug_traceTransaction: dev/rpc/reference/debug_traceTransaction.md
+  dev/read/rpc/error-codes: dev/rpc/error-codes.md
+  dev/read/rpc/eth_accounts: dev/rpc/reference/eth_accounts.md
+  dev/read/rpc/eth_blockNumber: dev/rpc/reference/eth_blockNumber.md
+  dev/read/rpc/eth_call: dev/rpc/reference/eth_call.md
+  dev/read/rpc/eth_callAfter: dev/rpc/reference/README.md#available-methods
+  dev/read/rpc/eth_callMany: dev/rpc/reference/eth_callMany.md
+  dev/read/rpc/eth_chainId: dev/rpc/reference/eth_chainId.md
+  dev/read/rpc/eth_createAccessList: dev/rpc/reference/eth_createAccessList.md
+  dev/read/rpc/eth_estimateGas: dev/rpc/reference/eth_estimateGas.md
+  dev/read/rpc/eth_feeHistory: dev/rpc/reference/eth_feeHistory.md
+  dev/read/rpc/eth_gasPrice: dev/rpc/reference/eth_gasPrice.md
+  dev/read/rpc/eth_getBalance: dev/rpc/reference/eth_getBalance.md
+  dev/read/rpc/eth_getBlockByHash: dev/rpc/reference/eth_getBlockByHash.md
+  dev/read/rpc/eth_getBlockByNumber: dev/rpc/reference/eth_getBlockByNumber.md
+  dev/read/rpc/eth_getBlockReceipts: dev/rpc/reference/eth_getBlockReceipts.md
+  dev/read/rpc/eth_getBlockTransactionCountByHash: dev/rpc/reference/eth_getBlockTransactionCountByHash.md
+  dev/read/rpc/eth_getBlockTransactionCountByNumber: dev/rpc/reference/eth_getBlockTransactionCountByNumber.md
+  dev/read/rpc/eth_getCode: dev/rpc/reference/eth_getCode.md
+  dev/read/rpc/eth_getCodeByHash: dev/rpc/reference/eth_getCodeByHash.md
+  dev/read/rpc/eth_getHeaderByHash: dev/rpc/reference/eth_getHeaderByHash.md
+  dev/read/rpc/eth_getHeaderByNumber: dev/rpc/reference/eth_getHeaderByNumber.md
+  dev/read/rpc/eth_getLogs: dev/rpc/reference/eth_getLogs.md
+  dev/read/rpc/eth_getLogsWithCursor: dev/rpc/reference/README.md#available-methods
+  dev/read/rpc/eth_getStorageAt: dev/rpc/reference/eth_getStorageAt.md
+  dev/read/rpc/eth_getTransactionByHash: dev/rpc/reference/eth_getTransactionByHash.md
+  dev/read/rpc/eth_getTransactionCount: dev/rpc/reference/eth_getTransactionCount.md
+  dev/read/rpc/eth_getTransactionReceipt: dev/rpc/reference/eth_getTransactionReceipt.md
+  dev/read/rpc/eth_getUncleByBlockHashAndIndex: dev/rpc/reference/eth_getUncleByBlockHashAndIndex.md
+  dev/read/rpc/eth_getUncleByBlockNumberAndIndex: dev/rpc/reference/eth_getUncleByBlockNumberAndIndex.md
+  dev/read/rpc/eth_getUncleCountByBlockHash: dev/rpc/reference/eth_getUncleCountByBlockHash.md
+  dev/read/rpc/eth_getUncleCountByBlockNumber: dev/rpc/reference/eth_getUncleCountByBlockNumber.md
+  dev/read/rpc/eth_getWithdrawalProof: dev/rpc/reference/eth_getWithdrawalProof.md
+  dev/read/rpc/eth_maxPriorityFeePerGas: dev/rpc/reference/eth_maxPriorityFeePerGas.md
+  dev/read/rpc/eth_protocolVersion: dev/rpc/reference/eth_protocolVersion.md
+  dev/read/rpc/eth_sendRawTransaction: dev/rpc/reference/eth_sendRawTransaction.md
+  dev/read/rpc/eth_sendRawTransactionSync: dev/rpc/reference/eth_sendRawTransactionSync.md
+  dev/read/rpc/eth_subscribe: dev/rpc/reference/eth_subscribe.md
+  dev/read/rpc/eth_syncing: dev/rpc/reference/eth_syncing.md
+  dev/read/rpc/eth_uninstallFilter: dev/rpc/reference/eth_uninstallFilter.md
+  dev/read/rpc/eth_unsubscribe: dev/rpc/reference/eth_unsubscribe.md
+  dev/read/rpc/mega_getBlockWitness: dev/rpc/reference/mega_getBlockWitness.md
+  dev/read/rpc/mega_getWithdrawalProof: dev/rpc/reference/mega_getWithdrawalProof.md
+  dev/read/rpc/mega_outputAtBlock: dev/rpc/reference/mega_outputAtBlock.md
+  dev/read/rpc/net_listening: dev/rpc/reference/net_listening.md
+  dev/read/rpc/net_peerCount: dev/rpc/reference/net_peerCount.md
+  dev/read/rpc/net_version: dev/rpc/reference/net_version.md
+  dev/read/rpc/optimism_outputAtBlock: dev/rpc/reference/optimism_outputAtBlock.md
+  dev/read/rpc/realtime_sendRawTransaction: dev/rpc/reference/realtime_sendRawTransaction.md
+  dev/read/rpc/web3_clientVersion: dev/rpc/reference/web3_clientVersion.md

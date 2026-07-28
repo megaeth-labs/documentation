@@ -337,7 +337,7 @@ The repository also includes the escrow contract (`contract/`) and protocol sche
 
 - **Token.** The demo uses a testnet USD-style ERC-20 (USDm) as the payment asset across all five flows.
 - **Escrow.** The session flows use a `TempoStreamChannel`-style escrow deployed on MegaETH; the gasless variant adds Permit2 / EIP-3009 funding entry points so a relayer can fund on the payer's behalf.
-- **Fast settlement.** Server-side settlement (gasless charge, channel `close`, relayed funding) is submitted via MegaETH's realtime transaction RPC, which returns a receipt synchronously instead of requiring a separate poll. See [`realtime_sendRawTransaction`](read/rpc/realtime_sendRawTransaction.md) and the [Realtime API](read/realtime-api.md).
+- **Fast settlement.** Server-side settlement (gasless charge, channel `close`, relayed funding) is submitted via MegaETH's realtime transaction RPC, which returns a receipt synchronously instead of requiring a separate poll. See [`realtime_sendRawTransaction`](rpc/reference/realtime_sendRawTransaction.md) and the [Realtime API](read/realtime-api.md).
 - **Gas.** Sponsored flows require a funded server key to pay gas. Estimate gas with `eth_estimateGas` against a MegaETH endpoint rather than computing it manually — see [Gas Estimation](send-tx/gas-estimation.md).
 
 ## Further reading

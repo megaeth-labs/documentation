@@ -20,3 +20,12 @@ jobs:
 
       - name: Lint
         run: mise run lint
+
+      - name: Test PR review pipeline
+        env:
+          PYTHONDONTWRITEBYTECODE: "1"
+        run: |
+          python3 -m unittest discover \
+            -s .github/actions/claude-pr-review \
+            -p 'test_*.py' \
+            -v
