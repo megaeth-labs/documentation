@@ -1285,6 +1285,19 @@ def prepare(args: argparse.Namespace) -> None:
         "pipeline_version": pipeline_version,
         "rubric_version": rubric_version,
     }
+    if mode != "skip":
+        # Announce the round before analysis so the PR carries a status comment
+        # from the start rather than staying silent until the review lands.
+        # Skip mode publishes nothing, so announcing it would strand the
+        # comment at "in progress".
+        input_value["sticky_comment_id"] = set_sticky_phase(
+            repository=args.repository,
+            pull_request=args.pull_request,
+            manifest=manifest,
+            sticky_comment_id=sticky_comment_id,
+            scope_text=scope_label(input_value),
+            phase="in_progress",
+        )
     (state_dir / "review-input.json").write_text(
         json.dumps(input_value, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -2317,6 +2330,8 @@ def render_status_body(
     current head or the moment it first appeared.
     """
     summary = payload.get("status_summary") or {}
+    phase = str(summary.get("phase") or "complete")
+    scope_text = summary.get("scope_text", "the current head")
     findings = (manifest.get("findings") or {}).values()
     open_findings = [
         item
@@ -2324,14 +2339,39 @@ def render_status_body(
         if isinstance(item, dict) and item.get("status") == "open"
     ]
     pending_questions = open_questions(manifest)
-    if open_findings:
-        status_title = f"⚠️ {len(open_findings)} open finding(s)"
-        if pending_questions:
-            status_title += f" · {len(pending_questions)} open question(s)"
-    elif pending_questions:
-        status_title = f"❓ {len(pending_questions)} open question(s)"
+    if phase == "in_progress":
+        status_title = "🔄 Review in progress"
+        progress_line = f"Reviewing {scope_text} · started {utc_now()}"
+        detail_line = (
+            "Findings and questions from this round appear here, and in a"
+            " review below, once the round finishes. Anything listed below is"
+            " carried over from earlier rounds."
+        )
+    elif phase == "failed":
+        status_title = "🛠️ Review did not finish"
+        reason = public_text(summary.get("reason"), maximum=200)
+        progress_line = f"Attempted {scope_text} · updated {utc_now()}"
+        detail_line = (
+            f"This round did not publish{': ' + reason if reason else ''}."
+            " Anything listed below is from the last round that did. Re-run"
+            " the workflow or push a new commit to try again."
+        )
     else:
-        status_title = "✅ Review clean"
+        if open_findings:
+            status_title = f"⚠️ {len(open_findings)} open finding(s)"
+            if pending_questions:
+                status_title += f" · {len(pending_questions)} open question(s)"
+        elif pending_questions:
+            status_title = f"❓ {len(pending_questions)} open question(s)"
+        else:
+            status_title = "✅ Review clean"
+        progress_line = f"Last reviewed: {scope_text} · updated {utc_now()}"
+        detail_line = (
+            f"New this round: {summary.get('new_findings', 0)} finding(s),"
+            f" {summary.get('new_questions', 0)} question(s)"
+            f" · Resolved this round: {summary.get('resolved_findings', 0)}"
+            f" · Open questions: {len(pending_questions)}"
+        )
     lines = [
         "## Claude review status",
         "",
@@ -2343,13 +2383,9 @@ def render_status_body(
         "",
         status_title,
         "",
-        f"Last reviewed: {summary.get('scope_text', 'the current head')}"
-        f" · updated {utc_now()}",
+        progress_line,
         "",
-        f"New this round: {summary.get('new_findings', 0)} finding(s),"
-        f" {summary.get('new_questions', 0)} question(s)"
-        f" · Resolved this round: {summary.get('resolved_findings', 0)}"
-        f" · Open questions: {len(pending_questions)}",
+        detail_line,
     ]
     if pending_questions:
         lines.extend(["", "Open questions awaiting an answer:"])
@@ -2359,6 +2395,38 @@ def render_status_body(
             text = public_text(question.get("question"), maximum=300)
             lines.append(f"- ❓ {text}{suffix}")
     return "\n".join(lines)
+
+
+def set_sticky_phase(
+    *,
+    repository: str,
+    pull_request: int,
+    manifest: dict[str, Any],
+    sticky_comment_id: int | None,
+    scope_text: str,
+    phase: str,
+    reason: str | None = None,
+) -> int | None:
+    """Move the sticky status comment to a non-publishing phase.
+
+    Used to announce a round before analysis starts and to close it out when a
+    round ends without publishing. Best effort: the status comment is a
+    courtesy, so a GitHub failure here must never fail the review.
+    """
+    payload = {
+        "repository": repository,
+        "pull_request": pull_request,
+        "sticky_comment_id": sticky_comment_id,
+        "status_summary": {
+            "scope_text": scope_text,
+            "phase": phase,
+            "reason": reason,
+        },
+    }
+    try:
+        return upsert_sticky(payload, manifest)
+    except PipelineError:
+        return sticky_comment_id
 
 
 def annotate_questions(
@@ -2609,6 +2677,30 @@ def render_outcomes(outcomes: dict[str, str]) -> str:
     return "\n".join(rows)
 
 
+def close_out_sticky(state_dir: Path, *, reason: str | None = None) -> None:
+    """Move an announced-but-unpublished round out of the in-progress phase.
+
+    `prepare` announces every round, so any path that ends without publishing
+    has to retire the comment itself; otherwise it reads as a review that is
+    still running hours later.
+    """
+    review_input = read_json_file(state_dir / "review-input.json")
+    if not review_input:
+        return
+    manifest = review_input.get("manifest")
+    if not isinstance(manifest, dict):
+        return
+    set_sticky_phase(
+        repository=str(review_input["repository"]),
+        pull_request=int(review_input["pull_request"]),
+        manifest=manifest,
+        sticky_comment_id=review_input.get("sticky_comment_id"),
+        scope_text=scope_label(review_input),
+        phase="failed",
+        reason=reason,
+    )
+
+
 def report(args: argparse.Namespace) -> None:
     state_dir = Path(args.state_dir)
     outcomes = step_outcomes()
@@ -2647,6 +2739,10 @@ def report(args: argparse.Namespace) -> None:
             + details
         )
         write_job_summary(body)
+        close_out_sticky(
+            state_dir,
+            reason=f"{diagnostic['code']} in phase {diagnostic['phase']}",
+        )
         print(
             "Claude PR review: FAILED "
             f"[{diagnostic['code']}] phase={diagnostic['phase']}: "
@@ -2668,6 +2764,17 @@ def report(args: argparse.Namespace) -> None:
     stale = os.environ.get("PUBLISH_STALE", "") == "true"
     published = os.environ.get("PUBLISH_PUBLISHED", "") == "true"
     retry_used = outcomes.get("review_retry") not in {"", "skipped"}
+    if not published and mode != "skip":
+        # prepare left the comment at "in progress"; nothing published, so no
+        # later step will move it. Close it out here or it stays there.
+        close_out_sticky(
+            state_dir,
+            reason=(
+                "the PR head changed while the review was running"
+                if stale
+                else None
+            ),
+        )
     if stale:
         status = "⚠️ Review output was discarded because the PR head changed."
     elif mode == "skip":

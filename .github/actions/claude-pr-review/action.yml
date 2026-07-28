@@ -299,6 +299,9 @@ runs:
       continue-on-error: true
       shell: bash
       env:
+        # Needed because this step retires the sticky status comment when a
+        # round ends without publishing.
+        GH_TOKEN: ${{ inputs.github_identity_token || github.token }}
         STATE_DIR: ${{ github.workspace }}/.pr-review
         PREPARE_OUTCOME: ${{ steps.prepare.outcome }}
         COMPOSE_OUTCOME: ${{ steps.compose.outcome }}

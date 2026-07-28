@@ -125,7 +125,8 @@ class ReviewPipelineTests(unittest.TestCase):
             "GH_TOKEN: "
             "${{ inputs.github_identity_token || github.token }}"
         )
-        self.assertEqual(action.count(identity_env), 2)
+        # prepare (announce), publish, and report (retire on failure).
+        self.assertEqual(action.count(identity_env), 3)
         self.assertIn(
             "GH_RESOLVE_THREADS: "
             "${{ inputs.github_identity_token != '' }}",
@@ -1413,6 +1414,99 @@ class ReviewPipelineTests(unittest.TestCase):
             "✅ **Answered**",
             payload["question_annotations"][0]["headline"],
         )
+
+    def test_in_progress_status_announces_the_round(self):
+        payload = {
+            "repository": "megaeth-labs/example",
+            "pull_request": 7,
+            "status_summary": {
+                "scope_text": "head `bbbbbbbb`",
+                "phase": "in_progress",
+            },
+        }
+
+        body = pipeline.render_status_body(payload, {"findings": {}})
+
+        self.assertIn("🔄 Review in progress", body)
+        self.assertIn("Reviewing head `bbbbbbbb`", body)
+        self.assertIn("Living comment — rewritten in place", body)
+        self.assertNotIn("New this round", body)
+
+    def test_in_progress_status_keeps_prior_open_items_visible(self):
+        payload = {
+            "repository": "megaeth-labs/example",
+            "pull_request": 7,
+            "status_summary": {
+                "scope_text": "head `bbbbbbbb`",
+                "phase": "in_progress",
+            },
+        }
+        manifest = {
+            "findings": {},
+            "questions": {
+                "Q-1": {
+                    "status": "open",
+                    "question": "Is the upstream unique?",
+                    "review_id": 42,
+                }
+            },
+        }
+
+        body = pipeline.render_status_body(payload, manifest)
+
+        self.assertIn("Open questions awaiting an answer:", body)
+        self.assertIn("carried over from earlier rounds", body)
+
+    def test_failed_status_retires_the_in_progress_phase(self):
+        payload = {
+            "repository": "megaeth-labs/example",
+            "pull_request": 7,
+            "status_summary": {
+                "scope_text": "head `bbbbbbbb`",
+                "phase": "failed",
+                "reason": "MODEL_NO_OUTPUT in phase compile",
+            },
+        }
+
+        body = pipeline.render_status_body(payload, {"findings": {}})
+
+        self.assertIn("🛠️ Review did not finish", body)
+        self.assertIn("MODEL_NO_OUTPUT in phase compile", body)
+        self.assertNotIn("🔄", body)
+
+    @mock.patch.object(pipeline, "upsert_sticky")
+    def test_set_sticky_phase_survives_a_github_failure(self, upsert_mock):
+        upsert_mock.side_effect = pipeline.PipelineError("gh api failed")
+
+        result = pipeline.set_sticky_phase(
+            repository="megaeth-labs/example",
+            pull_request=7,
+            manifest={"findings": {}},
+            sticky_comment_id=11,
+            scope_text="head `bbbbbbbb`",
+            phase="in_progress",
+        )
+
+        # Announcing is a courtesy; failing to announce must not fail the run.
+        self.assertEqual(result, 11)
+
+    @mock.patch.object(pipeline, "set_sticky_phase")
+    def test_close_out_sticky_needs_prepared_state(self, phase_mock):
+        with tempfile.TemporaryDirectory() as directory:
+            pipeline.close_out_sticky(Path(directory))
+        phase_mock.assert_not_called()
+
+    @mock.patch.object(pipeline, "set_sticky_phase")
+    def test_close_out_sticky_retires_the_comment(self, phase_mock):
+        with tempfile.TemporaryDirectory() as directory:
+            Path(directory, "review-input.json").write_text(
+                json.dumps(review_input()),
+                encoding="utf-8",
+            )
+            pipeline.close_out_sticky(Path(directory), reason="head moved")
+
+        self.assertEqual(phase_mock.call_args.kwargs["phase"], "failed")
+        self.assertEqual(phase_mock.call_args.kwargs["reason"], "head moved")
 
     def test_closed_question_without_a_review_stops_being_retried(self):
         value = review_input()

@@ -60,7 +60,9 @@ The PR reviewer is an explicit staged pipeline:
 
 1. A deterministic preparation step freezes the base and head SHAs, loads the durable review
    manifest, fetches prior automated threads, computes the full or incremental diff, and
-   selects the model tier.
+   selects the model tier. It then posts or updates the sticky status comment to
+   `🔄 Review in progress`, so the PR shows the round has started instead of staying silent
+   until the review lands minutes later.
 2. Claude performs semantic analysis and verification with read-only tools.
    It returns schema-constrained data and cannot publish comments or resolve threads.
 3. A deterministic compiler validates findings, enforces severity budgets, checks RIGHT-side
@@ -124,6 +126,11 @@ every run, so a reader who meets it mid-thread can tell it describes the current
 than the moment it first appeared.
 It carries the reviewed range, an update timestamp, this round's counts, and a roll-up of the
 questions still awaiting an answer with a link to the review that asked each one.
+It moves through three phases: `🔄 Review in progress` from preparation, then either the
+finished verdict or `🛠️ Review did not finish` for a round that ends without publishing.
+Every non-publishing path — a failure, a discarded stale head — retires the in-progress phase
+itself, so the comment never sits at "in progress" after the job ends. A skip-mode round
+publishes nothing and is never announced.
 When old automated review threads are addressed, the deterministic publisher resolves them
 without adding confirmation replies.
 A consumer repo's `REVIEW.md` may override or extend the semantic severity guidance.
