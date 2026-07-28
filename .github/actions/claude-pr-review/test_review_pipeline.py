@@ -436,19 +436,6 @@ class ReviewPipelineTests(unittest.TestCase):
                                 "author": {"login": "github-actions[bot]"},
                             },
                         },
-                        {
-                            "databaseId": 21,
-                            "body": "This is guarded by the request lifetime.",
-                            "path": "src/example.py",
-                            "line": 11,
-                            "createdAt": "2026-07-28T05:00:00Z",
-                            "url": "https://example.test/thread/21",
-                            "author": {"login": "carol"},
-                            "pullRequestReview": {
-                                "body": "",
-                                "author": {"login": "carol"},
-                            },
-                        },
                     ]
                 },
             }
@@ -479,6 +466,10 @@ class ReviewPipelineTests(unittest.TestCase):
             [entry["author"] for entry in context["timeline"]],
             ["alice", "bob", "carol"],
         )
+        reply = context["timeline"][-1]
+        self.assertEqual(reply["thread_id"], "THREAD")
+        self.assertFalse(reply["thread_resolved"])
+        self.assertFalse(reply["thread_outdated"])
         self.assertEqual(context["previous_reviewed_at"], "2026-07-28T02:00:00Z")
         self.assertFalse(context["truncated"])
 

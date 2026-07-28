@@ -718,6 +718,7 @@ def conversation_context(
     for comment in review_comments:
         comment_id = int(comment.get("id") or 0)
         review_id = int(comment.get("pull_request_review_id") or 0)
+        parent_id = int(comment.get("in_reply_to_id") or 0)
         author = (comment.get("user") or {}).get("login")
         if comment_id in owned_comment_ids or (
             is_bot_login(author, publisher_login=publisher_login)
@@ -729,11 +730,16 @@ def conversation_context(
         visible_body = conversation_body(comment.get("body"))
         if not visible_body:
             continue
+        metadata = thread_metadata.get(comment_id)
+        if metadata is None and parent_id:
+            metadata = thread_metadata.get(parent_id)
+            if metadata is not None and comment_id:
+                thread_metadata[comment_id] = metadata
         timeline.append(
             {
                 "source": "review_thread_comment",
                 "id": comment_id or comment.get("id"),
-                **thread_metadata.get(comment_id, {}),
+                **(metadata or {}),
                 "author": author,
                 "author_association": comment.get("author_association"),
                 "created_at": comment.get("created_at"),
@@ -742,7 +748,7 @@ def conversation_context(
                 "path": comment.get("path"),
                 "line": comment.get("line"),
                 "original_line": comment.get("original_line"),
-                "in_reply_to_id": comment.get("in_reply_to_id"),
+                "in_reply_to_id": parent_id or None,
                 "body": visible_body,
             }
         )
