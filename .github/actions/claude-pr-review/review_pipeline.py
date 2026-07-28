@@ -1388,15 +1388,36 @@ def question_headline(question: dict[str, Any]) -> str:
     return f"{headline} {marker}"
 
 
+def question_block_header(question: dict[str, Any]) -> str:
+    """Render the two-line `<details>` header that opens a question block.
+
+    An unanswered question stays expanded; a closed one collapses to its
+    summary line, so the rationale bullets stop competing for attention once
+    they are only history. `annotate_questions` swaps this header in place,
+    and because the replacement reproduces the same shape (marker included),
+    re-applying it is a no-op.
+    """
+    expanded = " open" if str(question.get("status") or "open") == "open" else ""
+    return (
+        f"<details{expanded}>\n"
+        f"<summary>{question_headline(question)}</summary>"
+    )
+
+
 def render_question(question: dict[str, Any]) -> str:
     text = public_text(question["question"], maximum=500)
     why = public_text(question["why_it_matters"], maximum=600)
     verify = public_text(question["verification"], maximum=600)
+    # Blank lines around the body: GitHub only renders Markdown inside
+    # <details> when it is separated from the surrounding HTML tags.
     return (
-        f"{question_headline(question)}\n"
+        f"{question_block_header(question)}\n"
+        f"\n"
         f"- {text}\n"
         f"- Why it matters: {why}\n"
-        f"- How to verify: {verify}"
+        f"- How to verify: {verify}\n"
+        f"\n"
+        f"</details>"
     )
 
 
@@ -1734,6 +1755,9 @@ def compile_review(
             "question_id": item_id,
             "review_id": item["review_id"],
             "headline": question_headline({**item, "question_id": item_id}),
+            "block_header": question_block_header(
+                {**item, "question_id": item_id}
+            ),
         }
         for item_id, item in sorted(question_state.items())
         if isinstance(item, dict)
@@ -2399,20 +2423,35 @@ def annotate_questions(
         updated = body
         outcomes: dict[str, str] = {}
         for annotation in items:
-            pattern = re.compile(
-                "^.*" + re.escape(question_marker(annotation["question_id"]))
-                + ".*$",
-                re.MULTILINE,
+            marker = re.escape(question_marker(annotation["question_id"]))
+            # Current shape first, then the pre-collapse single-line shape, so
+            # a question published by an older pipeline still gets annotated.
+            candidates = (
+                (
+                    re.compile(
+                        r"^<details[^>]*>\n<summary>.*" + marker
+                        + r".*</summary>$",
+                        re.MULTILINE,
+                    ),
+                    annotation.get("block_header") or annotation["headline"],
+                ),
+                (
+                    re.compile("^.*" + marker + ".*$", re.MULTILINE),
+                    annotation["headline"],
+                ),
             )
-            replaced, count = pattern.subn(
-                lambda _match, line=annotation["headline"]: line,
-                updated,
-            )
+            count = 0
+            for pattern, replacement in candidates:
+                replaced, count = pattern.subn(
+                    lambda _match, line=replacement: line,
+                    updated,
+                )
+                if count:
+                    updated = replaced
+                    break
             outcomes[annotation["question_id"]] = (
                 "applied" if count else "unavailable"
             )
-            if count:
-                updated = replaced
         if updated != body:
             try:
                 if before_write is not None:

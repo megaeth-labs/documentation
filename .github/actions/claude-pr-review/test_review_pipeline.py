@@ -1406,12 +1406,136 @@ class ReviewPipelineTests(unittest.TestCase):
                     "question_id": question_id_value,
                     "review_id": 42,
                     "headline": pipeline.question_headline(question),
+                    "block_header": pipeline.question_block_header(question),
                 }
             ],
         )
         self.assertIn(
             "✅ **Answered**",
             payload["question_annotations"][0]["headline"],
+        )
+        # Answered means collapsed: no `open` attribute on the details block.
+        self.assertTrue(
+            payload["question_annotations"][0]["block_header"].startswith(
+                "<details>"
+            )
+        )
+
+    def test_open_question_renders_expanded(self):
+        payload = pipeline.compile_review(review_input(), question_output())
+        body = payload["review_body"]
+
+        self.assertIn("<details open>", body)
+        self.assertIn("<summary>❓ **Open question", body)
+        self.assertIn("</details>", body)
+        self.assertNotIn("<details>", body)
+
+    @mock.patch.object(pipeline, "gh_json")
+    def test_answering_collapses_the_question_block(self, gh_mock):
+        value = review_input()
+        first = pipeline.compile_review(value, question_output())
+        question_id_value = next(iter(first["manifest"]["questions"]))
+        first["manifest"]["questions"][question_id_value]["review_id"] = 42
+        value["manifest"] = first["manifest"]
+        output = clean_output()
+        output["prior_questions"] = [
+            {
+                "question_id": question_id_value,
+                "disposition": "answered",
+                "reason": "Confirmed unique upstream.",
+            }
+        ]
+        payload = pipeline.compile_review(value, output)
+        gh_mock.side_effect = [{"body": first["review_body"]}, {"id": 42}]
+
+        pipeline.annotate_questions(payload, payload["manifest"])
+
+        written = gh_mock.call_args.kwargs["input_value"]["body"]
+        self.assertIn("<details>\n<summary>✅ **Answered**", written)
+        self.assertNotIn("<details open>", written)
+        # The original question survives collapsed, not deleted.
+        self.assertIn("- Can the upstream return duplicate records?", written)
+        self.assertIn("- Why it matters:", written)
+        self.assertEqual(
+            payload["manifest"]["questions"][question_id_value]["annotation"],
+            "applied",
+        )
+
+    @mock.patch.object(pipeline, "gh_json")
+    def test_collapse_annotation_is_idempotent(self, gh_mock):
+        value = review_input()
+        first = pipeline.compile_review(value, question_output())
+        question_id_value = next(iter(first["manifest"]["questions"]))
+        first["manifest"]["questions"][question_id_value]["review_id"] = 42
+        value["manifest"] = first["manifest"]
+        output = clean_output()
+        output["prior_questions"] = [
+            {
+                "question_id": question_id_value,
+                "disposition": "answered",
+                "reason": "Confirmed unique upstream.",
+            }
+        ]
+        payload = pipeline.compile_review(value, output)
+        gh_mock.side_effect = [{"body": first["review_body"]}, {"id": 42}]
+        pipeline.annotate_questions(payload, payload["manifest"])
+        once = gh_mock.call_args.kwargs["input_value"]["body"]
+
+        gh_mock.reset_mock()
+        gh_mock.side_effect = None
+        gh_mock.return_value = {"body": once}
+        payload["manifest"]["questions"][question_id_value]["annotation"] = (
+            "pending"
+        )
+        pipeline.annotate_questions(payload, payload["manifest"])
+
+        # Re-applying finds the same marker and produces identical text, so
+        # there is nothing to write.
+        self.assertEqual(gh_mock.call_count, 1)
+        self.assertEqual(
+            payload["manifest"]["questions"][question_id_value]["annotation"],
+            "applied",
+        )
+
+    @mock.patch.object(pipeline, "gh_json")
+    def test_legacy_single_line_question_still_annotates(self, gh_mock):
+        question_id_value = "Q-abc123"
+        marker = pipeline.question_marker(question_id_value)
+        legacy = (
+            f"❓ **Open question · Medium confidence** {marker}\n"
+            "- Can the upstream return duplicate records?"
+        )
+        gh_mock.side_effect = [{"body": legacy}, {"id": 42}]
+        payload = {
+            "repository": "megaeth-labs/example",
+            "pull_request": 7,
+            "question_annotations": [
+                {
+                    "question_id": question_id_value,
+                    "review_id": 42,
+                    "headline": f"✅ **Answered** — confirmed {marker}",
+                    "block_header": (
+                        f"<details>\n<summary>✅ **Answered** — confirmed "
+                        f"{marker}</summary>"
+                    ),
+                }
+            ],
+        }
+        manifest = {"questions": {question_id_value: {"annotation": "pending"}}}
+
+        pipeline.annotate_questions(payload, manifest)
+
+        written = gh_mock.call_args.kwargs["input_value"]["body"]
+        # Falls back to the single-line rewrite rather than injecting an
+        # unbalanced <details> into a body that has no closing tag.
+        self.assertEqual(
+            written,
+            f"✅ **Answered** — confirmed {marker}\n"
+            "- Can the upstream return duplicate records?",
+        )
+        self.assertEqual(
+            manifest["questions"][question_id_value]["annotation"],
+            "applied",
         )
 
     def test_closed_question_without_a_review_stops_being_retried(self):
