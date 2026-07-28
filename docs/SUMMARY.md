@@ -99,5 +99,5 @@
 - [Stateless Validation](node/stateless-validation.md)
   - [Validator Architecture](node/validator-architecture.md)
   - [Get Block Witness](node/witness.md)
-- [Run a Full Node](node/full-node.md)
+- [Full Node](node/full-node.md)
 - [Debug Trace Server](node/debug-trace-server.md)

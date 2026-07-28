@@ -2,7 +2,7 @@
 description: Run a MegaETH full node — sync blocks and state from the sequencer stream and re-execute every block with the embedded stateless validator.
 ---
 
-# Run a full node
+# Full node
 
 A **full node** is a role of `mega-reth`, the MegaETH node client.
 Like a replica node, it syncs blocks and state from the sequencer stream and serves the full JSON-RPC surface.
