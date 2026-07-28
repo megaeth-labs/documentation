@@ -29,11 +29,9 @@ The roles available to external operators are:
 
 The flag defaults to `sequencer` — the block-producer role MegaETH itself operates — so a full node must pass `--node-type full-node` explicitly.
 
-`full-node` and `rpc-node` share the same sync path and data directory layout; the only difference is the embedded validator pipeline that produces attestations.
-Both types serve `mega_getValidatedChain`, but on an `rpc-node` it only reflects validated tips pushed by an upstream full node via `--validator.report-to` — that node validated nothing itself, and its `anchor` always reads `null`.
-An `rpc-node` accepts those pushes only when started with `--rpc.accept-validated-blocks` (env `MEGARETH_RPC_ACCEPT_VALIDATED_BLOCKS`, default `false`).
-The flag opens an unauthenticated write path — any client that can reach the RPC port can push validated tips — so enable it only on nodes whose RPC surface is private.
-To see where attestation actually starts, query the full node that produced the tips.
+`full-node` and `rpc-node` share the same sync path and data directory layout; the difference is the embedded validator pipeline.
+The validator produces no witnesses or SALT proofs — it consumes them: it re-executes each block against a witness whose IPA proof authenticates the replay inputs, and records the outcome as the node's validated range.
+The node serves that validated range via `mega_getValidatedChain` and, with `--validator.report-to`, pushes the validated tip to other nodes — see [Validator flags](#validator-flags).
 
 ## Prerequisites
 
@@ -48,7 +46,8 @@ A full node needs four inputs beyond the binary itself:
    The endpoint needs no other JSON-RPC method: the validator reads blocks and bytecode from the node's own database and fetches only witnesses remotely.
 
 Plan for a fast NVMe SSD, sized by how the node syncs — the two paths differ by an order of magnitude.
-A node bootstrapped at the tip (see [Initial sync](#initial-sync)) holds only the SALT state at its bootstrap block and everything after: budget at least 500 GB, and size the volume for months of growth rather than for the footprint just after bootstrap.
+A node bootstrapped at the tip (see [Initial sync](#initial-sync)) holds only the SALT state at its bootstrap block and everything after — roughly 5 GB right after bootstrap as of July 2026, which is all a short-lived test node needs.
+A long-running node should budget at least 500 GB and size the volume for months of growth rather than for the footprint just after bootstrap.
 A node that replays from genesis keeps the chain un-pruned, which on MegaETH Mainnet is roughly 3 TB as of July 2026 (Testnet is roughly 1.6 TB) — provision 4 TB.
 Budget for logs separately: they are written outside the data directory and rotate at `--log.file.max-size` × `--log.file.max-files`.
 Validation throughput scales with CPU cores; the validator defaults to one worker per two physical cores.
@@ -76,15 +75,16 @@ mega-reth node \
 
 - `--bootstrap-policy required` starts the node at the current chain tip: it fetches a snapshot of the SALT state from the trusted peers and syncs forward from there.
   The flag defaults to `never`, and a node started without it begins at block 1 and replays the entire chain — see [Initial sync](#initial-sync) for the trade-off.
-  Expect the first start to run for a while before blocks commit: the snapshot fetch and the CPU-bound trie rebuild both take time on Mainnet-sized state, and an interrupted bootstrap only resumes within 1,800 blocks of the tip — let it finish.
+  Expect the first start to run for a while before blocks commit: the snapshot fetch and the CPU-bound trie rebuild both take time on Mainnet-sized state.
 - `--disable-discovery` is recommended: MegaETH has no public discovery network, and all sync traffic flows through the trusted peers anyway.
 - `--max-load` caps how many downstream children this node serves in one streaming tree; it is required and has no default.
-- `--validator.rpc-urls` must be quoted when the URL carries query parameters — an unquoted `&` splits the command in the shell and the node starts with a truncated URL.
+- `--validator.rpc-urls` must be quoted when the URL carries query parameters, e.g. `--validator.rpc-urls 'https://<WITNESS_HOST>/rpc?key=<KEY>&sig=<SIGNATURE>'`.
+  Unquoted, the shell splits the command at the `&` and the node starts with the URL truncated to `https://<WITNESS_HOST>/rpc?key=<KEY>`.
 - `--metrics` binds the Prometheus endpoint; omit it to disable metrics.
 
 {% hint style="warning" %}
-`--bootstrap-policy required` needs an empty `--datadir`.
-Pointing it at a directory that already holds a chain synced from genesis exits with `Bootstrap is required, but the database is not empty`.
+`--bootstrap-policy required` triggers a bootstrap only on an empty `--datadir`; restarting a node whose bootstrap already finished is fine — the flag is then a no-op.
+The one case that fails is a data directory synced from genesis without a bootstrap: the node exits with `Bootstrap is required, but the database is not empty`.
 {% endhint %}
 
 To also serve JSON-RPC, add the standard server flags:
@@ -134,6 +134,7 @@ All flags shown above are operational, not persisted — re-supply them on every
 Keep `--bootstrap-policy required` in place.
 Once a bootstrap has finished the flag is a no-op on restart, and leaving it set means a data directory that is ever cleared bootstraps again instead of quietly replaying from genesis.
 An interrupted bootstrap resumes on the next start on its own, whatever the flag says.
+On a healthy restart the `Loaded local state` line reports `bootstrap_status=Finished(<BLOCK>)`, where `<BLOCK>` is the bootstrap base block.
 
 The validator resumes from its persisted cursor automatically; only pass `--validator.start-block` when you deliberately want to re-anchor (see [Validator pipeline](#validator-pipeline)).
 
@@ -346,8 +347,7 @@ Read the quantiles directly (`reth_megaeth_validator_block_validation_duration_s
 
 ## Deployment
 
-Run the node under a service manager in production.
-A minimal systemd setup:
+Run the node under a service manager in production, configured through an env file:
 
 ```ini
 # /etc/megaeth/full-node.env
@@ -363,29 +363,6 @@ MEGARETH_VALIDATOR_RPC_URLS=<WITNESS_RPC_URL>
 MEGARETH_METRICS=127.0.0.1:9001
 MEGARETH_LOG_FILE_DIRECTORY=/var/log/megaeth
 ```
-
-```ini
-# /etc/systemd/system/megaeth-full-node.service
-[Unit]
-Description=MegaETH full node
-After=network-online.target
-Wants=network-online.target
-
-[Service]
-User=megaeth
-EnvironmentFile=/etc/megaeth/full-node.env
-ExecStart=/usr/local/bin/mega-reth node
-Restart=on-failure
-RestartSec=5
-LimitNOFILE=1048576
-TimeoutStopSec=120
-
-[Install]
-WantedBy=multi-user.target
-```
-
-`TimeoutStopSec=120` matters: on shutdown the node flushes its databases, and a clean stop can take tens of seconds (5 s for ordinary tasks and 30 s total for critical tasks by default; `MEGARETH_CRITICAL_WAIT_SECS=N` replaces the critical budget with 5 s + N s).
-If you raise `MEGARETH_CRITICAL_WAIT_SECS`, raise `TimeoutStopSec` to stay above 5 s + N s — when the stop timeout expires first, systemd escalates to SIGKILL, the hard kill the backup rules below warn against.
 
 `MEGARETH_BOOTSTRAP_POLICY=required` belongs in the env file permanently.
 It applies only to an empty data directory and is ignored once the bootstrap has finished, so it costs nothing on restart and keeps a future re-sync from replaying the chain from genesis.
@@ -451,7 +428,7 @@ MEGARETH_LOG_FILE_MAX_FILES=50
 - `MEGARETH_RPC_GAS_CAP=18446744073709551615` (`u64::MAX`) removes the `eth_call`/`eth_estimateGas` gas cap (default 50,000,000) — usual for trace and simulation providers.
 - `MEGARETH_RPC_WS_PING_INTERVAL=0` disables server-side WebSocket pings, leaving connection liveness to the reverse proxy.
 - A node that answers queries about blocks and state from before its own start needs `MEGARETH_BOOTSTRAP_POLICY=never` and the full-replay disk budget from [Prerequisites](#prerequisites) instead of `required`.
-- Unlike a shell command line, an `EnvironmentFile` needs no quoting around a `MEGARETH_VALIDATOR_RPC_URLS` value that carries query parameters.
+- Unlike a shell command line, an env file needs no quoting around a `MEGARETH_VALIDATOR_RPC_URLS` value that carries query parameters.
 - `--rpc.max-subscriptions-per-connection` has no `MEGARETH_*` environment variable — pass it on the command line if the default of 1,024 needs changing.
 
 ## Data directory and maintenance
@@ -472,6 +449,8 @@ It is also bound to its chain: opening it with a different `--chain` fails at st
 ### Graceful shutdown and backups
 
 Stop the node with SIGTERM or SIGINT and wait for the process to exit before touching the data directory.
+A clean stop flushes the databases and can take tens of seconds: 5 s for ordinary tasks and 30 s total for critical tasks by default, and `MEGARETH_CRITICAL_WAIT_SECS=N` replaces the critical budget with 5 s + N s.
+If a service manager supervises the node, keep its stop timeout above that budget so it does not escalate to SIGKILL mid-flush.
 
 {% hint style="warning" %}
 Never SIGKILL the node or copy the data directory while it runs.
@@ -524,6 +503,10 @@ Preserve the logs around the halt and report the block number to the MegaETH tea
 Either witness fetches are stalling (witness endpoint slow, rate-limited, or persistently behind the local tip — consider raising `--validator.tip-buffer`) or validation is CPU-bound (raise `--validator.workers` up to the physical core count).
 The `validation_witness_verification_seconds`, `validation_block_replay_seconds`, and `validation_salt_update_seconds` quantiles break the per-block cost into fetch-verify, replay, and SALT stages; `block_validation_duration_seconds` is the total.
 
+**The log shows an occasional `Witness not found` error near the tip.**
+Normal: witness generation runs slightly behind the chain head, so a fetch can land before the witness exists — the validator backs off and retries, and `--validator.tip-buffer` sets how much headroom it leaves the generator.
+It needs attention only when the same blocks keep failing and the validation lag grows — the previous item.
+
 **A fallback counter climbs steadily.**
 Delta mode is degrading to the slower full path on most blocks.
 Validation results remain correct; expect reduced throughput.
@@ -537,8 +520,8 @@ Which counter is moving says why:
 Switching to `--validator.mode full` removes the fallback churn but not the underlying cost.
 
 **Startup fails with `Bootstrap is required, but the database is not empty`.**
-`--bootstrap-policy required` only works on an empty data directory.
-Either clear the data directory to bootstrap, or drop the flag to keep the existing database.
+`--bootstrap-policy required` can only start a bootstrap on an empty data directory, and this one already holds a chain synced from genesis.
+Either clear the data directory to bootstrap at the tip, or drop the flag to keep the existing full-history database.
 
 ## Related pages
 
