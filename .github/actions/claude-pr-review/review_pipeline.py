@@ -28,6 +28,11 @@ ROUND_MARKER_RE = re.compile(
     r"<!-- claude-review-round:v1 [A-Za-z0-9_-]+ -->"
 )
 INLINE_FALLBACK_MARKER = "<!-- claude-review-inline-fallback:v1 -->"
+QUESTION_MARKER_PREFIX = "<!-- claude-review-question:v1 "
+QUESTION_MARKER_RE = re.compile(
+    r"<!-- claude-review-question:v1 Q-[0-9a-f]+ -->"
+)
+QUESTION_DISPOSITIONS = {"open", "answered", "withdrawn"}
 CONVERSATION_MAX_ENTRIES = 120
 CONVERSATION_MAX_BODY_CHARS = 6_000
 CONVERSATION_MAX_TOTAL_BODY_CHARS = 96_000
@@ -410,6 +415,26 @@ def finding_id(finding: dict[str, Any]) -> str:
     return f"F-{hashlib.sha256(key.encode()).hexdigest()[:12]}"
 
 
+def question_id(question: dict[str, Any]) -> str:
+    key = normalize_key(sanitize_text(question.get("question"), maximum=500))
+    return f"Q-{hashlib.sha256(key.encode()).hexdigest()[:12]}"
+
+
+def question_marker(value: str) -> str:
+    return f"{QUESTION_MARKER_PREFIX}{value} -->"
+
+
+def question_link(payload: dict[str, Any], question: dict[str, Any]) -> str:
+    review_id = question.get("review_id")
+    if not review_id:
+        return ""
+    server = os.environ.get("GITHUB_SERVER_URL") or "https://github.com"
+    return (
+        f"{server.rstrip('/')}/{payload['repository']}/pull/"
+        f"{payload['pull_request']}#pullrequestreview-{review_id}"
+    )
+
+
 def parse_patch_lines(patch: str) -> set[int]:
     """Return RIGHT-side line numbers present in unified-diff hunks."""
     lines: set[int] = set()
@@ -532,6 +557,7 @@ def empty_manifest(
             "mode": None,
         },
         "findings": {},
+        "questions": {},
         "rounds": [],
     }
 
@@ -615,6 +641,7 @@ def conversation_body(value: Any) -> str:
     body = str(value or "")
     body = STATE_MARKER_RE.sub("", body)
     body = ROUND_MARKER_RE.sub("", body)
+    body = QUESTION_MARKER_RE.sub("", body)
     body = body.replace(INLINE_FALLBACK_MARKER, "")
     body = body.strip()
     if len(body) <= CONVERSATION_MAX_BODY_CHARS:
@@ -1295,7 +1322,16 @@ def validate_model_output(value: Any) -> dict[str, Any]:
             f"structured review output missing: {missing}",
             code="MODEL_OUTPUT_INVALID",
         )
-    for field in ("findings", "open_questions", "prior_findings"):
+    # An omitted disposition list means "nothing was assessed", which leaves
+    # every prior item open. Tolerating it keeps an older model response from
+    # failing the round outright.
+    value.setdefault("prior_questions", [])
+    for field in (
+        "findings",
+        "open_questions",
+        "prior_findings",
+        "prior_questions",
+    ):
         if not isinstance(value[field], list):
             raise PipelineError(
                 f"{field} must be an array",
@@ -1325,13 +1361,39 @@ def render_finding(finding: dict[str, Any]) -> str:
     )
 
 
+def question_headline(question: dict[str, Any]) -> str:
+    """Render the single line that carries a question's current status.
+
+    The line always ends with the question's marker, so `annotate_questions`
+    can find it in an already-published review body and rewrite it in place.
+    Rewriting produces this same shape, which makes the rewrite idempotent.
+    """
+    marker = question_marker(str(question["question_id"]))
+    status = str(question.get("status") or "open")
+    if status == "answered":
+        headline = "✅ **Answered**"
+        default_reason = "closed by later discussion"
+    elif status == "withdrawn":
+        headline = "🚫 **Withdrawn**"
+        default_reason = "no longer applicable"
+    else:
+        default_reason = ""
+        confidence = str(question.get("confidence") or "medium").capitalize()
+        headline = f"❓ **Open question · {confidence} confidence**"
+    # public_text collapses whitespace, which keeps the headline on one line —
+    # the invariant the in-place rewrite depends on.
+    reason = public_text(question.get("disposition_reason"), maximum=300)
+    if status != "open":
+        headline = f"{headline} — {reason or default_reason}"
+    return f"{headline} {marker}"
+
+
 def render_question(question: dict[str, Any]) -> str:
-    confidence = question["confidence"].capitalize()
     text = public_text(question["question"], maximum=500)
     why = public_text(question["why_it_matters"], maximum=600)
     verify = public_text(question["verification"], maximum=600)
     return (
-        f"❓ **Open question · {confidence} confidence**\n"
+        f"{question_headline(question)}\n"
         f"- {text}\n"
         f"- Why it matters: {why}\n"
         f"- How to verify: {verify}"
@@ -1368,6 +1430,15 @@ def compile_review(
                     "reason": "No changes were analyzed in skip mode.",
                 }
                 for item_id, item in manifest["findings"].items()
+                if isinstance(item, dict) and item.get("status") == "open"
+            ],
+            "prior_questions": [
+                {
+                    "question_id": item_id,
+                    "disposition": "open",
+                    "reason": "No changes were analyzed in skip mode.",
+                }
+                for item_id, item in manifest.get("questions", {}).items()
                 if isinstance(item, dict) and item.get("status") == "open"
             ],
         }
@@ -1543,6 +1614,56 @@ def compile_review(
     low = [f for f in findings if f["severity"] in {"minor", "nit"}][:5]
     findings = high + low
 
+    question_state = manifest.setdefault("questions", {})
+    open_question_ids = {
+        item_id
+        for item_id, item in question_state.items()
+        if isinstance(item, dict) and item.get("status") == "open"
+    }
+    returned_question_ids = [
+        str(item.get("question_id") or "")
+        for item in model_output["prior_questions"]
+        if isinstance(item, dict)
+    ]
+    if len(returned_question_ids) != len(set(returned_question_ids)):
+        raise PipelineError(
+            "prior_questions contains duplicate question IDs",
+            code="PRIOR_QUESTION_INVALID",
+        )
+    unknown_questions = sorted(set(returned_question_ids) - open_question_ids)
+    if unknown_questions:
+        raise PipelineError(
+            "prior_questions references questions that are not open "
+            f"(unknown={unknown_questions})",
+            code="PRIOR_QUESTION_INVALID",
+        )
+    for disposition in model_output["prior_questions"]:
+        if not isinstance(disposition, dict):
+            raise PipelineError(
+                "prior_questions contains a non-object",
+                code="PRIOR_QUESTION_INVALID",
+            )
+        item_id = str(disposition.get("question_id") or "")
+        item = question_state[item_id]
+        status = disposition.get("disposition")
+        if status not in QUESTION_DISPOSITIONS:
+            raise PipelineError(
+                f"prior_questions has invalid disposition for {item_id}",
+                code="PRIOR_QUESTION_INVALID",
+            )
+        item["status"] = status
+        item["last_checked_sha"] = head
+        if status != "open":
+            item["closed_sha"] = head
+            item["disposition_reason"] = public_text(
+                disposition.get("reason"),
+                maximum=300,
+            )
+            # A closed question is only annotated once its asking review is
+            # rewritten; `pending` keeps the retry alive across rounds.
+            if item.get("annotation") != "applied":
+                item["annotation"] = "pending"
+
     questions: list[dict[str, Any]] = []
     for index, raw in enumerate(model_output["open_questions"][:3]):
         if not isinstance(raw, dict):
@@ -1573,7 +1694,53 @@ def compile_review(
                 f"open question {index} is incomplete",
                 code="MODEL_OUTPUT_INVALID",
             )
+        question["question_id"] = question_id(question)
+        question["status"] = "open"
+        existing = question_state.get(question["question_id"])
+        if isinstance(existing, dict) and existing.get("status") == "open":
+            # Already asked and still unanswered. Re-asking would orphan the
+            # original, which is the copy the author is expected to answer.
+            existing["last_checked_sha"] = head
+            continue
         questions.append(question)
+
+    for question in questions:
+        question_state[question["question_id"]] = {
+            "question_id": question["question_id"],
+            "status": "open",
+            "question": question["question"],
+            "confidence": question["confidence"],
+            "review_id": None,
+            "asked_sha": head,
+            "last_checked_sha": head,
+            "closed_sha": None,
+            "disposition_reason": None,
+            "annotation": "none",
+        }
+
+    for item in question_state.values():
+        # A closed question whose asking review was never recorded has nothing
+        # to rewrite. Settle it so it stops being retried and pinned in state.
+        if (
+            isinstance(item, dict)
+            and item.get("status") in {"answered", "withdrawn"}
+            and item.get("annotation") == "pending"
+            and not item.get("review_id")
+        ):
+            item["annotation"] = "unavailable"
+
+    question_annotations = [
+        {
+            "question_id": item_id,
+            "review_id": item["review_id"],
+            "headline": question_headline({**item, "question_id": item_id}),
+        }
+        for item_id, item in sorted(question_state.items())
+        if isinstance(item, dict)
+        and item.get("status") in {"answered", "withdrawn"}
+        and item.get("review_id")
+        and item.get("annotation") == "pending"
+    ]
 
     for finding in findings:
         item_id = finding["finding_id"]
@@ -1686,25 +1853,12 @@ def compile_review(
         )
     if questions:
         sections.append(
-            "Open questions:\n"
+            "Open questions — answer them in a reply on this PR. Each one is "
+            "marked answered here once a later review round confirms the "
+            "answer, so this list stays current:\n"
             + "\n\n".join(render_question(question) for question in questions)
         )
     review_body = "\n\n".join(section for section in sections if section)
-
-    status_icon = "⚠️" if open_findings or findings else "✅"
-    status_title = (
-        f"{status_icon} {len(open_findings)} open finding(s)"
-        if open_findings
-        else f"{status_icon} Review clean"
-    )
-    status_body = (
-        "## Claude review status\n\n"
-        f"{status_title}\n\n"
-        f"Last reviewed: {scope_text}\n\n"
-        f"New this round: {len(findings)} · "
-        f"Resolved this round: {resolved_count} · "
-        f"Open questions: {len(questions)}"
-    )
 
     manifest["reviewer"] = {
         "pipeline_version": review_input["pipeline_version"],
@@ -1759,7 +1913,13 @@ def compile_review(
         "resolve_thread_ids": sorted(set(resolution_ids)),
         "should_submit_review": bool(findings or questions),
         "sticky_comment_id": review_input.get("sticky_comment_id"),
-        "status_body": status_body,
+        "question_annotations": question_annotations,
+        "status_summary": {
+            "scope_text": scope_text,
+            "new_findings": len(findings),
+            "resolved_findings": resolved_count,
+            "new_questions": len(questions),
+        },
         "manifest": manifest,
         "round": round_value,
         "verdict": round_value["result"],
@@ -2138,6 +2298,139 @@ def attach_published_threads(
     )
 
 
+def open_questions(manifest: dict[str, Any]) -> list[dict[str, Any]]:
+    return [
+        item
+        for _, item in sorted((manifest.get("questions") or {}).items())
+        if isinstance(item, dict) and item.get("status") == "open"
+    ]
+
+
+def render_status_body(
+    payload: dict[str, Any],
+    manifest: dict[str, Any],
+) -> str:
+    """Render the sticky status comment.
+
+    The comment is rewritten in place on every run, so it must say so: readers
+    who meet it mid-thread otherwise cannot tell whether it describes the
+    current head or the moment it first appeared.
+    """
+    summary = payload.get("status_summary") or {}
+    findings = (manifest.get("findings") or {}).values()
+    open_findings = [
+        item
+        for item in findings
+        if isinstance(item, dict) and item.get("status") == "open"
+    ]
+    pending_questions = open_questions(manifest)
+    if open_findings:
+        status_title = f"⚠️ {len(open_findings)} open finding(s)"
+        if pending_questions:
+            status_title += f" · {len(pending_questions)} open question(s)"
+    elif pending_questions:
+        status_title = f"❓ {len(pending_questions)} open question(s)"
+    else:
+        status_title = "✅ Review clean"
+    lines = [
+        "## Claude review status",
+        "",
+        "> **Living comment — rewritten in place.** The review workflow keeps"
+        " this single comment up to date instead of posting a new one each"
+        " round, so it always describes the latest reviewed commit and the"
+        " earlier text is intentionally gone. No reply is needed here; answer"
+        " findings and questions in the review threads it links to.",
+        "",
+        status_title,
+        "",
+        f"Last reviewed: {summary.get('scope_text', 'the current head')}"
+        f" · updated {utc_now()}",
+        "",
+        f"New this round: {summary.get('new_findings', 0)} finding(s),"
+        f" {summary.get('new_questions', 0)} question(s)"
+        f" · Resolved this round: {summary.get('resolved_findings', 0)}"
+        f" · Open questions: {len(pending_questions)}",
+    ]
+    if pending_questions:
+        lines.extend(["", "Open questions awaiting an answer:"])
+        for question in pending_questions:
+            link = question_link(payload, question)
+            suffix = f" ([asked here]({link}))" if link else ""
+            text = public_text(question.get("question"), maximum=300)
+            lines.append(f"- ❓ {text}{suffix}")
+    return "\n".join(lines)
+
+
+def annotate_questions(
+    payload: dict[str, Any],
+    manifest: dict[str, Any],
+    *,
+    before_write: Callable[[], None] | None = None,
+) -> None:
+    """Mark closed questions as such in the review body that asked them.
+
+    Editing a submitted review body rewrites the original text without creating
+    a new review or notification, so an answered question stops reading as
+    still open. Best effort: anything that fails stays `pending` and is retried
+    next round, and a rewrite reproduces the same marker line, so re-applying
+    is a no-op.
+    """
+    annotations = payload.get("question_annotations") or []
+    if not annotations:
+        return
+    questions = manifest.get("questions") or {}
+    grouped: dict[int, list[dict[str, Any]]] = {}
+    for annotation in annotations:
+        grouped.setdefault(int(annotation["review_id"]), []).append(annotation)
+
+    repository = payload["repository"]
+    pull_request = payload["pull_request"]
+    for review_id, items in sorted(grouped.items()):
+        endpoint = f"repos/{repository}/pulls/{pull_request}/reviews/{review_id}"
+        try:
+            if before_write is not None:
+                before_write()
+            review = gh_json(["api", endpoint])
+        except StaleReviewError:
+            raise
+        except PipelineError:
+            continue
+        body = str(review.get("body") or "")
+        updated = body
+        outcomes: dict[str, str] = {}
+        for annotation in items:
+            pattern = re.compile(
+                "^.*" + re.escape(question_marker(annotation["question_id"]))
+                + ".*$",
+                re.MULTILINE,
+            )
+            replaced, count = pattern.subn(
+                lambda _match, line=annotation["headline"]: line,
+                updated,
+            )
+            outcomes[annotation["question_id"]] = (
+                "applied" if count else "unavailable"
+            )
+            if count:
+                updated = replaced
+        if updated != body:
+            try:
+                if before_write is not None:
+                    before_write()
+                gh_json(
+                    ["api", endpoint, "--method", "PUT"],
+                    input_value={"body": updated},
+                )
+            except StaleReviewError:
+                raise
+            except PipelineError:
+                continue
+        for question_id_value, outcome in outcomes.items():
+            item = questions.get(question_id_value)
+            if isinstance(item, dict):
+                item["annotation"] = outcome
+
+
 def upsert_sticky(
     payload: dict[str, Any],
     manifest: dict[str, Any],
@@ -2145,7 +2438,7 @@ def upsert_sticky(
     before_write: Callable[[], None] | None = None,
 ) -> int:
     body = (
-        f"{payload['status_body']}\n\n"
+        f"{render_status_body(payload, manifest)}\n\n"
         f"{STATE_MARKER_PREFIX}{encode_state(manifest)} -->"
     )
     repository = payload["repository"]
@@ -2195,6 +2488,36 @@ def prune_manifest(manifest: dict[str, Any]) -> None:
         reverse=True,
     )
     manifest["findings"] = dict(open_items + resolved_items[:30])
+    questions = manifest.get("questions")
+    if isinstance(questions, dict):
+
+        def is_live(item: Any) -> bool:
+            # Keep every unanswered question, plus any closed one whose asking
+            # review has not been annotated yet, so the retry survives pruning.
+            return isinstance(item, dict) and (
+                item.get("status") == "open"
+                or item.get("annotation") == "pending"
+            )
+
+        live = [
+            (item_id, item)
+            for item_id, item in questions.items()
+            if is_live(item)
+        ]
+        settled = [
+            (item_id, item)
+            for item_id, item in questions.items()
+            if not is_live(item)
+        ]
+        settled.sort(
+            key=lambda pair: str(
+                pair[1].get("closed_sha") or ""
+                if isinstance(pair[1], dict)
+                else ""
+            ),
+            reverse=True,
+        )
+        manifest["questions"] = dict(live + settled[:20])
 
 
 def write_job_summary(body: str) -> None:
@@ -2432,6 +2755,20 @@ def publish(args: argparse.Namespace) -> None:
                 finding = manifest["findings"].get(published["finding_id"])
                 if isinstance(finding, dict):
                     finding["thread_required"] = False
+        if review_id is not None:
+            for item in (manifest.get("questions") or {}).values():
+                if (
+                    isinstance(item, dict)
+                    and item.get("status") == "open"
+                    and not item.get("review_id")
+                    and item.get("asked_sha") == payload["frozen_head"]
+                ):
+                    item["review_id"] = review_id
+        annotate_questions(
+            payload,
+            manifest,
+            before_write=require_frozen_pull,
+        )
         manifest["cursor"] = {
             "last_published_head": payload["frozen_head"],
             "base_branch_sha": payload["base_sha"],

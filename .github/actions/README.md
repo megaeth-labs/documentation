@@ -93,6 +93,18 @@ Useful uncertainty becomes an `Open question` with medium or low confidence and 
 verification request.
 Rejected candidates and an empty internal analysis remain invisible.
 
+Open questions have the same durable lifecycle as findings.
+Each one gets a stable ID and a hidden marker on its status line, and the manifest records
+which review asked it.
+A later round dispositions every open question as `open`, `answered`, or `withdrawn`, and the
+publisher edits the original review body in place so the question line reads
+`✅ **Answered**` or `🚫 **Withdrawn**` with a one-line reason.
+Editing a submitted review body creates no new review and no new notification, and rewriting
+reproduces the same marker line, so the update is idempotent and retried on the next round if
+GitHub rejects it.
+A question that is already open is never re-asked; the original stays the copy the author
+answers.
+
 ## Per-Repo Conventions
 
 The prompt-bearing actions instruct Claude to read and respect a consumer repo's own agent
@@ -105,8 +117,13 @@ small deltas that do not belong in a checked-in convention file.
 `**[Major]**`, `**[Minor]**`, or `**[Nit]**`).
 Clean reviews and re-reviews update the sticky status without creating another review
 notification.
-Rounds with findings or open questions submit one atomic review and update the same sticky
+Rounds with findings or new open questions submit one atomic review and update the same sticky
 status.
+The sticky status comment states up front that it is a living comment rewritten in place on
+every run, so a reader who meets it mid-thread can tell it describes the current head rather
+than the moment it first appeared.
+It carries the reviewed range, an update timestamp, this round's counts, and a roll-up of the
+questions still awaiting an answer with a link to the review that asked each one.
 When old automated review threads are addressed, the deterministic publisher resolves them
 without adding confirmation replies.
 A consumer repo's `REVIEW.md` may override or extend the semantic severity guidance.
