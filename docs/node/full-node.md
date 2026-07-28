@@ -76,6 +76,7 @@ mega-reth node \
 
 - `--bootstrap-policy required` starts the node at the current chain tip: it fetches a snapshot of the SALT state from the trusted peers and syncs forward from there.
   The flag defaults to `never`, and a node started without it begins at block 1 and replays the entire chain — see [Initial sync](#initial-sync) for the trade-off.
+  Expect the first start to run for a while before blocks commit: the snapshot fetch and the CPU-bound trie rebuild both take time on Mainnet-sized state, and an interrupted bootstrap only resumes within 1,800 blocks of the tip — let it finish.
 - `--disable-discovery` is recommended: MegaETH has no public discovery network, and all sync traffic flows through the trusted peers anyway.
 - `--max-load` caps how many downstream children this node serves in one streaming tree; it is required and has no default.
 - `--validator.rpc-urls` must be quoted when the URL carries query parameters — an unquoted `&` splits the command in the shell and the node starts with a truncated URL.
@@ -389,6 +390,69 @@ If you raise `MEGARETH_CRITICAL_WAIT_SECS`, raise `TimeoutStopSec` to stay above
 `MEGARETH_BOOTSTRAP_POLICY=required` belongs in the env file permanently.
 It applies only to an empty data directory and is ignored once the bootstrap has finished, so it costs nothing on restart and keeps a future re-sync from replaying the chain from genesis.
 Adding it to a data directory that was already synced from genesis is the one case that fails — see [Troubleshooting](#troubleshooting).
+
+### Serving JSON-RPC in production
+
+A full node that doubles as an RPC endpoint — the replica workload plus attestation — extends the env file with the server and capacity settings:
+
+```ini
+# Append to /etc/megaeth/full-node.env
+# JSON-RPC servers
+MEGARETH_HTTP=true
+MEGARETH_HTTP_ADDR=127.0.0.1
+MEGARETH_HTTP_PORT=8545
+MEGARETH_HTTP_API=eth,net,web3
+MEGARETH_HTTP_CORS_DOMAIN=*
+MEGARETH_HTTP_DISABLE_COMPRESSION=true
+MEGARETH_WS=true
+MEGARETH_WS_ADDR=127.0.0.1
+MEGARETH_WS_PORT=8546
+MEGARETH_WS_API=eth,net,web3
+MEGARETH_WS_ALLOWED_ORIGINS=*
+MEGARETH_RPC_WS_PING_INTERVAL=0
+MEGARETH_IPC_PATH=/var/lib/megaeth/full-node/reth.ipc
+# Engine API (used only when an external consensus client is attached)
+MEGARETH_AUTH_ADDR=127.0.0.1
+MEGARETH_AUTH_PORT=8551
+# RPC capacity
+MEGARETH_RPC_MAX_CONNECTIONS=50000
+MEGARETH_RPC_MAX_TRACING_REQUESTS=200
+MEGARETH_RPC_MAX_LOGS_PER_RESPONSE=50000
+MEGARETH_RPC_MAX_REQUEST_SIZE=150
+MEGARETH_RPC_MAX_RESPONSE_SIZE=1600
+MEGARETH_RPC_GAS_CAP=18446744073709551615
+MEGARETH_RPC_CACHE_MAX_BLOCKS=1000
+MEGARETH_RPC_ETH_PROOF_WINDOW=10000
+# Transaction pool (the *_MAX_SIZE values are megabytes)
+MEGARETH_TXPOOL_GAS_LIMIT=2000000000
+MEGARETH_TXPOOL_MAX_ACCOUNT_SLOTS=100
+MEGARETH_TXPOOL_PENDING_MAX_COUNT=200000
+MEGARETH_TXPOOL_PENDING_MAX_SIZE=55
+MEGARETH_TXPOOL_QUEUED_MAX_COUNT=500000
+MEGARETH_TXPOOL_QUEUED_MAX_SIZE=137
+MEGARETH_ROLLUP_DISABLE_TX_POOL_GOSSIP=true
+# Storage and pipeline (values shown are the current defaults)
+MEGARETH_PIPELINE_PENDING=16
+MEGARETH_BLOCKHASH_CACHE_WINDOW=256
+MEGARETH_CODE_CACHE_SIZE_MB=65536
+# P2P
+MEGARETH_MAX_INBOUND_PEERS=100
+# Logging
+MEGARETH_LOG_STDOUT_FORMAT=terminal
+MEGARETH_LOG_FILE_FILTER=debug
+MEGARETH_LOG_FILE_FORMAT=terminal
+MEGARETH_LOG_COLOR=never
+MEGARETH_LOG_FILE_MAX_SIZE=400
+MEGARETH_LOG_FILE_MAX_FILES=50
+```
+
+- Keep the servers on loopback behind a reverse proxy, and widen `MEGARETH_HTTP_API`/`MEGARETH_WS_API` beyond `eth,net,web3` only on private networks — the exposure warning in [Quick start](#quick-start) applies verbatim here.
+- `MEGARETH_RPC_MAX_REQUEST_SIZE`, `MEGARETH_RPC_MAX_RESPONSE_SIZE`, and the `MEGARETH_TXPOOL_*_MAX_SIZE` values are megabytes; raise the response cap when serving `debug_trace*` or large `eth_getLogs` responses.
+- `MEGARETH_RPC_GAS_CAP=18446744073709551615` (`u64::MAX`) removes the `eth_call`/`eth_estimateGas` gas cap (default 50,000,000) — usual for trace and simulation providers.
+- `MEGARETH_RPC_WS_PING_INTERVAL=0` disables server-side WebSocket pings, leaving connection liveness to the reverse proxy.
+- A node that answers queries about blocks and state from before its own start needs `MEGARETH_BOOTSTRAP_POLICY=never` and the full-replay disk budget from [Prerequisites](#prerequisites) instead of `required`.
+- Unlike a shell command line, an `EnvironmentFile` needs no quoting around a `MEGARETH_VALIDATOR_RPC_URLS` value that carries query parameters.
+- `--rpc.max-subscriptions-per-connection` has no `MEGARETH_*` environment variable — pass it on the command line if the default of 1,024 needs changing.
 
 ## Data directory and maintenance
 
