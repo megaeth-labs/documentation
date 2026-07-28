@@ -42,6 +42,7 @@ def review_input(*, mode: str = "full"):
         "commentable_lines": {"src/example.py": [10, 11, 12]},
         "sticky_comment_id": None,
         "publisher_login": "github-actions[bot]",
+        "thread_resolution_enabled": False,
         "pipeline_version": "sha256:pipeline",
         "rubric_version": "sha256:rubric",
     }
@@ -98,7 +99,28 @@ class ReviewPipelineTests(unittest.TestCase):
             "${{ inputs.github_identity_token != '' }}",
             action,
         )
+        self.assertIn(
+            '--resolve-threads "${{ inputs.github_identity_token != \'\' }}"',
+            action,
+        )
         self.assertNotIn("GH_TOKEN: ${{ steps.review", action)
+
+    def test_workflow_loads_actions_from_trusted_main(self):
+        workflow = (
+            Path(pipeline.__file__).parents[2] / "workflows" / "claude.yml"
+        ).read_text(encoding="utf-8")
+
+        self.assertIn(
+            "uses: megaeth-labs/documentation/"
+            ".github/actions/claude-pr-review@main",
+            workflow,
+        )
+        self.assertIn(
+            "uses: megaeth-labs/documentation/"
+            ".github/actions/claude-interactive@main",
+            workflow,
+        )
+        self.assertNotIn("uses: ./.github/actions/claude-", workflow)
 
     def test_output_schema_uses_action_compatible_dialect(self):
         schema_path = Path(pipeline.__file__).with_name(
@@ -419,12 +441,13 @@ class ReviewPipelineTests(unittest.TestCase):
         self.assertEqual(finding["thread_id"], "THREAD")
         self.assertEqual(finding["comment_id"], 99)
 
-    def test_unresolved_github_thread_reopens_manifest_finding(self):
+    def test_manually_reopened_github_thread_reopens_manifest_finding(self):
         manifest = review_input()["manifest"]
         manifest["findings"]["F-1"] = {
             "status": "resolved",
             "resolved_sha": "old",
             "thread_id": "THREAD",
+            "thread_resolution": "confirmed",
         }
         pipeline.sync_manifest_threads(
             manifest,
@@ -432,6 +455,49 @@ class ReviewPipelineTests(unittest.TestCase):
         )
         self.assertEqual(manifest["findings"]["F-1"]["status"], "open")
         self.assertIsNone(manifest["findings"]["F-1"]["resolved_sha"])
+        self.assertEqual(
+            manifest["findings"]["F-1"]["thread_resolution"],
+            "unresolved",
+        )
+
+    def test_skipped_github_resolution_does_not_reopen_finding(self):
+        manifest = review_input()["manifest"]
+        manifest["findings"]["F-1"] = {
+            "status": "resolved",
+            "resolved_sha": "old",
+            "thread_id": "THREAD",
+            "thread_resolution": "skipped",
+        }
+
+        pipeline.sync_manifest_threads(
+            manifest,
+            [{"id": "THREAD", "isResolved": False}],
+        )
+
+        self.assertEqual(manifest["findings"]["F-1"]["status"], "resolved")
+        self.assertEqual(
+            manifest["findings"]["F-1"]["thread_resolution"],
+            "skipped",
+        )
+
+    def test_legacy_resolved_finding_migrates_to_skipped_resolution(self):
+        manifest = review_input()["manifest"]
+        manifest["findings"]["F-1"] = {
+            "status": "resolved",
+            "resolved_sha": "old",
+            "thread_id": "THREAD",
+        }
+
+        pipeline.sync_manifest_threads(
+            manifest,
+            [{"id": "THREAD", "isResolved": False}],
+        )
+
+        self.assertEqual(manifest["findings"]["F-1"]["status"], "resolved")
+        self.assertEqual(
+            manifest["findings"]["F-1"]["thread_resolution"],
+            "skipped",
+        )
 
     def test_clean_incremental_review_is_compact(self):
         payload = pipeline.compile_review(
@@ -476,18 +542,36 @@ class ReviewPipelineTests(unittest.TestCase):
             payload["review_body"],
         )
 
-    def test_every_open_prior_finding_requires_a_disposition(self):
+    def test_omitted_prior_finding_remains_open(self):
         value = review_input()
         value["manifest"]["findings"]["F-existing"] = {
             "status": "open",
             "severity": "major",
             "thread_id": "THREAD",
         }
+        payload = pipeline.compile_review(value, clean_output())
+
+        self.assertEqual(
+            payload["manifest"]["findings"]["F-existing"]["status"],
+            "open",
+        )
+        self.assertEqual(payload["resolve_thread_ids"], [])
+
+    def test_unknown_prior_finding_still_fails(self):
+        output = clean_output()
+        output["prior_findings"] = [
+            {
+                "finding_id": "F-unknown",
+                "disposition": "open",
+                "reason": "The issue remains.",
+            }
+        ]
+
         with self.assertRaisesRegex(
             pipeline.PipelineError,
-            "disposition every open finding",
+            "not open",
         ):
-            pipeline.compile_review(value, clean_output())
+            pipeline.compile_review(review_input(), output)
 
     def test_skip_with_open_finding_preserves_manifest(self):
         value = review_input(mode="skip")
@@ -520,6 +604,7 @@ class ReviewPipelineTests(unittest.TestCase):
 
     def test_resolved_prior_finding_produces_thread_resolution(self):
         value = review_input()
+        value["thread_resolution_enabled"] = True
         value["manifest"]["findings"]["F-existing"] = {
             "status": "open",
             "severity": "major",
@@ -539,6 +624,52 @@ class ReviewPipelineTests(unittest.TestCase):
             payload["manifest"]["findings"]["F-existing"]["status"],
             "resolved",
         )
+        self.assertEqual(
+            payload["manifest"]["findings"]["F-existing"][
+                "thread_resolution"
+            ],
+            "pending",
+        )
+
+    def test_resolved_prior_finding_skips_thread_without_identity(self):
+        value = review_input()
+        value["manifest"]["findings"]["F-existing"] = {
+            "status": "open",
+            "severity": "major",
+            "thread_id": "THREAD",
+        }
+        output = clean_output()
+        output["prior_findings"] = [
+            {
+                "finding_id": "F-existing",
+                "disposition": "resolved",
+                "reason": "The retry now clears partial state.",
+            }
+        ]
+
+        payload = pipeline.compile_review(value, output)
+
+        self.assertEqual(payload["resolve_thread_ids"], [])
+        self.assertEqual(
+            payload["manifest"]["findings"]["F-existing"][
+                "thread_resolution"
+            ],
+            "skipped",
+        )
+
+    def test_capable_identity_resolves_skipped_thread_without_reopening(self):
+        value = review_input()
+        value["thread_resolution_enabled"] = True
+        value["manifest"]["findings"]["F-existing"] = {
+            "status": "resolved",
+            "severity": "major",
+            "thread_id": "THREAD",
+            "thread_resolution": "skipped",
+        }
+
+        payload = pipeline.compile_review(value, clean_output())
+
+        self.assertEqual(payload["resolve_thread_ids"], ["THREAD"])
 
     def test_inline_finding_cannot_resolve_without_thread_id(self):
         value = review_input()
@@ -586,6 +717,7 @@ class ReviewPipelineTests(unittest.TestCase):
 
     def test_resolved_prior_does_not_suppress_distinct_same_symbol_finding(self):
         value = review_input()
+        value["thread_resolution_enabled"] = True
         value["manifest"]["findings"]["F-existing"] = {
             "status": "open",
             "severity": "major",
