@@ -83,8 +83,6 @@ Managed providers may expose additional methods.
 | `trace_transaction`                       | Unavailable    | The public endpoint returns `-32601`.                                                           |
 | `web3_clientVersion`                      | Available      |                                                                                                 |
 
-## Method Reference
-
 ## State and simulation
 
 - [`eth_accounts`](./eth_accounts.md)

@@ -73,19 +73,32 @@ Capture date: July 24, 2026
 
 Outcome: success
 
+The gateway routes this method and `eth_sendRawTransactionSync` through the same handler, so their successful receipt responses have the same structure:
+
 ```json
 {
   "jsonrpc": "2.0",
   "id": 1,
   "result": {
-    "transactionHash": "0xf98a6b5de84ee59666d0ff3d8c361f308c3a22fc0bb94466810777d60a3ed7a7",
-    "blockNumber": "0x10",
-    "from": "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266",
-    "to": "0xa7b8c275b3dde39e69a5c0ffd9f34f974364941a",
-    "gasUsed": "0x5208",
+    "type": "0x0",
     "status": "0x1",
+    "transactionHash": "0x8d3b1e22e7a9026c8658b5d922293d59e4de7c3382bb832d6890e6ab23ad7ec7",
+    "transactionIndex": "0x5",
+    "blockHash": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "blockNumber": "0xe7133c",
+    "from": "0xcc4b43ab7230cc5913801a746c1834aa06c4e7e7",
+    "to": "0xcc4b43ab7230cc5913801a746c1834aa06c4e7e7",
+    "gasUsed": "0xea60",
+    "effectiveGasPrice": "0xf4240",
+    "cumulativeGasUsed": "0x143043",
+    "contractAddress": null,
     "logs": [],
-    "contractAddress": null
+    "l1GasPrice": "0x3216",
+    "l1GasUsed": "0x640",
+    "l1Fee": "0x6da0",
+    "l1BaseFeeScalar": "0x558",
+    "l1BlobBaseFee": "0x1",
+    "l1BlobBaseFeeScalar": "0x0"
   }
 }
 ```

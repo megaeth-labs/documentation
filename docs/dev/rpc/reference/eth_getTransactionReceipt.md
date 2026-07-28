@@ -96,6 +96,8 @@ Capture date: July 24, 2026
 
 Outcome: success
 
+The captured response below is abridged. Receipts also include the other fields documented in [Result](#result), including `transactionIndex`, `cumulativeGasUsed`, `logs`, and `logsBloom`.
+
 ```json
 {
   "jsonrpc": "2.0",

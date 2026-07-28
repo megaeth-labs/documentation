@@ -58,8 +58,20 @@ Reduce concurrency and query size before increasing retry frequency.
 
 ## Gateway caching
 
-The public gateway caches eligible read methods internally.
-Immutable block numbers and hashes can use longer-lived entries, while head-following reads use shorter policies or bypass the cache.
+The public gateway has several internal caches.
+Their eligibility and lifetime depend on the method and selector: immutable block numbers and hashes can use longer-lived entries, while head-following reads use shorter policies or bypass a cache layer.
+See each method's reference page for its method-specific behavior.
+
+The gateway's Workers read-cache layer is limited to:
+
+- `eth_getBlockByNumber`
+- `eth_getBlockReceipts`
+- `eth_getHeaderByNumber`
+- `web3_clientVersion`
+
+For the block-selecting methods in this layer, only an explicit historical block number, a block hash, or `earliest` is eligible.
+The `latest`, `pending`, `safe`, and `finalized` tags bypass this layer.
+Other gateway cache layers can still apply method-specific short-lived policies to head-following reads.
 
 Rate-limit accounting differs by request shape:
 
@@ -68,7 +80,7 @@ Rate-limit accounting differs by request shape:
 
 Every public response includes `Cache-Control: no-store` for downstream caches.
 This header does not disable the gateway's internal cache.
-`X-Workers-Cache-Status` indicates whether that internal cache returned the response.
+For methods eligible for the Workers read-cache layer, `X-Workers-Cache-Status` indicates whether that layer returned the response.
 
 The gateway does not expose a request header or parameter that bypasses its internal cache.
 
