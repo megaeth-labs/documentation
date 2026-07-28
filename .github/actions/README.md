@@ -96,12 +96,16 @@ Rejected candidates and an empty internal analysis remain invisible.
 Open questions have the same durable lifecycle as findings.
 Each one gets a stable ID and a hidden marker on its status line, and the manifest records
 which review asked it.
+Each question is published inside a `<details>` block that starts expanded.
 A later round dispositions every open question as `open`, `answered`, or `withdrawn`, and the
-publisher edits the original review body in place so the question line reads
-`✅ **Answered**` or `🚫 **Withdrawn**` with a one-line reason.
+publisher edits the original review body in place so the summary line reads
+`✅ **Answered**` or `🚫 **Withdrawn**` with a one-line reason, and the block collapses.
+The rationale bullets are kept rather than deleted, so an answered question stays one green
+line that expands to the original question, why it mattered, and how to verify it.
 Editing a submitted review body creates no new review and no new notification, and rewriting
-reproduces the same marker line, so the update is idempotent and retried on the next round if
-GitHub rejects it.
+reproduces the same header (marker included), so the update is idempotent and retried on the
+next round if GitHub rejects it.
+Questions published before the `<details>` shape existed fall back to a single-line rewrite.
 A question that is already open is never re-asked; the original stays the copy the author
 answers.
 
