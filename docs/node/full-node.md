@@ -68,7 +68,7 @@ mega-reth node \
   --disable-discovery \
   --bootstrap-policy required \
   --max-load 100 \
-  --validator.rpc-urls <WITNESS_RPC_URL> \
+  --validator.rpc-urls '<WITNESS_RPC_URL>' \
   --metrics 127.0.0.1:9001 \
   --log.file.directory <LOG_DIR>
 ```
@@ -87,7 +87,7 @@ mega-reth node \
 The one case that fails is a data directory synced from genesis without a bootstrap: the node exits with `Bootstrap is required, but the database is not empty`.
 {% endhint %}
 
-To also serve JSON-RPC, add the standard server flags:
+To also serve JSON-RPC, append the standard server flags (add a trailing `\` to the last line above first):
 
 ```bash
   --http --http.addr 127.0.0.1 --http.port 8545 \
@@ -98,9 +98,7 @@ To also serve JSON-RPC, add the standard server flags:
 The `mega_*` methods are not part of this selection — they are merged into every enabled transport regardless of `--http.api`, so `mega_getValidatedChain` works with the namespace set above.
 
 {% hint style="warning" %}
-Bind to `127.0.0.1` unless the node is deliberately a public RPC endpoint.
-Serving `0.0.0.0` with `admin`, `debug`, `trace`, or `txpool` enabled exposes `admin_addPeer` (unauthenticated peer manipulation), `debug_trace*` (unmetered remote CPU and memory), and `txpool_content` (pending-transaction leakage) to anyone who can reach the port.
-To serve traffic publicly, keep the node on loopback and put a reverse proxy in front of it that terminates TLS, rate-limits, and forwards only the namespaces you intend to expose.
+Bind to `127.0.0.1` unless the node is deliberately a public RPC endpoint — before exposing anything beyond loopback, see [Serving JSON-RPC in production](#serving-json-rpc-in-production).
 {% endhint %}
 
 On start, the node:
@@ -131,8 +129,7 @@ INFO validator: blocks validated and advanced from=... to=... count=...
 
 All flags shown above are operational, not persisted — re-supply them on every run.
 
-Keep `--bootstrap-policy required` in place.
-Once a bootstrap has finished the flag is a no-op on restart, and leaving it set means a data directory that is ever cleared bootstraps again instead of quietly replaying from genesis.
+Keep `--bootstrap-policy required` in place — a data directory that is ever cleared then bootstraps again instead of quietly replaying from genesis.
 An interrupted bootstrap resumes on the next start on its own, whatever the flag says.
 On a healthy restart the `Loaded local state` line reports `bootstrap_status=Finished(<BLOCK>)`, where `<BLOCK>` is the bootstrap base block.
 
@@ -142,15 +139,12 @@ The validator resumes from its persisted cursor automatically; only pass `--vali
 
 `--bootstrap-policy` selects how an empty data directory reaches the chain tip:
 
-- **`required`** — fetch a snapshot of the current SALT state from the trusted peers instead of replaying history, then sync blocks forward from there.
-  The node bootstraps at the tip its peers report at startup, so it is caught up and serving current state without replaying the chain.
+- **`required`** — fetch a snapshot of the current SALT state from the trusted peers at the tip they report, then sync forward from there — caught up and serving current state without replaying history.
   Bootstrap requires an empty data directory, and on a full node it does not complete until the node has also applied the next 256 blocks past that base block.
   A bootstrapped node cannot serve history from before its bootstrap block and cannot unwind below it.
-- **`never` (default)** — fetch and apply every historical block from the trusted peers, starting at genesis.
-  The node serves full chain history, but initial sync replays the entire chain.
+- **`never` (default)** — fetch and apply every historical block starting at genesis; the node serves full chain history at the cost of replaying the entire chain.
 
 Pass `required` unless the node has to answer queries about blocks and state that predate its own start.
-The flag defaults to `never`, so omitting it is what makes a fresh node start at block 1.
 
 Bootstrapped state is verified, not taken on trust: when the fetched buckets are complete the node rebuilds the SALT and withdrawal tries from scratch and compares the recomputed state root against the header's, failing the bootstrap on a mismatch.
 The rebuild is CPU-bound and can take a while on a large state.
@@ -193,7 +187,7 @@ Command-line flags take precedence over environment variables.
 
 ### Validator flags
 
-Only consulted when `--node-type full-node`; other node types ignore them.
+Only consulted when `--node-type full-node`.
 
 | Flag                                | Env variable                               | Default            | Description                                                                                                                                     |
 | ----------------------------------- | ------------------------------------------ | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -209,7 +203,7 @@ Only consulted when `--node-type full-node`; other node types ignore them.
 | `--validator.report-to`             | `MEGARETH_VALIDATOR_REPORT_TO`             | empty (disabled)   | RPC-node URLs that receive best-effort `mega_setValidatedBlocks` pushes of the validated tip. Targets must run `--rpc.accept-validated-blocks`. |
 
 {% hint style="info" %}
-When pointing `--validator.rpc-urls` at a rate-limited endpoint, lower `--validator.channel-capacity` to cap concurrent witness fetches — the default of two in-flight fetches per worker is tuned for a dedicated witness provider.
+When pointing `--validator.rpc-urls` at a rate-limited endpoint, lower `--validator.channel-capacity` to cap concurrent witness fetches — the default is tuned for a dedicated witness provider.
 {% endhint %}
 
 ### Logging flags
@@ -220,6 +214,7 @@ When pointing `--validator.rpc-urls` at a rate-limited endpoint, lower `--valida
 | `--log.stdout.format`  | `MEGARETH_LOG_STDOUT_FORMAT`  | `terminal`                     | Console format: `terminal`, `log-fmt`, or `json`.             |
 | `--log.file.directory` | `MEGARETH_LOG_FILE_DIRECTORY` | OS cache dir (`.../reth/logs`) | Directory for rotated log files; the chain ID is appended.    |
 | `--log.file.filter`    | `MEGARETH_LOG_FILE_FILTER`    | `debug`                        | Log filter for file output.                                   |
+| `--log.file.format`    | `MEGARETH_LOG_FILE_FORMAT`    | `terminal`                     | File log format: `terminal`, `log-fmt`, or `json`.            |
 | `--log.file.max-size`  | `MEGARETH_LOG_FILE_MAX_SIZE`  | `200`                          | Max log file size (MB) before rotation.                       |
 | `--log.file.max-files` | `MEGARETH_LOG_FILE_MAX_FILES` | `5`                            | Number of rotated log files to keep.                          |
 | `--color`              | `MEGARETH_LOG_COLOR`          | `always`                       | ANSI color: `always`, `auto`, or `never`.                     |
@@ -234,7 +229,7 @@ A validator failure never tears down the node — RPC and sync keep running.
 The anchor is the trusted block validation starts from; blocks are validated from `anchor + 1` onward.
 At startup the validator resolves it in this order:
 
-1. `--validator.start-block <BLOCK_HASH>` set — anchor at that block, overriding any persisted anchor and clearing the validated cursor.
+1. `--validator.start-block <BLOCK_HASH>` set — anchor at that block, overriding any persisted anchor.
    The node waits (bounded by `--validator.start-block-wait-secs`) for the hash to appear locally via state sync.
 2. Flag unset, persisted anchor exists — resume from the persisted cursor.
 3. Flag unset, fresh database — anchor at the last finalized block, or at the first synced canonical head if nothing is finalized yet.
@@ -244,7 +239,7 @@ The `validator: anchor resolved` log line reports the outcome: `action=Skip` (an
 
 {% hint style="warning" %}
 `--validator.start-block` takes a block **hash**, not a number, and re-anchoring clears the validated cursor — the range validated under the old anchor is no longer attested.
-Once the anchor is persisted, restarts with the same flag are skipped without rewriting it, but remove the flag anyway so a copied unit file or later restart does not silently pin validation to an old block.
+Once the anchor is persisted, restarts with the same flag are skipped without rewriting it, but remove the flag anyway so a copied env file or later restart does not silently pin validation to an old block.
 {% endhint %}
 
 ### Validation modes
@@ -255,20 +250,14 @@ Both modes IPA-verify the witness and re-execute the block with the `stateless-v
 - **`full`** — recompute the SALT trie root from the replay output and compare it with the header's state root.
   Slower, but independent of stored changesets and parent anchors.
 
-Delta mode never runs unanchored: a block falls back to `full` behavior for that block alone when either input is missing, and each cause has its own counter.
-
-| Missing input                                                    | Counter                                                |
-| ---------------------------------------------------------------- | ------------------------------------------------------ |
-| Stored changeset row                                             | `reth_megaeth_validator_changeset_fallback_full_total` |
-| Parent-anchor pair (reorg mid-fetch, or a pruned/bootstrap edge) | `reth_megaeth_validator_anchor_fallback_full_total`    |
-
+Delta mode never runs unanchored: a block falls back to `full` behavior for that block alone when either input is missing, and each cause has its own counter — `reth_megaeth_validator_changeset_fallback_full_total` for a missing changeset row, `reth_megaeth_validator_anchor_fallback_full_total` for a missing parent-anchor pair (reorg mid-fetch, or a pruned/bootstrap edge).
 Both are counted once per validated block, not per fetch attempt.
 Validation results are identical either way — only throughput differs.
 
 ### Mismatch handling
 
 A deterministic validation failure — a state-root, receipts-root, logs-bloom, or gas mismatch, or a changeset mismatch — halts the validation pipeline.
-The node logs `megaeth validator pipeline halted` at error level, sets the `reth_megaeth_validator_halted` gauge to 1, and keeps serving RPC and syncing.
+The node logs `megaeth validator pipeline halted` at error level and sets the `reth_megaeth_validator_halted` gauge to 1.
 The stalled validated height is the operator alert: it means the sequencer produced a block this node could not reproduce.
 
 On a reorg, the validator restarts from its persisted cursor — it does not search for the divergence point — and re-validates forward on the new canonical chain; `reth_megaeth_validator_reorg_resets_total` counts these events.
@@ -291,7 +280,7 @@ reth_megaeth_validator_cursor 6907396
 The difference is the validation lag in blocks.
 A small, stable lag is normal; a growing lag means validation cannot keep pace (see [Troubleshooting](#troubleshooting)).
 
-Full nodes also serve `mega_getValidatedChain`, which returns the anchor and the validated tip — available on any enabled transport, whatever `--http.api` selects:
+Full nodes also serve `mega_getValidatedChain`, which returns the anchor and the validated tip — available on any enabled transport, whatever `--http.api` selects; the call below assumes the `--http` server flags from [Quick start](#quick-start):
 
 ```bash
 curl -sX POST http://localhost:8545 \
@@ -332,8 +321,10 @@ Two more track the validated-block publisher:
 A peer that is reachable but refuses a report is not counted as a failure — only transport errors, timeouts, RPC-layer errors, and publish-client panics are.
 The `peer` label is the configured URL after `Url` normalization, so `http://rpc-a:8545` appears as `http://rpc-a:8545/` and Prometheus matchers must use the trailing-slash form.
 
+{% hint style="warning" %}
 The `_seconds` metrics are recorded as histograms internally but exported as Prometheus **summaries** — pre-computed quantile series plus `_sum` and `_count`, with no `_bucket` series.
 Read the quantiles directly (`reth_megaeth_validator_block_validation_duration_seconds{quantile="0.99"}`); `histogram_quantile()` returns nothing for them.
+{% endhint %}
 
 ### Key log lines
 
@@ -364,13 +355,12 @@ MEGARETH_METRICS=127.0.0.1:9001
 MEGARETH_LOG_FILE_DIRECTORY=/var/log/megaeth
 ```
 
-`MEGARETH_BOOTSTRAP_POLICY=required` belongs in the env file permanently.
-It applies only to an empty data directory and is ignored once the bootstrap has finished, so it costs nothing on restart and keeps a future re-sync from replaying the chain from genesis.
-Adding it to a data directory that was already synced from genesis is the one case that fails — see [Troubleshooting](#troubleshooting).
+`MEGARETH_BOOTSTRAP_POLICY=required` belongs in the env file permanently — it is a no-op once the bootstrap has finished (see [Subsequent runs](#subsequent-runs)), and it keeps a future re-sync from replaying the chain from genesis.
 
 ### Serving JSON-RPC in production
 
-A full node that doubles as an RPC endpoint — the replica workload plus attestation — extends the env file with the server and capacity settings:
+A full node that doubles as an RPC endpoint — the replica workload plus attestation — extends the env file with server and capacity settings.
+The block below is a typical configuration, not a requirement: every key is optional and falls back to its default when omitted, and the values are a starting point to adapt:
 
 ```ini
 # Append to /etc/megaeth/full-node.env
@@ -386,17 +376,19 @@ MEGARETH_WS_ADDR=127.0.0.1
 MEGARETH_WS_PORT=8546
 MEGARETH_WS_API=eth,net,web3
 MEGARETH_WS_ALLOWED_ORIGINS=*
+# 0 disables server-side WebSocket pings; the reverse proxy owns liveness
 MEGARETH_RPC_WS_PING_INTERVAL=0
 MEGARETH_IPC_PATH=/var/lib/megaeth/full-node/reth.ipc
 # Engine API (used only when an external consensus client is attached)
 MEGARETH_AUTH_ADDR=127.0.0.1
 MEGARETH_AUTH_PORT=8551
-# RPC capacity
+# RPC capacity (the *_SIZE values are megabytes)
 MEGARETH_RPC_MAX_CONNECTIONS=50000
 MEGARETH_RPC_MAX_TRACING_REQUESTS=200
 MEGARETH_RPC_MAX_LOGS_PER_RESPONSE=50000
 MEGARETH_RPC_MAX_REQUEST_SIZE=150
 MEGARETH_RPC_MAX_RESPONSE_SIZE=1600
+# u64::MAX removes the eth_call/eth_estimateGas gas cap (default 50,000,000)
 MEGARETH_RPC_GAS_CAP=18446744073709551615
 MEGARETH_RPC_CACHE_MAX_BLOCKS=1000
 MEGARETH_RPC_ETH_PROOF_WINDOW=10000
@@ -423,17 +415,19 @@ MEGARETH_LOG_FILE_MAX_SIZE=400
 MEGARETH_LOG_FILE_MAX_FILES=50
 ```
 
-- Keep the servers on loopback behind a reverse proxy, and widen `MEGARETH_HTTP_API`/`MEGARETH_WS_API` beyond `eth,net,web3` only on private networks — the exposure warning in [Quick start](#quick-start) applies verbatim here.
-- `MEGARETH_RPC_MAX_REQUEST_SIZE`, `MEGARETH_RPC_MAX_RESPONSE_SIZE`, and the `MEGARETH_TXPOOL_*_MAX_SIZE` values are megabytes; raise the response cap when serving `debug_trace*` or large `eth_getLogs` responses.
-- `MEGARETH_RPC_GAS_CAP=18446744073709551615` (`u64::MAX`) removes the `eth_call`/`eth_estimateGas` gas cap (default 50,000,000) — usual for trace and simulation providers.
-- `MEGARETH_RPC_WS_PING_INTERVAL=0` disables server-side WebSocket pings, leaving connection liveness to the reverse proxy.
+{% hint style="warning" %}
+Serving `0.0.0.0` with `admin`, `debug`, `trace`, or `txpool` enabled exposes `admin_addPeer` (unauthenticated peer manipulation), `debug_trace*` (unmetered remote CPU and memory), and `txpool_content` (pending-transaction leakage) to anyone who can reach the port.
+Keep the servers on loopback behind a reverse proxy that terminates TLS, rate-limits, and forwards only the namespaces you intend to expose; widen `MEGARETH_HTTP_API`/`MEGARETH_WS_API` beyond `eth,net,web3` only on private networks.
+{% endhint %}
+
+- Raise `MEGARETH_RPC_MAX_RESPONSE_SIZE` when serving `debug_trace*` or large `eth_getLogs` responses.
 - A node that answers queries about blocks and state from before its own start needs `MEGARETH_BOOTSTRAP_POLICY=never` and the full-replay disk budget from [Prerequisites](#prerequisites) instead of `required`.
 - Unlike a shell command line, an env file needs no quoting around a `MEGARETH_VALIDATOR_RPC_URLS` value that carries query parameters.
 - `--rpc.max-subscriptions-per-connection` has no `MEGARETH_*` environment variable — pass it on the command line if the default of 1,024 needs changing.
 
 ## Data directory and maintenance
 
-An explicitly passed `--datadir` is used as-is (the OS default adds a `<CHAIN_ID>/` level) and contains, among other entries:
+The data directory contains, among other entries:
 
 | Path               | Contents                                                                                                                      |
 | ------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
@@ -458,17 +452,17 @@ Never SIGKILL the node or copy the data directory while it runs.
 The node repairs an inconsistent directory in place on the next start, but a backup taken from a running or killed node bakes the inconsistency in.
 {% endhint %}
 
-To back up: stop the node, copy the data directory, and verify the copy:
+To back up: stop the node, copy the data directory, and verify the copy.
+Maintenance subcommands (`tables-height`, `db`) do not raise the process file-descriptor limit the way `node` does — raise it before running them against a large database:
 
 ```bash
+ulimit -n 1048576
 mega-reth tables-height \
   --datadir <DATA_DIR_COPY> \
   --chain <PATH_TO_GENESIS_JSON> \
   --node-type full-node
 # Expect: "tables height is consistent true at block height: <N>"
 ```
-
-Maintenance subcommands (`tables-height`, `db`) do not raise the process file-descriptor limit the way `node` does — raise it yourself (`ulimit -n 1048576`) before running them against a large database.
 
 ## Trust model
 
@@ -479,7 +473,7 @@ A full node removes the sequencer's execution from its trusted computing base in
 
 The witness endpoint does not need to be trusted for correctness: witness contents are cryptographically verified, so a faulty endpoint can only stall validation, not produce a false attestation.
 
-Like the standalone stateless validator, a full node validates the block sequence its peers feed it — it does not derive the canonical chain from L1, and it does not check consistency with the rollup batches posted to L1.
+Like the [standalone stateless validator](stateless-validation.md#trust-model), a full node validates the block sequence its peers feed it — it does not derive the canonical chain from L1, and it does not check consistency with the rollup batches posted to L1.
 Once syncing, a full node ignores the sequencer's `safe` and `finalized` markers in block metadata: those tags advance only when an external consensus client drives `engine_forkchoiceUpdated`.
 The exception is bootstrap — blocks applied by the bootstrapper persist the sequencer's markers, so a node that has bootstrapped starts its next run with `safe` and `finalized` seeded from the sequencer's view rather than from a consensus client.
 
