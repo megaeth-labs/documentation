@@ -58,14 +58,64 @@ LEGACY_REVIEWER_LOGINS = {
 }
 GITHUB_LINK_RETRY_ATTEMPTS = 5
 GITHUB_LINK_RETRY_DELAY_SECONDS = 1
+FAILURE_FILENAME = "failure.json"
+
+DEFAULT_REMEDIATIONS = {
+    "prepare": (
+        "Check GitHub authentication and the frozen PR base/head, then rerun "
+        "the workflow."
+    ),
+    "compose": (
+        "Check the configured model, review depth, and allowed tools, then "
+        "rerun the workflow."
+    ),
+    "review": (
+        "Inspect the Claude analysis step for authentication, timeout, or "
+        "service errors, then rerun the workflow."
+    ),
+    "review_retry": (
+        "Inspect both Claude analysis attempts for authentication, timeout, "
+        "or service errors, then rerun the workflow."
+    ),
+    "compile": (
+        "Inspect the structured review result and rerun the workflow after "
+        "correcting the reported contract violation."
+    ),
+    "publish": (
+        "Check the GitHub identity token permissions and confirm the PR head "
+        "did not change, then rerun the workflow."
+    ),
+    "report": "Inspect the failed step above for the original error.",
+}
 
 
 class PipelineError(RuntimeError):
     """A deterministic pipeline failure."""
 
+    def __init__(
+        self,
+        message: str,
+        *,
+        code: str | None = None,
+        remediation: str | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.code = code
+        self.remediation = remediation
+
 
 class StaleReviewError(PipelineError):
     """The pull request no longer matches the frozen review revision."""
+
+    def __init__(self, message: str) -> None:
+        super().__init__(
+            message,
+            code="STALE_HEAD",
+            remediation=(
+                "A new commit changed the frozen PR revision. Rerun the "
+                "review against the latest head."
+            ),
+        )
 
 
 def run(
@@ -83,7 +133,20 @@ def run(
     )
     if check and result.returncode != 0:
         detail = result.stderr.strip() or result.stdout.strip()
-        raise PipelineError(f"{' '.join(args)} failed: {detail}")
+        code = "GITHUB_API_FAILED" if args and args[0] == "gh" else None
+        command = " ".join(args)
+        if code:
+            command = " ".join(args[:3])
+        raise PipelineError(
+            f"{command} failed: {detail}",
+            code=code,
+            remediation=(
+                "Check GitHub authentication, API permissions, and service "
+                "availability, then rerun the workflow."
+                if code
+                else None
+            ),
+        )
     return result
 
 
@@ -127,7 +190,14 @@ def authenticated_login() -> str:
         (response or {}).get("data", {}).get("viewer", {}).get("login") or ""
     )
     if not login:
-        raise PipelineError("could not determine GitHub publisher identity")
+        raise PipelineError(
+            "could not determine GitHub publisher identity",
+            code="GITHUB_IDENTITY_FAILED",
+            remediation=(
+                "Verify the configured GitHub token is valid and can query the "
+                "GraphQL viewer identity."
+            ),
+        )
     return login
 
 
@@ -171,6 +241,120 @@ def sanitize_text(value: Any, *, maximum: int) -> str:
     text = " ".join(str(value or "").strip().split())
     text = text.replace("<!--", "").replace("-->", "")
     return text[:maximum].rstrip()
+
+
+def read_json_file(path: Path) -> dict[str, Any] | None:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    return value if isinstance(value, dict) else None
+
+
+def github_command_data(value: Any) -> str:
+    return (
+        str(value)
+        .replace("%", "%25")
+        .replace("\r", "%0D")
+        .replace("\n", "%0A")
+    )
+
+
+def github_command_property(value: Any) -> str:
+    return (
+        github_command_data(value)
+        .replace(":", "%3A")
+        .replace(",", "%2C")
+    )
+
+
+def diagnostic_for(
+    command: str,
+    error: Exception,
+    *,
+    state_dir: Path,
+) -> dict[str, Any]:
+    code = getattr(error, "code", None)
+    if not code:
+        if isinstance(error, json.JSONDecodeError):
+            code = (
+                "MODEL_OUTPUT_INVALID"
+                if command == "compile"
+                else "STATE_JSON_INVALID"
+            )
+        elif isinstance(error, OSError):
+            code = "PIPELINE_IO_FAILED"
+        else:
+            code = f"{command.upper()}_FAILED"
+    remediation = (
+        getattr(error, "remediation", None)
+        or DEFAULT_REMEDIATIONS.get(command)
+        or "Inspect the failed step and rerun the workflow."
+    )
+    diagnostic: dict[str, Any] = {
+        "schema_version": 1,
+        "status": "failed",
+        "phase": command,
+        "code": code,
+        "message": sanitize_text(error, maximum=1200),
+        "remediation": sanitize_text(remediation, maximum=600),
+    }
+    review_input = read_json_file(state_dir / "review-input.json")
+    if review_input:
+        scope = review_input.get("review_scope") or {}
+        pull = review_input.get("pull_request_data") or {}
+        diagnostic["context"] = {
+            "repository": review_input.get("repository"),
+            "pull_request": review_input.get("pull_request"),
+            "head": pull.get("head_sha") or scope.get("current_head"),
+            "mode": scope.get("mode"),
+            "thread_resolution": (
+                "enabled"
+                if review_input.get("thread_resolution_enabled")
+                else "disabled"
+            ),
+        }
+    return diagnostic
+
+
+def emit_error_annotation(diagnostic: dict[str, Any]) -> None:
+    title = (
+        f"Claude PR review {diagnostic['phase']} failed "
+        f"[{diagnostic['code']}]"
+    )
+    message = (
+        f"{diagnostic['message']} Next: {diagnostic['remediation']}"
+    )
+    print(
+        f"::error title={github_command_property(title)}::"
+        f"{github_command_data(message)}"
+    )
+
+
+def record_failure(
+    command: str,
+    error: Exception,
+    *,
+    state_dir: Path,
+    fallback_context: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    diagnostic = diagnostic_for(command, error, state_dir=state_dir)
+    if fallback_context and not diagnostic.get("context"):
+        diagnostic["context"] = {
+            key: value
+            for key, value in fallback_context.items()
+            if value not in {None, ""}
+        }
+    try:
+        state_dir.mkdir(parents=True, exist_ok=True)
+        (state_dir / FAILURE_FILENAME).write_text(
+            json.dumps(diagnostic, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
+    except OSError:
+        pass
+    emit_error_annotation(diagnostic)
+    return diagnostic
 
 
 def canonicalize_path(value: Any) -> str:
@@ -649,6 +833,7 @@ def prepare(args: argparse.Namespace) -> None:
     action_dir = Path(__file__).resolve().parent
     state_dir = Path(args.state_dir)
     state_dir.mkdir(parents=True, exist_ok=True)
+    (state_dir / FAILURE_FILENAME).unlink(missing_ok=True)
 
     pipeline_version = hash_files(
         [
@@ -893,7 +1078,10 @@ def prepare(args: argparse.Namespace) -> None:
 
 def validate_model_output(value: Any) -> dict[str, Any]:
     if not isinstance(value, dict):
-        raise PipelineError("structured review output must be an object")
+        raise PipelineError(
+            "structured review output must be an object",
+            code="MODEL_OUTPUT_INVALID",
+        )
     required = {
         "scope_summary",
         "findings",
@@ -902,10 +1090,16 @@ def validate_model_output(value: Any) -> dict[str, Any]:
     }
     if not required.issubset(value):
         missing = ", ".join(sorted(required - set(value)))
-        raise PipelineError(f"structured review output missing: {missing}")
+        raise PipelineError(
+            f"structured review output missing: {missing}",
+            code="MODEL_OUTPUT_INVALID",
+        )
     for field in ("findings", "open_questions", "prior_findings"):
         if not isinstance(value[field], list):
-            raise PipelineError(f"{field} must be an array")
+            raise PipelineError(
+                f"{field} must be an array",
+                code="MODEL_OUTPUT_INVALID",
+            )
     return value
 
 
@@ -989,12 +1183,16 @@ def compile_review(
         if isinstance(item, dict)
     ]
     if len(returned_prior_ids) != len(set(returned_prior_ids)):
-        raise PipelineError("prior_findings contains duplicate finding IDs")
+        raise PipelineError(
+            "prior_findings contains duplicate finding IDs",
+            code="PRIOR_FINDING_INVALID",
+        )
     unknown = sorted(set(returned_prior_ids) - expected_prior_ids)
     if unknown:
         raise PipelineError(
             "prior_findings references findings that are not open "
-            f"(unknown={unknown})"
+            f"(unknown={unknown})",
+            code="PRIOR_FINDING_INVALID",
         )
 
     scope_summary = public_text(
@@ -1012,15 +1210,22 @@ def compile_review(
     )
     for disposition in model_output["prior_findings"]:
         if not isinstance(disposition, dict):
-            raise PipelineError("prior_findings contains a non-object")
+            raise PipelineError(
+                "prior_findings contains a non-object",
+                code="PRIOR_FINDING_INVALID",
+            )
         item_id = str(disposition.get("finding_id") or "")
         item = manifest["findings"].get(item_id)
         if not isinstance(item, dict):
-            raise PipelineError(f"prior_findings references unknown ID: {item_id}")
+            raise PipelineError(
+                f"prior_findings references unknown ID: {item_id}",
+                code="PRIOR_FINDING_INVALID",
+            )
         status = disposition.get("disposition")
         if status not in {"open", "resolved"}:
             raise PipelineError(
-                f"prior_findings has invalid disposition for {item_id}"
+                f"prior_findings has invalid disposition for {item_id}",
+                code="PRIOR_FINDING_INVALID",
             )
         item["status"] = status
         item["last_checked_sha"] = head
@@ -1028,7 +1233,8 @@ def compile_review(
             if item.get("thread_required") and not item.get("thread_id"):
                 raise PipelineError(
                     f"cannot resolve inline finding {item_id} without "
-                    "a GitHub thread ID"
+                    "a GitHub thread ID",
+                    code="PRIOR_FINDING_INVALID",
                 )
             item["resolved_sha"] = head
             if item.get("thread_id"):
@@ -1058,7 +1264,10 @@ def compile_review(
     findings: list[dict[str, Any]] = []
     for index, raw in enumerate(model_output["findings"]):
         if not isinstance(raw, dict):
-            raise PipelineError(f"finding {index} is not an object")
+            raise PipelineError(
+                f"finding {index} is not an object",
+                code="FINDING_OUTPUT_INVALID",
+            )
         severity = str(raw.get("severity", "")).lower()
         confidence = str(raw.get("confidence", "")).lower()
         path = canonicalize_path(raw.get("path"))
@@ -1067,18 +1276,26 @@ def compile_review(
             or confidence != "high"
         ):
             raise PipelineError(
-                f"finding {index} has invalid severity or confidence"
+                f"finding {index} has invalid severity or confidence",
+                code="FINDING_OUTPUT_INVALID",
             )
         if path not in changed_paths:
             raise PipelineError(
-                f"finding {index} references unchanged path: {path!r}"
+                f"finding {index} references unchanged path: {path!r}",
+                code="FINDING_ANCHOR_INVALID",
             )
         try:
             line = int(raw["line"])
         except (KeyError, TypeError, ValueError):
-            raise PipelineError(f"finding {index} has an invalid line")
+            raise PipelineError(
+                f"finding {index} has an invalid line",
+                code="FINDING_ANCHOR_INVALID",
+            )
         if isinstance(raw.get("line"), bool) or line < 1:
-            raise PipelineError(f"finding {index} has an invalid line")
+            raise PipelineError(
+                f"finding {index} has an invalid line",
+                code="FINDING_ANCHOR_INVALID",
+            )
         finding = {
             "title": public_text(raw.get("title"), maximum=160),
             "path": path,
@@ -1101,7 +1318,10 @@ def compile_review(
             finding[field]
             for field in ("title", "path", "root_cause", "impact", "suggested_fix")
         ):
-            raise PipelineError(f"finding {index} is missing required text")
+            raise PipelineError(
+                f"finding {index} is missing required text",
+                code="FINDING_OUTPUT_INVALID",
+            )
         prior_finding_id = raw.get("prior_finding_id")
         if (
             prior_finding_id
@@ -1125,11 +1345,15 @@ def compile_review(
     questions: list[dict[str, Any]] = []
     for index, raw in enumerate(model_output["open_questions"][:3]):
         if not isinstance(raw, dict):
-            raise PipelineError(f"open question {index} is not an object")
+            raise PipelineError(
+                f"open question {index} is not an object",
+                code="MODEL_OUTPUT_INVALID",
+            )
         confidence = str(raw.get("confidence", "")).lower()
         if confidence not in QUESTION_CONFIDENCE:
             raise PipelineError(
-                f"open question {index} has invalid confidence"
+                f"open question {index} has invalid confidence",
+                code="MODEL_OUTPUT_INVALID",
             )
         question = {
             "question": public_text(raw.get("question"), maximum=500),
@@ -1144,7 +1368,10 @@ def compile_review(
             ),
         }
         if not all(question.values()):
-            raise PipelineError(f"open question {index} is incomplete")
+            raise PipelineError(
+                f"open question {index} is incomplete",
+                code="MODEL_OUTPUT_INVALID",
+            )
         questions.append(question)
 
     for finding in findings:
@@ -1348,8 +1575,21 @@ def compile_command(args: argparse.Namespace) -> None:
     else:
         raw = os.environ.get("REVIEW_STRUCTURED_OUTPUT", "")
         if not raw:
-            raise PipelineError("Claude returned no structured review output")
-        model_output = json.loads(raw)
+            raise PipelineError(
+                "Claude returned no structured review output",
+                code="MODEL_NO_OUTPUT",
+                remediation=(
+                    "Rerun the workflow. If this repeats, inspect the model "
+                    "analysis step for timeout or authentication failures."
+                ),
+            )
+        try:
+            model_output = json.loads(raw)
+        except json.JSONDecodeError as error:
+            raise PipelineError(
+                "Claude returned malformed structured review JSON",
+                code="MODEL_OUTPUT_INVALID",
+            ) from error
     payload = compile_review(review_input, model_output)
     (state_dir / "review-payload.json").write_text(
         json.dumps(payload, indent=2, sort_keys=True) + "\n",
@@ -1613,7 +1853,12 @@ mutation($threadId:ID!) {
             or thread.get("isResolved") is not True
         ):
             raise PipelineError(
-                f"GitHub did not confirm resolution of review thread {thread_id}"
+                f"GitHub did not confirm resolution of review thread {thread_id}",
+                code="THREAD_RESOLUTION_FAILED",
+                remediation=(
+                    "Verify the configured GitHub identity can resolve pull "
+                    "request review threads, then rerun the workflow."
+                ),
             )
         resolved.add(thread_id)
     return resolved
@@ -1683,7 +1928,12 @@ def attach_published_threads(
             time.sleep(GITHUB_LINK_RETRY_DELAY_SECONDS)
     raise PipelineError(
         "could not associate published inline findings with GitHub threads: "
-        + ", ".join(missing)
+        + ", ".join(missing),
+        code="THREAD_ASSOCIATION_FAILED",
+        remediation=(
+            "Rerun the workflow. If this repeats, inspect the submitted review "
+            "and GitHub review-thread API responses."
+        ),
     )
 
 
@@ -1746,25 +1996,176 @@ def prune_manifest(manifest: dict[str, Any]) -> None:
     manifest["findings"] = dict(open_items + resolved_items[:30])
 
 
-def write_step_summary(payload: dict[str, Any], *, stale: bool = False) -> None:
+def write_job_summary(body: str) -> None:
     summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
     if not summary_path:
         return
-    if stale:
-        body = (
-            "## Claude PR review\n\n"
-            "Review output was discarded because the pull request head changed "
-            "during analysis.\n"
-        )
-    else:
-        body = (
-            "## Claude PR review\n\n"
-            f"- Verdict: `{payload['verdict']}`\n"
-            f"- Mode: `{payload['mode']}`\n"
-            f"- Head: `{payload['frozen_head']}`\n"
-        )
     with Path(summary_path).open("a", encoding="utf-8") as summary:
-        summary.write(body)
+        summary.write(body.rstrip() + "\n")
+
+
+def step_outcomes() -> dict[str, str]:
+    return {
+        phase: os.environ.get(f"{phase.upper()}_OUTCOME", "")
+        for phase in (
+            "prepare",
+            "compose",
+            "review",
+            "review_retry",
+            "compile",
+            "publish",
+        )
+    }
+
+
+def inferred_action_failure(
+    outcomes: dict[str, str],
+    *,
+    state_dir: Path,
+) -> dict[str, Any] | None:
+    candidates = (
+        (
+            "prepare",
+            "PREPARE_ACTION_FAILED",
+            "The review preparation action failed before producing diagnostics.",
+        ),
+        (
+            "compose",
+            "ANALYSIS_SETUP_FAILED",
+            "The review analysis setup step failed.",
+        ),
+        (
+            "review_retry",
+            "MODEL_ACTION_FAILED",
+            "The Claude review retry action failed.",
+        ),
+        (
+            "compile",
+            "COMPILE_ACTION_FAILED",
+            "The review compiler step failed before producing diagnostics.",
+        ),
+        (
+            "publish",
+            "PUBLISH_ACTION_FAILED",
+            "The review publisher step failed before producing diagnostics.",
+        ),
+    )
+    for phase, code, message in candidates:
+        if outcomes.get(phase) == "failure":
+            return diagnostic_for(
+                phase,
+                PipelineError(message, code=code),
+                state_dir=state_dir,
+            )
+    if (
+        outcomes.get("review") == "failure"
+        and outcomes.get("review_retry") != "success"
+    ):
+        return diagnostic_for(
+            "review",
+            PipelineError(
+                "The Claude review action failed and no retry completed.",
+                code="MODEL_ACTION_FAILED",
+                remediation=(
+                    "Inspect the Claude analysis step for authentication, "
+                    "timeout, or service errors, then rerun the workflow."
+                ),
+            ),
+            state_dir=state_dir,
+        )
+    return None
+
+
+def render_outcomes(outcomes: dict[str, str]) -> str:
+    rows = [
+        f"- `{phase}`: `{outcome}`"
+        for phase, outcome in outcomes.items()
+        if outcome
+    ]
+    return "\n".join(rows)
+
+
+def report(args: argparse.Namespace) -> None:
+    state_dir = Path(args.state_dir)
+    outcomes = step_outcomes()
+    diagnostic = read_json_file(state_dir / FAILURE_FILENAME)
+    if diagnostic is None:
+        diagnostic = inferred_action_failure(outcomes, state_dir=state_dir)
+        if diagnostic is not None:
+            emit_error_annotation(diagnostic)
+
+    if diagnostic is not None:
+        context = diagnostic.get("context") or {}
+        context_lines = []
+        if context.get("head"):
+            context_lines.append(f"- **Head:** `{context['head']}`")
+        if context.get("mode"):
+            context_lines.append(f"- **Mode:** `{context['mode']}`")
+        if context.get("thread_resolution"):
+            context_lines.append(
+                "- **Thread resolution:** "
+                f"`{context['thread_resolution']}`"
+            )
+        outcomes_text = render_outcomes(outcomes)
+        details = (
+            "\n\n<details>\n<summary>Step outcomes</summary>\n\n"
+            f"{outcomes_text}\n\n</details>"
+            if outcomes_text
+            else ""
+        )
+        body = (
+            "## Claude PR review failed\n\n"
+            f"**`{diagnostic['code']}` · phase "
+            f"`{diagnostic['phase']}`**\n\n"
+            f"- **Cause:** {diagnostic['message']}\n"
+            f"- **Next action:** {diagnostic['remediation']}\n"
+            + ("\n".join(context_lines) + "\n" if context_lines else "")
+            + details
+        )
+        write_job_summary(body)
+        print(
+            "Claude PR review: FAILED "
+            f"[{diagnostic['code']}] phase={diagnostic['phase']}: "
+            f"{diagnostic['message']}"
+        )
+        return
+
+    review_input = read_json_file(state_dir / "review-input.json") or {}
+    payload = read_json_file(state_dir / "review-payload.json") or {}
+    scope = review_input.get("review_scope") or {}
+    mode = payload.get("mode") or scope.get("mode") or "unknown"
+    head = (
+        payload.get("frozen_head")
+        or (review_input.get("pull_request_data") or {}).get("head_sha")
+        or scope.get("current_head")
+        or "unknown"
+    )
+    verdict = payload.get("verdict") or "unknown"
+    stale = os.environ.get("PUBLISH_STALE", "") == "true"
+    published = os.environ.get("PUBLISH_PUBLISHED", "") == "true"
+    retry_used = outcomes.get("review_retry") not in {"", "skipped"}
+    if stale:
+        status = "⚠️ Review output was discarded because the PR head changed."
+    elif mode == "skip":
+        status = "⏭️ The current PR head was already reviewed."
+    elif published:
+        status = "✅ Review completed and publication succeeded."
+    else:
+        status = "✅ Review completed."
+    body = (
+        "## Claude PR review\n\n"
+        f"{status}\n\n"
+        f"- **Verdict:** `{verdict}`\n"
+        f"- **Mode:** `{mode}`\n"
+        f"- **Head:** `{head}`\n"
+        "- **Thread resolution:** "
+        f"`{'enabled' if review_input.get('thread_resolution_enabled') else 'disabled'}`\n"
+        f"- **Model retry used:** `{'yes' if retry_used else 'no'}`\n"
+    )
+    write_job_summary(body)
+    print(
+        f"Claude PR review: OK verdict={verdict} mode={mode} head={head}"
+    )
 
 
 def publish(args: argparse.Namespace) -> None:
@@ -1772,7 +2173,6 @@ def publish(args: argparse.Namespace) -> None:
     payload_path = state_dir / "review-payload.json"
     payload = json.loads(payload_path.read_text(encoding="utf-8"))
     if payload["mode"] == "skip":
-        write_step_summary(payload)
         write_github_output({"published": "false", "stale": "false"})
         return
 
@@ -1794,7 +2194,6 @@ def publish(args: argparse.Namespace) -> None:
     try:
         require_frozen_pull()
     except StaleReviewError:
-        write_step_summary(payload, stale=True)
         write_github_output({"published": "false", "stale": "true"})
         return
 
@@ -1856,7 +2255,6 @@ def publish(args: argparse.Namespace) -> None:
             before_write=require_frozen_pull,
         )
     except StaleReviewError:
-        write_step_summary(payload, stale=True)
         write_github_output({"published": "false", "stale": "true"})
         return
 
@@ -1869,7 +2267,6 @@ def publish(args: argparse.Namespace) -> None:
         json.dumps(result, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
-    write_step_summary(payload)
     write_github_output(
         {
             "published": "true",
@@ -1913,6 +2310,10 @@ def parser() -> argparse.ArgumentParser:
     publish_parser = subparsers.add_parser("publish")
     publish_parser.add_argument("--state-dir", required=True)
     publish_parser.set_defaults(func=publish)
+
+    report_parser = subparsers.add_parser("report")
+    report_parser.add_argument("--state-dir", required=True)
+    report_parser.set_defaults(func=report)
     return value
 
 
@@ -1921,7 +2322,28 @@ def main() -> int:
     try:
         args.func(args)
     except (PipelineError, json.JSONDecodeError, OSError) as error:
-        print(f"ERROR: {error}", file=sys.stderr)
+        state_dir = Path(getattr(args, "state_dir", ".pr-review"))
+        fallback_context = {
+            "repository": getattr(args, "repository", None),
+            "pull_request": getattr(args, "pull_request", None),
+            "head": getattr(args, "event_head", None),
+            "thread_resolution": (
+                "enabled"
+                if getattr(args, "resolve_threads", "false") == "true"
+                else "disabled"
+            ),
+        }
+        diagnostic = record_failure(
+            str(args.command),
+            error,
+            state_dir=state_dir,
+            fallback_context=fallback_context,
+        )
+        print(
+            f"ERROR [{diagnostic['code']}] "
+            f"{diagnostic['phase']}: {diagnostic['message']}",
+            file=sys.stderr,
+        )
         return 1
     return 0
 
