@@ -24,7 +24,13 @@ STATE_MARKER_PREFIX = "<!-- claude-review-state:v1 "
 STATE_MARKER_RE = re.compile(
     r"<!-- claude-review-state:v1 ([A-Za-z0-9_-]+) -->"
 )
+ROUND_MARKER_RE = re.compile(
+    r"<!-- claude-review-round:v1 [A-Za-z0-9_-]+ -->"
+)
 INLINE_FALLBACK_MARKER = "<!-- claude-review-inline-fallback:v1 -->"
+CONVERSATION_MAX_ENTRIES = 120
+CONVERSATION_MAX_BODY_CHARS = 6_000
+CONVERSATION_MAX_TOTAL_BODY_CHARS = 96_000
 SEVERITIES = {"critical", "major", "minor", "nit"}
 QUESTION_CONFIDENCE = {"medium", "low"}
 INTERNAL_TERMS_RE = re.compile(
@@ -604,6 +610,187 @@ def load_review_state(
     return None
 
 
+def conversation_body(value: Any) -> str:
+    """Return visible discussion text without private pipeline markers."""
+    body = str(value or "")
+    body = STATE_MARKER_RE.sub("", body)
+    body = ROUND_MARKER_RE.sub("", body)
+    body = body.replace(INLINE_FALLBACK_MARKER, "")
+    body = body.strip()
+    if len(body) <= CONVERSATION_MAX_BODY_CHARS:
+        return body
+    suffix = "\n\n[conversation entry truncated]"
+    return body[: CONVERSATION_MAX_BODY_CHARS - len(suffix)].rstrip() + suffix
+
+
+def conversation_context(
+    comments: list[dict[str, Any]],
+    reviews: list[dict[str, Any]],
+    review_comments: list[dict[str, Any]],
+    threads: list[dict[str, Any]],
+    *,
+    repository: str,
+    pull_request: int,
+    previous_reviewed_at: str | None,
+    publisher_login: str | None = None,
+) -> dict[str, Any]:
+    """Build a bounded, chronological view of PR discussion for the reviewer."""
+    timeline: list[dict[str, Any]] = []
+    previous_automated_review: dict[str, Any] | None = None
+    stateful_review_ids: set[int] = set()
+
+    for comment in comments:
+        author = (comment.get("user") or {}).get("login")
+        body = str(comment.get("body") or "")
+        if (
+            is_bot_login(author, publisher_login=publisher_login)
+            and decode_state(body) is not None
+        ):
+            # The sticky status comment is pipeline state, not PR discussion.
+            continue
+        visible_body = conversation_body(body)
+        if not visible_body:
+            continue
+        timeline.append(
+            {
+                "source": "issue_comment",
+                "id": comment.get("id"),
+                "author": author,
+                "author_association": comment.get("author_association"),
+                "created_at": comment.get("created_at"),
+                "updated_at": comment.get("updated_at"),
+                "url": comment.get("html_url"),
+                "body": visible_body,
+            }
+        )
+
+    for review in reviews:
+        author = (review.get("user") or {}).get("login")
+        body = str(review.get("body") or "")
+        stateful = is_stateful_review(
+            author,
+            body,
+            publisher_login=publisher_login,
+        )
+        if stateful and review.get("id"):
+            stateful_review_ids.add(int(review["id"]))
+        visible_body = conversation_body(body)
+        if not visible_body:
+            continue
+        entry = {
+            "source": "review",
+            "id": review.get("id"),
+            "author": author,
+            "author_association": review.get("author_association"),
+            "created_at": review.get("submitted_at"),
+            "updated_at": review.get("submitted_at"),
+            "url": review.get("html_url"),
+            "state": review.get("state"),
+            "commit_id": review.get("commit_id"),
+            "body": visible_body,
+        }
+        if stateful:
+            # Keep exactly the latest automated review visible so its open
+            # questions can be reconciled without replaying every bot round.
+            previous_automated_review = entry
+        else:
+            timeline.append(entry)
+
+    thread_metadata: dict[int, dict[str, Any]] = {}
+    owned_comment_ids: set[int] = set()
+    for thread in threads:
+        for comment in (thread.get("comments") or {}).get("nodes") or []:
+            comment_id = int(comment.get("databaseId") or 0)
+            if comment_id:
+                thread_metadata[comment_id] = {
+                    "thread_id": thread.get("id"),
+                    "thread_resolved": bool(thread.get("isResolved")),
+                    "thread_outdated": bool(thread.get("isOutdated")),
+                }
+            if is_owned_review_comment(
+                comment,
+                repository=repository,
+                pull_request=pull_request,
+                publisher_login=publisher_login,
+            ):
+                owned_comment_ids.add(comment_id)
+
+    for comment in review_comments:
+        comment_id = int(comment.get("id") or 0)
+        review_id = int(comment.get("pull_request_review_id") or 0)
+        parent_id = int(comment.get("in_reply_to_id") or 0)
+        author = (comment.get("user") or {}).get("login")
+        if comment_id in owned_comment_ids or (
+            is_bot_login(author, publisher_login=publisher_login)
+            and review_id in stateful_review_ids
+        ):
+            # Automated findings already exist in the manifest and raw thread
+            # data. Only human and external-bot replies belong in the timeline.
+            continue
+        visible_body = conversation_body(comment.get("body"))
+        if not visible_body:
+            continue
+        metadata = thread_metadata.get(comment_id)
+        if metadata is None and parent_id:
+            metadata = thread_metadata.get(parent_id)
+            if metadata is not None and comment_id:
+                thread_metadata[comment_id] = metadata
+        timeline.append(
+            {
+                "source": "review_thread_comment",
+                "id": comment_id or comment.get("id"),
+                **(metadata or {}),
+                "author": author,
+                "author_association": comment.get("author_association"),
+                "created_at": comment.get("created_at"),
+                "updated_at": comment.get("updated_at"),
+                "url": comment.get("html_url"),
+                "path": comment.get("path"),
+                "line": comment.get("line"),
+                "original_line": comment.get("original_line"),
+                "in_reply_to_id": parent_id or None,
+                "body": visible_body,
+            }
+        )
+
+    timeline.sort(
+        key=lambda entry: (
+            str(entry.get("created_at") or ""),
+            str(entry.get("source") or ""),
+            str(entry.get("id") or ""),
+        )
+    )
+    total_entries = len(timeline)
+    total_body_chars = sum(len(entry["body"]) for entry in timeline)
+    selected: list[dict[str, Any]] = []
+    selected_body_chars = 0
+    for entry in reversed(timeline):
+        body_chars = len(entry["body"])
+        if len(selected) >= CONVERSATION_MAX_ENTRIES:
+            break
+        if (
+            selected
+            and selected_body_chars + body_chars
+            > CONVERSATION_MAX_TOTAL_BODY_CHARS
+        ):
+            break
+        selected.append(entry)
+        selected_body_chars += body_chars
+    selected.reverse()
+
+    return {
+        "previous_reviewed_at": previous_reviewed_at,
+        "previous_automated_review": previous_automated_review,
+        "timeline": selected,
+        "total_entries": total_entries,
+        "included_entries": len(selected),
+        "omitted_entries": total_entries - len(selected),
+        "total_body_chars": total_body_chars,
+        "included_body_chars": selected_body_chars,
+        "truncated": len(selected) != total_entries,
+    }
+
+
 def compare_commits(
     repository: str,
     previous: str,
@@ -869,6 +1056,9 @@ def prepare(args: argparse.Namespace) -> None:
     reviews = gh_pages(
         f"repos/{args.repository}/pulls/{args.pull_request}/reviews?per_page=100"
     )
+    review_comments = gh_pages(
+        f"repos/{args.repository}/pulls/{args.pull_request}/comments?per_page=100"
+    )
     files = gh_pages(
         f"repos/{args.repository}/pulls/{args.pull_request}/files?per_page=100"
     )
@@ -903,6 +1093,16 @@ def prepare(args: argparse.Namespace) -> None:
         publisher_login=publisher_login,
     )
     sync_manifest_threads(manifest, threads)
+    conversation = conversation_context(
+        comments,
+        reviews,
+        review_comments,
+        threads,
+        repository=args.repository,
+        pull_request=args.pull_request,
+        previous_reviewed_at=manifest.get("cursor", {}).get("reviewed_at"),
+        publisher_login=publisher_login,
+    )
 
     previous_head = (
         manifest.get("cursor", {}).get("last_published_head")
@@ -1049,6 +1249,7 @@ def prepare(args: argparse.Namespace) -> None:
             "run_premortem": run_premortem,
         },
         "manifest": manifest,
+        "conversation": conversation,
         "review_threads": threads,
         "commentable_lines": commentable_lines,
         "sticky_comment_id": sticky_comment_id,
