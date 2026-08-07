@@ -11,7 +11,6 @@
 - [Get Funds on Mainnet](user/bridge.md)
 - [Force-include a transaction](user/force-inclusion.md)
 - [Get ETH on Testnet](user/faucet.md)
-- [Featured Apps](user/apps.md)
 - [User FAQ](user/faq.md)
 
 ## Developer Docs
