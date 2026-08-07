@@ -64,6 +64,8 @@ See the [Faucet](faucet.md) page for details.
 ### Start using MegaETH
 
 You are ready to interact with dApps, send transactions, and explore the network.
+Browse live apps in [Rabbithole Featured Apps](https://rabbithole.megaeth.com/featured-apps).
+Explore more projects through [Rabbithole Discover](https://rabbithole.megaeth.com/discover) and the community-run [Fluffle Tools ecosystem directory](https://www.fluffle.tools/).
 Track real-time network performance at [uptime.megaeth.com](https://uptime.megaeth.com).
 {% endstep %}
 {% endstepper %}
