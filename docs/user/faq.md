@@ -28,7 +28,7 @@ If you are on the Fluffle whitelist, registered via Discord, active in Telegram,
 ### Is the faucet capped?
 
 Yes.
-The faucet provides a maximum of 0.005 testnet ETH per user every 24 hours.
+The faucet provides 1 testnet ETH, 100 testnet USDM, and 1,000 testnet MEGA per user every 24 hours.
 
 ### Can I use different wallets to get more ETH from the faucet?
 

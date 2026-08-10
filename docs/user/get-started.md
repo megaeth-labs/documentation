@@ -53,7 +53,7 @@ See [Get Funds on Mainnet](bridge.md) for more options including third-party bri
 
 {% tab title="Testnet" %}
 Visit the faucet at [testnet.megaeth.com](https://testnet.megaeth.com), enter your wallet address, and complete the verification step.
-The faucet provides up to 0.005 testnet ETH per user every 24 hours.
+The faucet provides 1 testnet ETH, 100 testnet USDM, and 1,000 testnet MEGA per user every 24 hours.
 See the [Faucet](faucet.md) page for details.
 {% endtab %}
 {% endtabs %}
