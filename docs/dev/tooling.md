@@ -6,24 +6,25 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 
 ## RPC Providers
 
-| Provider       | Protocol           | Get Started                                                       | Public Endpoint                                           | Mainnet   |
-| -------------- | ------------------ | ----------------------------------------------------------------- | --------------------------------------------------------- | --------- |
-| MegaETH        | HTTP               | [Docs](https://docs.megaeth.com/developer-docs/overview-2)        | `https://mainnet.megaeth.com/rpc`                         | Supported |
-| MegaETH        | WebSocket          | [Docs](https://docs.megaeth.com/developer-docs/overview-2)        | `wss://mainnet.megaeth.com/ws`                            | Supported |
-| Alchemy        | HTTP               | [Docs](https://www.alchemy.com/docs/megaeth/megaeth-api-overview) | No public endpoint (API key required)                     | Supported |
-| Alchemy        | WebSocket          | [Docs](https://www.alchemy.com/docs/megaeth/megaeth-api-overview) | No public endpoint (API key required)                     | Supported |
-| QuickNode      | HTTP               | [Docs](https://www.quicknode.com/chains/megaeth)                  | No public endpoint (API key required)                     | Supported |
-| QuickNode      | WebSocket          | [Docs](https://www.quicknode.com/chains/megaeth)                  | No public endpoint (API key required)                     | Supported |
-| Nirvana Labs   | HTTP               | [Docs](https://docs.nirvanalabs.io)                               | No public endpoint (API key required)                     | Supported |
-| Nirvana Labs   | WebSocket          | [Docs](https://docs.nirvanalabs.io)                               | No public endpoint (API key required)                     | Supported |
-| dRPC           | HTTP               | [Docs](https://drpc.org/chainlist/megaeth-mainnet-rpc)            | `https://megaeth.drpc.org`                                | Supported |
-| dRPC           | WebSocket          | [Docs](https://drpc.org/chainlist/megaeth-mainnet-rpc)            | `wss://megaeth.drpc.org`                                  | Supported |
-| GlobalStake    | HTTP               | [Docs](https://globalstake.io)                                    | `https://rpc-megaeth-mainnet.globalstake.io`              | Supported |
-| Liquify        | HTTP               | [Docs](https://portal.liquify.com/)                               | `https://gateway.liquify.com/api=MEGAETHM2ONGJ26QTI0N1N6` | Supported |
-| Dwellir        | HTTP               | [Docs](https://www.dwellir.com/networks/megaeth)                  | No public endpoint (API key required)                     | Supported |
-| Dwellir        | WebSocket          | [Docs](https://www.dwellir.com/networks/megaeth)                  | No public endpoint (API key required)                     | Supported |
-| Envio HyperRPC | HTTP _(read-only)_ | [Docs](https://docs.envio.dev/docs/HyperRPC/overview-hyperrpc)    | `https://megaeth.rpc.hypersync.xyz`                       | Supported |
-| Chainstack     | HTTP               | [Docs](https://chainstack.com/build-better-with-megaeth/)         | No public endpoint (API key required)                     | Supported |
+| Provider       | Protocol           | Get Started                                                                    | Public Endpoint                                           | Mainnet   |
+| -------------- | ------------------ | ------------------------------------------------------------------------------ | --------------------------------------------------------- | --------- |
+| MegaETH        | HTTP               | [Docs](https://docs.megaeth.com/developer-docs/overview-2)                     | `https://mainnet.megaeth.com/rpc`                         | Supported |
+| MegaETH        | WebSocket          | [Docs](https://docs.megaeth.com/developer-docs/overview-2)                     | `wss://mainnet.megaeth.com/ws`                            | Supported |
+| Alchemy        | HTTP               | [Docs](https://www.alchemy.com/docs/megaeth/megaeth-api-overview)              | No public endpoint (API key required)                     | Supported |
+| Alchemy        | WebSocket          | [Docs](https://www.alchemy.com/docs/megaeth/megaeth-api-overview)              | No public endpoint (API key required)                     | Supported |
+| QuickNode      | HTTP               | [Docs](https://www.quicknode.com/chains/megaeth)                               | No public endpoint (API key required)                     | Supported |
+| QuickNode      | WebSocket          | [Docs](https://www.quicknode.com/chains/megaeth)                               | No public endpoint (API key required)                     | Supported |
+| QuickNode      | Webhooks           | [Docs](https://www.quicknode.com/docs/megaeth/api-overview#supported-products) | No public endpoint (API key required)                     | Supported |
+| Nirvana Labs   | HTTP               | [Docs](https://docs.nirvanalabs.io)                                            | No public endpoint (API key required)                     | Supported |
+| Nirvana Labs   | WebSocket          | [Docs](https://docs.nirvanalabs.io)                                            | No public endpoint (API key required)                     | Supported |
+| dRPC           | HTTP               | [Docs](https://drpc.org/chainlist/megaeth-mainnet-rpc)                         | `https://megaeth.drpc.org`                                | Supported |
+| dRPC           | WebSocket          | [Docs](https://drpc.org/chainlist/megaeth-mainnet-rpc)                         | `wss://megaeth.drpc.org`                                  | Supported |
+| GlobalStake    | HTTP               | [Docs](https://globalstake.io)                                                 | `https://rpc-megaeth-mainnet.globalstake.io`              | Supported |
+| Liquify        | HTTP               | [Docs](https://portal.liquify.com/)                                            | `https://gateway.liquify.com/api=MEGAETHM2ONGJ26QTI0N1N6` | Supported |
+| Dwellir        | HTTP               | [Docs](https://www.dwellir.com/networks/megaeth)                               | No public endpoint (API key required)                     | Supported |
+| Dwellir        | WebSocket          | [Docs](https://www.dwellir.com/networks/megaeth)                               | No public endpoint (API key required)                     | Supported |
+| Envio HyperRPC | HTTP _(read-only)_ | [Docs](https://docs.envio.dev/docs/HyperRPC/overview-hyperrpc)                 | `https://megaeth.rpc.hypersync.xyz`                       | Supported |
+| Chainstack     | HTTP               | [Docs](https://chainstack.com/build-better-with-megaeth/)                      | No public endpoint (API key required)                     | Supported |
 
 ---
 
