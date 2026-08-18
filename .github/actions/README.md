@@ -29,6 +29,7 @@ The `pr-review` action additionally accepts:
   When supplied, this token is the single identity for creating reviews,
   posting or updating status comments, and resolving addressed automated
   review threads.
+  The review action also forwards it to Claude Code for GitHub authentication instead of requesting a separate GitHub App token through OIDC.
   When omitted, publication uses the job token and leaves GitHub thread state
   unchanged.
 - `model` - optional, defaults to `claude-opus-4-7`.

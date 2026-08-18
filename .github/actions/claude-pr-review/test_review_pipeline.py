@@ -127,6 +127,12 @@ class ReviewPipelineTests(unittest.TestCase):
         )
         # prepare (announce), publish, and report (retire on failure).
         self.assertEqual(action.count(identity_env), 3)
+        self.assertEqual(
+            action.count(
+                "github_token: ${{ inputs.github_identity_token }}"
+            ),
+            2,
+        )
         self.assertIn(
             "GH_RESOLVE_THREADS: "
             "${{ inputs.github_identity_token != '' }}",

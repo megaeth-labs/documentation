@@ -146,6 +146,7 @@ runs:
       continue-on-error: true
       uses: anthropics/claude-code-action@c3d45e8e941e1b2ad7b278c57482d9c5bf1f35b3 # v1
       with:
+        github_token: ${{ inputs.github_identity_token }}
         claude_code_oauth_token: ${{ inputs.claude_code_oauth_token }}
         allowed_bots: ${{ inputs.allowed_bots }}
         display_report: false
@@ -252,6 +253,7 @@ runs:
          steps.review.outputs.structured_output == '')
       uses: anthropics/claude-code-action@c3d45e8e941e1b2ad7b278c57482d9c5bf1f35b3 # v1
       with:
+        github_token: ${{ inputs.github_identity_token }}
         claude_code_oauth_token: ${{ inputs.claude_code_oauth_token }}
         allowed_bots: ${{ inputs.allowed_bots }}
         display_report: false
