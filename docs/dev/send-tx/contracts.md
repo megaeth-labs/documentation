@@ -32,7 +32,6 @@ description: Key contract addresses and tokens on MegaETH and Ethereum Mainnet.
 | [CUSD](https://www.cap.app) | [`0xcCcc62962d17b8914c62D74FfB843d73B2a3cccC`](https://megaeth.blockscout.com/address/0xcCcc62962d17b8914c62D74FfB843d73B2a3cccC) | Dollar-pegged stablecoin by Cap Finance. |
 | [STCUSD](https://www.cap.app) | [`0x88887bE419578051FF9F4eb6C858A951921D8888`](https://megaeth.blockscout.com/address/0x88887bE419578051FF9F4eb6C858A951921D8888) | Yield-bearing version of CUSD — grows in value as Cap's protocol earns returns. |
 | [USDM](https://megaeth.com) | [`0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7`](https://megaeth.blockscout.com/address/0xFAfDdbb3FC7688494971a79cc65DCa3EF82079E7) | MegaETH's native stablecoin, backed by U.S. Treasury-based reserves. |
-| [USDmY](https://megaeth.com) | [`0x2eA493384F42d7Ea78564F3EF4C86986eAB4a890`](https://megaeth.blockscout.com/address/0x2eA493384F42d7Ea78564F3EF4C86986eAB4a890) | Yield-bearing version of USDM — holders earn returns from the underlying reserves. |
 | [USDe](https://ethena.fi) | [`0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34`](https://megaeth.blockscout.com/address/0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34) | Synthetic dollar by Ethena Labs, backed by crypto assets and hedged with futures. |
 | [sUSDe](https://ethena.fi) | [`0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2`](https://megaeth.blockscout.com/address/0x211Cc4DD073734dA055fbF44a2b4667d5E5fE5d2) | Staked USDe — grows in value over time as it earns Ethena protocol revenue. |
 | [USDT0](https://usdt0.to) | [`0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb`](https://megaeth.blockscout.com/address/0xB8CE59FC3717ada4C02eaDF9682A9e934F625ebb) | Cross-chain USDT by Tether and LayerZero, usable across 15+ blockchains. 6 decimals. |
@@ -73,11 +72,7 @@ description: Key contract addresses and tokens on MegaETH and Ethereum Mainnet.
 {% tab title="Mainnet" %}
 | Token | Address | Description |
 | ----- | ------- | ----------- |
-| CROWN | [`0xf7d2F0d0b0517CBDbf87C86910ce10FaAab3589D`](https://megaeth.blockscout.com/address/0xf7d2F0d0b0517CBDbf87C86910ce10FaAab3589D) | Crown Credits — a token native to MegaETH. |
-| [DCASH](https://app.offshoreprotocol.fun) | [`0x6691D67Ece85Ed950244c2CB5848d6498134321f`](https://megaeth.blockscout.com/address/0x6691D67Ece85Ed950244c2CB5848d6498134321f) | Dirty Cash — game token of Offshore Protocol, an on-chain idle RPG. |
-| [DIRTY](https://offshoreprotocol.xyz) | [`0xC2f34f8849a8607FD73E06D6849bDA07C2b7DE38`](https://megaeth.blockscout.com/address/0xC2f34f8849a8607FD73E06D6849bDA07C2b7DE38) | Dirty Money — game token of Offshore Protocol, an on-chain idle RPG. |
 | [MegaSIR](https://www.sir.trading) | [`0x9367A0c482703d8d9bda995B03f8E71056a72500`](https://megaeth.blockscout.com/address/0x9367A0c482703d8d9bda995B03f8E71056a72500) | SIR Trading token — a leverage protocol with no liquidations or funding fees. 12 decimals. |
-| [NXT](https://nxterminal.xyz) | [`0x2F55e14F0b2B2118d2026d20Ad2C39EAcBdCAc47`](https://megaeth.blockscout.com/address/0x2F55e14F0b2B2118d2026d20Ad2C39EAcBdCAc47) | NX Terminal Token — native utility token of NX Terminal: Protocol Wars. |
 | [WSOL](https://wormhole.com) | [`0x9a96E366F6b2ED5850A38B58D355a80aFD998411`](https://megaeth.blockscout.com/address/0x9a96E366F6b2ED5850A38B58D355a80aFD998411) | Solana's native SOL token bridged via Wormhole. 9 decimals. |
 
 {% hint style="info" %}
