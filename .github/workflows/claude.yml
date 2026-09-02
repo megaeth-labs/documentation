@@ -7,7 +7,7 @@ on:
   pull_request_review:
     types: [submitted]
   pull_request_target:
-    types: [opened, synchronize, ready_for_review, reopened]
+    types: [labeled]
 
 jobs:
   interactive:
@@ -51,10 +51,8 @@ jobs:
       cancel-in-progress: false
     if: |
       github.event_name == 'pull_request_target' &&
-      (github.event.action == 'opened' ||
-       github.event.action == 'synchronize' ||
-       github.event.action == 'ready_for_review' ||
-       github.event.action == 'reopened') &&
+      github.event.action == 'labeled' &&
+      github.event.label.name == 'review:Maxwell' &&
       (github.event.pull_request.user.type != 'Bot' ||
        github.event.pull_request.user.login == 'mega-putin[bot]')
     runs-on: ubuntu-24.04
@@ -109,3 +107,12 @@ jobs:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_identity_token: ${{ steps.app-token.outputs.token }}
           allowed_bots: "mega-putin"
+
+      - name: Remove one-shot review trigger
+        if: always()
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api --method DELETE \
+            "repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/labels/review%3AMaxwell"
