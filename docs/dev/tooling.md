@@ -12,6 +12,8 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | MegaETH        | WebSocket          | [Docs](https://docs.megaeth.com/developer-docs/overview-2)                     | `wss://mainnet.megaeth.com/ws`                            | Supported |
 | Alchemy        | HTTP               | [Docs](https://www.alchemy.com/docs/megaeth/megaeth-api-overview)              | No public endpoint (API key required)                     | Supported |
 | Alchemy        | WebSocket          | [Docs](https://www.alchemy.com/docs/megaeth/megaeth-api-overview)              | No public endpoint (API key required)                     | Supported |
+| BoltRPC        | HTTP               | [Docs](https://boltrpc.io/networks/megaeth)                                    | No public endpoint (API key required)                     | Supported |
+| BoltRPC        | WebSocket          | [Docs](https://boltrpc.io/networks/megaeth)                                    | No public endpoint (API key required)                     | Supported |
 | QuickNode      | HTTP               | [Docs](https://www.quicknode.com/chains/megaeth)                               | No public endpoint (API key required)                     | Supported |
 | QuickNode      | WebSocket          | [Docs](https://www.quicknode.com/chains/megaeth)                               | No public endpoint (API key required)                     | Supported |
 | QuickNode      | Webhooks           | [Docs](https://www.quicknode.com/docs/megaeth/api-overview#supported-products) | No public endpoint (API key required)                     | Supported |
