@@ -27,6 +27,8 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | Dwellir        | WebSocket          | [Docs](https://www.dwellir.com/networks/megaeth)                               | No public endpoint (API key required)                     | Supported |
 | Envio HyperRPC | HTTP _(read-only)_ | [Docs](https://docs.envio.dev/docs/HyperRPC/overview-hyperrpc)                 | `https://megaeth.rpc.hypersync.xyz`                       | Supported |
 | Chainstack     | HTTP               | [Docs](https://chainstack.com/build-better-with-megaeth/)                      | No public endpoint (API key required)                     | Supported |
+| node101        | HTTP               | [Docs](https://node101.io/en/rpc/megaeth)                                      | No public endpoint (paid plan required)                   | Supported |
+| node101        | WebSocket          | [Docs](https://node101.io/en/rpc/megaeth)                                      | No public endpoint (paid plan required)                   | Supported |
 
 ---
 
