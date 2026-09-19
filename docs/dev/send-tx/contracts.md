@@ -168,13 +168,32 @@ Create `data/YOUR_TOKEN/` in the repository.
 
 ### Add token metadata
 
-Create a `data.json` file with your token's name, symbol, decimals, and per-chain addresses.
+Create a `data.json` file with your token's name, symbol, decimals, root-level `verification`, and per-chain addresses.
+The generator rejects records with missing verification or a mismatched status and method.
+
+Choose the verification pair that describes the submission:
+
+| Status           | Required method           | When to request it                                                                                                         |
+| ---------------- | ------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `issuer`         | `source-submission`       | The issuer or its official organization supplied or approved the token relationship; include supporting evidence in the PR |
+| `community`      | `maintainer-review`       | A community asset submitted for maintainer review; default for new permissionless factory submissions                      |
+| `infrastructure` | `official-infrastructure` | Official MegaETH protocol infrastructure                                                                                   |
+
+The submitter proposes the verification level.
+Merging the PR is the registry maintainer's attestation that the selected level satisfies registry policy.
+
+This illustrative native-token template requests community verification.
+Replace the placeholder addresses and metadata in these templates with your token's deployed values, and select the appropriate verification pair before submitting.
 
 ```json
 {
   "name": "My Token",
   "symbol": "MTK",
   "decimals": 18,
+  "verification": {
+    "status": "community",
+    "method": "maintainer-review"
+  },
   "tokens": {
     "megaeth": {
       "address": "0xYourTokenAddress",
@@ -185,13 +204,17 @@ Create a `data.json` file with your token's name, symbol, decimals, and per-chai
 }
 ```
 
-If the token is bridged from Ethereum, include both chains:
+For a token locked on Ethereum and minted on MegaETH, include both chains as in this illustrative template:
 
 ```json
 {
   "name": "My Token",
   "symbol": "MTK",
   "decimals": 18,
+  "verification": {
+    "status": "community",
+    "method": "maintainer-review"
+  },
   "tokens": {
     "ethereum": {
       "address": "0xEthereumAddress",
@@ -209,6 +232,15 @@ If the token is bridged from Ethereum, include both chains:
 }
 ```
 
+For a MegaETH Testnet deployment, use `tokens.megaeth_testnet` with that deployment's address and origin/mechanism fields.
+Use the same root-level verification requirements for testnet submissions.
+The registry generates separate lists:
+
+| Chain keys            | Generated output                                |
+| --------------------- | ----------------------------------------------- |
+| `ethereum`, `megaeth` | `megaeth.tokenlist.json` (mainnet)              |
+| `megaeth_testnet`     | `megaeth.testnet.tokenlist.json` (testnet only) |
+
 {% endstep %}
 {% step %}
 
@@ -220,7 +252,13 @@ Add a `logo.svg` or `logo.png` (256×256 recommended) to the same folder.
 
 ### Submit a PR
 
-Open a pull request. Once merged, the token will appear in the generated tokenlist.
+Open a pull request using the [token submission template](https://github.com/megaeth-labs/mega-tokenlist/blob/main/.github/PULL_REQUEST_TEMPLATE.md).
+Specify the proposed verification status and matching method, and link to the official source, discussion, or documentation supporting the request when applicable.
+Only request `issuer` verification with evidence of issuer or official-organization submission or approval.
+
+For routine token submissions, change only metadata and logos under `data/`, following the [registry contribution guidelines](https://github.com/megaeth-labs/mega-tokenlist/blob/main/AGENTS.md).
+Do not commit changes to the generated tokenlists.
+After maintainer review and merge, the generation workflow publishes the token to the appropriate list.
 {% endstep %}
 {% endstepper %}
 
@@ -228,3 +266,22 @@ Open a pull request. Once merged, the token will appear in the generated tokenli
 EVM addresses must be checksummed ([EIP-55](https://eips.ethereum.org/EIPS/eip-55)).
 For the full data schema and bridge mechanism types (`native`, `lock`, `mint`, `burn`), see the [mega-tokenlist README](https://github.com/megaeth-labs/mega-tokenlist#token-data-schema).
 {% endhint %}
+
+### Reading verification and source relationships
+
+In generated tokenlists, `extensions.verification` contains the approved root-level verification object.
+For non-origin entries with a recorded origin/source, the generator also emits:
+
+| Field                      | Meaning                                          |
+| -------------------------- | ------------------------------------------------ |
+| `extensions.sourceChain`   | Source chain key, such as `ethereum` or `solana` |
+| `extensions.sourceAddress` | Token address on that source chain               |
+
+These are generated fields derived from the per-chain entries in `data.json`, not additional submission fields.
+They cover EVM sources as well as non-EVM sources.
+A `solana` entry provides source tracking only and is not emitted as a standalone tokenlist entry.
+
+For the bridged template above, the MegaETH entry's source is `ethereum` and its source address is the value of `tokens.ethereum.address`.
+The source address identifies the token, not the bridge or lockbox contract.
+Use the source chain and token address together for exact relationship matching rather than inferring a relationship from names or symbols.
+These fields can be absent when no origin/source is recorded; do not assume every non-origin entry has them.
