@@ -15,7 +15,7 @@ This is an upgrade compatibility change, not a claim that it is already deployed
 | Methods | Response after the update |
 | --- | --- |
 | `eth_blobBaseFee`, `eth_callBundle` | `-32004`, `<method> is not supported on MegaETH` |
-| `eth_getUncleCountByBlockHash` | Available before update | Zero/null on the documented deployment; `-32004` after the [node update](#upcoming-node-behavior). |
+| `eth_getUncleCountByBlockHash`, `eth_getUncleCountByBlockNumber`, `eth_getUncleByBlockHashAndIndex`, `eth_getUncleByBlockNumberAndIndex` | `-32004`, replacing the previous zero/null compatibility responses |
 | `eth_sign`, `eth_signTransaction`, `eth_signTypedData`, `eth_sendTransaction` | `-32004`, including with development accounts configured |
 | `eth_getLogsWithCursor` | `-32601`; not registered |
 | `eth_fillTransaction`, `eth_sendBundle`, `eth_cancelBundle`, `eth_sendPrivateTransaction`, `eth_sendPrivateRawTransaction`, `eth_cancelPrivateTransaction` | Remain unimplemented and unregistered (`-32601`) |
