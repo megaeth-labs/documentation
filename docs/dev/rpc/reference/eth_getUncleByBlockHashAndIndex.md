@@ -4,6 +4,12 @@ description: "Returns an uncle block by parent block hash and uncle index."
 
 # eth_getUncleByBlockHashAndIndex
 
+{% hint style="warning" %}
+The [upcoming node update](./README.md#upcoming-node-behavior) intentionally disables this method.
+Nodes running that update return `-32004` with message `eth_getUncleByBlockHashAndIndex is not supported on MegaETH`, without parsing parameters.
+The zero/null responses and captured examples below describe the earlier deployment.
+{% endhint %}
+
 ## Summary
 
 Returns an uncle block selected by its parent block hash and index.

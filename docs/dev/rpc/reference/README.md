@@ -7,6 +7,24 @@ description: "Complete reference for the 51 JSON-RPC methods available through M
 This reference documents the JSON-RPC methods available through the public MegaETH HTTP and WebSocket endpoints.
 Use [JSON-RPC](../README.md) for request framing, shared wire types, errors, and gateway limits.
 
+## Upcoming node behavior
+
+The [unsupported RPC update](https://github.com/megaeth-labs/mega-reth/pull/2393) intentionally disables the methods below on nodes running that change.
+This is an upgrade compatibility change, not a claim that it is already deployed to the public Mainnet endpoint.
+
+| Methods | Response after the update |
+| --- | --- |
+| `eth_blobBaseFee`, `eth_callBundle` | `-32004`, `<method> is not supported on MegaETH` |
+| `eth_getUncleCountByBlockHash` | Available before update | Zero/null on the documented deployment; `-32004` after the [node update](#upcoming-node-behavior). |
+| `eth_sign`, `eth_signTransaction`, `eth_signTypedData`, `eth_sendTransaction` | `-32004`, including with development accounts configured |
+| `eth_getLogsWithCursor` | `-32601`; not registered |
+| `eth_fillTransaction`, `eth_sendBundle`, `eth_cancelBundle`, `eth_sendPrivateTransaction`, `eth_sendPrivateRawTransaction`, `eth_cancelPrivateTransaction` | Remain unimplemented and unregistered (`-32601`) |
+
+Explicit rejection handlers do not parse method parameters.
+They are registered only on HTTP, WebSocket, or IPC transports that enable the Eth namespace.
+Use client-side signing and `eth_sendRawTransaction` to submit transactions, and `eth_getLogs` instead of cursor queries.
+An SDK exposing a cursor action does not imply node support.
+
 ## Available Methods
 
 {% hint style="info" %}
@@ -53,10 +71,10 @@ Managed providers may expose additional methods.
 | `eth_getTransactionByHash`                | Available      |                                                                                                 |
 | `eth_getTransactionCount`                 | Available      |                                                                                                 |
 | `eth_getTransactionReceipt`               | Available      |                                                                                                 |
-| `eth_getUncleByBlockHashAndIndex`         | Available      | Returns `null` for valid MegaETH blocks.                                                        |
-| `eth_getUncleByBlockNumberAndIndex`       | Available      | Returns `null` for valid MegaETH blocks.                                                        |
-| `eth_getUncleCountByBlockHash`            | Available      | Returns `0x0` for valid MegaETH blocks.                                                         |
-| `eth_getUncleCountByBlockNumber`          | Available      | Returns `0x0` for valid MegaETH blocks.                                                         |
+| `eth_getUncleByBlockHashAndIndex` | Available before update | Zero/null on the documented deployment; `-32004` after the [node update](#upcoming-node-behavior). |
+| `eth_getUncleByBlockNumberAndIndex` | Available before update | Zero/null on the documented deployment; `-32004` after the [node update](#upcoming-node-behavior). |
+| `eth_getUncleCountByBlockHash` | Available before update | Zero/null on the documented deployment; `-32004` after the [node update](#upcoming-node-behavior). |
+| `eth_getUncleCountByBlockNumber` | Available before update | Zero/null on the documented deployment; `-32004` after the [node update](#upcoming-node-behavior). |
 | `eth_getWithdrawalProof`                  | Available      | OP Stack withdrawal proof method.                                                               |
 | `eth_maxPriorityFeePerGas`                | Available      |                                                                                                 |
 | `eth_mining`                              | Unavailable    | The node reports the method as unimplemented.                                                   |

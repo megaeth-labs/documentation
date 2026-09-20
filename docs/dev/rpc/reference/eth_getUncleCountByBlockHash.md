@@ -4,6 +4,12 @@ description: "Returns the number of uncle blocks referenced by a MegaETH block s
 
 # eth_getUncleCountByBlockHash
 
+{% hint style="warning" %}
+The [upcoming node update](./README.md#upcoming-node-behavior) intentionally disables this method.
+Nodes running that update return `-32004` with message `eth_getUncleCountByBlockHash is not supported on MegaETH`, without parsing parameters.
+The zero/null responses and captured examples below describe the earlier deployment.
+{% endhint %}
+
 ## Summary
 
 Returns the number of uncle blocks referenced by a block selected by hash.
