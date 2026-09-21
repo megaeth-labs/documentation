@@ -12,13 +12,13 @@ Use [JSON-RPC](../README.md) for request framing, shared wire types, errors, and
 The [unsupported RPC update](https://github.com/megaeth-labs/mega-reth/pull/2393) intentionally disables the methods below on nodes running that change.
 This is an upgrade compatibility change, not a claim that it is already deployed to the public Mainnet endpoint.
 
-| Methods | Response after the update |
-| --- | --- |
-| `eth_blobBaseFee`, `eth_callBundle` | `-32004`, `<method> is not supported on MegaETH` |
-| `eth_getUncleCountByBlockHash`, `eth_getUncleCountByBlockNumber`, `eth_getUncleByBlockHashAndIndex`, `eth_getUncleByBlockNumberAndIndex` | `-32004`, replacing the previous zero/null compatibility responses |
-| `eth_sign`, `eth_signTransaction`, `eth_signTypedData`, `eth_sendTransaction` | `-32004`, including with development accounts configured |
-| `eth_getLogsWithCursor` | `-32601`; not registered |
-| `eth_fillTransaction`, `eth_sendBundle`, `eth_cancelBundle`, `eth_sendPrivateTransaction`, `eth_sendPrivateRawTransaction`, `eth_cancelPrivateTransaction` | Remain unimplemented and unregistered (`-32601`) |
+| Methods                                                                                                                                                    | Response after the update                                          |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `eth_blobBaseFee`, `eth_callBundle`                                                                                                                        | `-32004`, `<method> is not supported on MegaETH`                   |
+| `eth_getUncleCountByBlockHash`, `eth_getUncleCountByBlockNumber`, `eth_getUncleByBlockHashAndIndex`, `eth_getUncleByBlockNumberAndIndex`                   | `-32004`, replacing the previous zero/null compatibility responses |
+| `eth_sign`, `eth_signTransaction`, `eth_signTypedData`, `eth_sendTransaction`                                                                              | `-32004`, including with development accounts configured           |
+| `eth_getLogsWithCursor`                                                                                                                                    | `-32601`; not registered                                           |
+| `eth_fillTransaction`, `eth_sendBundle`, `eth_cancelBundle`, `eth_sendPrivateTransaction`, `eth_sendPrivateRawTransaction`, `eth_cancelPrivateTransaction` | Remain unimplemented and unregistered (`-32601`)                   |
 
 Explicit rejection handlers do not parse method parameters.
 They are registered only on HTTP, WebSocket, or IPC transports that enable the Eth namespace.
@@ -33,73 +33,73 @@ The table below reflects the public MegaETH Mainnet endpoint.
 Managed providers may expose additional methods.
 {% endhint %}
 
-| Method                                    | Availability   | Additional restrictions or behavior                                                             |
-| ----------------------------------------- | -------------- | ----------------------------------------------------------------------------------------------- |
-| `debug_getHistoryTransactionCount`        | Available      | MegaETH-specific.                                                                               |
-| `debug_getRawHeader`                      | Available      |                                                                                                 |
-| `debug_traceBlockByHash`                  | Available      | Large responses are streamed.                                                                   |
-| `debug_traceBlockByNumber`                | Available      | Large responses are streamed.                                                                   |
-| `debug_traceCall`                         | Unavailable    | The public endpoint returns `-32601`.                                                           |
-| `debug_traceTransaction`                  | Available      | Large responses are streamed.                                                                   |
-| `eth_accounts`                            | Available      | Returns an empty array because the gateway does not manage user keys.                           |
-| `eth_blockNumber`                         | Available      |                                                                                                 |
-| `eth_call`                                | Available      | Compute gas limited to 60,000,000.                                                              |
-| `eth_callAfter`                           | Unavailable    | The public endpoint returns `-32601`.                                                           |
-| `eth_callMany`                            | Available      | 100 bundles and 100 total calls; 60,000,000 compute gas per call; timeout capped at 25 seconds. |
-| `eth_chainId`                             | Available      |                                                                                                 |
-| `eth_createAccessList`                    | Available      | Routed to the compute pool; no separate 60M compute override is added.                          |
-| `eth_estimateGas`                         | Available      | Uses an internal CPU-time limit; the source default is 0.5 seconds.                             |
-| `eth_feeHistory`                          | Available      | Block range limited to 256.                                                                     |
-| `eth_gasPrice`                            | Available      |                                                                                                 |
-| `eth_getBalance`                          | Available      |                                                                                                 |
-| `eth_getBlockByHash`                      | Available      |                                                                                                 |
-| `eth_getBlockByNumber`                    | Available      |                                                                                                 |
-| `eth_getBlockReceipts`                    | Available      |                                                                                                 |
-| `eth_getBlockTransactionCountByHash`      | Available      |                                                                                                 |
-| `eth_getBlockTransactionCountByNumber`    | Available      |                                                                                                 |
-| `eth_getCode`                             | Available      |                                                                                                 |
-| `eth_getCodeByHash`                       | Available      | MegaETH-specific.                                                                               |
-| `eth_getFilterChanges`                    | Unavailable    | The public endpoint returns `-32601`.                                                           |
-| `eth_getFilterLogs`                       | Unavailable    | The public endpoint returns `-32601`.                                                           |
-| `eth_getHeaderByHash`                     | Available      | MegaETH-specific.                                                                               |
-| `eth_getHeaderByNumber`                   | Available      | MegaETH-specific.                                                                               |
-| `eth_getLogs`                             | Available      |                                                                                                 |
-| `eth_getLogsWithCursor`                   | Unavailable    | The public endpoint returns `-32601`.                                                           |
-| `eth_getStorageAt`                        | Available      |                                                                                                 |
-| `eth_getTransactionByBlockHashAndIndex`   | Unavailable    | The public endpoint returns `-32601`.                                                           |
-| `eth_getTransactionByBlockNumberAndIndex` | Unavailable    | The public endpoint returns `-32601`.                                                           |
-| `eth_getTransactionByHash`                | Available      |                                                                                                 |
-| `eth_getTransactionCount`                 | Available      |                                                                                                 |
-| `eth_getTransactionReceipt`               | Available      |                                                                                                 |
-| `eth_getUncleByBlockHashAndIndex` | Available before update | Zero/null on the documented deployment; `-32004` after the [node update](#upcoming-node-behavior). |
-| `eth_getUncleByBlockNumberAndIndex` | Available before update | Zero/null on the documented deployment; `-32004` after the [node update](#upcoming-node-behavior). |
-| `eth_getUncleCountByBlockHash` | Available before update | Zero/null on the documented deployment; `-32004` after the [node update](#upcoming-node-behavior). |
-| `eth_getUncleCountByBlockNumber` | Available before update | Zero/null on the documented deployment; `-32004` after the [node update](#upcoming-node-behavior). |
-| `eth_getWithdrawalProof`                  | Available      | OP Stack withdrawal proof method.                                                               |
-| `eth_maxPriorityFeePerGas`                | Available      |                                                                                                 |
-| `eth_mining`                              | Unavailable    | The node reports the method as unimplemented.                                                   |
-| `eth_newBlockFilter`                      | Unavailable    | The public endpoint returns `-32601`.                                                           |
-| `eth_newFilter`                           | Unavailable    | The public endpoint returns `-32601`.                                                           |
-| `eth_newPendingTransactionFilter`         | Unavailable    | The public endpoint returns `-32601`.                                                           |
-| `eth_protocolVersion`                     | Available      | Legacy compatibility method.                                                                    |
-| `eth_sendRawTransaction`                  | Available      |                                                                                                 |
-| `eth_sendRawTransactionSync`              | Available      | MegaETH-specific synchronous receipt method.                                                    |
-| `eth_subscribe`                           | WebSocket only | Supports six subscription types; see the method page.                                           |
-| `eth_syncing`                             | Available      |                                                                                                 |
-| `eth_uninstallFilter`                     | Available      | Returns `false` when the filter ID does not exist.                                              |
-| `eth_unsubscribe`                         | WebSocket only |                                                                                                 |
-| `mega_getBlockWitness`                    | Available      | MegaETH-specific.                                                                               |
-| `mega_getWithdrawalProof`                 | Available      | Alias routed to `eth_getWithdrawalProof`.                                                       |
-| `mega_outputAtBlock`                      | Available      | OP Stack output-root method.                                                                    |
-| `net_listening`                           | Available      |                                                                                                 |
-| `net_peerCount`                           | Available      |                                                                                                 |
-| `net_version`                             | Available      |                                                                                                 |
-| `optimism_outputAtBlock`                  | Available      | Alias of `mega_outputAtBlock`.                                                                  |
-| `realtime_sendRawTransaction`             | Available      | MegaETH-specific synchronous receipt method.                                                    |
-| `trace_block`                             | Unavailable    | The public endpoint returns `-32601`.                                                           |
-| `trace_call`                              | Unavailable    | The public endpoint returns `-32601`.                                                           |
-| `trace_transaction`                       | Unavailable    | The public endpoint returns `-32601`.                                                           |
-| `web3_clientVersion`                      | Available      |                                                                                                 |
+| Method                                    | Availability            | Additional restrictions or behavior                                                                |
+| ----------------------------------------- | ----------------------- | -------------------------------------------------------------------------------------------------- |
+| `debug_getHistoryTransactionCount`        | Available               | MegaETH-specific.                                                                                  |
+| `debug_getRawHeader`                      | Available               |                                                                                                    |
+| `debug_traceBlockByHash`                  | Available               | Large responses are streamed.                                                                      |
+| `debug_traceBlockByNumber`                | Available               | Large responses are streamed.                                                                      |
+| `debug_traceCall`                         | Unavailable             | The public endpoint returns `-32601`.                                                              |
+| `debug_traceTransaction`                  | Available               | Large responses are streamed.                                                                      |
+| `eth_accounts`                            | Available               | Returns an empty array because the gateway does not manage user keys.                              |
+| `eth_blockNumber`                         | Available               |                                                                                                    |
+| `eth_call`                                | Available               | Compute gas limited to 60,000,000.                                                                 |
+| `eth_callAfter`                           | Unavailable             | The public endpoint returns `-32601`.                                                              |
+| `eth_callMany`                            | Available               | 100 bundles and 100 total calls; 60,000,000 compute gas per call; timeout capped at 25 seconds.    |
+| `eth_chainId`                             | Available               |                                                                                                    |
+| `eth_createAccessList`                    | Available               | Routed to the compute pool; no separate 60M compute override is added.                             |
+| `eth_estimateGas`                         | Available               | Uses an internal CPU-time limit; the source default is 0.5 seconds.                                |
+| `eth_feeHistory`                          | Available               | Block range limited to 256.                                                                        |
+| `eth_gasPrice`                            | Available               |                                                                                                    |
+| `eth_getBalance`                          | Available               |                                                                                                    |
+| `eth_getBlockByHash`                      | Available               |                                                                                                    |
+| `eth_getBlockByNumber`                    | Available               |                                                                                                    |
+| `eth_getBlockReceipts`                    | Available               |                                                                                                    |
+| `eth_getBlockTransactionCountByHash`      | Available               |                                                                                                    |
+| `eth_getBlockTransactionCountByNumber`    | Available               |                                                                                                    |
+| `eth_getCode`                             | Available               |                                                                                                    |
+| `eth_getCodeByHash`                       | Available               | MegaETH-specific.                                                                                  |
+| `eth_getFilterChanges`                    | Unavailable             | The public endpoint returns `-32601`.                                                              |
+| `eth_getFilterLogs`                       | Unavailable             | The public endpoint returns `-32601`.                                                              |
+| `eth_getHeaderByHash`                     | Available               | MegaETH-specific.                                                                                  |
+| `eth_getHeaderByNumber`                   | Available               | MegaETH-specific.                                                                                  |
+| `eth_getLogs`                             | Available               |                                                                                                    |
+| `eth_getLogsWithCursor`                   | Unavailable             | The public endpoint returns `-32601`.                                                              |
+| `eth_getStorageAt`                        | Available               |                                                                                                    |
+| `eth_getTransactionByBlockHashAndIndex`   | Unavailable             | The public endpoint returns `-32601`.                                                              |
+| `eth_getTransactionByBlockNumberAndIndex` | Unavailable             | The public endpoint returns `-32601`.                                                              |
+| `eth_getTransactionByHash`                | Available               |                                                                                                    |
+| `eth_getTransactionCount`                 | Available               |                                                                                                    |
+| `eth_getTransactionReceipt`               | Available               |                                                                                                    |
+| `eth_getUncleByBlockHashAndIndex`         | Available before update | Zero/null on the documented deployment; `-32004` after the [node update](#upcoming-node-behavior). |
+| `eth_getUncleByBlockNumberAndIndex`       | Available before update | Zero/null on the documented deployment; `-32004` after the [node update](#upcoming-node-behavior). |
+| `eth_getUncleCountByBlockHash`            | Available before update | Zero/null on the documented deployment; `-32004` after the [node update](#upcoming-node-behavior). |
+| `eth_getUncleCountByBlockNumber`          | Available before update | Zero/null on the documented deployment; `-32004` after the [node update](#upcoming-node-behavior). |
+| `eth_getWithdrawalProof`                  | Available               | OP Stack withdrawal proof method.                                                                  |
+| `eth_maxPriorityFeePerGas`                | Available               |                                                                                                    |
+| `eth_mining`                              | Unavailable             | The node reports the method as unimplemented.                                                      |
+| `eth_newBlockFilter`                      | Unavailable             | The public endpoint returns `-32601`.                                                              |
+| `eth_newFilter`                           | Unavailable             | The public endpoint returns `-32601`.                                                              |
+| `eth_newPendingTransactionFilter`         | Unavailable             | The public endpoint returns `-32601`.                                                              |
+| `eth_protocolVersion`                     | Available               | Legacy compatibility method.                                                                       |
+| `eth_sendRawTransaction`                  | Available               |                                                                                                    |
+| `eth_sendRawTransactionSync`              | Available               | MegaETH-specific synchronous receipt method.                                                       |
+| `eth_subscribe`                           | WebSocket only          | Supports six subscription types; see the method page.                                              |
+| `eth_syncing`                             | Available               |                                                                                                    |
+| `eth_uninstallFilter`                     | Available               | Returns `false` when the filter ID does not exist.                                                 |
+| `eth_unsubscribe`                         | WebSocket only          |                                                                                                    |
+| `mega_getBlockWitness`                    | Available               | MegaETH-specific.                                                                                  |
+| `mega_getWithdrawalProof`                 | Available               | Alias routed to `eth_getWithdrawalProof`.                                                          |
+| `mega_outputAtBlock`                      | Available               | OP Stack output-root method.                                                                       |
+| `net_listening`                           | Available               |                                                                                                    |
+| `net_peerCount`                           | Available               |                                                                                                    |
+| `net_version`                             | Available               |                                                                                                    |
+| `optimism_outputAtBlock`                  | Available               | Alias of `mega_outputAtBlock`.                                                                     |
+| `realtime_sendRawTransaction`             | Available               | MegaETH-specific synchronous receipt method.                                                       |
+| `trace_block`                             | Unavailable             | The public endpoint returns `-32601`.                                                              |
+| `trace_call`                              | Unavailable             | The public endpoint returns `-32601`.                                                              |
+| `trace_transaction`                       | Unavailable             | The public endpoint returns `-32601`.                                                              |
+| `web3_clientVersion`                      | Available               |                                                                                                    |
 
 ## State and simulation
 
