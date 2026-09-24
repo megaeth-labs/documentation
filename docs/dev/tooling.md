@@ -102,14 +102,14 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 
 ## Account Abstraction & Smart Accounts
 
-| Provider                                       | Type                                                         | Get Started                                                  | Mainnet   |
-| ---------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | --------- |
-| [MOSS](https://joinmoss.megaeth.com)           | Passkey smart accounts, scoped session keys, gas sponsorship | [Docs](https://docs.megaeth.com/moss-docs/wallet/quickstart) | Supported |
-| [ZeroDev](https://zerodev.app)                 | Kernel smart accounts (ERC-4337)                             | [Docs](https://docs.zerodev.app)                             | Supported |
-| [Privy](https://privy.io)                      | Embedded wallets / headless signing                          | [Docs](https://docs.privy.io)                                | Supported |
-| [Safe](https://safe.global)                    | Multisig / smart account                                     | [Docs](https://docs.safe.global)                             | Supported |
-| [Protofire](https://protofire.io/)             | Safe multisig deployment and hosting                         | [App](https://app.safe.protofire.io/)                        | Supported |
-| [MetaMask Smart Accounts](https://metamask.io) | Smart Accounts                                               | [Docs](https://docs.metamask.io/smart-accounts-kit)          | Supported |
+| Provider                                       | Type                                                         | Get Started                                                       | Mainnet   |
+| ---------------------------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------- | --------- |
+| [MOSS](https://joinmoss.megaeth.com)           | Passkey smart accounts, scoped session keys, gas sponsorship | [Docs](https://docs.megaeth.com/moss-docs/wallet/quickstart)      | Supported |
+| [ZeroDev](https://zerodev.app)                 | Kernel smart accounts (ERC-4337)                             | [Docs](https://docs.zerodev.app)                                  | Supported |
+| [Privy](https://privy.io)                      | Embedded wallets / headless signing                          | [Docs](https://docs.privy.io)                                     | Supported |
+| [Safe](https://safe.global)                    | Multisig / smart account                                     | [Docs](https://docs.safe.global)                                  | Supported |
+| [Protofire](https://protofire.io/)             | Safe multisig deployment and hosting                         | [Docs](https://protofire.io/blog/protofire-safe-beginners-guide/) | Supported |
+| [MetaMask Smart Accounts](https://metamask.io) | Smart Accounts                                               | [Docs](https://docs.metamask.io/smart-accounts-kit)               | Supported |
 
 ---
 
