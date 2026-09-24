@@ -102,34 +102,39 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 
 ## Account Abstraction & Smart Accounts
 
-| Provider                                       | Type                                | Get Started                                         | Mainnet   |
-| ---------------------------------------------- | ----------------------------------- | --------------------------------------------------- | --------- |
-| [ZeroDev](https://zerodev.app)                 | Kernel smart accounts (ERC-4337)    | [Docs](https://docs.zerodev.app)                    | Supported |
-| [Privy](https://privy.io)                      | Embedded wallets / headless signing | [Docs](https://docs.privy.io)                       | Supported |
-| [Safe](https://safe.global)                    | Multisig / smart account            | [Docs](https://docs.safe.global)                    | Supported |
-| [MetaMask Smart Accounts](https://metamask.io) | Smart Accounts                      | [Docs](https://docs.metamask.io/smart-accounts-kit) | Supported |
+| Provider                                       | Type                                                         | Get Started                                                  | Mainnet   |
+| ---------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | --------- |
+| [MOSS](https://joinmoss.megaeth.com)           | Passkey smart accounts, scoped session keys, gas sponsorship | [Docs](https://docs.megaeth.com/moss-docs/wallet/quickstart) | Supported |
+| [ZeroDev](https://zerodev.app)                 | Kernel smart accounts (ERC-4337)                             | [Docs](https://docs.zerodev.app)                             | Supported |
+| [Privy](https://privy.io)                      | Embedded wallets / headless signing                          | [Docs](https://docs.privy.io)                                | Supported |
+| [Safe](https://safe.global)                    | Multisig / smart account                                     | [Docs](https://docs.safe.global)                             | Supported |
+| [Protofire](https://protofire.io/)             | Safe multisig deployment and hosting                         | [App](https://app.safe.protofire.io/)                        | Supported |
+| [MetaMask Smart Accounts](https://metamask.io) | Smart Accounts                                               | [Docs](https://docs.metamask.io/smart-accounts-kit)          | Supported |
 
 ---
 
 ## Wallets
 
-| Wallet                                   | Type                          | Mainnet   |
-| ---------------------------------------- | ----------------------------- | --------- |
-| [MetaMask](https://metamask.io)          | Browser / mobile              | Supported |
-| [Zerion](https://zerion.io)              | Mobile / web portfolio wallet | Supported |
-| [Rainbow](https://rainbow.me)            | Mobile wallet                 | Supported |
-| [Bitget Wallet](https://web3.bitget.com) | Mobile / web wallet           | Supported |
-| [imToken](https://token.im)              | Mobile wallet                 | Supported |
+| Wallet                                   | Type                                | Mainnet   |
+| ---------------------------------------- | ----------------------------------- | --------- |
+| [MOSS](https://account.megaeth.com)      | Embedded / web wallet with passkeys | Supported |
+| [MetaMask](https://metamask.io)          | Browser / mobile                    | Supported |
+| [Zerion](https://zerion.io)              | Mobile / web portfolio wallet       | Supported |
+| [Rainbow](https://rainbow.me)            | Mobile wallet                       | Supported |
+| [Bitget Wallet](https://web3.bitget.com) | Mobile / web wallet                 | Supported |
+| [imToken](https://token.im)              | Mobile wallet                       | Supported |
 
 ---
 
 ## Developer Tooling
 
-| Tool                                                 | Type                               | Get Started                                                                        | Mainnet   |
-| ---------------------------------------------------- | ---------------------------------- | ---------------------------------------------------------------------------------- | --------- |
-| [Tenderly](https://tenderly.co)                      | Debugging, simulation, alerts      | [Docs](https://docs.tenderly.co)                                                   | Planned   |
-| [mega-evm](https://github.com/megaeth-labs/mega-evm) | EVM debugger / tx replay           | [Docs](https://github.com/megaeth-labs/mega-evm/blob/main/bin/mega-evme/README.md) | Supported |
-| [Blocksec Phalcon](https://blocksec.com/phalcon)     | Transaction debugging & simulation | [App](https://blocksec.com/phalcon/explorer)                                       | Supported |
+| Tool                                                   | Type                                                         | Get Started                                                                        | Mainnet   |
+| ------------------------------------------------------ | ------------------------------------------------------------ | ---------------------------------------------------------------------------------- | --------- |
+| [MOSS SDK](https://joinmoss.megaeth.com)               | TypeScript SDK, React hooks, wagmi connector                 | [Docs](https://docs.megaeth.com/moss-docs)                                         | Supported |
+| [MOSS CLI](https://github.com/megaeth-labs/wallet-cli) | Scoped delegated keys, transfers, contract calls, automation | [Docs](https://docs.megaeth.com/moss-docs/wallet/cli)                              | Supported |
+| [Tenderly](https://tenderly.co)                        | Debugging, simulation, alerts                                | [Docs](https://docs.tenderly.co)                                                   | Planned   |
+| [mega-evm](https://github.com/megaeth-labs/mega-evm)   | EVM debugger / tx replay                                     | [Docs](https://github.com/megaeth-labs/mega-evm/blob/main/bin/mega-evme/README.md) | Supported |
+| [Blocksec Phalcon](https://blocksec.com/phalcon)       | Transaction debugging & simulation                           | [App](https://blocksec.com/phalcon/explorer)                                       | Supported |
 
 ---
 
