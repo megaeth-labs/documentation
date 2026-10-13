@@ -26,26 +26,31 @@ Any client — an operator running [`stateless-validator`](https://github.com/me
 `<keys>` is a JSON object that identifies the block.
 `blockNumber` is always required; pair it with `blockHash` to pin the witness to a specific block.
 
-| Field         | Type              | Required | Description                                                                                             |
-| ------------- | ----------------- | -------- | ------------------------------------------------------------------------------------------------------- |
-| `blockNumber` | `Quantity` (hex)  | Yes      | Block number, 0x-prefixed lowercase hex (e.g. `"0x7fd"`).                                               |
-| `blockHash`   | `Data` (32 bytes) | No       | 0x-prefixed lowercase hash of the block to fetch the witness for. Pins the result, so it is reorg-safe. |
+| Field         | Type              | Required | Description                                                                                                        |
+| ------------- | ----------------- | -------- | ------------------------------------------------------------------------------------------------------------------ |
+| `blockNumber` | `Quantity` (hex)  | Yes      | Block number, 0x-prefixed lowercase hex (e.g. `"0x7fd"`).                                                          |
+| `blockHash`   | `Data` (32 bytes) | No       | 0x-prefixed lowercase hash of the block to fetch the witness for. Pins the requested block identity across reorgs. |
 
 ### Lookup modes
 
-The combination of fields chosen determines the lookup mode.
-**Always pass `blockHash` when one is available.**
-The `blockNumber`-only mode does not pin the result to a specific block and can return a witness for the wrong fork.
+As of mega-reth v2.2.1, a number-only lookup resolves the node's local canonical hash before selecting a witness.
+**Pass `blockHash` when you need a specific block.**
 
-| Mode                        | Recommendation | When to use                                                                                                                                                                                                                                                   |
-| --------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `blockNumber` + `blockHash` | **Preferred**  | The caller already knows the canonical block hash (e.g. fetched from `eth_getBlockByNumber` first). The witness is pinned to that exact block, so the result is reorg-safe.                                                                                   |
-| `blockNumber`               | **Avoid**      | Last-resort convenience. The backend returns the first stored witness it finds at that height — there is **no guarantee** the returned witness is for the block you expect. Only use when you cannot obtain a hash and can independently verify the response. |
+| Mode                        | Selection                                                                | When to use                                                |
+| --------------------------- | ------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| `blockNumber` + `blockHash` | Matches the supplied block hash                                          | The caller already knows the block it wants to verify      |
+| `blockNumber`               | Resolves the local canonical hash at that height, then matches that hash | The caller wants the node's canonical block at lookup time |
 
-{% hint style="warning" %}
-Calling `mega_getBlockWitness` with `blockNumber` only is unsafe for any caller that needs a specific block.
-The server returns the first witness it finds at that height, which is non-deterministic, may correspond to a non-canonical fork, and may change between calls.
-Always pair `blockNumber` with `blockHash` unless you are willing to validate the response yourself (e.g. by re-deriving the block hash from the returned witness against an independently-trusted header).
+If the canonical hash is unknown, the number-only lookup returns `result: null`, even if stored witnesses exist at that height.
+This can happen during resynchronization after an unwind or when the requested height is beyond the local head.
+Retry after the node catches up.
+When the canonical hash is known, the handler returns its matching witness, or `null` if that witness is unavailable; it does not fall back to the first stored row or an orphaned witness.
+
+{% hint style="info" %}
+A number-only lookup follows the node's canonical view, which can change across a reorg.
+Supplying `blockHash` pins the requested block identity; it does not guarantee that the block remains canonical.
+Hash-keyed and payload-keyed lookups are unchanged by v2.2.1.
+For all supported selectors, see the [RPC reference](../dev/rpc/reference/mega_getBlockWitness.md).
 {% endhint %}
 
 ### Examples
@@ -64,7 +69,7 @@ Always pair `blockNumber` with `blockHash` unless you are willing to validate th
 
 {% endtab %}
 
-{% tab title="By block number only (unsafe)" %}
+{% tab title="By block number (local canonical)" %}
 
 ```json
 [{ "blockNumber": "0x7fd" }]
@@ -75,7 +80,7 @@ Always pair `blockNumber` with `blockHash` unless you are willing to validate th
 
 ## Response
 
-The response `result` is a single string of the form `<version>:<base64-payload>`.
+When a witness is available, `result` is a string of the form `<version>:<base64-payload>`.
 
 ```json
 {
@@ -90,16 +95,28 @@ The response `result` is a single string of the form `<version>:<base64-payload>
 | `version` | Encoding version. Currently `v0`. Bumped if the witness payload format ever changes — clients must check the prefix.                                                                            |
 | `payload` | Base64-encoded, Zstd-compressed [bincode](https://docs.rs/bincode/2.0.1/bincode) tuple ([`SaltWitness`](#saltwitness--main-state-trie), [`MptWitness`](#mptwitness--withdrawals-storage-trie)). |
 
+When no matching witness is available, the node returns a successful JSON-RPC response with `result: null`:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": null
+}
+```
+
+Handle `null` before decoding the payload.
+It means the witness is unavailable, not a `-32000` or `-32603` error.
+Retry after catch-up for a temporarily unknown canonical hash; missing historical coverage may remain unavailable.
+
 ### Errors
 
-| Code     | Cause                                                                                                         |
-| -------- | ------------------------------------------------------------------------------------------------------------- |
-| `-32602` | Invalid params — malformed JSON, missing `blockNumber`, unparseable hex, or an invalid parameter combination. |
-| `-32603` | Witness not found for the requested keys, or a server-side failure while fetching it.                         |
+| Code     | Cause                                                                                                              |
+| -------- | ------------------------------------------------------------------------------------------------------------------ |
+| `-32602` | Invalid params — malformed parameters, missing `blockNumber`, unparseable hex, or an invalid parameter combination |
+| `-32603` | Internal failure while resolving the canonical hash, reading, or encoding a witness                                |
 
-A missing witness and a server-side fetch failure both surface as `-32603`; the error `message` distinguishes them.
-To treat a missing witness as an expected outcome, match both `code == -32603` and an error `message` containing `Witness not found`.
-Treating `-32603` alone as a hard failure produces false alerts for testnet blocks outside the covered range — see [Historical coverage](#historical-coverage) below.
+Do not match a `Witness not found` error message to detect unavailability; check for `result: null`.
 The RPC layer in front of the witness service may also return standard JSON-RPC transport codes: `-32700` (parse error), `-32600` (invalid request).
 
 ### Historical coverage
@@ -111,11 +128,11 @@ Witness availability on the public RPC depends on the network:
 | Mainnet | All blocks.                                                                                                                                              |
 | Testnet | As of 2026-07-24: block `1000` (a permanent test fixture) and blocks `>= 10325789`. Older testnet witnesses are not guaranteed and cannot be backfilled. |
 
-Requesting a testnet block outside this range typically returns `Witness not found`.
+A request with no available witness returns `result: null`.
 
 ### Decoding pipeline
 
-To turn the response string back into a witness, apply these steps in order:
+After checking for an RPC error or `result: null`, decode an available response string in this order:
 
 1. Verify the string starts with the literal prefix `v0:` and strip it.
 2. Base64-decode the payload (standard alphabet, padded).
@@ -271,7 +288,9 @@ Replace `<BLOCK_NUMBER>` (0x-prefixed lowercase hex) and `<BLOCK_HASH>` with val
 The pipeline below assumes `jq` and `zstd` are on `PATH` — install them via `brew install jq zstd` on macOS or `apt install jq zstd` on Debian/Ubuntu.
 
 ```bash
-curl -sS https://mainnet.megaeth.com/rpc \
+set -euo pipefail
+
+response=$(curl -fsS https://mainnet.megaeth.com/rpc \
   -X POST -H 'Content-Type: application/json' \
   -d '{
     "jsonrpc": "2.0",
@@ -281,8 +300,15 @@ curl -sS https://mainnet.megaeth.com/rpc \
       "blockNumber": "<BLOCK_NUMBER>",
       "blockHash": "<BLOCK_HASH>"
     }]
-  }' \
-  | jq -r '.result' \
+  }')
+
+encoded=$(printf '%s' "$response" | jq -er '
+  if .error then error(.error.message)
+  elif .result == null then error("Witness unavailable; check sync and coverage before retrying")
+  else .result end
+')
+
+printf '%s' "$encoded" \
   | sed 's/^v0://' \
   | base64 --decode \
   | zstd -d \
@@ -293,6 +319,7 @@ curl -sS https://mainnet.megaeth.com/rpc \
 
 ## Related pages
 
+- [mega-reth v2.2.1 witness handler](https://github.com/megaeth-labs/mega-reth/blob/v2.2.1/crates/megaeth/rpc/src/witness.rs) — canonical lookup and nullable response behavior.
 - [Stateless Validation](stateless-validation.md) — the operator guide for the reference client that consumes this RPC.
 - [stateless-validator source](https://github.com/megaeth-labs/stateless-validator) — Rust implementation of the witness fetcher and verifier.
 - [SALT](https://github.com/megaeth-labs/salt) — the authenticated key-value store that produces `SaltWitness`.

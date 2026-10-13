@@ -35,16 +35,24 @@ Block lookup key.
   Payload-attributes hash for an OP payload lookup.
   Must be supplied together with `parentHash` and cannot be combined with `blockHash`.
 
-{% hint style="warning" %}
-A `blockNumber`-only lookup returns the first stored witness at that height and is not reorg-safe.
-Use `blockNumber` together with `blockHash`, or the paired `parentHash` and `attributesHash`, for production verification.
+As of mega-reth v2.2.1, a `blockNumber`-only lookup first resolves the node's local canonical hash at that height.
+If the hash is unknown, it returns `result: null`, even when stored witnesses exist; retry after the node catches up.
+If the hash is known, it returns the witness matching that hash, or `null` if unavailable.
+It does not select the first stored row or fall back to an orphaned witness.
+
+{% hint style="info" %}
+The local canonical view can change across a reorg.
+Use `blockNumber` with `blockHash`, or the paired `parentHash` and `attributesHash`, to pin the requested identity.
+These explicit selectors are unchanged by v2.2.1; pinning a block does not guarantee it remains canonical.
 {% endhint %}
 
 ## Result
 
-**`result`** string
+**`result`** string or `null`
 
-`v0:` followed by a base64-encoded zstd-compressed witness blob.
+When available, `v0:` followed by a base64-encoded zstd-compressed witness blob.
+A missing matching witness, or an unknown canonical hash for a number-only lookup, returns `null` rather than a `-32000` or `-32603` error.
+Check for `null` before decoding; see [witness availability and decoding](../../../node/witness.md#response).
 
 ## Comparison with Ethereum Standard JSON-RPC
 
@@ -64,12 +72,12 @@ The gateway does not cache witness responses. In an outer batch, if any witness 
 
 The `| Scope |` column distinguishes method failures from gateway policy errors.
 
-| Code     | Scope            | Message             | When it happens                                                             |
-| -------- | ---------------- | ------------------- | --------------------------------------------------------------------------- |
-| `-32602` | Request          | Invalid params      | `blockNumber` missing, invalid hex value, or invalid hash field combination |
-| `-32603` | Method           | Internal error      | No witness exists for the requested keys, or the witness service failed     |
-| `-32005` | Transport/policy | Rate limit exceeded | The caller exceeds the public gateway's simple read budget.                 |
-| `-32099` | Transport/policy | Payload too large   | The request body exceeds the 128 KiB public endpoint limit.                 |
+| Code     | Scope            | Message             | When it happens                                                                 |
+| -------- | ---------------- | ------------------- | ------------------------------------------------------------------------------- |
+| `-32602` | Request          | Invalid params      | `blockNumber` missing, invalid hex value, or invalid hash field combination     |
+| `-32603` | Method           | Internal error      | Internal failure resolving the canonical hash, reading, or encoding the witness |
+| `-32005` | Transport/policy | Rate limit exceeded | The caller exceeds the public gateway's simple read budget.                     |
+| `-32099` | Transport/policy | Payload too large   | The request body exceeds the 128 KiB public endpoint limit.                     |
 
 See also [Error Codes](../error-codes.md).
 
@@ -103,9 +111,19 @@ Outcome: success
 }
 ```
 
+An unavailable witness produces this response:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": null
+}
+```
+
 ## Sources
 
 - Spec: EIP-1474 for JSON-RPC framing and error conventions; this method is an extension or legacy compatibility method.
-- Code: `git@github.com:megaeth-labs/mega-reth.git @ ab60376631228edab3a6df180f295280bad26e93: crates/megaeth/rpc/src/witness.rs`
+- Code: [mega-reth v2.2.1 witness handler](https://github.com/megaeth-labs/mega-reth/blob/v2.2.1/crates/megaeth/rpc/src/witness.rs) — selector resolution and nullable results.
 - Code: `git@github.com:megaeth-labs/mega-rpc.git @ 06aa35aa95d569c227cc25d2aa12834eb0458aa0: workers/src/services/batch/batch-processor.ts`
 - Probe: MegaETH Mainnet public endpoint, July 24, 2026
