@@ -29,6 +29,8 @@ description: Developer tooling and infrastructure partners on MegaETH — RPC pr
 | Chainstack     | HTTP               | [Docs](https://chainstack.com/build-better-with-megaeth/)                      | No public endpoint (API key required)                     | Supported |
 | node101        | HTTP               | [Docs](https://node101.io/en/rpc/megaeth)                                      | No public endpoint (paid plan required)                   | Supported |
 | node101        | WebSocket          | [Docs](https://node101.io/en/rpc/megaeth)                                      | No public endpoint (paid plan required)                   | Supported |
+| SwiftNodes     | HTTP               | [Docs](https://swiftnodes.io/megaeth-rpc)                                      | No public endpoint (API key required)                     | Supported |
+| SwiftNodes     | WebSocket          | [Docs](https://swiftnodes.io/megaeth-rpc)                                      | No public endpoint (API key required)                     | Supported |
 
 ---
 
